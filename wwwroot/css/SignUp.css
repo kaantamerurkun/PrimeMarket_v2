@@ -1,0 +1,56 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+}
+
+#signup-btn {
+    margin-top: 10px;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #4caf50;
+    color: white;
+    cursor: pointer;
+}
+
+    #signup-btn:disabled {
+        cursor: not-allowed;
+        background-color: #ccc;
+    }
+
+        #signup-btn:disabled:hover {
+            background-color: #ccc;
+        }
+
+#agree-btn:hover {
+    background-color: #45a049;
+}
+
+#signup-btn:hover {
+    background-color: #45a049;
+}
+
+.terms-box {
+    border: 2px solid #ccc;
+    background-color: #f9f9f9;
+    max-width: 900px;
+    overflow-y: auto;
+    height: 300px;
+}
+
+    .terms-box p {
+        line-height: 1.5;
+    }
+
+h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}

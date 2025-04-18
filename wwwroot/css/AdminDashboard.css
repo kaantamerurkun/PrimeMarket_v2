@@ -1,0 +1,477 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+}
+.main-header {
+    background: #f0f8ff;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.btn-listing-back {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: white;
+    color: #333;
+    cursor: pointer;
+    margin-bottom: 20px;
+    display: inline-block;
+}
+
+    .btn-listing-back:hover {
+        background: #007bff;
+        color: white;
+        transition: 0.3s;
+    }
+
+.dashboard {
+    display: flex;
+    margin-top: 80px;
+}
+
+.sidebar {
+    width: 200px;
+    background: #fff;
+    padding: 20px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px;
+}
+
+    .sidebar ul {
+        list-style: none;
+    }
+
+    .sidebar li {
+        padding: 10px;
+        cursor: pointer;
+        color: #333;
+    }
+
+        .sidebar li:hover,
+        .sidebar li.active {
+            background-color: #f0f8ff;
+            font-weight: bold;
+        }
+
+.dashboard-content {
+    flex: 1;
+    padding: 20px;
+}
+
+.section {
+    display: none;
+}
+
+    .section.active {
+        display: block;
+    }
+
+/* User ID Card Styling */
+.user-id-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+    .user-id-card:hover {
+        transform: translateY(-5px);
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    }
+
+.user-info {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    font-weight: bold;
+    font-size: 18px;
+    margin-right: 10px;
+}
+
+.id-images-container {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.id-image-wrapper {
+    flex: 1;
+}
+
+    .id-image-wrapper p {
+        margin: 0 0 5px 0;
+        font-size: 14px;
+        color: #666;
+    }
+
+.user-id-image {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.actions {
+    display: none;
+    margin-top: 15px;
+    justify-content: space-between;
+}
+
+.btn-approve {
+    padding: 8px 16px;
+    background: #2CB736;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-reject {
+    padding: 8px 16px;
+    background: #FF5252;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-approve:hover {
+    background: #259b2d;
+}
+
+.btn-reject:hover {
+    background: #e04848;
+}
+
+/* Modal styling */
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 100;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+.modal-content {
+    background-color: #f0f8ff;
+    margin: 5% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 70%;
+    max-width: 800px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.close {
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.modal-images {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.modal-image-container {
+    flex: 1;
+}
+
+    .modal-image-container h4 {
+        margin-top: 0;
+        margin-bottom: 10px;
+    }
+
+.modal-image {
+    width: 100%;
+    max-height: 300px;
+    object-fit: contain;
+    border-radius: 4px;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+/* Reject reasons checklist */
+.reject-reasons {
+    display: none;
+    margin-top: 20px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+    .reject-reasons h3 {
+        margin-bottom: 10px;
+    }
+
+.reasons-checklist {
+    max-height: 200px;
+    overflow-y: auto;
+    padding-right: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    padding: 10px;
+}
+
+.reason-item {
+    margin-bottom: 8px;
+}
+
+    .reason-item label {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+
+.btn-confirm-reject {
+    margin-top: 15px;
+    padding: 8px 16px;
+    background: #FF5252;
+    color: white;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+}
+
+/* Approval feedback */
+.approval-message {
+    display: none;
+    padding: 15px;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 4px;
+    margin-top: 15px;
+    text-align: center;
+}
+
+/* Active card state */
+.user-id-card.active {
+    border: 2px solid #0066cc;
+}
+
+.expanded-view {
+    padding: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    margin-top: 20px;
+    display: none;
+}
+
+/* Listing card styles */
+.item-card {
+    background: white;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    padding: 15px;
+    margin-bottom: 20px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+    .item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px;
+    }
+
+.listing-details {
+    display: none;
+    padding: 20px;
+    background: white;
+    margin-top: 20px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px;
+}
+
+    .listing-details.active {
+        display: block;
+    }
+
+.reject-checklist {
+    display: none;
+    margin-top: 15px;
+    padding: 15px;
+    background: #f9f9f9;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+}
+
+    .reject-checklist.active {
+        display: block;
+    }
+
+.reject-reason {
+    margin-bottom: 10px;
+}
+
+    .reject-reason label {
+        margin-left: 5px;
+        cursor: pointer;
+    }
+
+.admin-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+}
+
+/* Listing details styles */
+.breadcrumb {
+    margin-bottom: 20px;
+    color: #666;
+}
+
+    .breadcrumb a {
+        color: #0066cc;
+        text-decoration: none;
+    }
+
+.listing-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .listing-header h1 {
+        margin: 0;
+        font-size: 24px;
+    }
+
+.price {
+    font-size: 24px;
+    font-weight: bold;
+    color: #2CB736;
+}
+
+.image-gallery {
+    margin-bottom: 20px;
+}
+
+.main-image {
+    width: 100%;
+    height: 400px;
+    object-fit: cover;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.thumbnail-container {
+    display: flex;
+    gap: 10px;
+}
+
+    .thumbnail-container img {
+        width: 100px;
+        height: 75px;
+        object-fit: cover;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: opacity 0.3s;
+    }
+
+        .thumbnail-container img:hover {
+            opacity: 0.8;
+        }
+
+.property-details {
+    background-color: ##f0f8ff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #f0f8ff;
+    border-radius: 4px;
+}
+
+    .detail-item .label {
+        color: #666;
+    }
+
+    .detail-item .value {
+        font-weight: bold;
+    }
+
+.items-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+}
+
+.btn-logoutadmin {
+    padding: 8px 16px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    background: white;
+    cursor: pointer;
+}
+
+    .btn-logoutadmin:hover {
+        background: #FEBA00;
+        transition: 0.3s;
+        color: white;
+    }
+

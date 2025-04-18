@@ -1,0 +1,94 @@
+﻿/* Reset and Base Styling */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    min-height: 100vh;
+    padding-top: 40px;
+}
+
+/* Logo */
+.logo {
+    margin-bottom: 20px;
+}
+
+/* Payment Card Container */
+.payment-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+    width: 100%;
+    max-width: 500px;
+    text-align: left;
+}
+
+    /* Title */
+    .payment-card h2 {
+        margin-bottom: 25px;
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: #222;
+    }
+
+/* Form Labels & Inputs */
+label {
+    display: block;
+    margin-bottom: 6px;
+    font-weight: 600;
+}
+
+input[type="text"],
+input[type="tel"],
+input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 20px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+}
+
+/* Button */
+.pay-button {
+    width: 100%;
+    padding: 14px;
+    background-color: #0066d9;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+    .pay-button:hover {
+        background-color: #0052b4;
+    }
+
+/* Responsive Design */
+@media (max-width: 600px) {
+    .payment-card {
+        padding: 20px;
+    }
+
+        .payment-card h2 {
+            font-size: 1.3rem;
+        }
+
+    input[type="text"],
+    input[type="tel"],
+    input[type="password"] {
+        font-size: 0.95em;
+    }
+}

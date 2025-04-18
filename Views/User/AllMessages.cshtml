@@ -1,0 +1,31 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href=/css/AllMessages.css />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Messages</title>
+</head>
+<body>
+    <h2>All Messages</h2>
+    <div class="dashboard-container">
+        <div class="summary-cards">
+            <a asp-action="LiveChat" asp-controller="User">
+            <div class="card">
+                <div class="card-title">John Doe</div>
+                <div class="card-value neutral">Message 1 Content</div>
+            </div>
+            </a>
+            <a asp-action="LiveChat" asp-controller="User">
+            <div class="card">
+                <div class="card-title">Brad Pitt</div>
+                <div class="card-value neutral">Message 2 Content</div>
+            </div>
+            </a>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,89 @@
+﻿@{
+    ViewBag.Title = "Email Verification";
+    var email = ViewBag.Email as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="/css/EmailVerification.css" />
+</head>
+<body>
+    <div class="container" id="codeSection">
+        <br /><br /><br />
+        <center>
+            <div style="padding-top: 20px">
+                <a>
+                    <img style="height: 200px" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" />
+                </a>
+                <h2>Enter the 6-digit Verification Code</h2>
+                <form id="codeForm">
+                    <label for="verificationCode">Verification Code</label>
+                    <input class="search-box-input"
+                           type="text"
+                           id="verificationCode"
+                           name="verificationCode"
+                           maxlength="6"
+                           required
+                           placeholder="Enter code"
+                           style="padding: 8px 16px;
+                                  border: 1px solid #ddd;
+                                  border-radius: 20px;
+                                  width: 250px;
+                                  outline: none;
+                                  transition: border-color 0.3s ease;" />
+                    <br /><br />
+                    <input type="hidden" id="email" value="@email" />
+                    <div>
+                        <button class="send-btn" type="submit">Verify</button>
+                    </div>
+                </form>
+            </div>
+        </center>
+    </div>
+
+    <script>
+        // Auto-send verification code when page loads
+        window.addEventListener("DOMContentLoaded", function () {
+            const email = document.getElementById("email").value;
+
+            fetch('/User/SendVerificationCode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to send code.");
+                return res.json();
+            })
+            .then(() => {
+                console.log("Verification code sent to:", email);
+            })
+            .catch(err => {
+                console.error(err);
+                alert("Failed to send verification code. Please refresh the page and try again.");
+            });
+        });
+
+        // Handle form submission for code verification
+        document.getElementById("codeForm").addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const code = document.getElementById("verificationCode").value;
+
+            fetch('/User/VerifyEmailCode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email, code })
+            })
+            .then(res => res.ok ? res.json() : Promise.reject())
+            .then(data => window.location.href = data.redirectUrl)
+            .catch(() => alert("Invalid or expired verification code."));
+        });
+    </script>
+</body>
+</html>

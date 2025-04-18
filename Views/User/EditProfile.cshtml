@@ -1,0 +1,190 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Edit Profile</title>
+    <link rel="stylesheet" href="/css/EditProfile.css" />
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="User_MainPage" asp-controller="User" class="logo">
+                <img style="height: 50px; width: 100px; background-color:#f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <div class="search-box">
+                    <a asp-action="Search_Page" asp-controller="Home">
+                        <input type="text" placeholder="Search for a listed item" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="min-h-screen">
+        <div class="container">
+            <div class="profile-card">
+                <h1>Edit Profile</h1>
+
+                <!-- Tabs -->
+                <div class="tabs">
+                    <button class="tab active" data-tab="profile">
+                        <img src="https://picsum.photos/20" alt="Profile" class="tab-icon">
+                        <span>Profile Info</span>
+                    </button>
+                    <button class="tab" data-tab="email">
+                        <img src="https://picsum.photos/20" alt="Email" class="tab-icon">
+                        <span>Email Address</span>
+                    </button>
+                    <button class="tab" data-tab="password">
+                        <img src="https://picsum.photos/20" alt="Password" class="tab-icon">
+                        <span>Password</span>
+                    </button>
+                    <button class="tab" data-tab="verify">
+                        <img src="https://picsum.photos/20" alt="Verify" class="tab-icon">
+                        <span>Verify Account</span>
+                    </button>
+                </div>
+
+                <!-- Profile Tab -->
+                <div class="tab-content active" id="profile-tab">
+                    <div class="profile-info">
+                        <div class="profile-image-container">
+                            <img src="https://picsum.photos/200" alt="Profile" class="profile-image" id="profile-image">
+                            <button class="camera-button">
+                                <img src="/images/verified.png" alt="Camera" class="camera-icon">
+                            </button>
+                        </div>
+                        <div class="name-fields">
+                            <div class="input-group">
+                                <label>First Name</label>
+                                <input type="text" value="Sami">
+                            </div>
+                            <div class="input-group">
+                                <label>Last Name</label>
+                                <input type="text" value="Yilmaz">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Email Tab -->
+                <div class="tab-content" id="email-tab">
+                    <div class="input-group">
+                        <label>Current Email</label>
+                        <input type="email" value="sami-48-yilmaz@hotmail.com" disabled>
+                    </div>
+                    <div class="input-group">
+                        <label>New Email</label>
+                        <input type="email" placeholder="Enter new email address">
+                    </div>
+                </div>
+
+                <!-- Password Tab -->
+                <div class="tab-content" id="password-tab">
+                    <div class="input-group">
+                        <label>Current Password</label>
+                        <input type="password">
+                    </div>
+                    <div class="input-group">
+                        <label>New Password</label>
+                        <input type="password">
+                    </div>
+                    <div class="input-group">
+                        <label>Confirm New Password</label>
+                        <input type="password">
+                    </div>
+                </div>
+
+                <!-- Verify Tab -->
+                <div class="tab-content" id="verify-tab">
+                    <h2>Verify Your Account</h2>
+                    <form id="verification-form" enctype="multipart/form-data">
+                        <div class="input-group">
+                            <label for="idFront">Upload Front of ID:</label>
+                            <input type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" required />
+                        </div>
+                        <div class="input-group">
+                            <label for="idBack">Upload Back of ID:</label>
+                            <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" required />
+                        </div>
+                        <div class="button-container">
+                            <button type="submit" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Save Button - Hidden on Verify Tab -->
+                <div class="button-container" id="save-button-container">
+                    <button id="saveChangesBtn" class="btn-savechangesandgoprofile">Save Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Tab switching functionality
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        const saveButtonContainer = document.getElementById('save-button-container');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(content => content.classList.remove('active'));
+
+                tab.classList.add('active');
+                const tabId = `${tab.dataset.tab}-tab`;
+                document.getElementById(tabId).classList.add('active');
+
+                // Hide Save Changes button on Verify tab
+                if (tab.dataset.tab === "verify") {
+                    saveButtonContainer.style.display = "none";
+                } else {
+                    saveButtonContainer.style.display = "block";
+                }
+            });
+        });
+
+        // Profile image upload
+        const profileImage = document.querySelector('#profile-image');
+        const cameraButton = document.querySelector('.camera-button');
+
+        cameraButton.addEventListener('click', () => {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = 'image/*';
+
+            input.onchange = (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (e) => {
+                        profileImage.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            };
+
+            input.click();
+        });
+
+        // Save Changes button behavior
+        const saveChangesBtn = document.getElementById('saveChangesBtn');
+        if (saveChangesBtn) {
+            saveChangesBtn.addEventListener('click', () => {
+                alert('Changes saved successfully!');
+                // Add actual saving logic here if needed
+            });
+        }
+
+        // Verification form submission
+        document.getElementById("verification-form").addEventListener("submit", function (e) {
+            e.preventDefault();
+            alert("Verification images sent successfully.");
+            // Add actual verification submission logic here if needed
+        });
+    </script>
+</body>
+</html>

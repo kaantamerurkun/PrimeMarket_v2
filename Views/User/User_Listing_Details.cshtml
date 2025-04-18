@@ -1,0 +1,149 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Listing</title>
+    <link rel="stylesheet" href="/css/UserListingDetails.css">
+    <style>
+        .btn-buynow {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+        }
+
+            .btn-buynow:hover {
+                background: #2CB736;
+                transition: 0.3s;
+                color: white;
+            }
+    </style>
+</head>
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+                <nav class="breadcrumb">
+            <a href="#">First-Hand</a> &gt;
+            <a href="#">Electronics</a> &gt;
+            <a href="#">White Goods</a> &gt;
+            <a href="#">Ovens</a>
+        </nav>
+
+        <div class="listing-header">
+            <h1>2+1 Apartment in Menteşe</h1>
+            <div class="price">3.900.000 TL</div>
+        </div>
+
+        <div class="main-content">
+            <div class="image-gallery">
+                <img src="https://picsum.photos/800/600" alt="Property Image" class="main-image">
+                <div class="thumbnail-container">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 1">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 2">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 3">
+                </div>
+            </div>
+
+            <div class="property-details">
+                <div class="detail-item">
+                    <span class="label">Area (Gross):</span>
+                    <span class="value">102 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Area (Net):</span>
+                    <span class="value">90 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Rooms:</span>
+                    <span class="value">2+1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Floor:</span>
+                    <span class="value">1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Building Age:</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Heating:</span>
+                    <span class="value">Combi Boiler</span>
+                </div>
+                <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 10px" class="bookmark-btn-container">
+                        <button style="display: flex;flex: 0 0 30%;font-size:0.8em" class="btn-bookmark">Add to Bookmark</button>
+                    <a asp-action="PaymentPage" asp-controller="User">
+                        <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-info">
+            <div class="agent-card">
+                <img src="https://picsum.photos/100/100" alt="Agent Photo" class="agent-photo">
+                <div class ="agent-details">
+                    <h3>Real Estate Agent</h3>
+                    <p class="phone">0 (542) 220 35 58</p>
+                    <a asp-action="LiveChat" asp-controller="User">
+                    <button class="btn-sendmessage">Send Message</button>
+                    </a>
+                    <!-- Make an Offer Button -->
+                    <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
+
+                    <!-- Offer Modal -->
+                    <div id="offerModal" class="modal">
+                        <div class="modal-content">
+                            <span class="close-btn" onclick="closeOfferModal()">&times;</span>
+                            <h2>Make an Offer</h2>
+                            <form id="offerForm">
+                                <label for="offerAmount">Your Offer (TL):</label>
+                                <input style="border-radius:50px; padding:5px" type="number" id="offerAmount" name="offerAmount" required min="1">
+                                <br><br>
+                                <label for="offerMessage">Message (optional):</label><br>
+                                <textarea id="offerMessage" name="offerMessage" rows="4" cols="40"></textarea>
+                                <br><br>
+                                <button type="submit" class="btn-sendmessage">Send Offer</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+                function openOfferModal() {
+          document.getElementById('offerModal').style.display = 'block';
+        }
+
+        function closeOfferModal() {
+          document.getElementById('offerModal').style.display = 'none';
+        }
+
+        // Optional: close modal when clicking outside of it
+        window.onclick = function(event) {
+          const modal = document.getElementById('offerModal');
+          if (event.target === modal) {
+            closeOfferModal();
+          }
+        }
+
+        // Handle form submission
+        document.getElementById("offerForm").addEventListener("submit", function(e) {
+          e.preventDefault();
+          const amount = document.getElementById("offerAmount").value;
+          const message = document.getElementById("offerMessage").value;
+          alert(`Offer sent!\nAmount: ${amount + " TL"}\nMessage: ${message}`);
+          closeOfferModal();
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,37 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+}
+
+.star-rating {
+    display: flex;
+    gap: 10px;
+    cursor: pointer;
+    margin: 8px 0;
+}
+
+    .star-rating .star {
+        font-size: 45px !important; /* Important to override inline styles */
+        color: #ddd !important; /* Light gray for default state */
+        transition: color 0.2s ease;
+    }
+
+        .star-rating .star.hover {
+            color: #FEBA00 !important; /* Yellow for hover state */
+        }
+
+        .star-rating .star.selected {
+            color: #FEBA00 !important; /* Yellow for selected state */
+        }
+
+.seller-rating {
+    margin-top: 10px;
+    font-size: 16px;
+    color: #333;
+}

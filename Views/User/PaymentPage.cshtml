@@ -1,0 +1,119 @@
+﻿
+    @{
+        ViewBag.Title = "Payment";
+        Layout = null;
+    }
+
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Payment</title>
+        <link rel="stylesheet" href="/css/PaymentPage.css" />
+    </head>
+    <body>
+
+        <!-- Logo -->
+        <div class="logo">
+            <a asp-action="User_MainPage" asp-controller="User">
+            <img src="/images/PrimeMarket_Logo_V2.png" alt="Prime Market Logo" style="height: 80px;">
+            </a>
+        </div>
+
+        <!-- Payment Card -->
+        <div class="payment-card">
+        <h2 id="payment-title">Complete Your Payment</h2>
+
+        <form method="post" action="/Payment/Submit" id="payment-form">
+            <div class="input-group">
+                <label for="fullname">Full Name</label>
+                <input type="text" id="fullname" name="fullname" placeholder="Full Name" required />
+            </div>
+
+            <div class="input-group">
+                <label for="cardnumber">Card Number</label>
+                <input type="tel" id="cardnumber" name="cardnumber" placeholder="1234 5678 9012 3456" required />
+            </div>
+
+            <div class="input-group">
+                <label for="expiry">Expiry Date</label>
+                <input type="text" id="expiry" name="expiry" placeholder="MM/YY" required />
+            </div>
+
+            <div class="input-group">
+                <label for="cvv">CVV</label>
+                <input type="password" id="cvv" name="cvv" placeholder="CVV" required />
+            </div>
+
+            <button type="submit" class="pay-button" id="submitButton">Pay Now</button>
+        </form>
+        </div>
+
+        <!-- Hidden success message -->
+        <div id="success-message" style="display: none; text-align: center; margin-top: 20px;">
+            <h2>Payment Successful!</h2>
+            <p>Thank you for your payment.</p>
+        </div>
+
+
+
+    <script>
+        // Format card number with spaces
+        document.getElementById('cardnumber').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '').slice(0, 16);
+            if (value.length > 0) {
+                value = value.match(/.{1,4}/g).join(' ');
+            }
+            e.target.value = value;
+        });
+
+        // Format expiry date to MM/YY
+        document.getElementById('expiry').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, '').slice(0, 4);
+            if (value.length >= 3) {
+                value = value.slice(0, 2) + '/' + value.slice(2);
+            }
+            e.target.value = value;
+        });
+
+        // Allow only numbers in CVV
+        document.getElementById('cvv').addEventListener('input', function (e) {
+            e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
+        });
+
+        // Simulate payment processing
+        document.getElementById('payment-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const submitButton = document.getElementById('submitButton');
+            const paymentForm = document.getElementById('payment-form');
+            const successMessage = document.getElementById('success-message');
+            const paymentTitle = document.getElementById('payment-title');
+
+            submitButton.disabled = true;
+            submitButton.innerHTML = `<div class="spinner" style="display:inline-block;width:16px;height:16px;border:2px solid #fff;border-radius:50%;border-top:2px solid transparent;margin-right:8px;animation:spin 0.6s linear infinite;"></div> Processing...`;
+
+        setTimeout(() => {
+            paymentForm.style.display = 'none';
+            paymentTitle.style.display = 'none';
+            successMessage.style.display = 'block';
+
+            // Redirect after a short delay (e.g., 1 second)
+            setTimeout(() => {
+                window.location.href = '/User/User_MainPage'; // or any other route you want
+            }, 1000);
+        }, 2000);
+        });
+
+        // Spinner animation
+        const style = document.createElement('style');
+        style.textContent = `
+        @@keyframes spin {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+            </body>
+
+    </html>

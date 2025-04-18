@@ -1,0 +1,100 @@
+﻿@model PrimeMarket.Controllers.SignUpViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - PrimeMarket</title>
+    <link rel="stylesheet" href="/css/SignUp.css">
+</head>
+<body>
+    <div style="display: flex; justify-content: center; padding-top: 20px">
+        <a><img height="150" width="175" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" /></a>
+    </div>
+    <br />
+    <h2>Sign Up</h2>
+
+    <form asp-action="SignUp" asp-controller="User" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="All" class="text-danger"></div>
+
+        <div style="display: flex; justify-content: center; align-items: center; gap: 150px; margin-top: 50px;">
+            <!-- First column -->
+            <div>
+                <p>First Name</p>
+                <input asp-for="FirstName" class="form-control" placeholder="Enter first name"
+                       style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 250px;" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+
+                <br><br>
+
+                <p>Last Name</p>
+                <input asp-for="LastName" class="form-control" placeholder="Enter last name"
+                       style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 250px;" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+
+                <br><br>
+
+                <p>Email</p>
+                <input asp-for="Email" class="form-control" placeholder="Enter email"
+                       style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 250px;" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+
+                <br><br>
+
+                <p>Password</p>
+                <input asp-for="Password" class="form-control" placeholder="Enter password"
+                       style="padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px; width: 250px;" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+
+                <br><br>
+
+                <div style="display: flex; align-items: center;">
+                    <input asp-for="AgreeToTerms" type="checkbox" id="termsCheckbox" />
+                    <label for="termsCheckbox" style="margin-left: 10px">Agree to the Terms Of Condition</label>
+                </div>
+                <span asp-validation-for="AgreeToTerms" class="text-danger"></span>
+
+                <br />
+
+                <div style="display: flex; justify-content: center;">
+                    <button type="submit" id="signup-btn" disabled
+                            style="cursor: pointer; padding: 8px 16px; border: 1px solid #ddd; border-radius: 20px;">
+                        Sign Up
+                    </button>
+                </div>
+                <br />
+                <p>Already have an account? <a asp-action="Login" asp-controller="User">Login</a></p>
+            </div>
+
+            <!-- Terms column -->
+            <div>
+                <p style="text-align: center;">Terms Of Conditions For PrimeMarket</p>
+                <br>
+                <div class="terms-box" style="border-radius:20px; padding:10px; width:120%">
+                    <pre style="white-space: pre-wrap;">
+Terms and Conditions 
+(That You Won’t Read Anyway)
+...
+[Leave the full terms content as you already have it]
+...
+                    </pre>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const checkbox = document.getElementById('termsCheckbox');
+            const signupButton = document.getElementById("signup-btn");
+
+            checkbox.addEventListener("change", () => {
+                signupButton.disabled = !checkbox.checked;
+            });
+        });
+    </script>
+</body>
+</html>

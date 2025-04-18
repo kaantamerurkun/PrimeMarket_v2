@@ -1,0 +1,111 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+}
+body.search-body {
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    background-color: #eaf6fd;
+    font-family: 'Segoe UI', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-header {
+    height: 70px;
+    background-color: #eaf6fd;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 15px 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+}
+
+    .main-header img {
+        height: 50px;
+    }
+
+    .main-header h1 {
+        font-size: 24px;
+        font-weight: bold;
+        margin: 0;
+        cursor: pointer;
+    }
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.search-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.search-bar {
+    display: flex;
+    background-color: white;
+    border-radius: 30px;
+    padding: 5px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    transition: box-shadow 0.3s ease;
+}
+
+    .search-bar.focused {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .search-bar input {
+        border: none;
+        padding: 10px 15px;
+        border-radius: 30px 0 0 30px;
+        outline: none;
+        font-size: 14px;
+        flex: 1;
+    }
+
+    .search-bar button {
+        border: none;
+        padding: 10px 20px;
+        background-color: #ff4d4f;
+        color: white;
+        border-radius: 0 30px 30px 0;
+        font-size: 14px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .search-bar button:hover {
+            background-color: #e04344;
+        }
+
+.search-bar.focused {
+    position: fixed;
+    top: 14%; /* yukarı çıkma miktarı ayarlıyoruz */
+    left: 50%;
+    transform: translateX(-50%); /* kodun calısması içingerekli */
+    z-index: 1000;
+    max-width: 50%; /* değişim */
+}

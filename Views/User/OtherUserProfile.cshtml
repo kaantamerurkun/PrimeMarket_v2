@@ -1,0 +1,145 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/OtherUserProfile.css" />
+
+    <title>Other User Profile</title>
+</head>
+
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
+        <div style="margin-right: 20px; margin-left: 300px">
+            <img src="/images/PrimeMarket_Logo_V2.png" alt="Profile Pic" width="350px" height="350px" />
+        </div>
+
+        <div style="flex: 1; text-align: left">
+            <br>
+            <p><strong>Name:</strong>Name</p>
+            <p><strong>Last Name:</strong> LastName</p>
+            <br />
+            <p><strong>Email:</strong> NameLastname@gmail.com</p>
+            <br />
+            <p><strong>Phone Number:</strong> 999999999</p>
+            <br />
+            <div class="seller-rating">
+                <span class="rating-label">Your Rating:</span>
+                <div class="star-rating" id="userRating">
+                    <span class="star" data-value="1">&#9733;</span>
+                    <span class="star" data-value="2">&#9733;</span>
+                    <span class="star" data-value="3">&#9733;</span>
+                    <span class="star" data-value="4">&#9733;</span>
+                    <span class="star" data-value="5">&#9733;</span>
+                </div>
+                <div class="overall-rating" id="overallRatingDisplay">
+                    Overall Rating: <span id="avgRating">0</span>/5 (<span id="ratingCount">0</span> ratings)
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <br>
+    <br>
+    <br>
+    <br />
+    <h2 style="text-align: center">User's' Listings</h2>
+    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
+        @*         @foreach (var recipe in Model.Recipes)
+        {
+            <div class="slider-item">
+                <a asp-controller="Home" asp-action="RecipeDetailsGuest" asp-route-id="@recipe.Id">
+                    <img src="@recipe.ImageUrl" alt="Recipe Image" width="200px" height="200px" />
+                </a>
+                <a asp-controller="Home" asp-action="RecipeDetailsGuest" asp-route-id="@recipe.Id">
+                    <h3>@recipe.Title</h3>
+                </a>
+                <p>@recipe.Instructions</p>
+                <a asp-controller="Home" asp-action="OtherUserProfilePageGuest" asp-route-id="@recipe.User.Id">
+                    <h4 style="margin-left: 20px; color: black">Created by @recipe.User.Username</h4>
+                </a>
+            </div>
+        } *@
+    </div>
+    <br />
+    <script>
+        let selectedRating = 0;
+        let totalRatings = 0;
+        let totalScore = 0;
+
+        const stars = document.querySelectorAll("#userRating .star");
+        const avgRatingEl = document.getElementById("avgRating");
+        const ratingCountEl = document.getElementById("ratingCount");
+
+        // Check if user has already rated
+        const storedRating = localStorage.getItem("userRating");
+
+        if (storedRating) {
+            selectedRating = parseInt(storedRating);
+            totalRatings = 1;
+            totalScore = selectedRating;
+            updateDisplay();
+            highlightStars(selectedRating, false);
+        } else {
+            totalRatings = 0;
+            totalScore = 0;
+        }
+
+        stars.forEach(star => {
+            star.addEventListener("mouseover", () => {
+                const hoverValue = parseInt(star.dataset.value);
+                highlightStars(hoverValue, true);
+            });
+
+            star.addEventListener("mouseout", () => {
+                highlightStars(selectedRating, false);
+            });
+
+            star.addEventListener("click", () => {
+                const newRating = parseInt(star.dataset.value);
+
+                if (localStorage.getItem("userRating")) {
+                    // Update score by subtracting old rating and adding new one
+                    totalScore = totalScore - selectedRating + newRating;
+                } else {
+                    totalRatings++;
+                    totalScore += newRating;
+                }
+
+                selectedRating = newRating;
+                localStorage.setItem("userRating", newRating);
+                updateDisplay();
+                highlightStars(selectedRating, false);
+            });
+        });
+
+        function highlightStars(rating, isHover) {
+            stars.forEach(star => {
+                const val = parseInt(star.dataset.value);
+                if (isHover) {
+                    star.classList.toggle("hover", val <= rating);
+                } else {
+                    star.classList.remove("hover");
+                }
+                star.classList.toggle("selected", val <= rating);
+            });
+        }
+
+        function updateDisplay() {
+            const average = (totalScore / totalRatings).toFixed(1);
+            avgRatingEl.textContent = average;
+            ratingCountEl.textContent = totalRatings;
+        }
+
+    </script>
+</body>
+</html>

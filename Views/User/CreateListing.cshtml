@@ -1,0 +1,644 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create Listing</title>
+    <link rel="stylesheet" href="/css/CreateListing.css" />
+    <link rel="stylesheet" href="/css/messagenotifications.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+</head>
+<body>
+    <center>
+        <main class="container" style="margin-top: 100px;">
+            <div id="categoryHeaderWrapper">
+                <h2>Choose the Category</h2>
+            </div>
+
+            <div id="backToCategory" style="display:none; text-align:center; margin-bottom: 20px;">
+                <button class="btn-back">← Back to Category Selection</button>
+            </div>
+
+            <div class="selection-grid">
+                <div class="selection-column" id="conditions">
+                    <div class="selection-item" data-value="First-Hand">First-Hand</div>
+                    <div class="selection-item" data-value="Second-Hand">Second-Hand</div>
+                </div>
+                <div class="selection-column" id="categories" style="visibility:hidden;"></div>
+                <div class="selection-column" id="subcategories" style="visibility:hidden;"></div>
+                <div class="selection-column" id="details" style="visibility:hidden;"></div>
+            </div>
+
+            <div style="text-align: center;">
+                <button id="continueBtn" class="btn-continue">Continue to Details</button>
+            </div>
+
+            <div id="detailsForm" style="display:none; margin-top: 50px;">
+                <div class="form-wrapper">
+
+                    <h2>Enter Details of the Item</h2>
+                    <form id="listingForm" enctype="multipart/form-data">
+                        <input type="hidden" id="hiddenCondition" name="condition" / style="border-radius:50px;">
+                        <input type="hidden" id="hiddenCategory" name="category" / style="border-radius:50px;">
+                        <input type="hidden" id="hiddenSubcategory" name="subcategory" / style="border-radius:50px;">
+                        <input type="hidden" id="hiddenDetail" name="detail" / style="border-radius:50px;">
+
+                        <label>Images:</label>
+                        <input style="border-radius:50px" type="file" id="images" name="images" multiple accept="image/*" />
+                        <div id="imagePreview" style="display:flex; gap:10px; margin-top:10px;"></div>
+
+                        <label for="title">Title:</label>
+                        <input style="border-radius:50px" type="text" id="title" name="title" placeholder="Enter item title" required />
+
+                        <label for="price">Price (TL):</label>
+                        <input style="border-radius:50px" type="number" id="price" name="price" placeholder="e.g. 100" required min="0" inputmode="decimal" />
+
+                        <label for="description">Description:</label>
+                        <textarea style="border-radius:20px" id="description" name="description" rows="4" placeholder="Describe your item..." required></textarea>
+
+                        <!-- Dynamic fields will be added here -->
+                        <div id="dynamicFields"></div>
+
+                        <label for="location">Location:</label>
+                        <select style="border-radius:50px" id="location" name="location" required>
+                            <option value="">Select Location</option>
+                            <option value="LocationA">Location A</option>
+                            <option value="LocationB">Location B</option>
+                            <option value="LocationC">Location C</option>
+                        </select>
+
+                        <label for="phoneInput">Phone Number:</label>
+                        <div class="phone-wrapper">
+                            <select style="border-radius:50px" id="countrySelect" class="country-select">
+                                <option value="+1">🇺🇸 +1</option>
+                                <option value="+44">🇬🇧 +44</option>
+                                <option value="+49">🇩🇪 +49</option>
+                                <option value="+33">🇫🇷 +33</option>
+                                <option value="+39">🇮🇹 +39</option>
+                                <option value="+34">🇪🇸 +34</option>
+                                <option value="+90" selected>🇹🇷 +90</option>
+                                <option value="+86">🇨🇳 +86</option>
+                                <option value="+81">🇯🇵 +81</option>
+                                <option value="+82">🇰🇷 +82</option>
+                                <option value="+91">🇮🇳 +91</option>
+                                <option value="+7">🇷🇺 +7</option>
+                                <option value="+55">🇧🇷 +55</option>
+                                <option value="+52">🇲🇽 +52</option>
+                                <option value="+61">🇦🇺 +61</option>
+                            </select>
+                            <input style="border-radius:50px" type="tel" id="phoneInput" placeholder="Enter phone number" maxlength="15" />
+                        </div>
+                        <div class="error-message" id="errorMessage"></div>
+
+                        <button type="submit">List the Item</button>
+                    </form>
+                </div>
+            </div>
+
+        </main>
+    </center>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        const allCategories = {
+                  "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
+                  "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
+                  "Electronics": {
+                    "Computer": ["Laptops", "Desktops", "Computer Accessories", "Computer Components", "Monitors"],
+                    "White Goods": ["Fridges", "Washers", "Dishwashers", "Stoves", "Ovens", "Microwave Ovens"],
+                    "Electrical Domestic Appliances": ["Vacuum Cleaner", "Beverage Preparation", "Food Preparation", "Iron", "Sewing Machine"],
+                    "Televisions": [],
+                    "Heating & Cooling": [],
+                    "Cameras": [],
+                    "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
+                  }
+                };
+
+                // Definition of fields for each category/subcategory
+                const categoryFields = {
+                    // Computers
+                    "Laptops": [
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 16GB" },
+                        { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
+                        { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
+                        { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA GTX 1650" },
+                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3200MHz" },
+                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Backlit" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 15.6 inch" },
+                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. Intel i7-12700H" },
+                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 512GB SSD" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Desktops": [
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 32GB" },
+                        { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
+                        { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
+                        { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA RTX 3080" },
+                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3600MHz" },
+                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Mechanical" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 27 inch" },
+                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. AMD Ryzen 9" },
+                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    // Phones
+                    "IOS Phone": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 3200mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.1 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Lightning, USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    "Android Phone": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 108MP quad camera" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 5000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.7 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Other Phones": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 13MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 4000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.5 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 6GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    // Tablets
+                    "IOS Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    "Android Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 8MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 7000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.4 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 64GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Other Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 5MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 6000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 8 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Micro USB" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 3GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    // White Goods
+                    "Washers": [
+                        { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                        { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
+                        { name: "color", label: "Color", type: "text", placeholder: "e.g. White" },
+                        { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 8 kg" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
+                    ],
+                    "Dishwashers": [
+                        { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                        { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
+                        { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
+                        { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 12 place settings" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Fridges": [
+                        { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                        { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 70x180x65 cm" },
+                        { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
+                        { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 350L" },
+                        { name: "freezer", label: "Freezer", type: "select", options: ["Yes", "No"] },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
+                    ],
+                    "Ovens": [
+                        { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A+" },
+                        { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x60x55 cm" },
+                        { name: "color", label: "Color", type: "text", placeholder: "e.g. Black" },
+                        { name: "timer", label: "Timer", type: "select", options: ["Yes", "No"] },
+                        { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 65L" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    // Electrical Domestic Appliances
+                    "Vacuum Cleaner": [
+                        { name: "cableLength", label: "Cable Length", type: "text", placeholder: "e.g. 7m" },
+                        { name: "waterContainer", label: "Water Container", type: "select", options: ["Yes", "No"] },
+                        { name: "weight", label: "Weight", type: "text", placeholder: "e.g. 4.5 kg" },
+                        { name: "power", label: "Power", type: "text", placeholder: "e.g. 900W" },
+                        { name: "dustContainer", label: "Dust Container", type: "text", placeholder: "e.g. 2L" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    // Televisions
+                    "Televisions": [
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 55 inch" },
+                        { name: "smartTV", label: "Smart TV", type: "select", options: ["Yes", "No"] },
+                        { name: "hdmi", label: "HDMI", type: "text", placeholder: "e.g. 3 ports" },
+                        { name: "resolution", label: "Resolution", type: "text", placeholder: "e.g. 4K UHD" },
+                        { name: "displayTechnology", label: "Display Technology", type: "text", placeholder: "e.g. OLED" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ]
+                };
+
+                let selectedCondition = "", selectedCategory = "", selectedSubcategory = "", selectedDetail = "";
+
+                const conditions = document.getElementById("conditions");
+                const categories = document.getElementById("categories");
+                const subcategories = document.getElementById("subcategories");
+                const details = document.getElementById("details");
+                const continueBtn = document.getElementById("continueBtn");
+                const formContainer = document.getElementById("detailsForm");
+                const dynamicFields = document.getElementById("dynamicFields");
+
+                function highlight(section, el) {
+                  document.querySelectorAll(`#${section} .selection-item`).forEach(i => i.classList.remove("selected"));
+                  el.classList.add("selected");
+                }
+
+                function createItem(text) {
+                  const div = document.createElement("div");
+                  div.className = "selection-item";
+                  div.textContent = text;
+                  div.dataset.value = text;
+                  return div;
+                }
+
+                function loadCategories() {
+                  categories.innerHTML = "";
+                  Object.keys(allCategories).forEach(cat => {
+                    categories.appendChild(createItem(cat));
+                  });
+                }
+
+                function loadSubcategories() {
+                  subcategories.innerHTML = "";
+                  details.innerHTML = "";
+                  continueBtn.style.display = "none";
+                  const sub = allCategories[selectedCategory];
+                  if (Array.isArray(sub)) {
+                    sub.forEach(item => subcategories.appendChild(createItem(item)));
+                    subcategories.style.visibility = "visible";
+                    details.style.visibility = "hidden";
+                  } else {
+                    Object.keys(sub).forEach(key => subcategories.appendChild(createItem(key)));
+                    subcategories.style.visibility = "visible";
+                  }
+                }
+
+                function loadDetails() {
+                  details.innerHTML = "";
+                  continueBtn.style.display = "none";
+                  const deep = allCategories[selectedCategory][selectedSubcategory];
+                  if (Array.isArray(deep) && deep.length > 0) {
+                    deep.forEach(item => details.appendChild(createItem(item)));
+                    details.style.visibility = "visible";
+                  } else {
+                    details.style.visibility = "hidden";
+                    continueBtn.style.display = "inline-block";
+                  }
+                }
+
+                function generateDynamicFields() {
+                    dynamicFields.innerHTML = "";
+
+                    // Define which category to get fields for
+                    let fieldsToShow = [];
+
+                    // Look up in our field definitions based on selection
+                    if (selectedDetail && categoryFields[selectedDetail]) {
+                        fieldsToShow = categoryFields[selectedDetail];
+                    } else if (selectedSubcategory && categoryFields[selectedSubcategory]) {
+                        fieldsToShow = categoryFields[selectedSubcategory];
+                    }
+
+                    if (fieldsToShow.length === 0) {
+                        return;
+                    }
+
+                    // Create a heading for the specific fields
+                    const heading = document.createElement("h3");
+                    heading.textContent = "Item Specific Details";
+                    heading.style.marginTop = "20px";
+                    heading.style.marginBottom = "10px";
+                    dynamicFields.appendChild(heading);
+
+                    // Generate fields based on definition
+                    fieldsToShow.forEach(field => {
+                        const fieldContainer = document.createElement("div");
+
+                        const label = document.createElement("label");
+                        label.setAttribute("for", field.name);
+                        label.textContent = field.label;
+                        fieldContainer.appendChild(label);
+
+                        if (field.type === "select") {
+                            const select = document.createElement("select");
+                            select.id = field.name;
+                            select.name = field.name;
+                            select.style.borderRadius = "50px";
+
+                            // Add empty option
+                            const emptyOption = document.createElement("option");
+                            emptyOption.value = "";
+                            emptyOption.textContent = `Select ${field.label}`;
+                            select.appendChild(emptyOption);
+
+                            // Add options from definition
+                            field.options.forEach(option => {
+                                const optionEl = document.createElement("option");
+                                optionEl.value = option;
+                                optionEl.textContent = option;
+                                select.appendChild(optionEl);
+                            });
+
+                            fieldContainer.appendChild(select);
+                        } else {
+                            const input = document.createElement("input");
+                            input.type = field.type;
+                            input.id = field.name;
+                            input.name = field.name;
+                            input.placeholder = field.placeholder || "";
+                            input.style.borderRadius = "50px";
+                            fieldContainer.appendChild(input);
+                        }
+
+                        dynamicFields.appendChild(fieldContainer);
+                    });
+                }
+
+                conditions.addEventListener("click", e => {
+                  if (e.target.classList.contains("selection-item")) {
+                    selectedCondition = e.target.dataset.value;
+                    highlight("conditions", e.target);
+
+                    selectedCategory = "";
+                    selectedSubcategory = "";
+                    selectedDetail = "";
+
+                    categories.innerHTML = "";
+                    subcategories.innerHTML = "";
+                    details.innerHTML = "";
+                    subcategories.style.visibility = "hidden";
+                    details.style.visibility = "hidden";
+                    continueBtn.style.display = "none";
+
+                    categories.style.visibility = "visible";
+                    loadCategories();
+                  }
+                });
+
+                categories.addEventListener("click", e => {
+                  if (e.target.classList.contains("selection-item")) {
+                    selectedCategory = e.target.dataset.value;
+                    highlight("categories", e.target);
+                    loadSubcategories();
+                  }
+                });
+
+                subcategories.addEventListener("click", e => {
+                  if (e.target.classList.contains("selection-item")) {
+                    selectedSubcategory = e.target.dataset.value;
+                    highlight("subcategories", e.target);
+                    const deep = allCategories[selectedCategory][selectedSubcategory];
+                    if (Array.isArray(deep) && deep.length > 0) {
+                      loadDetails();
+                    } else {
+                      selectedDetail = "";
+                      details.style.visibility = "hidden";
+                      continueBtn.style.display = "inline-block";
+                    }
+                  }
+                });
+
+                details.addEventListener("click", e => {
+                  if (e.target.classList.contains("selection-item")) {
+                    selectedDetail = e.target.dataset.value;
+                    highlight("details", e.target);
+                    continueBtn.style.display = "inline-block";
+                  }
+                });
+
+                continueBtn.addEventListener("click", () => {
+                  if (
+                    !selectedCondition ||
+                    !selectedCategory ||
+                    (subcategories.style.visibility === "visible" && !selectedSubcategory) ||
+                    (details.style.visibility === "visible" && details.childElementCount > 0 && !selectedDetail)
+                  ) {
+                    alert("Please make sure to select all category levels before continuing.");
+                    return;
+                  }
+
+                  document.querySelector(".selection-grid").style.display = "none";
+                  document.getElementById("categoryHeaderWrapper").style.display = "none";
+                  continueBtn.style.display = "none";
+                  formContainer.style.display = "block";
+                  document.getElementById("backToCategory").style.display = "block";
+
+                  document.getElementById("hiddenCondition").value = selectedCondition;
+                  document.getElementById("hiddenCategory").value = selectedCategory;
+                  document.getElementById("hiddenSubcategory").value = selectedSubcategory;
+                  document.getElementById("hiddenDetail").value = selectedDetail;
+
+                  // Generate the dynamic fields based on selection
+                  generateDynamicFields();
+                });
+
+                document.querySelector(".btn-back").addEventListener("click", () => {
+                  document.querySelector(".selection-grid").style.display = "grid";
+                  document.getElementById("categoryHeaderWrapper").style.display = "block";
+                  formContainer.style.display = "none";
+                  document.getElementById("backToCategory").style.display = "none";
+
+                  // Don't reset condition - allow user to keep their previous selection
+                  // selectedCategory = "";
+                  // selectedSubcategory = "";
+                  // selectedDetail = "";
+
+                  // categories.innerHTML = "";
+                  // subcategories.innerHTML = "";
+                  // details.innerHTML = "";
+                  // subcategories.style.visibility = "hidden";
+                  // details.style.visibility = "hidden";
+                  // continueBtn.style.display = "none";
+
+                  // loadCategories();
+                });
+
+                document.getElementById('images')?.addEventListener('change', function () {
+                  const preview = document.getElementById('imagePreview');
+                  preview.innerHTML = "";
+                  Array.from(this.files).forEach(file => {
+                    const img = document.createElement('img');
+                    img.src = URL.createObjectURL(file);
+                    img.style.width = "60px";
+                    img.style.height = "60px";
+                    img.style.borderRadius = "4px";
+                    img.style.objectFit = "cover";
+                    preview.appendChild(img);
+                  });
+                });
+
+                document.getElementById('listingForm')?.addEventListener('submit', function (e) {
+                  e.preventDefault();
+                  alert("Listing submitted!");
+                  window.location.href = '@Url.Action("User_MainPage", "User")';
+                });
+
+                // Phone formatting logic
+                document.addEventListener('DOMContentLoaded', () => {
+                    const phoneInput = document.getElementById('phoneInput');
+                    const countrySelect = document.getElementById('countrySelect');
+                    const errorMessage = document.getElementById('errorMessage');
+
+                    // Phone number formats for different countries
+                    const phoneFormats = {
+                        '+1': { // USA
+                            pattern: /^(\d{3})(\d{3})(\d{4})$/,
+                            format: '($1) $2-$3',
+                            minLength: 10,
+                            maxLength: 10
+                        },
+                        '+44': { // UK
+                            pattern: /^(\d{2})(\d{4})(\d{4})$/,
+                            format: '$1 $2 $3',
+                            minLength: 10,
+                            maxLength: 10
+                        },
+                        '+90': { // Turkey
+                            pattern: /^(\d{3})(\d{3})(\d{4})$/,
+                            format: '($1) $2 $3',
+                            minLength: 10,
+                            maxLength: 10
+                        },
+                        'default': {
+                            pattern: /^(\d{3})(\d{3})(\d{4})$/,
+                            format: '$1 $2 $3',
+                            minLength: 8,
+                            maxLength: 12
+                        }
+                    };
+
+                    function formatPhoneNumber(number, countryCode) {
+                        const format = phoneFormats[countryCode] || phoneFormats.default;
+                        const cleaned = number.replace(/\D/g, '');
+
+                        if (cleaned.length === 0) return '';
+
+                        // Apply specific country format if available
+                        if (format.pattern.test(cleaned)) {
+                            return cleaned.replace(format.pattern, format.format);
+                        }
+
+                        // Default grouping for other numbers
+                        return cleaned.replace(/(\d{3})(?=\d)/g, '$1 ').trim();
+                    }
+
+                    function validatePhoneNumber(number, countryCode) {
+                        const format = phoneFormats[countryCode] || phoneFormats.default;
+                        const cleaned = number.replace(/\D/g, '');
+
+                        if (cleaned.length < format.minLength) {
+                            return `Phone number must be at least ${format.minLength} digits`;
+                        }
+                        if (cleaned.length > format.maxLength) {
+                            return `Phone number cannot exceed ${format.maxLength} digits`;
+                        }
+
+                        // Country-specific validations
+                        switch (countryCode) {
+                            case '+1':
+                                if (!/^[2-9]/.test(cleaned)) {
+                                    return 'US/Canada numbers must not start with 0 or 1';
+                                }
+                                break;
+                            case '+90':
+                                if (!/^5/.test(cleaned)) {
+                                    return 'Turkish mobile numbers must start with 5';
+                                }
+                                break;
+                        }
+
+                        return '';
+                    }
+
+                    phoneInput.addEventListener('input', (e) => {
+                        const cursorPosition = e.target.selectionStart;
+                        const previousLength = e.target.value.length;
+
+                        let value = e.target.value.replace(/\D/g, '');
+                        const countryCode = countrySelect.value;
+
+                        const formattedNumber = formatPhoneNumber(value, countryCode);
+                        e.target.value = formattedNumber;
+
+                        const error = validatePhoneNumber(formattedNumber, countryCode);
+                        errorMessage.textContent = error;
+
+                        // Adjust cursor position
+                        const lengthDifference = formattedNumber.length - previousLength;
+                        const newPosition = cursorPosition + lengthDifference;
+                        e.target.setSelectionRange(newPosition, newPosition);
+                    });
+
+                    countrySelect.addEventListener('change', () => {
+                        const currentNumber = phoneInput.value.replace(/\D/g, '');
+                        phoneInput.value = formatPhoneNumber(currentNumber, countrySelect.value);
+
+                        const error = validatePhoneNumber(phoneInput.value, countrySelect.value);
+                        errorMessage.textContent = error;
+
+                        // Update placeholder based on country
+                        const format = phoneFormats[countrySelect.value] || phoneFormats.default;
+                        phoneInput.placeholder = format.format.replace(/\$\d/g, 'X').replace(/[()]/g, '');
+                    });
+
+                    phoneInput.addEventListener('keypress', (e) => {
+                        if (!/[\d]/.test(e.key)) {
+                            e.preventDefault();
+                        }
+                    });
+
+                    phoneInput.addEventListener('paste', (e) => {
+                        e.preventDefault();
+                        const pastedData = (e.clipboardData || window.clipboardData).getData('text');
+                        const numericOnly = pastedData.replace(/\D/g, '');
+                        const formattedNumber = formatPhoneNumber(numericOnly, countrySelect.value);
+                        phoneInput.value = formattedNumber;
+
+                        const error = validatePhoneNumber(formattedNumber, countrySelect.value);
+                        errorMessage.textContent = error;
+                    });
+                });
+
+                // Initialize category selection when page loads
+                document.addEventListener('DOMContentLoaded', function() {
+                    loadCategories();
+                });
+        });
+    </script>
+
+</body>
+</html>

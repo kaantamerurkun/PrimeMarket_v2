@@ -1,0 +1,262 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Listing</title>
+    <style>
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        .close-btn {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+            .close-btn:hover {
+                color: red;
+            }
+
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .btn-buynow {
+            padding: 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+        }
+
+            .btn-buynow:hover {
+                background: #2CB736;
+                transition: 0.3s;
+                color: white;
+            }
+
+        .edit-btn, .remove-btn {
+            margin-right: 10px;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            color: black;
+        }
+
+            .edit-btn:hover, .remove-btn:hover {
+                background: #FEBA00;
+                transition: 0.3s;
+                color: white;
+            }
+
+        #editModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+
+            #editModal .modal-content {
+                background: white;
+                padding: 30px;
+                border-radius: 10px;
+                width: 60%;
+                max-height: 90%;
+                overflow: auto;
+                position: relative;
+            }
+
+            #editModal input,
+            #editModal textarea,
+            #editModal select {
+                width: 100%;
+                padding: 15px;
+                margin-top: 5px;
+                margin-bottom: 15px;
+                border: 1px solid #ccc;
+                border-radius: 50px;
+                box-sizing: border-box;
+            }
+
+            #editModal button {
+                padding: 10px 20px;
+                margin-left: 10px;
+                border-radius: 50px;
+                color: black;
+                cursor: pointer;
+            }
+
+                #editModal button:hover {
+                    background: #FEBA00;
+                    color: white;
+                }
+    </style>
+</head>
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+
+        <div class="listing-header">
+            <h1>2+1 Apartment in Menteşe</h1>
+            <div class="price">3.900.000 TL</div>
+        </div>
+
+        <div class="main-content">
+            <div class="image-gallery">
+                <img src="https://picsum.photos/800/600" alt="Property Image" class="main-image">
+                <div class="thumbnail-container">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 1">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 2">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 3">
+                </div>
+            </div>
+
+            <div class="property-details">
+                <div class="detail-item">
+                    <span class="label">Area (Gross):</span>
+                    <span class="value">102 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Area (Net):</span>
+                    <span class="value">90 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Rooms:</span>
+                    <span class="value">2+1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Floor:</span>
+                    <span class="value">1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Building Age:</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Heating:</span>
+                    <span class="value">Combi Boiler</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-info">
+            <div class="agent-card">
+                <img src="https://picsum.photos/100/100" alt="Agent Photo" class="agent-photo">
+                <div class="agent-details">
+                    <h3>Real Estate Agent</h3>
+                    <p class="phone">0 (542) 220 35 58</p>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top:25px;display:flex;justify-content:center">
+        <button class="edit-btn">Edit</button>
+        </div>
+    </div>
+    <!-- Edit Modal -->
+    <div id="editModal">
+        <div class="modal-content">
+            <h2 style="text-align:center;">Enter Details of the Item</h2>
+            <form id="editForm">
+                <label>Images:</label>
+                <input type="file" name="images" multiple>
+
+                <label>Title:</label>
+                <input type="text" name="title" placeholder="Enter item title">
+
+                <label>Price (TL):</label>
+                <input type="text" name="price" placeholder="e.g. 100">
+
+                <label>Description:</label>
+                <textarea name="description" placeholder="Describe your item..." style="height:100px;"></textarea>
+
+                <label>Location:</label>
+                <select name="location">
+                    <option>Select Location</option>
+                    <option>Istanbul</option>
+                    <option>Ankara</option>
+                </select>
+
+                <label>Phone Number:</label>
+                <div style="display:flex;">
+                    <select style="margin-right:10px;">
+                        <option>+90</option>
+                    </select>
+                    <input type="text" name="phone" placeholder="Enter phone number">
+                </div>
+
+                <div style="text-align:right; margin-top: 20px;">
+                    <button type="button" onclick="saveEdit()">Save</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEdit() {
+            alert('Edit is saved');
+            closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.edit-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    openModal();
+                });
+            });
+
+        });
+    </script>
+</body>
+</html>

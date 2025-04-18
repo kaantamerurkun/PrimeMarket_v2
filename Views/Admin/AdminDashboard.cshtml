@@ -1,0 +1,629 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="~/css/AdminDashboard.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+    <link rel="stylesheet" href="/css/messagenotifications.css" />
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
+                <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
+
+                <!-- Listing Notifications -->
+                <div class="notification-wrapper">
+                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px ; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Listing Notification Bell" />
+                    <div id="listingNotificationDropdown" class="notification-dropdown">
+                        <p class="notification-item">An item is waiting to be approved or rejected</p>
+                        <p class="notification-item">An user sent ID for verification.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <ul>
+                <li onclick="showSection('user-ids')" class="active">User ID Images</li>
+                <li onclick="showSection('seller-listings')">Seller Listings</li>
+                <li onclick="showSection('usage-report')">Usage Report</li>
+            </ul>
+        </div>
+
+        <div class="dashboard-content">
+            <div id="user-ids" class="section active">
+                <h2>User Uploaded ID Images</h2>
+                <div class="items-grid">
+                    <!-- User ID cards will be generated here -->
+                </div>
+            </div>
+
+            <div id="seller-listings" class="section">
+                <h2>Pending Seller Listings</h2>
+                <main class="listing-content">
+                    <section class="listings">
+                        <div class="items-grid">
+                            <!-- Sample listing cards will be generated here -->
+                        </div>
+                        <!-- Listing details view will be shown here -->
+                        <div style="margin-top:100px; background-color:#f0f8ff" class="listing-details">
+                            <div style="margin-bottom: 20px;">
+                                <button class="btn-listing-back" onclick="goBackToListings()">← Back to Listings</button>
+                            </div>
+
+                            <div class="listing-header">
+                                <h1>2+1 Apartment in Menteşe</h1>
+                                <div class="price">3.900.000 TL</div>
+                            </div>
+
+                            <div class="main-content">
+                                <div class="image-gallery">
+                                    <img src="https://picsum.photos/800/600" alt="Property Image" class="main-image">
+                                    <div class="thumbnail-container">
+                                        <img src="https://picsum.photos/200/150" alt="Thumbnail 1">
+                                        <img src="https://picsum.photos/200/150" alt="Thumbnail 2">
+                                        <img src="https://picsum.photos/200/150" alt="Thumbnail 3">
+                                    </div>
+                                </div>
+
+                                <div style="background-color:#f0f8ff" class="property-details">
+                                    <div class="detail-item">
+                                        <span class="label">Area (Gross):</span>
+                                        <span class="value">102 m²</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Area (Net):</span>
+                                        <span class="value">90 m²</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Rooms:</span>
+                                        <span class="value">2+1</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Floor:</span>
+                                        <span class="value">1</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Building Age:</span>
+                                        <span class="value">0</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <span class="label">Heating:</span>
+                                        <span class="value">Combi Boiler</span>
+                                    </div>
+                                    <div class="admin-actions">
+                                        <button class="btn-approve">Approve Listing</button>
+                                        <button class="btn-reject">Reject Listing</button>
+                                    </div>
+                                    <div class="reject-checklist">
+                                        <h3>Select Reason(s) for Rejection:</h3>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reason1" value="Inappropriate content">
+                                            <label for="reason1">Inappropriate content</label>
+                                        </div>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reason2" value="Incorrect pricing">
+                                            <label for="reason2">Incorrect pricing</label>
+                                        </div>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reason3" value="Misleading information">
+                                            <label for="reason3">Misleading information</label>
+                                        </div>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reason4" value="Poor quality images">
+                                            <label for="reason4">Poor quality images</label>
+                                        </div>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reason5" value="Duplicate listing">
+                                            <label for="reason5">Duplicate listing</label>
+                                        </div>
+                                        <div class="reject-reason">
+                                            <input type="checkbox" id="reasonOther" value="Other">
+                                            <label for="reasonOther">Other</label>
+                                            <input type="text" id="otherReasonText" style="display:none; margin-top:5px; width:100%; padding:5px;">
+                                        </div>
+                                        <button class="btn-confirm-reject">Confirm Rejection</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </main>
+            </div>
+
+<div id="usage-report" class="section">
+    <h2>Usage Report</h2>
+
+                <div style="overflow-x: auto; margin-top: 20px;">
+                    <table id="usageTable" style="width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px;">
+                        <thead style="background-color: #0066cc; color: white;">
+                            <tr>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Signed Up</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Name Lastname</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Total Listed Items</th>
+                                <th style="padding: 12px; border: 1px solid #ddd;">Last Seen (days)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">2025-01-15</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">Jane Doe</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">8</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">2</td>
+                            </tr>
+                            <tr>
+                                <td style="padding: 10px; border: 1px solid #ddd;">2024-11-22</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">John Smith</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">12</td>
+                                <td style="padding: 10px; border: 1px solid #ddd;">5</td>
+                            </tr>
+                            <!-- Add more rows as needed -->
+                        </tbody>
+                    </table>
+                </div>
+
+    <div style="text-align: right; margin-top: 15px;">
+        <button class="btn-approve" onclick="exportToCSV()">Export as CSV</button>
+    </div>
+</div>
+
+        </div>
+    </div>
+
+    <!-- Modal for enlarged image -->
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalUserName">User ID Verification</h3>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-images">
+                <div class="modal-image-container">
+                    <h4>ID Front</h4>
+                    <img id="modalImageFront" class="modal-image" src="" alt="ID Front">
+                </div>
+                <div class="modal-image-container">
+                    <h4>ID Back</h4>
+                    <img id="modalImageBack" class="modal-image" src="" alt="ID Back">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="modalApproveBtn" class="btn-approve">Approve</button>
+                <button id="modalRejectBtn" class="btn-reject">Reject</button>
+            </div>
+
+            <!-- Reject reasons checklist -->
+            <div id="rejectReasons" class="reject-reasons">
+                <h3>Select Reason(s) for Rejection:</h3>
+                <div class="reasons-checklist">
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason1" name="reason" value="Image is blurry or unclear">
+                        <label for="reason1">Image is blurry or unclear</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason2" name="reason" value="ID appears to be damaged or altered">
+                        <label for="reason2">ID appears to be damaged or altered</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason3" name="reason" value="Information on ID doesn't match user account">
+                        <label for="reason3">Information on ID doesn't match user account</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason4" name="reason" value="ID is expired">
+                        <label for="reason4">ID is expired</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason5" name="reason" value="Document type not acceptable">
+                        <label for="reason5">Document type not acceptable</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason6" name="reason" value="Both sides of ID not provided">
+                        <label for="reason6">Both sides of ID not provided</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason7" name="reason" value="ID information not legible">
+                        <label for="reason7">ID information not legible</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason8" name="reason" value="Security features not visible">
+                        <label for="reason8">Security features not visible</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason9" name="reason" value="Photo on ID doesn't match user">
+                        <label for="reason9">Photo on ID doesn't match user</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reasonOther" name="reason" value="Other">
+                        <label for="reasonOther">Other</label>
+                        <input type="text" id="otherReasonText" placeholder="Please specify..." style="display:none; margin-top:5px; width:100%; padding:5px;">
+                    </div>
+                </div>
+                <button id="confirmRejectBtn" class="btn-confirm-reject">Confirm Rejection</button>
+            </div>
+
+            <!-- Approval message -->
+            <div id="approvalMessage" class="approval-message">
+                <p>ID verification has been approved successfully!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            const users = [            {
+                id: 1,
+                firstName: "John",
+                lastName: "Doe",
+                idImageFront: "https://picsum.photos/id/1018/600/400",
+                idImageBack: "https://picsum.photos/id/1025/600/400"
+            },
+            {
+                id: 2,
+                firstName: "Jane",
+                lastName: "Smith",
+                idImageFront: "https://picsum.photos/id/1015/600/400",
+                idImageBack: "https://picsum.photos/id/1026/600/400"
+            },
+            {
+                id: 3,
+                firstName: "Robert",
+                lastName: "Johnson",
+                idImageFront: "https://picsum.photos/id/1016/600/400",
+                idImageBack: "https://picsum.photos/id/1027/600/400"
+            },
+            {
+                id: 4,
+                firstName: "Emily",
+                lastName: "Williams",
+                idImageFront: "https://picsum.photos/id/1019/600/400",
+                idImageBack: "https://picsum.photos/id/1028/600/400"
+            },
+            {
+                id: 5,
+                firstName: "Michael",
+                lastName: "Brown",
+                idImageFront: "https://picsum.photos/id/1020/600/400",
+                idImageBack: "https://picsum.photos/id/1029/600/400"
+            },
+            {
+                id: 6,
+                firstName: "Sarah",
+                lastName: "Davis",
+                idImageFront: "https://picsum.photos/id/1021/600/400",
+                idImageBack: "https://picsum.photos/id/1030/600/400"
+            }
+        ];
+            const listings = [             {
+                id: 1,
+                title: "2+1 Apartment in Menteşe",
+                price: "3.900.000 TL",
+                image: "https://picsum.photos/800/600",
+                category: "Real Estate",
+                subcategory: "Apartment"
+            },
+            {
+                id: 2,
+                title: "3+1 Villa with Pool",
+                price: "5.500.000 TL",
+                image: "https://picsum.photos/800/601",
+                category: "Real Estate",
+                subcategory: "Villa"
+            },
+            {
+                id: 3,
+                title: "Studio Apartment",
+                price: "1.200.000 TL",
+                image: "https://picsum.photos/800/602",
+                category: "Real Estate",
+                subcategory: "Apartment"
+            } ];
+
+            const userIDsGrid = document.querySelector('#user-ids .items-grid');
+            const modal = document.getElementById('idModal');
+            const modalImageFront = document.getElementById('modalImageFront');
+            const modalImageBack = document.getElementById('modalImageBack');
+            const modalUserName = document.getElementById('modalUserName');
+            const modalClose = document.querySelector('.close');
+            const modalApproveBtn = document.getElementById('modalApproveBtn');
+            const modalRejectBtn = document.getElementById('modalRejectBtn');
+            const rejectReasons = document.getElementById('rejectReasons');
+            const confirmRejectBtn = document.getElementById('confirmRejectBtn');
+            const approvalMessage = document.getElementById('approvalMessage');
+            const reasonOther = document.getElementById('reasonOther');
+            const otherReasonText = document.getElementById('otherReasonText');
+            const listingBell = document.getElementById("listingNotificationBell");
+            const listingDropdown = document.getElementById("listingNotificationDropdown");
+
+            function generateUserIDCards() {
+                userIDsGrid.innerHTML = '';
+
+                users.forEach(user => {
+                    const card = document.createElement('div');
+                    card.className = 'user-id-card';
+                    card.dataset.userId = user.id;
+
+                    card.innerHTML = `
+                        <div class="user-info">
+                            <span class="user-name">${user.firstName} ${user.lastName}</span>
+                        </div>
+                        <div class="id-images-container">
+                            <div class="id-image-wrapper">
+                                <p>ID Front</p>
+                                <img src="${user.idImageFront}" class="user-id-image front-image">
+                            </div>
+                            <div class="id-image-wrapper">
+                                <p>ID Back</p>
+                                <img src="${user.idImageBack}" class="user-id-image back-image">
+                            </div>
+                        </div>
+                        <div class="actions">
+                            <button class="btn-approve">Approve</button>
+                            <button class="btn-reject">Reject</button>
+                        </div>
+                    `;
+
+                    card.querySelectorAll('img').forEach(img => {
+                        img.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            openModal(user);
+                        });
+                    });
+
+                    card.addEventListener('click', () => {
+                        document.querySelectorAll('.user-id-card').forEach(c => {
+                            c.classList.remove('active');
+                            c.querySelector('.actions').style.display = 'none';
+                        });
+
+                        if (!card.classList.contains('active')) {
+                            card.classList.add('active');
+                            card.querySelector('.actions').style.display = 'flex';
+                        }
+                    });
+
+                    card.querySelector('.btn-approve').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        approveUser(user);
+                    });
+
+                    card.querySelector('.btn-reject').addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openModal(user, 'reject');
+                    });
+
+                    userIDsGrid.appendChild(card);
+                });
+            }
+
+            function generateListingCards() {
+                const listingsGrid = document.querySelector('#seller-listings .items-grid');
+                listingsGrid.innerHTML = '';
+
+                listings.forEach(listing => {
+                    const card = document.createElement('div');
+                    card.className = 'item-card';
+                    card.dataset.listingId = listing.id;
+
+                    card.innerHTML = `
+                        <img src="${listing.image}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+                        <h3>${listing.title}</h3>
+                        <p>${listing.price}</p>
+                        <p>${listing.category} - ${listing.subcategory}</p>
+                    `;
+
+                    card.addEventListener('click', () => showListingDetails(listing));
+                    listingsGrid.appendChild(card);
+                });
+            }
+
+            function showListingDetails(listing) {
+                const listingDetails = document.querySelector('.listing-details');
+                const itemsGrid = document.querySelector('#seller-listings .items-grid');
+
+                itemsGrid.style.display = 'none';
+                listingDetails.classList.add('active');
+
+                listingDetails.querySelector('.listing-header h1').textContent = listing.title;
+                listingDetails.querySelector('.price').textContent = listing.price;
+                listingDetails.querySelector('.main-image').src = listing.image;
+
+                const approveBtn = listingDetails.querySelector('.btn-approve');
+                const rejectBtn = listingDetails.querySelector('.btn-reject');
+                const rejectChecklist = listingDetails.querySelector('.reject-checklist');
+                const confirmRejectBtn = listingDetails.querySelector('.btn-confirm-reject');
+                const reasonOther = listingDetails.querySelector('#reasonOther');
+                const otherReasonText = listingDetails.querySelector('#otherReasonText');
+
+                approveBtn.onclick = () => approveListing(listing.id);
+                rejectBtn.onclick = () => {
+                    rejectChecklist.classList.add('active');
+                    approveBtn.style.display = 'none';
+                    rejectBtn.style.display = 'none';
+                };
+
+                reasonOther.onchange = () => {
+                    otherReasonText.style.display = reasonOther.checked ? 'block' : 'none';
+                };
+
+                confirmRejectBtn.onclick = () => {
+                    const reasons = Array.from(rejectChecklist.querySelectorAll('input[type="checkbox"]:checked'))
+                        .map(cb => cb.id === 'reasonOther' ? otherReasonText.value : cb.value);
+                    rejectListing(listing.id, reasons);
+                };
+            }
+
+        function approveListing(id) {
+            console.log(`Approved listing ${id}`);
+            // Remove it from the listings array
+            const index = listings.findIndex(listing => listing.id === id);
+            if (index !== -1) listings.splice(index, 1);
+
+            // Return to grid view and regenerate
+            document.querySelector('.listing-details').classList.remove('active');
+            const grid = document.querySelector('#seller-listings .items-grid');
+            grid.style.display = 'grid';
+            generateListingCards();
+        }
+
+        function rejectListing(id, reasons) {
+            console.log(`Rejected listing ${id}`, reasons);
+            // Remove it from the listings array
+            const index = listings.findIndex(listing => listing.id === id);
+            if (index !== -1) listings.splice(index, 1);
+
+            // Return to grid view and regenerate
+            document.querySelector('.listing-details').classList.remove('active');
+            const grid = document.querySelector('#seller-listings .items-grid');
+            grid.style.display = 'grid';
+            generateListingCards();
+        }
+
+            function removeListing(id) {
+                document.querySelector('.listing-details').classList.remove('active');
+                document.querySelector('#seller-listings .items-grid').style.display = 'grid';
+                const card = document.querySelector(`.item-card[data-listing-id="${id}"]`);
+                if (card) card.remove();
+            }
+
+            function openModal(user, action) {
+                modalUserName.textContent = `${user.firstName} ${user.lastName} - ID Verification`;
+                modalImageFront.src = user.idImageFront;
+                modalImageBack.src = user.idImageBack;
+                modal.style.display = 'block';
+
+                modal.dataset.userId = user.id;
+                rejectReasons.style.display = 'none';
+                approvalMessage.style.display = 'none';
+                modalApproveBtn.style.display = 'block';
+                modalRejectBtn.style.display = 'block';
+
+                if (action === 'reject') {
+                    showRejectReasons();
+                }
+            }
+
+            function closeModal() {
+                modal.style.display = 'none';
+                rejectReasons.style.display = 'none';
+                approvalMessage.style.display = 'none';
+                otherReasonText.style.display = 'none';
+                otherReasonText.value = '';
+                document.querySelectorAll('.reject-reasons input[type="checkbox"]').forEach(cb => cb.checked = false);
+            }
+
+            function showRejectReasons() {
+                modalApproveBtn.style.display = 'none';
+                modalRejectBtn.style.display = 'none';
+                rejectReasons.style.display = 'block';
+            }
+
+            function approveUser(user) {
+                console.log(`Approved ${user.firstName} ${user.lastName}`);
+                approvalMessage.style.display = 'block';
+                modalApproveBtn.style.display = 'none';
+                modalRejectBtn.style.display = 'none';
+
+                setTimeout(() => {
+                    closeModal();
+                    const card = document.querySelector(`.user-id-card[data-user-id="${user.id}"]`);
+                    if (card) {
+                        card.style.opacity = '0';
+                        setTimeout(() => card.remove(), 300);
+                    }
+                }, 2000);
+            }
+
+            function rejectUser() {
+                const userId = modal.dataset.userId;
+                const user = users.find(u => u.id == userId);
+                const reasons = Array.from(document.querySelectorAll('.reject-reasons input[type="checkbox"]:checked'))
+                    .map(cb => cb.id === 'reasonOther' ? otherReasonText.value : cb.value);
+
+                console.log(`Rejected ${user.firstName} ${user.lastName}`, reasons);
+                closeModal();
+                const card = document.querySelector(`.user-id-card[data-user-id="${userId}"]`);
+                if (card) {
+                    card.style.opacity = '0';
+                    setTimeout(() => card.remove(), 300);
+                }
+            }
+
+            window.showSection = function (id) {
+                document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+                document.querySelectorAll('.sidebar li').forEach(li => li.classList.remove('active'));
+
+                document.getElementById(id).classList.add('active');
+                event.target.classList.add('active');
+
+                if (id === 'seller-listings') generateListingCards();
+            };
+
+            modalClose.addEventListener('click', closeModal);
+            window.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+            modalApproveBtn.addEventListener('click', () => {
+                const user = users.find(u => u.id == modal.dataset.userId);
+                approveUser(user);
+            });
+
+            modalRejectBtn.addEventListener('click', showRejectReasons);
+            confirmRejectBtn.addEventListener('click', rejectUser);
+
+            reasonOther.addEventListener('change', () => {
+                otherReasonText.style.display = reasonOther.checked ? 'block' : 'none';
+            });
+
+            listingBell.addEventListener("click", (e) => {
+                e.stopPropagation();
+                listingDropdown.style.display = listingDropdown.style.display === "block" ? "none" : "block";
+            });
+
+            document.addEventListener("click", (event) => {
+                if (!listingDropdown.contains(event.target) && event.target !== listingBell) {
+                    listingDropdown.style.display = "none";
+                }
+            });
+
+
+
+            generateUserIDCards(); // init
+        });
+        function goBackToListings() {
+            const listingDetails = document.querySelector('.listing-details');
+            const itemsGrid = document.querySelector('#seller-listings .items-grid');
+
+            listingDetails.classList.remove('active');
+            itemsGrid.style.display = 'grid';
+        }
+
+                function exportToCSV() {
+            const table = document.getElementById("usageTable");
+            const rows = table.querySelectorAll("tr");
+            let csvContent = "";
+
+            rows.forEach(row => {
+                const cols = row.querySelectorAll("th, td");
+                const rowData = Array.from(cols).map(col => `"${col.innerText.trim()}"`).join(",");
+                csvContent += rowData + "\n";
+            });
+
+            const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement("a");
+            link.setAttribute("href", url);
+            link.setAttribute("download", "usage_report.csv");
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+
+</body>
+</html>

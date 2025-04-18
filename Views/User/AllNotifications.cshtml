@@ -1,0 +1,39 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href=/css/AllNotifications.css />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All Notifications</title>
+</head>
+<body>
+    <h2>All Notifications</h2>
+    <div class="dashboard-container">
+        <div class="summary-cards">
+            <a asp-action="MyListing" asp-controller="User">
+                <div class="card">
+                    <div class="card-title">Listing 1</div>
+                    <div class="card-value neutral">Your listing is accepted</div>
+                </div>
+            </a>
+            <div class="card" id="rejected-card" onclick="removeCard()">
+                <div class="card-title">Listing 2</div>
+                <div class="card-value neutral">Your listing is rejected</div>
+                <div>Reason: Inappropriate Listing</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function removeCard() {
+            const card = document.getElementById("rejected-card");
+            if (card) {
+                card.remove();
+            }
+        }
+    </script>
+</body>
+</html>

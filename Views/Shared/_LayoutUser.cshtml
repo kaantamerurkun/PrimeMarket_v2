@@ -1,0 +1,273 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link rel="stylesheet" href="/css/UserLayout.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+    <link rel="stylesheet" href="/css/messagenotifications.css" />
+    <title>@ViewBag.Title</title>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="User_MainPage" asp-controller="User" class="logo">
+                <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <div class="search-box">
+                    <a asp-action="Search_Page" asp-controller="Home">
+                        <input type="text" placeholder="Search for a listed item" />
+                    </a>
+                </div>
+
+                <a asp-action="MyProfilePage" asp-controller="User"><p>NameLastName</p></a>
+                <a asp-action="Login" asp-controller="User"><button class="btn-logout">Logout</button></a>
+
+                <!-- ✅ Listing Notifications -->
+                <div class="notification-wrapper">
+                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px ; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Listing Notification Bell" />
+                    <div id="listingNotificationDropdown" class="notification-dropdown">
+                        <a asp-action="MyListing" asp-controller="User">
+                            <p class="notification-item">One of your listings has been approved.</p>
+                        </a>
+                        <p class="notification-item" id="rejectedListingNotice" style="cursor: pointer;">One of your listings has been rejected.</p>
+                        <a asp-action="AllNotifications" asp-controller="User">
+                            <p style="color:black">All Notifications</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- ✅ Message Notifications -->
+                <div class="notification-wrapper">
+                    <img id="messageNotificationBell" class="notification-icon" style="margin-top:10px ; height: 25px; width: 25px; cursor: pointer;" src="/images/MessagesIcon.png" alt="Message Notification Bell" />
+                    <div id="messageNotificationDropdown" class="notification-dropdown">
+                        <a asp-action="LiveChat" asp-controller="User">
+                            <p class="notification-item">A buyer has sent you a message.</p>
+                        </a>
+                        <a asp-action="AllMessages" asp-controller="User">
+                            <p style="color:black">All Messages</p>
+                        </a>
+                    </div>
+                </div>
+
+                <a asp-action="MyBookmarks" asp-controller="User"><img style="margin-top:10px ; height: 25px; width: 25px;" src="/images/bookmark-button.png" alt="Bookmarks" /></a>
+                <a asp-action="MyShoppingCart" asp-controller="User"><img style="margin-top:10px ; height: 25px; width: 25px;" src="/images/shopping_cart_icon.png" alt="Shopping Cart" /></a>
+                <a asp-action="CreateListing" asp-controller="User"><button class="btn-list">List an Item</button></a>
+            </div>
+        </div>
+    </header>
+
+    <div>
+        @RenderBody()
+    </div>
+
+    <!-- ✅ Modal for Rejection Reason -->
+    <div id="rejectionModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:999;">
+        <div style="background-color:white; padding:20px; border-radius:8px; max-width:400px; margin:100px auto; position:relative;">
+            <span id="closeRejectionModal" style="position:absolute; top:10px; right:15px; cursor:pointer; font-size:20px;">&times;</span>
+            <h3>Listing Rejected</h3>
+            <p id="rejectionReasonText">Reason: Your listing was rejected because it violated our content guidelines.</p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // ✅ Notifications
+            const dropdownToggles = [
+                {
+                    bell: document.getElementById("listingNotificationBell"),
+                    dropdown: document.getElementById("listingNotificationDropdown")
+                },
+                {
+                    bell: document.getElementById("messageNotificationBell"),
+                    dropdown: document.getElementById("messageNotificationDropdown")
+                }
+            ];
+
+            dropdownToggles.forEach(({ bell, dropdown }) => {
+                bell.addEventListener("click", function (e) {
+                    e.stopPropagation();
+                    dropdownToggles.forEach(({ dropdown: otherDropdown }) => {
+                        if (otherDropdown !== dropdown) {
+                            otherDropdown.style.display = "none";
+                        }
+                    });
+                    dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
+                });
+            });
+
+            document.addEventListener("click", function (event) {
+                dropdownToggles.forEach(({ dropdown }) => {
+                    if (!dropdown.contains(event.target)) {
+                        dropdown.style.display = "none";
+                    }
+                });
+            });
+
+            // ✅ Rejected Listing Modal Logic
+            document.getElementById("rejectedListingNotice").addEventListener("click", function (e) {
+                e.stopPropagation();
+                document.getElementById("rejectionModal").style.display = "block";
+            });
+
+            document.getElementById("closeRejectionModal").addEventListener("click", function () {
+                document.getElementById("rejectionModal").style.display = "none";
+            });
+
+            window.addEventListener("click", function (e) {
+                const modal = document.getElementById("rejectionModal");
+                if (e.target === modal) {
+                    modal.style.display = "none";
+                }
+            });
+
+            // ✅ Category Dropdown Logic - MODIFIED
+            const allCategories = {
+                "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
+                "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
+                "Electronics": {
+                    "Computer": ["Laptops", "Desktops", "Computer Accessories", "Computer Components", "Monitors"],
+                    "White Goods": ["Fridges", "Washers", "Dishwashers", "Stoves", "Ovens", "Microwave Ovens"],
+                    "Electrical Domestic Appliances": ["Vacuum Cleaner", "Beverage Preparation", "Food Preparation", "Iron", "Sewing Machine"],
+                    "Televisions": [],
+                    "Heating & Cooling": [],
+                    "Cameras": [],
+                    "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
+                }
+            };
+
+            // Store references to open menus for better control
+            let openMainMenu = null;
+            let openSubMenu = null;
+
+            function createDropdownItem(name, subItems) {
+                const li = document.createElement("li");
+                li.style.position = "relative";
+                li.style.cursor = "pointer";
+                li.textContent = name;
+
+                if (subItems && Object.keys(subItems).length > 0) {
+                    const ul = document.createElement("ul");
+                    ul.style.position = "absolute";
+                    ul.style.top = "100%";
+                    ul.style.listStyle = "none";
+                    ul.style.left = "0";
+                    ul.style.backgroundColor = "#fff";
+                    ul.style.padding = "10px";
+                    ul.style.border = "1px solid #ddd";
+                    ul.style.borderRadius = "8px";
+                    ul.style.boxShadow = "rgba(0, 0, 0, 0.12) 0px 1px 3px";
+                    ul.style.display = "none";
+                    ul.style.zIndex = 10;
+
+                    if (Array.isArray(subItems)) {
+                        subItems.forEach(sub => {
+                            const subLi = document.createElement("li");
+                            subLi.textContent = sub;
+                            subLi.style.padding = "6px 12px";
+                            subLi.style.whiteSpace = "nowrap";
+                            ul.appendChild(subLi);
+                        });
+                    } else {
+                        Object.keys(subItems).forEach(key => {
+                            const innerLi = document.createElement("li");
+                            innerLi.textContent = key;
+                            innerLi.style.padding = "6px 12px";
+                            innerLi.style.whiteSpace = "nowrap";
+                            innerLi.style.position = "relative";
+
+                            if (Array.isArray(subItems[key]) && subItems[key].length > 0) {
+                                const deepUl = document.createElement("ul");
+                                deepUl.style.position = "absolute";
+                                deepUl.style.left = "100%";
+                                deepUl.style.top = "0";
+                                deepUl.style.marginLeft = "5px";
+                                deepUl.style.backgroundColor = "#fff";
+                                deepUl.style.padding = "10px";
+                                deepUl.style.border = "1px solid #ddd";
+                                deepUl.style.borderRadius = "8px";
+                                deepUl.style.listStyle = "none";
+                                deepUl.style.display = "none";
+                                deepUl.style.zIndex = 11;
+
+                                subItems[key].forEach(detail => {
+                                    const detailLi = document.createElement("li");
+                                    detailLi.textContent = detail;
+                                    detailLi.style.padding = "6px 12px";
+                                    detailLi.style.whiteSpace = "nowrap";
+                                    deepUl.appendChild(detailLi);
+                                });
+
+                                innerLi.appendChild(deepUl);
+
+                                innerLi.addEventListener("click", (e) => {
+                                    e.stopPropagation();
+
+                                    // Close any previously open sub-menu
+                                    if (openSubMenu && openSubMenu !== deepUl) {
+                                        openSubMenu.style.display = "none";
+                                    }
+
+                                    // Toggle the current deep menu
+                                    deepUl.style.display = deepUl.style.display === "block" ? "none" : "block";
+
+                                    // Update reference to open sub-menu
+                                    openSubMenu = deepUl.style.display === "block" ? deepUl : null;
+                                });
+                            }
+
+                            ul.appendChild(innerLi);
+                        });
+                    }
+
+                    li.appendChild(ul);
+
+                    li.addEventListener("click", (e) => {
+                        e.stopPropagation();
+
+                        // Close any previously open main menu
+                        if (openMainMenu && openMainMenu !== ul) {
+                            openMainMenu.style.display = "none";
+                        }
+
+                        // Close any open sub-menu when clicking a different main category
+                        if (openSubMenu && ul !== openMainMenu) {
+                            openSubMenu.style.display = "none";
+                            openSubMenu = null;
+                        }
+
+                        // Toggle the current menu
+                        ul.style.display = ul.style.display === "block" ? "none" : "block";
+
+                        // Update reference to open main menu
+                        openMainMenu = ul.style.display === "block" ? ul : null;
+                    });
+                }
+
+                return li;
+            }
+
+            const mainCategoryList = document.getElementById("mainCategories");
+            if (mainCategoryList) {
+                Object.entries(allCategories).forEach(([name, subs]) => {
+                    const item = createDropdownItem(name, subs);
+                    mainCategoryList.appendChild(item);
+                });
+            }
+
+            // Close all menus when clicking outside
+            document.addEventListener("click", () => {
+                if (openMainMenu) {
+                    openMainMenu.style.display = "none";
+                    openMainMenu = null;
+                }
+
+                if (openSubMenu) {
+                    openSubMenu.style.display = "none";
+                    openSubMenu = null;
+                }
+            });
+        });
+    </script>
+</body>
+</html>

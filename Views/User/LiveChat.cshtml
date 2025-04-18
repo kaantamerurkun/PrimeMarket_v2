@@ -1,0 +1,76 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Page</title>
+    <link rel="stylesheet" href="/css/chat.css">
+</head>
+<body>
+
+    <div style="margin-top:100px; margin-bottom:50px" class="chat-container">
+        <div class="chat-header">
+            <img src="/api/placeholder/80/80" alt="Car" style="width: 80px; height: 80px; border-radius: 8px;">
+            <div class="car-details">
+                <h2>HATASISIZ, BOYASIZ, CAM TAVANLI TEMİZ PASSAT ELEGANCE, 98.900 KM</h2>
+                <p>1.5 TSI - Elegance - Pendik / Esenyalı Mh.</p>
+                <p>1.995.000 TL</p>
+            </div>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message">
+                <img src="/api/placeholder/40/40" alt="Seller" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="message-content">
+                    Merhaba, araç hakkında bilgi almak istiyorum.
+                </div>
+            </div>
+            <div class="message you">
+                <img src="/api/placeholder/40/40" alt="You" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="message-content">
+                    Evet, hangi konuda bilgi almak istersiniz?
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-input">
+            <input type="text" id="messageInput" placeholder="Mesajınızı buraya yazın">
+            <button class="send-btn" onclick="sendMessage()">Gönder</button>
+        </div>
+    </div>
+
+    <script>
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const chatMessages = document.getElementById('chatMessages');
+
+            if (messageInput.value.trim() === '') return;
+
+            const newMessage = document.createElement('div');
+            newMessage.className = 'message you';
+            newMessage.innerHTML = `
+                <img src="/api/placeholder/40/40" alt="You" style="width: 40px; height: 40px; border-radius: 50%;">
+                <div class="message-content">
+                    ${messageInput.value}
+                </div>
+            `;
+
+            chatMessages.appendChild(newMessage);
+            messageInput.value = '';
+
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Allow sending message by pressing Enter
+        document.getElementById('messageInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>

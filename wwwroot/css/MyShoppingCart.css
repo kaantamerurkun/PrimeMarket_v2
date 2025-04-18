@@ -1,0 +1,94 @@
+﻿* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+body {
+    background-color: #f0f8ff;
+}
+h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: #333;
+    text-align: center;
+}
+.cart-content {
+    display: flex;
+    padding: 30px;
+    gap: 30px;
+    max-width: 1400px;
+    margin: 80px auto 0;
+}
+
+.cart-listings {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.shopping-items-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    justify-content: center;
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.shopping-item-card {
+    background: white;
+    height: 200px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    transition: transform 0.2s;
+}
+
+    .shopping-item-card:hover {
+        transform: translateY(-5px);
+    }
+
+.shopping-item-card {
+    background: white;
+    height: auto;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
+    transition: transform 0.2s;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+    .shopping-item-card:hover {
+        transform: translateY(-5px);
+    }
+
+.item-actions {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.buy-btn, .remove-btn, .buyall-btn {
+    padding: 8px 12px;
+    background-color: #f0f8ff;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+    box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+}
+
+
+    .buy-btn:hover, .buyall-btn:hover {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .remove-btn:hover {
+        background-color: #f44336;
+        color: white;
+    }

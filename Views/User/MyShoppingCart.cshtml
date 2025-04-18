@@ -1,0 +1,117 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrimeMarket - Guest Main Page</title>
+    <link rel="stylesheet" href="/css/MyShoppingCart.css" />
+</head>
+<body>
+<main class="cart-content">
+    <section class="cart-listings">
+        <h2>Shopping Cart</h2>
+            <div style="width:60%" class="shopping-items-grid">
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>350TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <a asp-action="PaymentPage" asp-controller="User"><button class="buy-btn">Buy</button></a>
+                        <button class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>100TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="buy-btn">Buy</button>
+                        <button class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>8745TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="buy-btn">Buy</button>
+                        <button class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>854TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="buy-btn">Buy</button>
+                        <button class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>9667TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="buy-btn">Buy</button>
+                        <button class="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <div class="shopping-item-card">
+                    <div class="item-content">
+                        <!-- Replace with your item details -->
+                        <h3>Item Name</h3>
+                        <p>5532TL</p>
+                    </div>
+                    <div class="item-actions">
+                        <button class="buy-btn">Buy</button>
+                        <button class ="remove-btn">Remove</button>
+                    </div>
+                </div>
+                <!-- Repeat for other items -->
+            </div>
+            <br>
+            <a asp-action="PaymentPage" asp-controller="User"><button class = "buyall-btn">Buy All</button></a>
+    </section>
+</main>
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const buyAllBtn = document.querySelector(".buyall-btn");
+        const itemGrid = document.querySelector(".shopping-items-grid");
+
+        function updateBuyAllVisibility() {
+            const items = itemGrid.querySelectorAll(".shopping-item-card");
+            if (items.length === 0) {
+                buyAllBtn.style.display = "none";
+            }
+        }
+
+        itemGrid.addEventListener("click", (event) => {
+            if (event.target.classList.contains("remove-btn")) {
+                const itemCard = event.target.closest(".shopping-item-card");
+                if (itemCard) {
+                    itemCard.remove();
+                    updateBuyAllVisibility();
+                }
+            }
+        });
+
+        // Initial check in case there are no items at page load
+        updateBuyAllVisibility();
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,154 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/MyProfilePage.css"/>
+    <title>My Profile</title>
+</head>
+
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+
+    <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
+        <div style="margin-right: 20px; margin-left: 300px">
+            <img src="/images/PrimeMarket_Logo_V2.png" alt="Profile Pic" width="350px" height="350px" />
+        </div>
+
+        <div style="flex: 1; text-align: left">
+            <br>
+            <p><strong>Name:</strong> Name</p>
+            <p><strong>Last Name:</strong> LastName</p>
+            <br />
+            <p><strong>Email:</strong> NameLastname@gmail.com</p>
+            <br />
+            <p><strong>Phone Number:</strong> 999999999</p>
+            <br />
+        </div>
+    </div>
+
+    <br>
+    <br>
+    <br>
+
+    <div style="display: flex; justify-content: center;">
+        <a asp-controller="User" asp-action="EditProfile">
+            <button class="btn-editprofile">Edit Profile</button>
+        </a>
+        <a asp-controller="User" asp-action="MyBookmarks">
+            <button style="margin-left:100px" class="btn-mybookmark">My Bookmarks</button>
+        </a>
+        <a asp-controller="User" asp-action="MyProfitLossReport">
+            <button style="margin-left:100px" class="btn-profitlossreport">Profit & Loss Report</button>
+        </a>
+    </div>
+
+    <br />
+    <h2 style="text-align: center">My Listings</h2>
+    <div class="items-container">
+        <div class="items-grid">
+            <a asp-action="MyListing" asp-controller="User">
+            <div class="item-card">
+            </a>
+                <div class="button-container">
+                    <button class="edit-btn">Edit</button>
+                    <button class="remove-btn">Remove</button>
+                </div>
+            </div>
+            <div class="item-card">
+                <div class="button-container">
+                    <button class="edit-btn">Edit</button>
+                    <button class="remove-btn">Remove</button>
+                </div>
+            </div>
+            <div class="item-card">
+                <div class="button-container">
+                    <button class="edit-btn">Edit</button>
+                    <button class="remove-btn">Remove</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div id="editModal">
+        <div class="modal-content">
+            <h2 style="text-align:center;">Enter Details of the Item</h2>
+            <form id="editForm">
+                <label>Images:</label>
+                <input type="file" name="images" multiple>
+
+                <label>Title:</label>
+                <input type="text" name="title" placeholder="Enter item title">
+
+                <label>Price (TL):</label>
+                <input type="text" name="price" placeholder="e.g. 100">
+
+                <label>Description:</label>
+                <textarea name="description" placeholder="Describe your item..." style="height:100px;"></textarea>
+
+                <label>Location:</label>
+                <select name="location">
+                    <option>Select Location</option>
+                    <option>Istanbul</option>
+                    <option>Ankara</option>
+                </select>
+
+                <label>Phone Number:</label>
+                <div style="display:flex;">
+                    <select style="margin-right:10px;">
+                        <option>+90</option>
+                    </select>
+                    <input type="text" name="phone" placeholder="Enter phone number">
+                </div>
+
+                <div style="text-align:right; margin-top: 20px;">
+                    <button type="button" onclick="saveEdit()">Save</button>
+                    <button type="button" onclick="closeModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function openModal() {
+            document.getElementById('editModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        function saveEdit() {
+            alert('Edit is saved');
+            closeModal();
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelectorAll('.edit-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    openModal();
+                });
+            });
+
+            document.querySelectorAll('.remove-btn').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    const card = btn.closest('.item-card');
+                    if (card) {
+                        card.remove();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>

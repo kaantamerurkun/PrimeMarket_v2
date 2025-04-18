@@ -1,0 +1,74 @@
+﻿@{
+    Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real Estate Listing</title>
+    <link rel="stylesheet" href="/css/GuestListingDetails.css">
+</head>
+<body>
+    <br />
+    <br />
+    <br />
+    <br />
+    <div class="container">
+
+        <div class="listing-header">
+            <h1>2+1 Apartment in Menteşe</h1>
+            <div class="price">3.900.000 TL</div>
+        </div>
+
+        <div class="main-content">
+            <div class="image-gallery">
+                <img src="https://picsum.photos/800/600" alt="Property Image" class="main-image">
+                <div class="thumbnail-container">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 1">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 2">
+                    <img src="https://picsum.photos/200/150" alt="Thumbnail 3">
+                </div>
+            </div>
+
+            <div class="property-details">
+                <div class="detail-item">
+                    <span class="label">Area (Gross):</span>
+                    <span class="value">102 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Area (Net):</span>
+                    <span class="value">90 m²</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Rooms:</span>
+                    <span class="value">2+1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Floor:</span>
+                    <span class="value">1</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Building Age:</span>
+                    <span class="value">0</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Heating:</span>
+                    <span class="value">Combi Boiler</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="agent-info">
+            <div class="agent-card">
+                <img src="https://picsum.photos/100/100" alt="Agent Photo" class="agent-photo">
+                <div class="agent-details">
+                    <h3>Real Estate Agent</h3>
+                    <p class="phone">0 (542) 220 35 58</p>
+                    <a asp-action="Login"asp-controller="User"><button class="btn-sendmessage">Send Message</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
