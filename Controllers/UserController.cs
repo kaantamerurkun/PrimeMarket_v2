@@ -378,11 +378,31 @@ namespace PrimeMarket.Controllers
             }
         }
         [UserAuthenticationFilter]
+        public async Task<IActionResult> MyProfilePage()
+        {
+            // Get the user ID from session
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Fetch user data from database
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Pass the user object to the view
+            return View(user);
+        }
+        [UserAuthenticationFilter]
         public IActionResult User_Listing_Details() => View();
         [UserAuthenticationFilter]
         public IActionResult User_MainPage() => View();
-        [UserAuthenticationFilter]
-        public IActionResult MyProfilePage() => View();
+        //[UserAuthenticationFilter]
+        //public IActionResult MyProfilePage() => View();
         [UserAuthenticationFilter]
         public IActionResult MyBookmarks() => View();
         [UserAuthenticationFilter]
