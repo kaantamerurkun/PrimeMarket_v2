@@ -257,7 +257,126 @@ namespace PrimeMarket.Controllers
         }
 
         // Other user views
+        // GET: /User/ResetPassword
         public IActionResult ResetPassword() => View();
+
+        [HttpPost]
+        public async Task<IActionResult> SendResetCode([FromForm] string email)
+        {
+            try
+            {
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                    return Json(new { success = false, message = "No account exists with this email address." });
+
+                // Check for existing reset code
+                var existingCode = await _context.EmailVerifications.FirstOrDefaultAsync(v => v.Email == email);
+                if (existingCode != null)
+                    _context.EmailVerifications.Remove(existingCode);
+
+                // Generate a random 6-digit code
+                var code = new Random().Next(100000, 999999).ToString();
+
+                // Save new verification code to database
+                _context.EmailVerifications.Add(new EmailVerification
+                {
+                    Email = email,
+                    Code = code,
+                    Expiration = DateTime.UtcNow.AddMinutes(10)
+                });
+                await _context.SaveChangesAsync();
+
+                // Send email with verification code
+                using (var smtpClient = new SmtpClient(_emailSettings.Host))
+                {
+                    smtpClient.Port = _emailSettings.Port;
+                    smtpClient.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword);
+                    smtpClient.EnableSsl = _emailSettings.EnableSsl;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                        Subject = "Your PrimeMarket Password Reset Code",
+                        IsBodyHtml = true,
+                        Body = $@"
+                <html>
+                <head>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                        .container {{ width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }}
+                        .header {{ background-color: #0066cc; color: white; padding: 10px; text-align: center; }}
+                        .content {{ padding: 20px; }}
+                        .code {{ font-size: 24px; font-weight: bold; text-align: center; 
+                                 margin: 30px 0; color: #0066cc; letter-spacing: 3px; }}
+                        .footer {{ font-size: 12px; text-align: center; margin-top: 30px; color: #666; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h1>PrimeMarket Password Reset</h1>
+                        </div>
+                        <div class='content'>
+                            <p>Hello,</p>
+                            <p>You requested to reset your password. Please use the verification code below:</p>
+                            <div class='code'>{code}</div>
+                            <p>This code will expire in 10 minutes for security reasons.</p>
+                            <p>If you did not request this code, please ignore this email.</p>
+                            <p>Thank you,<br>The PrimeMarket Team</p>
+                        </div>
+                        <div class='footer'>
+                            <p>This is an automated message, please do not reply to this email.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>"
+                    };
+
+                    mailMessage.To.Add(email);
+                    smtpClient.Send(mailMessage);
+                }
+
+                return Json(new { success = true, message = "Verification code sent to your email." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error sending verification code: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword([FromForm] string email, [FromForm] string code, [FromForm] string newPassword)
+        {
+            try
+            {
+                // Verify the code
+                var verification = await _context.EmailVerifications
+                    .FirstOrDefaultAsync(v => v.Email == email && v.Code == code);
+
+                if (verification == null || verification.Expiration < DateTime.UtcNow)
+                    return Json(new { success = false, message = "Invalid or expired verification code." });
+
+                // Get the user
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                    return Json(new { success = false, message = "User not found." });
+
+                // Update password
+                string hashedPassword = ComputeSha256Hash(newPassword);
+                user.PasswordHash = hashedPassword;
+
+                // Remove the verification code
+                _context.EmailVerifications.Remove(verification);
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Password reset successfully.", redirectUrl = Url.Action("Login", "User") });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error resetting password: {ex.Message}" });
+            }
+        }
         [UserAuthenticationFilter]
         public IActionResult User_Listing_Details() => View();
         [UserAuthenticationFilter]
