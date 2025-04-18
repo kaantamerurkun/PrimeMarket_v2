@@ -387,11 +387,14 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Fetch user data from database
-            var user = await _context.Users.FindAsync(userId);
+            // Always fetch the fresh user data from database
+            var user = await _context.Users
+                .AsNoTracking() // To ensure we get fresh data
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
             if (user == null)
             {
-                return NotFound();
+                return NotFound("User not found. Please try logging in again.");
             }
 
             // Pass the user object to the view
@@ -405,8 +408,8 @@ namespace PrimeMarket.Controllers
         //public IActionResult MyProfilePage() => View();
         [UserAuthenticationFilter]
         public IActionResult MyBookmarks() => View();
-        [UserAuthenticationFilter]
-        public IActionResult EditProfile() => View();
+        //[UserAuthenticationFilter]
+        //public IActionResult EditProfile() => View();
         [UserAuthenticationFilter]
         public IActionResult LiveChat() => View();
         [UserAuthenticationFilter]
@@ -425,6 +428,228 @@ namespace PrimeMarket.Controllers
         public IActionResult AllNotifications() => View();
         [UserAuthenticationFilter]
         public IActionResult MyListing() => View();
+
+        [HttpGet]
+        public async Task<IActionResult> EditProfile()
+        {
+            // Get the user ID from session
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            // Fetch user data from database
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            // Create view model for the form
+            var model = new EditProfileViewModel
+            {
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                PhoneNumber = user.PhoneNumber,
+                Email = user.Email,
+                ProfileImagePath = user.ProfileImagePath
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditProfile(EditProfileViewModel model, IFormFile profileImage)
+        {
+            try
+            {
+                if (!ModelState.IsValid)
+                {
+                    return View(model);
+                }
+
+                // Get the user ID from session
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return RedirectToAction("Login");
+                }
+
+                // Fetch user from database
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+
+                // Update user information
+                user.FirstName = model.FirstName;
+                user.LastName = model.LastName;
+                user.PhoneNumber = model.PhoneNumber;
+
+                // Handle profile image upload if provided
+                if (profileImage != null && profileImage.Length > 0)
+                {
+                    // Define upload directory path (create if it doesn't exist)
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Generate unique filename
+                    var uniqueFileName = $"{userId}_{Guid.NewGuid()}{Path.GetExtension(profileImage.FileName)}";
+                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                    // Save the file
+                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await profileImage.CopyToAsync(fileStream);
+                    }
+
+                    // Update user profile image path
+                    user.ProfileImagePath = $"/images/profiles/{uniqueFileName}";
+                }
+
+                // Update email if changed and not already in use by another account
+                if (user.Email != model.Email)
+                {
+                    // Check if the new email is already in use
+                    if (await _context.Users.AnyAsync(u => u.Email == model.Email && u.Id != userId))
+                    {
+                        ModelState.AddModelError("Email", "This email is already in use by another account.");
+                        return View(model);
+                    }
+
+                    user.Email = model.Email;
+                    user.IsEmailVerified = false; // Require verification for new email
+
+                    // TODO: Send verification email to the new address
+                    // SendVerificationCodeInternal(model.Email);
+                }
+
+                // Update password if provided
+                if (!string.IsNullOrEmpty(model.CurrentPassword) && !string.IsNullOrEmpty(model.NewPassword))
+                {
+                    // Verify current password
+                    string hashedCurrentPassword = ComputeSha256Hash(model.CurrentPassword);
+                    if (user.PasswordHash != hashedCurrentPassword)
+                    {
+                        ModelState.AddModelError("CurrentPassword", "Current password is incorrect");
+                        return View(model);
+                    }
+
+                    // Update with new password
+                    user.PasswordHash = ComputeSha256Hash(model.NewPassword);
+                }
+
+                // Save changes
+                user.UpdatedAt = DateTime.Now;
+                await _context.SaveChangesAsync();
+
+                // Update session data
+                HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
+                HttpContext.Session.SetString("UserEmail", user.Email);
+
+                // Add success message to temp data so it persists through the redirect
+                TempData["SuccessMessage"] = "Your profile has been updated successfully!";
+
+                // Redirect to profile page
+                return RedirectToAction("MyProfilePage");
+            }
+            catch (Exception ex)
+            {
+                // Log the error
+                Console.Error.WriteLine($"Error updating profile: {ex.Message}");
+
+                // Add error message to model state
+                ModelState.AddModelError("", "An error occurred while updating your profile. Please try again.");
+                return View(model);
+            }
+        }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SubmitIdVerification(IFormFile idFront, IFormFile idBack)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "You must be logged in to verify your ID" });
+            }
+
+            if (idFront == null || idBack == null)
+            {
+                return Json(new { success = false, message = "Both front and back ID images are required" });
+            }
+
+            try
+            {
+                // Save the ID images
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "verification");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                // Generate unique filenames
+                string frontImageFileName = $"front_{userId}_{Guid.NewGuid()}{Path.GetExtension(idFront.FileName)}";
+                string backImageFileName = $"back_{userId}_{Guid.NewGuid()}{Path.GetExtension(idBack.FileName)}";
+
+                string frontImagePath = Path.Combine(uploadsFolder, frontImageFileName);
+                string backImagePath = Path.Combine(uploadsFolder, backImageFileName);
+
+                // Save files to disk
+                using (var frontStream = new FileStream(frontImagePath, FileMode.Create))
+                {
+                    await idFront.CopyToAsync(frontStream);
+                }
+
+                using (var backStream = new FileStream(backImagePath, FileMode.Create))
+                {
+                    await idBack.CopyToAsync(backStream);
+                }
+
+                // Check if user already has a verification document
+                var existingVerification = await _context.VerificationDocuments.FirstOrDefaultAsync(v => v.UserId == userId);
+
+                if (existingVerification != null)
+                {
+                    // Update existing document
+                    existingVerification.FrontImagePath = $"/images/verification/{frontImageFileName}";
+                    existingVerification.BackImagePath = $"/images/verification/{backImageFileName}";
+                    existingVerification.Status = PrimeMarket.Models.Enum.VerificationStatus.Pending;
+                    existingVerification.RejectionReason = null;
+                    existingVerification.UpdatedAt = DateTime.Now;
+                }
+                else
+                {
+                    // Create new verification document
+                    var verificationDocument = new VerificationDocument
+                    {
+                        UserId = userId.Value,
+                        FrontImagePath = $"/images/verification/{frontImageFileName}",
+                        BackImagePath = $"/images/verification/{backImageFileName}",
+                        Status = PrimeMarket.Models.Enum.VerificationStatus.Pending,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    _context.VerificationDocuments.Add(verificationDocument);
+                }
+
+                await _context.SaveChangesAsync();
+
+                // Create a notification for admins that a new verification is pending
+
+                return Json(new { success = true, message = "ID verification submitted successfully. Our team will review your documents." });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = "An error occurred while processing your verification: " + ex.Message });
+            }
+        }
+
     }
 
     public class SignUpViewModel
@@ -444,5 +669,29 @@ namespace PrimeMarket.Controllers
 
         [Required]
         public bool AgreeToTerms { get; set; }
+    }
+    public class EditProfileViewModel
+    {
+        [Required, MaxLength(50)]
+        public string FirstName { get; set; }
+
+        [Required, MaxLength(50)]
+        public string LastName { get; set; }
+
+        [Required, MaxLength(100), EmailAddress]
+        public string Email { get; set; }
+
+        [MaxLength(15)]
+        public string PhoneNumber { get; set; }
+
+        public string ProfileImagePath { get; set; }
+
+        // Password change fields (optional)
+        public string CurrentPassword { get; set; }
+
+        [MinLength(6)]
+        public string NewPassword { get; set; }
+
+        public string ConfirmNewPassword { get; set; }
     }
 }

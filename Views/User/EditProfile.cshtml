@@ -1,27 +1,18 @@
-﻿<!DOCTYPE html>
+﻿@model PrimeMarket.Controllers.EditProfileViewModel
+@{
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    ViewBag.Title = "Edit Profile";
+}
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Edit Profile</title>
+    <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="/css/EditProfile.css" />
 </head>
 <body>
-    <header class="main-header">
-        <div class="header-content">
-            <a asp-action="User_MainPage" asp-controller="User" class="logo">
-                <img style="height: 50px; width: 100px; background-color:#f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
-            </a>
-            <div class="header-actions">
-                <div class="search-box">
-                    <a asp-action="Search_Page" asp-controller="Home">
-                        <input type="text" placeholder="Search for a listed item" />
-                    </a>
-                </div>
-            </div>
-        </div>
-    </header>
-
     <div class="min-h-screen">
         <div class="container">
             <div class="profile-card">
@@ -47,82 +38,101 @@
                     </button>
                 </div>
 
-                <!-- Profile Tab -->
-                <div class="tab-content active" id="profile-tab">
-                    <div class="profile-info">
-                        <div class="profile-image-container">
-                            <img src="https://picsum.photos/200" alt="Profile" class="profile-image" id="profile-image">
-                            <button class="camera-button">
-                                <img src="/images/verified.png" alt="Camera" class="camera-icon">
-                            </button>
+                <form asp-action="EditProfile" asp-controller="User" method="post" enctype="multipart/form-data">
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                    <!-- Profile Tab -->
+                    <div class="tab-content active" id="profile-tab">
+                        <div class="profile-info">
+                            <div class="profile-image-container">
+                                <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.ProfileImagePath)"
+                                     alt="Profile" class="profile-image" id="profile-image">
+                                <label for="profile-image-upload" class="camera-button">
+                                    <img src="/images/verified.png" alt="Camera" class="camera-icon">
+                                </label>
+                                <input type="file" id="profile-image-upload" name="profileImage" style="display: none" accept="image/*" />
+                            </div>
+                            <div class="name-fields">
+                                <div class="input-group">
+                                    <label asp-for="FirstName">First Name</label>
+                                    <input asp-for="FirstName" type="text" placeholder="Enter your Name">
+                                    <span asp-validation-for="FirstName" class="text-danger"></span>
+                                </div>
+                                <div class="input-group">
+                                    <label asp-for="LastName">Last Name</label>
+                                    <input asp-for="LastName" type="text" placeholder="Enter your Lastname">
+                                    <span asp-validation-for="LastName" class="text-danger"></span>
+                                </div>
+                                <div class="input-group">
+                                    <label asp-for="PhoneNumber">Phone Number</label>
+                                    <input asp-for="PhoneNumber" type="tel" placeholder="Enter your phone number">
+                                    <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="name-fields">
-                            <div class="input-group">
-                                <label>First Name</label>
-                                <input type="text" placeholder="Enter your Name">
-                            </div>
-                            <div class="input-group">
-                                <label>Last Name</label>
-                                <input type="text" placeholder="Enter your Lastname">
-                            </div>
-                            <div class="input-group">
-                                <label>Phone Number</label>
-                                <input type="tel" placeholder="Enter your phone number">
-                            </div>
-                        </div>
                     </div>
-                </div>
 
-                <!-- Email Tab -->
-                <div class="tab-content" id="email-tab">
-                    <div class="input-group">
-                        <label>Current Email</label>
-                        <input type="email" value="" disabled>
-                    </div>
-                    <div class="input-group">
-                        <label>New Email</label>
-                        <input type="email" placeholder="Enter new email address">
-                    </div>
-                </div>
-
-                <!-- Password Tab -->
-                <div class="tab-content" id="password-tab">
-                    <div class="input-group">
-                        <label>Current Password</label>
-                        <input type="password">
-                    </div>
-                    <div class="input-group">
-                        <label>New Password</label>
-                        <input type="password">
-                    </div>
-                    <div class="input-group">
-                        <label>Confirm New Password</label>
-                        <input type="password">
-                    </div>
-                </div>
-
-                <!-- Verify Tab -->
-                <div class="tab-content" id="verify-tab">
-                    <h2>Verify Your Account</h2>
-                    <form id="verification-form" enctype="multipart/form-data">
+                    <!-- Email Tab -->
+                    <div class="tab-content" id="email-tab">
                         <div class="input-group">
-                            <label for="idFront">Upload Front of ID:</label>
-                            <input type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" required />
+                            <label>Current Email</label>
+                            <input type="email" value="@Model.Email" disabled>
                         </div>
                         <div class="input-group">
-                            <label for="idBack">Upload Back of ID:</label>
-                            <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" required />
+                            <label asp-for="Email">New Email</label>
+                            <input asp-for="Email" type="email" placeholder="Enter new email address">
+                            <span asp-validation-for="Email" class="text-danger"></span>
+                            <p class="note">Note: Changing your email will require verification of the new address.</p>
                         </div>
-                        <div class="button-container">
-                            <button type="submit" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
-                        </div>
-                    </form>
-                </div>
+                    </div>
 
-                <!-- Save Button - Hidden on Verify Tab -->
-                <div class="button-container" id="save-button-container">
-                    <button id="saveChangesBtn" class="btn-savechangesandgoprofile">Save Changes</button>
-                </div>
+                    <!-- Password Tab -->
+                    <div class="tab-content" id="password-tab">
+                        <div class="input-group">
+                            <label asp-for="CurrentPassword">Current Password</label>
+                            <input asp-for="CurrentPassword" type="password">
+                            <span asp-validation-for="CurrentPassword" class="text-danger"></span>
+                        </div>
+                        <div class="input-group">
+                            <label asp-for="NewPassword">New Password</label>
+                            <input asp-for="NewPassword" type="password">
+                            <span asp-validation-for="NewPassword" class="text-danger"></span>
+                        </div>
+                        <div class="input-group">
+                            <label asp-for="ConfirmNewPassword">Confirm New Password</label>
+                            <input asp-for="ConfirmNewPassword" type="password">
+                            <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
+                        </div>
+                    </div>
+
+                    <!-- Verify Tab -->
+                    <div class="tab-content" id="verify-tab">
+                        <h2>Verify Your Account</h2>
+                        <!-- Separate form for ID verification -->
+                        <div id="verification-form-container">
+                            <form id="verification-form" action="/User/SubmitIdVerification" method="post" enctype="multipart/form-data">
+                                @Html.AntiForgeryToken()
+                                <div class="input-group">
+                                    <label for="idFront">Upload Front of ID:</label>
+                                    <input type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" required />
+                                </div>
+                                <div class="input-group">
+                                    <label for="idBack">Upload Back of ID:</label>
+                                    <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" required />
+                                </div>
+                                <div class="button-container">
+                                    <button type="submit" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
+                                </div>
+                            </form>
+                            <div id="verification-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
+                        </div>
+                    </div>
+
+                    <!-- Save Button - Hidden on Verify Tab -->
+                    <div class="button-container" id="save-button-container">
+                        <button type="submit" id="saveChangesBtn" class="btn-savechangesandgoprofile">Save Changes</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -132,9 +142,14 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const saveButtonContainer = document.getElementById('save-button-container');
+        const form = document.querySelector('form');
+
+        // Show debug message (optional)
+        console.log("EditProfile script loaded");
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => {
+                console.log("Tab clicked:", tab.dataset.tab);
                 tabs.forEach(t => t.classList.remove('active'));
                 tabContents.forEach(content => content.classList.remove('active'));
 
@@ -151,43 +166,102 @@
             });
         });
 
-        // Profile image upload
+        // Profile image upload preview
         const profileImage = document.querySelector('#profile-image');
+        const imageUploadInput = document.querySelector('#profile-image-upload');
         const cameraButton = document.querySelector('.camera-button');
 
         cameraButton.addEventListener('click', () => {
-            const input = document.createElement('input');
-            input.type = 'file';
-            input.accept = 'image/*';
-
-            input.onchange = (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => {
-                        profileImage.src = e.target.result;
-                    };
-                    reader.readAsDataURL(file);
-                }
-            };
-
-            input.click();
+            imageUploadInput.click();
         });
 
-        // Save Changes button behavior
-        const saveChangesBtn = document.getElementById('saveChangesBtn');
-        if (saveChangesBtn) {
-            saveChangesBtn.addEventListener('click', () => {
-                alert('Changes saved successfully!');
-                // Add actual saving logic here if needed
-            });
-        }
+        imageUploadInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    profileImage.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
 
-        // Verification form submission
+        // Handle ID verification form submission with AJAX
         document.getElementById("verification-form").addEventListener("submit", function (e) {
             e.preventDefault();
-            alert("Verification images sent successfully.");
-            // Add actual verification submission logic here if needed
+
+            const messageDiv = document.getElementById("verification-message");
+            messageDiv.style.display = "none";
+
+            const idFront = document.getElementById("idFront").files[0];
+            const idBack = document.getElementById("idBack").files[0];
+
+            if (!idFront || !idBack) {
+                messageDiv.textContent = "Please upload both front and back images of your ID";
+                messageDiv.style.backgroundColor = "#f8d7da";
+                messageDiv.style.color = "#721c24";
+                messageDiv.style.display = "block";
+                return;
+            }
+
+            // Show loading state
+            const submitBtn = document.getElementById("sendVerificationBtn");
+            const originalText = submitBtn.textContent;
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Submitting...";
+
+            // Create form data to send
+            const formData = new FormData(this);
+
+            // Add anti-forgery token
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            formData.append("__RequestVerificationToken", token);
+
+            // Submit verification request via fetch
+            fetch('/User/SubmitIdVerification', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    messageDiv.textContent = "Verification documents submitted successfully. They will be reviewed by our team.";
+                    messageDiv.style.backgroundColor = "#d4edda";
+                    messageDiv.style.color = "#155724";
+
+                    // Clear the form
+                    document.getElementById("idFront").value = "";
+                    document.getElementById("idBack").value = "";
+                } else {
+                    messageDiv.textContent = "Error: " + data.message;
+                    messageDiv.style.backgroundColor = "#f8d7da";
+                    messageDiv.style.color = "#721c24";
+                }
+                messageDiv.style.display = "block";
+            })
+            .catch(error => {
+                console.error("Verification submission error:", error);
+                messageDiv.textContent = "An error occurred while submitting your verification. Please try again.";
+                messageDiv.style.backgroundColor = "#f8d7da";
+                messageDiv.style.color = "#721c24";
+                messageDiv.style.display = "block";
+            })
+            .finally(() => {
+                // Reset button state
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            });
+        });
+
+        // Form submission validation for password match
+        form.addEventListener('submit', function(e) {
+            const newPassword = document.getElementById('NewPassword').value;
+            const confirmPassword = document.getElementById('ConfirmNewPassword').value;
+
+            if (newPassword && newPassword !== confirmPassword) {
+                e.preventDefault();
+                alert('New password and confirmation do not match');
+            }
         });
     </script>
 </body>
