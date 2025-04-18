@@ -54,9 +54,21 @@ namespace PrimeMarket.Controllers
             _context.Users.Add(user);
             _context.SaveChanges();
 
-            SendVerificationCodeInternal(model.Email);
+            // Send verification code 
+            try
+            {
+                SendVerificationCodeInternal(model.Email);
+                return RedirectToAction("EmailVerification", "User", new { email = model.Email });
+            }
+            catch (Exception ex)
+            {
+                // Log the error (ideally to a proper logging system)
+                Console.WriteLine($"Error sending verification email: {ex.Message}");
 
-            return RedirectToAction("EmailVerification", "User", new { email = model.Email });
+                // Add a more user-friendly error
+                ModelState.AddModelError("", "We encountered an issue sending the verification email. Please try again later.");
+                return View(model);
+            }
         }
 
         [HttpGet]
@@ -101,23 +113,62 @@ namespace PrimeMarket.Controllers
 
             _context.SaveChanges();
 
-            var smtpClient = new SmtpClient(_emailSettings.Host)
+            try
             {
-                Port = _emailSettings.Port,
-                Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword),
-                EnableSsl = _emailSettings.EnableSsl
-            };
+                using (var smtpClient = new SmtpClient(_emailSettings.Host))
+                {
+                    smtpClient.Port = _emailSettings.Port;
+                    smtpClient.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword);
+                    smtpClient.EnableSsl = _emailSettings.EnableSsl;
 
-            var mailMessage = new MailMessage
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                        Subject = "Your PrimeMarket Verification Code",
+                        IsBodyHtml = true,
+                        Body = $@"
+                        <html>
+                        <head>
+                            <style>
+                                body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                                .container {{ width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }}
+                                .header {{ background-color: #0066cc; color: white; padding: 10px; text-align: center; }}
+                                .content {{ padding: 20px; }}
+                                .code {{ font-size: 24px; font-weight: bold; text-align: center; 
+                                         margin: 30px 0; color: #0066cc; letter-spacing: 3px; }}
+                                .footer {{ font-size: 12px; text-align: center; margin-top: 30px; color: #666; }}
+                            </style>
+                        </head>
+                        <body>
+                            <div class='container'>
+                                <div class='header'>
+                                    <h1>PrimeMarket Email Verification</h1>
+                                </div>
+                                <div class='content'>
+                                    <p>Hello,</p>
+                                    <p>Thank you for registering with PrimeMarket. To complete your registration, please use the verification code below:</p>
+                                    <div class='code'>{code}</div>
+                                    <p>This code will expire in 10 minutes for security reasons.</p>
+                                    <p>If you did not request this code, please ignore this email.</p>
+                                    <p>Thank you,<br>The PrimeMarket Team</p>
+                                </div>
+                                <div class='footer'>
+                                    <p>This is an automated message, please do not reply to this email.</p>
+                                </div>
+                            </div>
+                        </body>
+                        </html>"
+                    };
+
+                    mailMessage.To.Add(email);
+                    smtpClient.Send(mailMessage);
+                }
+            }
+            catch (Exception ex)
             {
-                From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
-                Subject = "Your Verification Code",
-                Body = $"Hello,\n\nYour email verification code is: {code}\nThis code will expire in 10 minutes.\n\nThank you,\nPrimeMarket Team",
-                IsBodyHtml = false,
-            };
-
-            mailMessage.To.Add(email);
-            smtpClient.Send(mailMessage);
+                // Add better error handling
+                throw new Exception($"SMTP Error: {ex.Message}. Please check your email configuration.", ex);
+            }
         }
 
         [HttpPost]
