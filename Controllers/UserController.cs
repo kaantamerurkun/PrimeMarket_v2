@@ -8,6 +8,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Net;
 using System.Net.Mail;
+using PrimeMarket.Filters;
 
 namespace PrimeMarket.Controllers
 {
@@ -202,22 +203,88 @@ namespace PrimeMarket.Controllers
                 return builder.ToString();
             }
         }
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(password))
+            {
+                ViewBag.ErrorMessage = "Please enter both email and password.";
+                return View();
+            }
+
+            // Find the user by email
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+
+            // Check if user exists and password is correct
+            if (user == null)
+            {
+                ViewBag.ErrorMessage = "Invalid email or password.";
+                return View();
+            }
+
+            // Compute SHA256 hash of the provided password
+            string hashedPassword = ComputeSha256Hash(password);
+
+            // Verify the password
+            if (user.PasswordHash != hashedPassword)
+            {
+                ViewBag.ErrorMessage = "Invalid email or password.";
+                return View();
+            }
+
+            // Check if email is verified
+            if (!user.IsEmailVerified)
+            {
+                ViewBag.ErrorMessage = "Please verify your email before logging in.";
+                return RedirectToAction("EmailVerification", new { email = user.Email });
+            }
+
+            // Store user information in session
+            HttpContext.Session.SetInt32("UserId", user.Id);
+            HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
+            HttpContext.Session.SetString("UserEmail", user.Email);
+
+            return RedirectToAction("User_MainPage");
+        }
+        [HttpPost]
+        public IActionResult Logout()
+        {
+            // Clear the session
+            HttpContext.Session.Clear();
+
+            // Redirect to home page
+            return RedirectToAction("Index", "Home");
+        }
 
         // Other user views
         public IActionResult ResetPassword() => View();
+        [UserAuthenticationFilter]
         public IActionResult User_Listing_Details() => View();
+        [UserAuthenticationFilter]
         public IActionResult User_MainPage() => View();
+        [UserAuthenticationFilter]
         public IActionResult MyProfilePage() => View();
+        [UserAuthenticationFilter]
         public IActionResult MyBookmarks() => View();
+        [UserAuthenticationFilter]
         public IActionResult EditProfile() => View();
+        [UserAuthenticationFilter]
         public IActionResult LiveChat() => View();
+        [UserAuthenticationFilter]
         public IActionResult OtherUserProfile() => View();
+        [UserAuthenticationFilter]
         public IActionResult CreateListing() => View();
+        [UserAuthenticationFilter]
         public IActionResult MyShoppingCart() => View();
+        [UserAuthenticationFilter]
         public IActionResult PaymentPage() => View();
+        [UserAuthenticationFilter]
         public IActionResult MyProfitLossReport() => View();
+        [UserAuthenticationFilter]
         public IActionResult AllMessages() => View();
+        [UserAuthenticationFilter]
         public IActionResult AllNotifications() => View();
+        [UserAuthenticationFilter]
         public IActionResult MyListing() => View();
     }
 

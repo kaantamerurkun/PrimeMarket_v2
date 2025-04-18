@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var userName = Context.Session.GetString("UserName") ?? "User";
+}
+<!DOCTYPE html>
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -20,8 +23,10 @@
                     </a>
                 </div>
 
-                <a asp-action="MyProfilePage" asp-controller="User"><p>NameLastName</p></a>
-                <a asp-action="Login" asp-controller="User"><button class="btn-logout">Logout</button></a>
+                <a asp-action="MyProfilePage" asp-controller="User"><p>@userName</p></a>
+                <form asp-action="Logout" asp-controller="User" method="post" style="display: inline;">
+                    <button type="submit" class="btn-logout">Logout</button>
+                </form>
 
                 <!-- ✅ Listing Notifications -->
                 <div class="notification-wrapper">
