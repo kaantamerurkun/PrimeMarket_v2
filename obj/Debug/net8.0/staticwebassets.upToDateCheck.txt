@@ -33,6 +33,8 @@ wwwroot\images\NotificationBell.png
 wwwroot\images\PrimeMarket_Logo.png
 wwwroot\images\PrimeMarket_Logo_V2.png
 wwwroot\images\shopping_cart_icon.png
+wwwroot\images\verification\back_14_70917466-7487-4a42-8278-318c14eea0e3.png
+wwwroot\images\verification\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png
 wwwroot\images\verified.png
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css

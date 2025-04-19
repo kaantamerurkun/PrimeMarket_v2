@@ -141,6 +141,14 @@
       "PackagePath": "staticwebassets\\images\\shopping_cart_icon.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\back_14_70917466-7487-4a42-8278-318c14eea0e3.png",
+      "PackagePath": "staticwebassets\\images\\verification\\back_14_70917466-7487-4a42-8278-318c14eea0e3.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png",
+      "PackagePath": "staticwebassets\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verified.png",
       "PackagePath": "staticwebassets\\images\\verified.png"
     },

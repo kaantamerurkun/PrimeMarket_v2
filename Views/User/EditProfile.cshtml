@@ -21,24 +21,20 @@
                 <!-- Tabs -->
                 <div class="tabs">
                     <button class="tab active" data-tab="profile">
-                        <img src="https://picsum.photos/20" alt="Profile" class="tab-icon">
                         <span>Profile Info</span>
                     </button>
                     <button class="tab" data-tab="email">
-                        <img src="https://picsum.photos/20" alt="Email" class="tab-icon">
                         <span>Email Address</span>
                     </button>
                     <button class="tab" data-tab="password">
-                        <img src="https://picsum.photos/20" alt="Password" class="tab-icon">
                         <span>Password</span>
                     </button>
                     <button class="tab" data-tab="verify">
-                        <img src="https://picsum.photos/20" alt="Verify" class="tab-icon">
                         <span>Verify Account</span>
                     </button>
                 </div>
 
-                <form asp-action="EditProfile" asp-controller="User" method="post" enctype="multipart/form-data">
+                <form asp-action="EditProfile" asp-controller="User" method="post" enctype="multipart/form-data" id="profileForm">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                     <!-- Profile Tab -->
@@ -110,7 +106,7 @@
                         <h2>Verify Your Account</h2>
                         <!-- Separate form for ID verification -->
                         <div id="verification-form-container">
-                            <form id="verification-form" action="/User/SubmitIdVerification" method="post" enctype="multipart/form-data">
+                            <div id="verification-form">
                                 @Html.AntiForgeryToken()
                                 <div class="input-group">
                                     <label for="idFront">Upload Front of ID:</label>
@@ -121,9 +117,9 @@
                                     <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" required />
                                 </div>
                                 <div class="button-container">
-                                    <button type="submit" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
+                                    <button type="button" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
                                 </div>
-                            </form>
+                            </div>
                             <div id="verification-message" style="margin-top: 15px; padding: 10px; border-radius: 4px; display: none;"></div>
                         </div>
                     </div>
@@ -142,7 +138,7 @@
         const tabs = document.querySelectorAll('.tab');
         const tabContents = document.querySelectorAll('.tab-content');
         const saveButtonContainer = document.getElementById('save-button-container');
-        const form = document.querySelector('form');
+        const profileForm = document.getElementById('profileForm');
 
         // Show debug message (optional)
         console.log("EditProfile script loaded");
@@ -186,10 +182,8 @@
             }
         });
 
-        // Handle ID verification form submission with AJAX
-        document.getElementById("verification-form").addEventListener("submit", function (e) {
-            e.preventDefault();
-
+        // Handle ID verification submission
+        document.getElementById("sendVerificationBtn").addEventListener("click", function () {
             const messageDiv = document.getElementById("verification-message");
             messageDiv.style.display = "none";
 
@@ -211,7 +205,9 @@
             submitBtn.textContent = "Submitting...";
 
             // Create form data to send
-            const formData = new FormData(this);
+            const formData = new FormData();
+            formData.append("idFront", idFront);
+            formData.append("idBack", idBack);
 
             // Add anti-forgery token
             const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
@@ -254,7 +250,7 @@
         });
 
         // Form submission validation for password match
-        form.addEventListener('submit', function(e) {
+        profileForm.addEventListener('submit', function(e) {
             const newPassword = document.getElementById('NewPassword').value;
             const confirmPassword = document.getElementById('ConfirmNewPassword').value;
 
