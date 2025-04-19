@@ -22,6 +22,110 @@ namespace PrimeMarket.Controllers
             _context = context;
             _emailSettings = emailOptions.Value;
         }
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProfile(EditProfileViewModel model, IFormFile profileImage)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            user.FirstName = model.FirstName;
+            user.LastName = model.LastName;
+            user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
+
+            if (profileImage != null && profileImage.Length > 0)
+            {
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
+                Directory.CreateDirectory(uploadsFolder);
+                var uniqueFileName = $"{userId}_{Guid.NewGuid()}{Path.GetExtension(profileImage.FileName)}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using var stream = new FileStream(filePath, FileMode.Create);
+                await profileImage.CopyToAsync(stream);
+                user.ProfileImagePath = $"/images/profiles/{uniqueFileName}";
+            }
+
+            await _context.SaveChangesAsync();
+            HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
+            return RedirectToAction("EditProfile");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            if (user.Email != model.Email)
+            {
+                var emailInUse = await _context.Users.AnyAsync(u => u.Email == model.Email && u.Id != userId);
+                if (emailInUse)
+                {
+                    ModelState.AddModelError("Email", "This email is already in use.");
+                    return RedirectToAction("EditProfile");
+                }
+
+                user.Email = model.Email;
+                user.IsEmailVerified = false;
+
+                try
+                {
+                    SendVerificationCodeInternal(model.Email);
+                }
+                catch (Exception ex)
+                {
+                    TempData["ErrorMessage"] = "Failed to send verification email: " + ex.Message;
+                    return RedirectToAction("EditProfile");
+                }
+
+                await _context.SaveChangesAsync();
+                HttpContext.Session.SetString("UserEmail", user.Email);
+            }
+
+            return RedirectToAction("EditProfile");
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdatePassword(EditProfileViewModel model)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null) return RedirectToAction("Login");
+
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null) return NotFound();
+
+            if (string.IsNullOrEmpty(model.CurrentPassword) || string.IsNullOrEmpty(model.NewPassword) || string.IsNullOrEmpty(model.ConfirmNewPassword))
+            {
+                TempData["ErrorMessage"] = "All password fields are required.";
+                return RedirectToAction("EditProfile");
+            }
+
+            var currentHash = ComputeSha256Hash(model.CurrentPassword);
+            if (user.PasswordHash != currentHash)
+            {
+                TempData["ErrorMessage"] = "Current password is incorrect.";
+                return RedirectToAction("EditProfile");
+            }
+
+            if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                TempData["ErrorMessage"] = "New password and confirmation do not match.";
+                return RedirectToAction("EditProfile");
+            }
+
+            user.PasswordHash = ComputeSha256Hash(model.NewPassword);
+            await _context.SaveChangesAsync();
+            TempData["SuccessMessage"] = "Password updated successfully.";
+            return RedirectToAction("EditProfile");
+        }
 
         public IActionResult Login() => View();
 
@@ -203,6 +307,7 @@ namespace PrimeMarket.Controllers
                 return builder.ToString();
             }
         }
+
         [HttpPost]
         public async Task<IActionResult> Login(string email, string password)
         {
@@ -246,6 +351,7 @@ namespace PrimeMarket.Controllers
 
             return RedirectToAction("User_MainPage");
         }
+
         [HttpPost]
         public IActionResult Logout()
         {
@@ -377,6 +483,7 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = $"Error resetting password: {ex.Message}" });
             }
         }
+
         [UserAuthenticationFilter]
         public async Task<IActionResult> MyProfilePage()
         {
@@ -400,34 +507,6 @@ namespace PrimeMarket.Controllers
             // Pass the user object to the view
             return View(user);
         }
-        [UserAuthenticationFilter]
-        public IActionResult User_Listing_Details() => View();
-        [UserAuthenticationFilter]
-        public IActionResult User_MainPage() => View();
-        //[UserAuthenticationFilter]
-        //public IActionResult MyProfilePage() => View();
-        [UserAuthenticationFilter]
-        public IActionResult MyBookmarks() => View();
-        //[UserAuthenticationFilter]
-        //public IActionResult EditProfile() => View();
-        [UserAuthenticationFilter]
-        public IActionResult LiveChat() => View();
-        [UserAuthenticationFilter]
-        public IActionResult OtherUserProfile() => View();
-        [UserAuthenticationFilter]
-        public IActionResult CreateListing() => View();
-        [UserAuthenticationFilter]
-        public IActionResult MyShoppingCart() => View();
-        [UserAuthenticationFilter]
-        public IActionResult PaymentPage() => View();
-        [UserAuthenticationFilter]
-        public IActionResult MyProfitLossReport() => View();
-        [UserAuthenticationFilter]
-        public IActionResult AllMessages() => View();
-        [UserAuthenticationFilter]
-        public IActionResult AllNotifications() => View();
-        [UserAuthenticationFilter]
-        public IActionResult MyListing() => View();
 
         [HttpGet]
         public async Task<IActionResult> EditProfile()
@@ -439,24 +518,38 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login");
             }
 
-            // Fetch user data from database
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
+            try
             {
-                return NotFound();
+                // Fetch user data from database
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                {
+                    return NotFound("User not found");
+                }
+
+                // Create view model for the form
+                var model = new EditProfileViewModel
+                {
+                    FirstName = user.FirstName,
+                    LastName = user.LastName,
+                    PhoneNumber = user.PhoneNumber,
+                    Email = user.Email,
+                    ProfileImagePath = user.ProfileImagePath
+                };
+
+                return View(model);
             }
-
-            // Create view model for the form
-            var model = new EditProfileViewModel
+            catch (Exception ex)
             {
-                FirstName = user.FirstName,
-                LastName = user.LastName,
-                PhoneNumber = user.PhoneNumber,
-                Email = user.Email,
-                ProfileImagePath = user.ProfileImagePath
-            };
+                // Log the error
+                Console.Error.WriteLine($"Error loading profile: {ex.Message}");
 
-            return View(model);
+                // Add error to TempData
+                TempData["ErrorMessage"] = "Failed to load profile data. Please try again.";
+
+                // Redirect to profile page
+                return RedirectToAction("MyProfilePage");
+            }
         }
 
         [HttpPost]
@@ -465,6 +558,7 @@ namespace PrimeMarket.Controllers
         {
             try
             {
+                // Basic model validation
                 if (!ModelState.IsValid)
                 {
                     return View(model);
@@ -481,36 +575,50 @@ namespace PrimeMarket.Controllers
                 var user = await _context.Users.FindAsync(userId);
                 if (user == null)
                 {
-                    return NotFound();
+                    ModelState.AddModelError("", "User not found. Please try logging in again.");
+                    return View(model);
                 }
 
                 // Update user information
                 user.FirstName = model.FirstName;
                 user.LastName = model.LastName;
-                user.PhoneNumber = model.PhoneNumber;
+
+                // Handle phone number - add null check and trimming
+                Console.WriteLine($"Phone number from form: '{model.PhoneNumber}'");
+                user.PhoneNumber = string.IsNullOrWhiteSpace(model.PhoneNumber) ? null : model.PhoneNumber.Trim();
+                Console.WriteLine($"Phone number to save: '{user.PhoneNumber}'");
 
                 // Handle profile image upload if provided
                 if (profileImage != null && profileImage.Length > 0)
                 {
-                    // Define upload directory path (create if it doesn't exist)
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
-                    if (!Directory.Exists(uploadsFolder))
+                    try
                     {
-                        Directory.CreateDirectory(uploadsFolder);
+                        // Define upload directory path (create if it doesn't exist)
+                        var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "profiles");
+                        if (!Directory.Exists(uploadsFolder))
+                        {
+                            Directory.CreateDirectory(uploadsFolder);
+                        }
+
+                        // Generate unique filename
+                        var uniqueFileName = $"{userId}_{Guid.NewGuid()}{Path.GetExtension(profileImage.FileName)}";
+                        var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                        // Save the file
+                        using (var fileStream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await profileImage.CopyToAsync(fileStream);
+                        }
+
+                        // Update user profile image path
+                        user.ProfileImagePath = $"/images/profiles/{uniqueFileName}";
+                        Console.WriteLine($"Profile image updated: {user.ProfileImagePath}");
                     }
-
-                    // Generate unique filename
-                    var uniqueFileName = $"{userId}_{Guid.NewGuid()}{Path.GetExtension(profileImage.FileName)}";
-                    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                    // Save the file
-                    using (var fileStream = new FileStream(filePath, FileMode.Create))
+                    catch (Exception ex)
                     {
-                        await profileImage.CopyToAsync(fileStream);
+                        Console.WriteLine($"Image upload error: {ex.Message}");
+                        // Continue without failing the whole operation
                     }
-
-                    // Update user profile image path
-                    user.ProfileImagePath = $"/images/profiles/{uniqueFileName}";
                 }
 
                 // Update email if changed and not already in use by another account
@@ -525,6 +633,7 @@ namespace PrimeMarket.Controllers
 
                     user.Email = model.Email;
                     user.IsEmailVerified = false; // Require verification for new email
+                    Console.WriteLine($"Email updated to: {user.Email}");
 
                     // TODO: Send verification email to the new address
                     // SendVerificationCodeInternal(model.Email);
@@ -543,11 +652,28 @@ namespace PrimeMarket.Controllers
 
                     // Update with new password
                     user.PasswordHash = ComputeSha256Hash(model.NewPassword);
+                    Console.WriteLine("Password has been updated");
                 }
 
                 // Save changes
                 user.UpdatedAt = DateTime.Now;
-                await _context.SaveChangesAsync();
+                Console.WriteLine("About to save changes...");
+
+                try
+                {
+                    await _context.SaveChangesAsync();
+                    Console.WriteLine("Changes saved successfully");
+                }
+                catch (DbUpdateException dbEx)
+                {
+                    Console.WriteLine($"Database update error: {dbEx.Message}");
+                    if (dbEx.InnerException != null)
+                    {
+                        Console.WriteLine($"Inner exception: {dbEx.InnerException.Message}");
+                    }
+                    ModelState.AddModelError("", "A database error occurred while saving your profile. Please try again.");
+                    return View(model);
+                }
 
                 // Update session data
                 HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
@@ -561,14 +687,21 @@ namespace PrimeMarket.Controllers
             }
             catch (Exception ex)
             {
-                // Log the error
+                // Detailed error logging
                 Console.Error.WriteLine($"Error updating profile: {ex.Message}");
+                Console.Error.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                if (ex.InnerException != null)
+                {
+                    Console.Error.WriteLine($"Inner exception: {ex.InnerException.Message}");
+                }
 
                 // Add error message to model state
                 ModelState.AddModelError("", "An error occurred while updating your profile. Please try again.");
                 return View(model);
             }
         }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitIdVerification(IFormFile idFront, IFormFile idBack)
@@ -650,48 +783,42 @@ namespace PrimeMarket.Controllers
             }
         }
 
+        // Add simple routes for views
+        [UserAuthenticationFilter]
+        public IActionResult User_Listing_Details() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult User_MainPage() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult MyBookmarks() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult LiveChat() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult OtherUserProfile() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult CreateListing() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult MyShoppingCart() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult PaymentPage() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult MyProfitLossReport() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult AllMessages() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult AllNotifications() => View();
+
+        [UserAuthenticationFilter]
+        public IActionResult MyListing() => View();
     }
 
-    public class SignUpViewModel
-    {
-        [Required, MaxLength(50)]
-        public string FirstName { get; set; }
-
-        [Required, MaxLength(50)]
-        public string LastName { get; set; }
-
-        [Required, MaxLength(100), EmailAddress]
-        public string Email { get; set; }
-
-        [Required, MinLength(6)]
-        [DataType(DataType.Password)]
-        public string Password { get; set; }
-
-        [Required]
-        public bool AgreeToTerms { get; set; }
-    }
-    public class EditProfileViewModel
-    {
-        [Required, MaxLength(50)]
-        public string FirstName { get; set; }
-
-        [Required, MaxLength(50)]
-        public string LastName { get; set; }
-
-        [Required, MaxLength(100), EmailAddress]
-        public string Email { get; set; }
-
-        [MaxLength(15)]
-        public string PhoneNumber { get; set; }
-
-        public string ProfileImagePath { get; set; }
-
-        // Password change fields (optional)
-        public string CurrentPassword { get; set; }
-
-        [MinLength(6)]
-        public string NewPassword { get; set; }
-
-        public string ConfirmNewPassword { get; set; }
-    }
 }

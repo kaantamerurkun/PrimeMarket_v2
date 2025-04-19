@@ -33,6 +33,13 @@
             <br />
             <p><strong>Phone Number:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</p>
             <br />
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
         </div>
     </div>
 
@@ -57,26 +64,26 @@
     <div class="items-container">
         <div class="items-grid">
             <a asp-action="MyListing" asp-controller="User">
-            <div class="item-card">
+                <div class="item-card">
             </a>
-                <div class="button-container">
-                    <button class="edit-btn">Edit</button>
-                    <button class="remove-btn">Remove</button>
-                </div>
-            </div>
-            <div class="item-card">
-                <div class="button-container">
-                    <button class="edit-btn">Edit</button>
-                    <button class="remove-btn">Remove</button>
-                </div>
-            </div>
-            <div class="item-card">
-                <div class="button-container">
-                    <button class="edit-btn">Edit</button>
-                    <button class="remove-btn">Remove</button>
-                </div>
+            <div class="button-container">
+                <button class="edit-btn">Edit</button>
+                <button class="remove-btn">Remove</button>
             </div>
         </div>
+        <div class="item-card">
+            <div class="button-container">
+                <button class="edit-btn">Edit</button>
+                <button class="remove-btn">Remove</button>
+            </div>
+        </div>
+        <div class="item-card">
+            <div class="button-container">
+                <button class="edit-btn">Edit</button>
+                <button class="remove-btn">Remove</button>
+            </div>
+        </div>
+    </div>
     </div>
 
     <!-- Edit Modal -->

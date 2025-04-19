@@ -32,9 +32,16 @@ wwwroot\images\MessagesIcon.png
 wwwroot\images\NotificationBell.png
 wwwroot\images\PrimeMarket_Logo.png
 wwwroot\images\PrimeMarket_Logo_V2.png
+wwwroot\images\profiles\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png
 wwwroot\images\shopping_cart_icon.png
+wwwroot\images\verification\back_14_06fc1ad1-884f-412d-a645-24be5439c933.png
 wwwroot\images\verification\back_14_70917466-7487-4a42-8278-318c14eea0e3.png
+wwwroot\images\verification\back_14_e4474849-2d96-4be3-a907-eca4b6f14dfb.png
+wwwroot\images\verification\back_15_68fafc88-08f1-4cec-8d19-ba465f1c4c4e.png
 wwwroot\images\verification\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png
+wwwroot\images\verification\front_14_40492d63-2284-47ea-9d5c-8ba9f08679d6.png
+wwwroot\images\verification\front_14_44bad9b6-21cf-4501-a7d6-6b5ad9fcd472.png
+wwwroot\images\verification\front_15_e8467c90-911e-4ac4-b81f-ee2eb0a16f8f.png
 wwwroot\images\verified.png
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
