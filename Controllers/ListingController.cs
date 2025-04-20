@@ -23,9 +23,6 @@ namespace PrimeMarket.Controllers
             _context = context;
         }
 
-        #region Create and Edit Listings
-
-        [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateListing(ListingViewModel model, List<IFormFile> images)
@@ -85,7 +82,7 @@ namespace PrimeMarket.Controllers
                                             // Handle different property types
                                             if (productProp.PropertyType == typeof(bool))
                                             {
-                                                bool.TryParse(prop.Value, out bool boolValue);
+                                                bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
                                                 productProp.SetValue(product, boolValue);
                                             }
                                             else if (productProp.PropertyType == typeof(int))
@@ -165,16 +162,21 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Create notification for admin
-                var adminNotification = new Notification
+                // Create notification for all admins
+                var admins = await _context.Admins.ToListAsync();
+                foreach (var admin in admins)
                 {
-                    UserId = 1, // Assuming user ID 1 is an admin, adjust as needed
-                    Message = $"New listing '{model.Title}' needs review",
-                    Type = NotificationType.ListingApproved,
-                    RelatedEntityId = listing.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(adminNotification);
+                    var adminNotification = new Notification
+                    {
+                        UserId = admin.Id,
+                        Message = $"New listing '{model.Title}' needs review",
+                        Type = NotificationType.ListingApproved,
+                        RelatedEntityId = listing.Id,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Notifications.Add(adminNotification);
+                }
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Your listing has been created and is pending approval.";
@@ -487,7 +489,7 @@ namespace PrimeMarket.Controllers
             }
         }
 
-        #endregion
+        
 
         #region Browse and Search
 
