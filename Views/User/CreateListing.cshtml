@@ -1,15 +1,40 @@
 ﻿@{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    ViewData["Title"] = "Create Listing";
+    @* ---- DEBUG: current session state ---- *@
+
+    // Pull whatever you stored when the user signed‑in.
+    // If you used SetInt32(...), read it back with GetInt32;  
+    // if you used SetString(...), switch to GetString instead.
+    var userIdInSession = Context.Session.GetInt32("UserId");
+
+
+@if (userIdInSession is null)
+{
+    <div style="position:fixed;top:0;right:0;background:#ffebee;
+                color:#c62828;padding:6px 10px;font-size:.85rem;
+                border:1px solid #c62828;z-index:9999">
+        <strong>DEBUG:</strong> No <code>UserId</code> in session 😱
+    </div>
+}
+else
+{
+    <div style="position:fixed;top:0;right:0;background:#e8f5e9;
+                color:#2e7d32;padding:6px 10px;font-size:.85rem;
+                border:1px solid #2e7d32;z-index:9999">
+        <strong>DEBUG:</strong> <code>UserId</code> in session =&nbsp;@userIdInSession
+    </div>
+}
+@* ---- /DEBUG ---- *@
+
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Create Listing</title>
+    <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="/css/CreateListing.css" />
-    <link rel="stylesheet" href="/css/messagenotifications.css" />
-    <link rel="stylesheet" href="/css/notificationstyle.css" />
 </head>
 <body>
     <center>
@@ -38,9 +63,8 @@
 
             <div id="detailsForm" style="display:none; margin-top: 50px;">
                 <div class="form-wrapper">
-
                     <h2>Enter Details of the Item</h2>
-                    <form id="listingForm" enctype="multipart/form-data" method="post" action="/Listing/CreateListing">
+                    <form id="listingForm" enctype="multipart/form-data" method="post" asp-controller="Listing" asp-action="CreateListing">
                         @Html.AntiForgeryToken()
                         <input type="hidden" id="hiddenCondition" name="Condition" />
                         <input type="hidden" id="hiddenCategory" name="Category" />
@@ -48,7 +72,7 @@
                         <input type="hidden" id="hiddenDetail" name="DetailCategory" />
 
                         <label>Images:</label>
-                        <input style="border-radius:50px" type="file" id="images" name="images" multiple accept="image/*" />
+                        <input style="border-radius:50px" type="file" id="images" name="images" multiple accept="image/*" required />
                         <div id="imagePreview" style="display:flex; gap:10px; margin-top:10px;"></div>
 
                         <label for="title">Title:</label>
@@ -74,37 +98,12 @@
                             <option value="Other">Other</option>
                         </select>
 
-                        <label for="phoneInput">Phone Number:</label>
-                        <div class="phone-wrapper">
-                            <select style="border-radius:50px" id="countrySelect" class="country-select">
-                                <option value="+1">🇺🇸 +1</option>
-                                <option value="+44">🇬🇧 +44</option>
-                                <option value="+49">🇩🇪 +49</option>
-                                <option value="+33">🇫🇷 +33</option>
-                                <option value="+39">🇮🇹 +39</option>
-                                <option value="+34">🇪🇸 +34</option>
-                                <option value="+90" selected>🇹🇷 +90</option>
-                                <option value="+86">🇨🇳 +86</option>
-                                <option value="+81">🇯🇵 +81</option>
-                                <option value="+82">🇰🇷 +82</option>
-                                <option value="+91">🇮🇳 +91</option>
-                                <option value="+7">🇷🇺 +7</option>
-                                <option value="+55">🇧🇷 +55</option>
-                                <option value="+52">🇲🇽 +52</option>
-                                <option value="+61">🇦🇺 +61</option>
-                            </select>
-                            <input style="border-radius:50px" type="tel" id="phoneInput" placeholder="Enter phone number" maxlength="15" />
-                        </div>
-                        <div class="error-message" id="errorMessage"></div>
-
-                        <button type="submit">List the Item</button>
+                        <button type="submit" class="submit-btn">List the Item</button>
                     </form>
                 </div>
             </div>
-
         </main>
     </center>
-
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
@@ -360,7 +359,7 @@
                     if (field.type === "select") {
                         const select = document.createElement("select");
                         select.id = field.name;
-                        select.name = field.name;
+                        select.name = `DynamicProperties[${field.name}]`;
                         select.style.borderRadius = "50px";
 
                         // Add empty option
@@ -382,7 +381,7 @@
                         const input = document.createElement("input");
                         input.type = field.type;
                         input.id = field.name;
-                        input.name = field.name;
+                        input.name = `DynamicProperties[${field.name}]`;
                         input.placeholder = field.placeholder || "";
                         input.style.borderRadius = "50px";
                         fieldContainer.appendChild(input);
@@ -475,89 +474,46 @@
                 document.getElementById("categoryHeaderWrapper").style.display = "block";
                 formContainer.style.display = "none";
                 document.getElementById("backToCategory").style.display = "none";
+                continueBtn.style.display = "inline-block";
             });
 
-            document.getElementById('images')?.addEventListener('change', function () {
+            // Image preview functionality
+            document.getElementById('images').addEventListener('change', function() {
                 const preview = document.getElementById('imagePreview');
                 preview.innerHTML = "";
-                Array.from(this.files).forEach(file => {
-                    const img = document.createElement('img');
-                    img.src = URL.createObjectURL(file);
-                    img.style.width = "60px";
-                    img.style.height = "60px";
-                    img.style.borderRadius = "4px";
-                    img.style.objectFit = "cover";
-                    preview.appendChild(img);
-                });
+
+                if (this.files && this.files.length > 0) {
+                    Array.from(this.files).forEach(file => {
+                        const img = document.createElement('img');
+                        img.src = URL.createObjectURL(file);
+                        img.style.width = "60px";
+                        img.style.height = "60px";
+                        img.style.borderRadius = "4px";
+                        img.style.objectFit = "cover";
+                        preview.appendChild(img);
+                    });
+                }
             });
 
-            document.getElementById('listingForm')?.addEventListener('submit', function (e) {
-                e.preventDefault();
+            // Form submission
+            document.getElementById('listingForm').addEventListener('submit', function(e) {
+                // Basic validation before submit
+                const title = document.getElementById('title').value;
+                const price = document.getElementById('price').value;
+                const description = document.getElementById('description').value;
+                const images = document.getElementById('images').files;
+                const location = document.getElementById('location').value;
 
-                // Get form data
-                const formData = new FormData(this);
-
-                // Add dynamic properties to form data
-                const dynamicFields = document.getElementById('dynamicFields');
-                const inputFields = dynamicFields.querySelectorAll('input, select');
-
-                inputFields.forEach(field => {
-                    if (field.value) {
-                        formData.append(`DynamicProperties[${field.name}]`, field.value);
-                    }
-                });
-
-                // Validate required fields
-                const requiredFields = ['Title', 'Price', 'Description', 'Location'];
-                let isValid = true;
-
-                requiredFields.forEach(fieldName => {
-                    const input = document.querySelector(`[name="${fieldName}"]`);
-                    if (input && !input.value.trim()) {
-                        isValid = false;
-                        input.style.borderColor = 'red';
-                    } else if (input) {
-                        input.style.borderColor = '';
-                    }
-                });
-
-                if (!isValid) {
-                    alert('Please fill in all required fields.');
-                    return;
+                if (!title || !price || !description || images.length === 0 || !location) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields and upload at least one image.');
+                    return false;
                 }
 
-                // Show loading state
-                // Show loading state
+                // Set button to loading state
                 const submitButton = this.querySelector('button[type="submit"]');
-                const originalText = submitButton.textContent;
                 submitButton.disabled = true;
-                submitButton.textContent = 'Listing...';
-
-                fetch('/Listing/CreateListing', {
-                    method: 'POST',
-                    body: formData,
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error("Failed to create listing.");
-                    }
-                    return response.json();
-                })
-                .then(data => {
-                    // Handle successful listing creation
-                    alert('Listing successfully created!');
-                    window.location.href = '/Listing/MyListings'; // or any desired redirect
-                })
-                .catch(error => {
-                    // Handle errors
-                    console.error('Error:', error);
-                    alert('There was an error creating the listing. Please try again.');
-                })
-                .finally(() => {
-                    // Reset button state
-                    submitButton.disabled = false;
-                    submitButton.textContent = originalText;
-                });
+                submitButton.textContent = 'Creating listing...';
             });
         });
     </script>
