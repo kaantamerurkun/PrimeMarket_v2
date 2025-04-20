@@ -23,19 +23,23 @@ namespace PrimeMarket.Controllers
             _context = context;
         }
 
-        [UserAuthenticationFilter]
+        [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateListing(ListingViewModel model, List<IFormFile> images)
         {
-            if (!ModelState.IsValid)
-            {
-                return View("~/Views/User/CreateListing.cshtml", model);
-            }
-
+            Console.WriteLine("CreateListing called");
+            // Check if the user is authenticated
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
                 return RedirectToAction("Login", "User");
+            }
+
+            // Check model validity
+            if (!ModelState.IsValid)
+            {
+                // Return to the create view with the model to retain form data
+                return View("~/Views/User/CreateListing.cshtml", model);
             }
 
             try
@@ -114,13 +118,32 @@ namespace PrimeMarket.Controllers
                             if (dbSetProperty != null)
                             {
                                 var dbSet = dbSetProperty.GetValue(_context);
-                                dbSet.GetType().GetMethod("Add").Invoke(dbSet, new[] { product });
+                                if (dbSet != null)
+                                {
+                                    var addMethod = dbSet.GetType().GetMethod("Add");
+                                    if (addMethod != null)
+                                    {
+                                        addMethod.Invoke(dbSet, new[] { product });
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine($"Error: Could not find Add method for DbSet of type {product.GetType().Name}s");
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Error: DbSet property returned null for {product.GetType().Name}s");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Error: DbSet property not found for {product.GetType().Name}s");
                             }
                         }
                     }
                     catch (Exception ex)
                     {
-                        // Log or handle the error
+                        // Log the error but continue with listing creation
                         Console.WriteLine($"Error creating product: {ex.Message}");
                     }
                 }
@@ -162,7 +185,7 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Create notification for all admins
+                // Create notifications for all admins
                 var admins = await _context.Admins.ToListAsync();
                 foreach (var admin in admins)
                 {
@@ -247,20 +270,83 @@ namespace PrimeMarket.Controllers
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 dynamic product = null;
-
                 // Get the appropriate product type based on subcategory
                 switch (listing.SubCategory)
                 {
+                    // Phones
                     case "IOS Phone":
                         product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Android Phone":
                         product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
+                    case "Other Phones":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessories":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                    // Tablets
+                    case "IOS Tablets":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablets":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablets":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessories":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                    // Computers
                     case "Laptops":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-                        // Add more cases for other subcategories as needed
+                    case "Desktops":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Accessories":
+                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                    // White Goods
+                    case "Fridges":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Washers":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Dishwashers":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Ovens":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                    // Electronics
+                    case "Vacuum Cleaner":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                    // Special handling for tablets since they are split across different types
+                    case "Tablets":
+                        // Try each tablet type in order
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        if (product == null)
+                        {
+                            product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        }
+                        if (product == null)
+                        {
+                            product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        }
+                        break;
                 }
 
                 // If product is found, extract properties using reflection
@@ -838,6 +924,8 @@ namespace PrimeMarket.Controllers
             {
                 return Json(new { success = false, message = "Please log in to view offers." });
             }
+           
+
 
             try
             {

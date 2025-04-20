@@ -770,6 +770,13 @@ namespace PrimeMarket.Controllers
         [UserAuthenticationFilter]
         public IActionResult CreateListing()
         {
+            // Check if user is authenticated
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
             return View();
         }
 

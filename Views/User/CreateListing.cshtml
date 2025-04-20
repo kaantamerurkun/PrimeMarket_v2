@@ -1,32 +1,28 @@
-﻿@{
+﻿@using PrimeMarket.Models.ViewModel
+@model ListingViewModel
+@{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
     ViewData["Title"] = "Create Listing";
-    @* ---- DEBUG: current session state ---- *@
 
     // Pull whatever you stored when the user signed‑in.
-    // If you used SetInt32(...), read it back with GetInt32;  
-    // if you used SetString(...), switch to GetString instead.
     var userIdInSession = Context.Session.GetInt32("UserId");
 
-
-@if (userIdInSession is null)
-{
-    <div style="position:fixed;top:0;right:0;background:#ffebee;
-                color:#c62828;padding:6px 10px;font-size:.85rem;
-                border:1px solid #c62828;z-index:9999">
-        <strong>DEBUG:</strong> No <code>UserId</code> in session 😱
-    </div>
-}
-else
-{
-    <div style="position:fixed;top:0;right:0;background:#e8f5e9;
-                color:#2e7d32;padding:6px 10px;font-size:.85rem;
-                border:1px solid #2e7d32;z-index:9999">
-        <strong>DEBUG:</strong> <code>UserId</code> in session =&nbsp;@userIdInSession
-    </div>
-}
-@* ---- /DEBUG ---- *@
-
+    @if (userIdInSession is null)
+    {
+        <div style="position:fixed;top:0;right:0;background:#ffebee;
+                        color:#c62828;padding:6px 10px;font-size:.85rem;
+                        border:1px solid #c62828;z-index:9999">
+            <strong>DEBUG:</strong> No <code>UserId</code> in session 😱
+        </div>
+    }
+    else
+    {
+        <div style="position:fixed;top:0;right:0;background:#e8f5e9;
+                        color:#2e7d32;padding:6px 10px;font-size:.85rem;
+                        border:1px solid #2e7d32;z-index:9999">
+            <strong>DEBUG:</strong> <code>UserId</code> in session =&nbsp;@userIdInSession
+        </div>
+    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -44,7 +40,7 @@ else
             </div>
 
             <div id="backToCategory" style="display:none; text-align:center; margin-bottom: 20px;">
-                <button class="btn-back">← Back to Category Selection</button>
+                <button class="btn-back" type="button">← Back to Category Selection</button>
             </div>
 
             <div class="selection-grid">
@@ -58,37 +54,45 @@ else
             </div>
 
             <div style="text-align: center;">
-                <button id="continueBtn" class="btn-continue">Continue to Details</button>
+                <button id="continueBtn" class="btn-continue" type="button">Continue to Details</button>
             </div>
 
             <div id="detailsForm" style="display:none; margin-top: 50px;">
                 <div class="form-wrapper">
                     <h2>Enter Details of the Item</h2>
+
+                    @if (!string.IsNullOrEmpty(TempData["ErrorMessage"]?.ToString()))
+                    {
+                        <div class="alert alert-danger">
+                            @TempData["ErrorMessage"]
+                        </div>
+                    }
+
                     <form id="listingForm" enctype="multipart/form-data" method="post" asp-controller="Listing" asp-action="CreateListing">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" id="hiddenCondition" name="Condition" />
-                        <input type="hidden" id="hiddenCategory" name="Category" />
-                        <input type="hidden" id="hiddenSubcategory" name="SubCategory" />
-                        <input type="hidden" id="hiddenDetail" name="DetailCategory" />
+                        <input type="hidden" id="hiddenCondition" asp-for="Condition" />
+                        <input type="hidden" id="hiddenCategory" asp-for="Category" />
+                        <input type="hidden" id="hiddenSubcategory" asp-for="SubCategory" />
+                        <input type="hidden" id="hiddenDetail" asp-for="DetailCategory" />
 
                         <label>Images:</label>
-                        <input style="border-radius:50px" type="file" id="images" name="images" multiple accept="image/*" required />
+                        <input style="border-radius:50px" type="file" id="images" asp-for="Images" multiple accept="image/*" required />
                         <div id="imagePreview" style="display:flex; gap:10px; margin-top:10px;"></div>
 
                         <label for="title">Title:</label>
-                        <input style="border-radius:50px" type="text" id="title" name="Title" placeholder="Enter item title" required />
+                        <input style="border-radius:50px" type="text" id="title" asp-for="Title" placeholder="Enter item title" required />
 
                         <label for="price">Price (TL):</label>
-                        <input style="border-radius:50px" type="number" id="price" name="Price" placeholder="e.g. 100" required min="0" inputmode="decimal" />
+                        <input style="border-radius:50px" type="number" id="price" asp-for="Price" placeholder="e.g. 100" required min="0" inputmode="decimal" step="0.01" />
 
                         <label for="description">Description:</label>
-                        <textarea style="border-radius:20px" id="description" name="Description" rows="4" placeholder="Describe your item..." required></textarea>
+                        <textarea style="border-radius:20px" id="description" asp-for="Description" rows="4" placeholder="Describe your item..." required></textarea>
 
                         <!-- Dynamic fields will be added here -->
                         <div id="dynamicFields"></div>
 
                         <label for="location">Location:</label>
-                        <select style="border-radius:50px" id="location" name="Location" required>
+                        <select style="border-radius:50px" id="location" asp-for="Location" required>
                             <option value="">Select Location</option>
                             <option value="Istanbul">Istanbul</option>
                             <option value="Ankara">Ankara</option>
@@ -98,7 +102,7 @@ else
                             <option value="Other">Other</option>
                         </select>
 
-                        <button type="submit" class="submit-btn">List the Item</button>
+                        <a asp-action="CreateListing" asp-controller="Listing"><button type="submit" class="submit-btn">List the Item</button></a>
                     </form>
                 </div>
             </div>
@@ -274,6 +278,7 @@ else
             const continueBtn = document.getElementById("continueBtn");
             const formContainer = document.getElementById("detailsForm");
             const dynamicFields = document.getElementById("dynamicFields");
+            const listingForm = document.getElementById("listingForm");
 
             function highlight(section, el) {
                 document.querySelectorAll(`#${section} .selection-item`).forEach(i => i.classList.remove("selected"));
@@ -495,26 +500,26 @@ else
                 }
             });
 
-            // Form submission
-            document.getElementById('listingForm').addEventListener('submit', function(e) {
-                // Basic validation before submit
-                const title = document.getElementById('title').value;
-                const price = document.getElementById('price').value;
-                const description = document.getElementById('description').value;
-                const images = document.getElementById('images').files;
-                const location = document.getElementById('location').value;
+            // // Form submission
+            // listingForm.addEventListener('submit', function(e) {
+            //     // Basic validation before submit
+            //     const title = document.getElementById('title').value;
+            //     const price = document.getElementById('price').value;
+            //     const description = document.getElementById('description').value;
+            //     const images = document.getElementById('images').files;
+            //     const location = document.getElementById('location').value;
 
-                if (!title || !price || !description || images.length === 0 || !location) {
-                    e.preventDefault();
-                    alert('Please fill in all required fields and upload at least one image.');
-                    return false;
-                }
+            //     if (!title || !price || !description || images.length === 0 || !location) {
+            //         e.preventDefault();
+            //         alert('Please fill in all required fields and upload at least one image.');
+            //         return false;
+            //     }
 
-                // Set button to loading state
-                const submitButton = this.querySelector('button[type="submit"]');
-                submitButton.disabled = true;
-                submitButton.textContent = 'Creating listing...';
-            });
+            //     // Set button to loading state
+            //     const submitButton = this.querySelector('button[type="submit"]');
+            //     submitButton.disabled = true;
+            //     submitButton.textContent = 'Creating listing...';
+            // });
         });
     </script>
 </body>
