@@ -3,7 +3,9 @@ using Microsoft.EntityFrameworkCore;
 using PrimeMarket.Data;
 using PrimeMarket.Models;
 using PrimeMarket.Models.Enum;
+using PrimeMarket.Models.ViewModel;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,8 +33,6 @@ namespace PrimeMarket.Controllers
         }
 
         // POST: /Admin/AdminLogin
-        // POST: /Admin/AdminLogin
-        // Improved AdminLogin method with secure password comparison
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminLogin(AdminLoginModel model)
@@ -46,17 +46,15 @@ namespace PrimeMarket.Controllers
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Username == model.Username);
 
-            // Use a secure password hashing method
             if (admin == null)
             {
                 ViewBag.ErrorMessage = "Invalid username or password.";
                 return View();
             }
 
-            // Either use your existing ComputeSha256Hash method from UserController
-            // or implement a proper password verification method
-            //string hashedPassword = ComputeSha256Hash(model.Password);
-            if (admin.Password != model.Password)
+            // Use secure password comparison
+            string hashedPassword = ComputeSha256Hash(model.Password);
+            if (admin.Password != hashedPassword)
             {
                 ViewBag.ErrorMessage = "Invalid username or password.";
                 return View();
@@ -82,19 +80,18 @@ namespace PrimeMarket.Controllers
             return RedirectToAction(nameof(AdminDashboard));
         }
 
-        // Add this helper method if not already present
-        //private string ComputeSha256Hash(string rawData)
-        //{
-        //    using (SHA256 sha256Hash = SHA256.Create())
-        //    {
-        //        byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
-        //        StringBuilder builder = new StringBuilder();
-        //        foreach (var b in bytes)
-        //            builder.Append(b.ToString("x2"));
-        //        return builder.ToString();
-        //    }
-        //}
-
+        // Add this helper method for password hashing
+        private string ComputeSha256Hash(string rawData)
+        {
+            using (SHA256 sha256Hash = SHA256.Create())
+            {
+                byte[] bytes = sha256Hash.ComputeHash(Encoding.UTF8.GetBytes(rawData));
+                StringBuilder builder = new StringBuilder();
+                foreach (var b in bytes)
+                    builder.Append(b.ToString("x2"));
+                return builder.ToString();
+            }
+        }
 
         // GET: /Admin/AdminDashboard
         public IActionResult AdminDashboard()
@@ -135,8 +132,6 @@ namespace PrimeMarket.Controllers
 
             return RedirectToAction(nameof(AdminLogin));
         }
-
-        // Add these methods to the AdminController class
 
         [HttpGet]
         public async Task<IActionResult> PendingListings()
@@ -179,8 +174,7 @@ namespace PrimeMarket.Controllers
             }
 
             // Get the specific product details based on the category
-            // This is a simplified approach - you'll need to handle different product types
-            dynamic product = null;
+            dynamic? product = null;
 
             if (listing.SubCategory == "IOS Phone")
                 product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -188,7 +182,37 @@ namespace PrimeMarket.Controllers
                 product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Laptops")
                 product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
-            // Add more conditions for other product types
+            else if (listing.SubCategory == "Desktops")
+                product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Tablets")
+
+                // Replace the problematic code block in the ListingDetails method with the following:
+
+                if (listing.SubCategory == "Tablets")
+                {
+                    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    if (product == null)
+                    {
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    }
+                    if (product == null)
+                    {
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    }
+                }
+
+            else if (listing.SubCategory == "Washers")
+                product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Dishwashers")
+                product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Fridges")
+                product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Ovens")
+                product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Vacuum Cleaner")
+                product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Televisions")
+                product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
 
             ViewBag.Product = product;
             return View(listing);
@@ -398,7 +422,6 @@ namespace PrimeMarket.Controllers
                 _context.AdminActions.Add(adminAction);
 
                 // Create a notification for the user
-                // Create a notification for the user
                 var notification = new Notification
                 {
                     UserId = verification.UserId,
@@ -560,8 +583,7 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction(nameof(AdminLogin));
             }
 
-            // Implement CSV export logic here
-            // For simplicity, we'll generate a sample CSV
+            // Generate CSV content
             var users = _context.Users
                 .Select(u => new
                 {
@@ -594,46 +616,4 @@ namespace PrimeMarket.Controllers
         }
     }
 
-
-        // ViewModel classes for admin dashboard
-        public class UserReportViewModel
-        {
-            public int Id { get; set; }
-            public string FullName { get; set; }
-            public string Email { get; set; }
-            public DateTime SignUpDate { get; set; }
-            public int TotalListings { get; set; }
-            public int TotalSales { get; set; }
-            public int TotalPurchases { get; set; }
-            public DateTime LastActivity { get; set; }
-
-            // Calculated property for display
-            public int DaysSinceLastActive => (DateTime.Now - LastActivity).Days;
-        }
-
-        public class CategoryStatViewModel
-        {
-            public string Category { get; set; }
-            public int Count { get; set; }
-            public double Percentage { get; set; }
-        }
-
-        public class AdminReportViewModel
-        {
-            public List<UserReportViewModel> Users { get; set; }
-            public int TotalUsers { get; set; }
-            public int TotalListings { get; set; }
-            public int PendingListings { get; set; }
-            public int ApprovedListings { get; set; }
-            public int SoldListings { get; set; }
-            public List<CategoryStatViewModel> CategoryStats { get; set; }
-        }
-
-        public class AdminLoginModel
-        {
-
-            public string Username { get; set; }
-            public string Password { get; set; }
-        }
-    
 }

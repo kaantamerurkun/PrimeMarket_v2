@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrimeMarket.Data;
+using PrimeMarket.Models.ViewModel;
 using PrimeMarket.Filters;
 using PrimeMarket.Models;
 using PrimeMarket.Models.Enum;
@@ -156,6 +157,10 @@ namespace PrimeMarket.Controllers
                 message.IsRead = true;
             }
             await _context.SaveChangesAsync();
+
+            // Get current user profile image
+            var currentUser = await _context.Users.FindAsync(currentUserId);
+            ViewBag.CurrentUserImage = currentUser?.ProfileImagePath;
 
             var conversationViewModel = new DetailedConversationViewModel
             {
@@ -349,46 +354,79 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = $"Error getting unread count: {ex.Message}" });
             }
         }
-    }
 
-    public class ConversationViewModel
-    {
-        public int OtherUserId { get; set; }
-        public string OtherUserName { get; set; }
-        public string OtherUserProfileImage { get; set; }
-        public int ListingId { get; set; }
-        public string ListingTitle { get; set; }
-        public string ListingImage { get; set; }
-        public DateTime LastMessageTime { get; set; }
-        public string LastMessageContent { get; set; }
-        public int UnreadCount { get; set; }
-    }
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> StartConversation(int userId, int listingId)
+        {
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
 
-    public class DetailedConversationViewModel
-    {
-        public int OtherUserId { get; set; }
-        public string OtherUserName { get; set; }
-        public string OtherUserProfileImage { get; set; }
-        public int ListingId { get; set; }
-        public string ListingTitle { get; set; }
-        public decimal ListingPrice { get; set; }
-        public string ListingImage { get; set; }
-        public int CurrentUserId { get; set; }
-        public List<MessageViewModel> Messages { get; set; }
-    }
+            // Check if the listing exists
+            var listing = await _context.Listings
+                .Include(l => l.Seller)
+                .FirstOrDefaultAsync(l => l.Id == listingId);
 
-    public class MessageViewModel
-    {
-        public int Id { get; set; }
-        public string Content { get; set; }
-        public bool SentByMe { get; set; }
-        public DateTime Timestamp { get; set; }
-    }
+            if (listing == null)
+            {
+                return NotFound();
+            }
 
-    public class SendMessageViewModel
-    {
-        public int ReceiverId { get; set; }
-        public int ListingId { get; set; }
-        public string Content { get; set; }
+            // If userId is 0, set it to the seller's ID
+            if (userId == 0)
+            {
+                userId = listing.SellerId;
+            }
+
+            // Check if the user exists
+            var otherUser = await _context.Users.FindAsync(userId);
+            if (otherUser == null)
+            {
+                return NotFound();
+            }
+
+            // Check if trying to message yourself
+            if (userId == currentUserId)
+            {
+                TempData["ErrorMessage"] = "You cannot message yourself.";
+                return RedirectToAction("Details", "Listing", new { id = listingId });
+            }
+
+            // Check if a conversation already exists
+            var existingConversation = await _context.Messages
+                .AnyAsync(m => (
+                    (m.SenderId == currentUserId && m.ReceiverId == userId) ||
+                    (m.SenderId == userId && m.ReceiverId == currentUserId)
+                ) && m.ListingId == listingId);
+
+            // If conversation exists, redirect to it
+            if (existingConversation)
+            {
+                return RedirectToAction("Conversation", new { userId, listingId });
+            }
+
+            // Otherwise create a view model for a new conversation
+            var currentUser = await _context.Users.FindAsync(currentUserId);
+            ViewBag.CurrentUserImage = currentUser?.ProfileImagePath;
+
+            var conversationViewModel = new DetailedConversationViewModel
+            {
+                OtherUserId = userId,
+                OtherUserName = $"{otherUser.FirstName} {otherUser.LastName}",
+                OtherUserProfileImage = otherUser.ProfileImagePath,
+                ListingId = listingId,
+                ListingTitle = listing.Title,
+                ListingPrice = listing.Price,
+                ListingImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
+                              listing.Images?.FirstOrDefault()?.ImagePath,
+                CurrentUserId = currentUserId.Value,
+                Messages = new List<MessageViewModel>()
+            };
+
+            return View("Conversation", conversationViewModel);
+        }
     }
 }

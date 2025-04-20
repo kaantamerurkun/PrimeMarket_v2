@@ -5,6 +5,7 @@ using PrimeMarket.Filters;
 using PrimeMarket.Models;
 using PrimeMarket.Models.Enum;
 using PrimeMarket.Models.Factory;
+using PrimeMarket.Models.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -21,6 +22,8 @@ namespace PrimeMarket.Controllers
         {
             _context = context;
         }
+
+        #region Create and Edit Listings
 
         [HttpPost]
         [UserAuthenticationFilter]
@@ -65,9 +68,6 @@ namespace PrimeMarket.Controllers
                     try
                     {
                         var product = ProductFactory.CreateProduct(model.Category, model.SubCategory);
-
-                        // Set product properties based on dynamic fields from the form
-                        // This depends on what properties you're collecting for each type of product
                         if (product != null)
                         {
                             product.ListingId = listing.Id;
@@ -80,15 +80,33 @@ namespace PrimeMarket.Controllers
                                     var productProp = product.GetType().GetProperty(prop.Key);
                                     if (productProp != null)
                                     {
-                                        // Handle different property types
-                                        if (productProp.PropertyType == typeof(bool))
+                                        try
                                         {
-                                            bool.TryParse(prop.Value, out bool boolValue);
-                                            productProp.SetValue(product, boolValue);
+                                            // Handle different property types
+                                            if (productProp.PropertyType == typeof(bool))
+                                            {
+                                                bool.TryParse(prop.Value, out bool boolValue);
+                                                productProp.SetValue(product, boolValue);
+                                            }
+                                            else if (productProp.PropertyType == typeof(int))
+                                            {
+                                                int.TryParse(prop.Value, out int intValue);
+                                                productProp.SetValue(product, intValue);
+                                            }
+                                            else if (productProp.PropertyType == typeof(decimal))
+                                            {
+                                                decimal.TryParse(prop.Value, out decimal decimalValue);
+                                                productProp.SetValue(product, decimalValue);
+                                            }
+                                            else
+                                            {
+                                                productProp.SetValue(product, prop.Value);
+                                            }
                                         }
-                                        else
+                                        catch (Exception ex)
                                         {
-                                            productProp.SetValue(product, prop.Value);
+                                            // Log the error but continue
+                                            Console.WriteLine($"Error setting property {prop.Key}: {ex.Message}");
                                         }
                                     }
                                 }
@@ -207,8 +225,7 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Get product details based on category and subcategory
-            // This is a simplification - you'll need to fetch the actual product data
+            // Prepare the view model with existing data
             var model = new ListingViewModel
             {
                 Id = listing.Id,
@@ -223,6 +240,46 @@ namespace PrimeMarket.Controllers
                 Images = listing.Images.ToList()
             };
 
+            // Fetch product-specific properties
+            var dynamicProperties = new Dictionary<string, string>();
+            if (!string.IsNullOrEmpty(listing.SubCategory))
+            {
+                dynamic product = null;
+
+                // Get the appropriate product type based on subcategory
+                switch (listing.SubCategory)
+                {
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Laptops":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                        // Add more cases for other subcategories as needed
+                }
+
+                // If product is found, extract properties using reflection
+                if (product != null)
+                {
+                    foreach (var prop in product.GetType().GetProperties())
+                    {
+                        // Skip navigation or system properties
+                        if (prop.Name == "Id" || prop.Name == "ListingId" || prop.Name == "Listing")
+                            continue;
+
+                        var value = prop.GetValue(product);
+                        if (value != null)
+                        {
+                            dynamicProperties[prop.Name] = value.ToString();
+                        }
+                    }
+                }
+            }
+
+            model.DynamicProperties = dynamicProperties;
             return View(model);
         }
 
@@ -259,11 +316,73 @@ namespace PrimeMarket.Controllers
                 listing.Description = model.Description;
                 listing.Location = model.Location;
                 listing.UpdatedAt = DateTime.UtcNow;
+
                 // Reset status to pending if it was previously rejected
                 if (listing.Status == ListingStatus.Rejected)
                 {
                     listing.Status = ListingStatus.Pending;
                     listing.RejectionReason = null;
+                }
+
+                // Update product-specific properties if applicable
+                if (model.DynamicProperties != null && !string.IsNullOrEmpty(listing.SubCategory))
+                {
+                    dynamic product = null;
+
+                    // Get the appropriate product based on subcategory
+                    switch (listing.SubCategory)
+                    {
+                        case "IOS Phone":
+                            product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Android Phone":
+                            product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Laptops":
+                            product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                            // Add more cases for other subcategories
+                    }
+
+                    // Update product properties if product exists
+                    if (product != null)
+                    {
+                        foreach (var prop in model.DynamicProperties)
+                        {
+                            var productProp = product.GetType().GetProperty(prop.Key);
+                            if (productProp != null)
+                            {
+                                try
+                                {
+                                    // Convert value to appropriate type
+                                    if (productProp.PropertyType == typeof(bool))
+                                    {
+                                        bool.TryParse(prop.Value, out bool boolValue);
+                                        productProp.SetValue(product, boolValue);
+                                    }
+                                    else if (productProp.PropertyType == typeof(int))
+                                    {
+                                        int.TryParse(prop.Value, out int intValue);
+                                        productProp.SetValue(product, intValue);
+                                    }
+                                    else if (productProp.PropertyType == typeof(decimal))
+                                    {
+                                        decimal.TryParse(prop.Value, out decimal decimalValue);
+                                        productProp.SetValue(product, decimalValue);
+                                    }
+                                    else
+                                    {
+                                        productProp.SetValue(product, prop.Value);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Log error but continue
+                                    Console.WriteLine($"Error updating property {prop.Key}: {ex.Message}");
+                                }
+                            }
+                        }
+                    }
                 }
 
                 // Process and save new images
@@ -302,6 +421,19 @@ namespace PrimeMarket.Controllers
                 }
 
                 await _context.SaveChangesAsync();
+
+                // Create notification for admin about the update
+                var adminNotification = new Notification
+                {
+                    UserId = 1, // Assuming admin ID is 1
+                    Message = $"Updated listing '{model.Title}' needs review",
+                    Type = NotificationType.ListingApproved, // Reusing this type
+                    RelatedEntityId = listing.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Notifications.Add(adminNotification);
+                await _context.SaveChangesAsync();
+
                 TempData["SuccessMessage"] = "Your listing has been updated and is pending review.";
                 return RedirectToAction("MyListings");
             }
@@ -354,6 +486,172 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyListings");
             }
         }
+
+        #endregion
+
+        #region Browse and Search
+
+        [HttpGet]
+        public async Task<IActionResult> Index(string category = null, string subcategory = null, string searchTerm = null, int page = 1)
+        {
+            int pageSize = 12; // Number of listings per page
+
+            // Start with all approved listings
+            var query = _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved)
+                .Include(l => l.Images)
+                .Include(l => l.Seller)
+                .AsQueryable();
+
+            // Apply filters
+            if (!string.IsNullOrEmpty(category))
+            {
+                query = query.Where(l => l.Category == category);
+            }
+
+            if (!string.IsNullOrEmpty(subcategory))
+            {
+                query = query.Where(l => l.SubCategory == subcategory);
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                query = query.Where(l =>
+                    l.Title.Contains(searchTerm) ||
+                    l.Description.Contains(searchTerm) ||
+                    l.Category.Contains(searchTerm) ||
+                    l.SubCategory.Contains(searchTerm)
+                );
+            }
+
+            // Get total count for pagination
+            var totalItems = await query.CountAsync();
+
+            // Calculate pagination
+            var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+            page = Math.Max(1, Math.Min(page, totalPages));
+
+            // Get page of listings
+            var listings = await query
+                .OrderByDescending(l => l.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            // Create view model
+            var viewModel = new ListingBrowseViewModel
+            {
+                Listings = listings,
+                CurrentPage = page,
+                TotalPages = totalPages,
+                Category = category,
+                SubCategory = subcategory,
+                SearchTerm = searchTerm
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Details(int id)
+        {
+            var listing = await _context.Listings
+                .Include(l => l.Images)
+                .Include(l => l.Seller)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (listing == null)
+            {
+                return NotFound();
+            }
+
+            // If not approved and current user is not the seller or an admin, return not found
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
+
+            if (listing.Status != ListingStatus.Approved &&
+                userId != listing.SellerId &&
+                !isAdmin)
+            {
+                return NotFound();
+            }
+
+            // Get product-specific details
+            dynamic product = null;
+
+            if (!string.IsNullOrEmpty(listing.SubCategory))
+            {
+                switch (listing.SubCategory)
+                {
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Laptops":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                        // Add cases for other product types
+                }
+            }
+
+            // Check if user has bookmarked this listing
+            bool isBookmarked = false;
+            if (userId.HasValue)
+            {
+                isBookmarked = await _context.Bookmarks
+                    .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
+            }
+
+            // Get related listings (same category)
+            var relatedListings = await _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved &&
+                            l.Id != id &&
+                            l.Category == listing.Category)
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(4)
+                .ToListAsync();
+
+            // Create view model
+            var viewModel = new ListingDetailsViewModel
+            {
+                Listing = listing,
+                Product = product,
+                IsBookmarked = isBookmarked,
+                RelatedListings = relatedListings,
+                IsOwner = userId.HasValue && userId.Value == listing.SellerId
+            };
+
+            return View(viewModel);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Search(string query)
+        {
+            if (string.IsNullOrEmpty(query))
+            {
+                return RedirectToAction("Index");
+            }
+
+            var results = await _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved &&
+                          (l.Title.Contains(query) ||
+                           l.Description.Contains(query) ||
+                           l.Category.Contains(query) ||
+                           l.SubCategory.Contains(query)))
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(20) // Limit results
+                .ToListAsync();
+
+            return View(results);
+        }
+
+        #endregion
+
+        #region User Interactions
 
         [HttpPost]
         [UserAuthenticationFilter]
@@ -528,27 +826,51 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = $"Error responding to offer: {ex.Message}" });
             }
         }
-    }
 
-    public class ListingViewModel
-    {
-        public int Id { get; set; }
-        public string Title { get; set; }
-        public decimal Price { get; set; }
-        public string Description { get; set; }
-        public string Condition { get; set; }
-        public string Category { get; set; }
-        public string SubCategory { get; set; }
-        public string DetailCategory { get; set; }
-        public string Location { get; set; }
-        public Dictionary<string, string> DynamicProperties { get; set; }
-        public List<ListingImage> Images { get; set; }
-    }
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> GetOffers(int listingId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Please log in to view offers." });
+            }
 
-    public class OfferViewModel
-    {
-        public int ListingId { get; set; }
-        public decimal OfferAmount { get; set; }
-        public string Message { get; set; }
+            try
+            {
+                var listing = await _context.Listings
+                    .FirstOrDefaultAsync(l => l.Id == listingId && l.SellerId == userId.Value);
+
+                if (listing == null)
+                {
+                    return Json(new { success = false, message = "Listing not found or you don't have permission to view these offers." });
+                }
+
+                var offers = await _context.Offers
+                    .Include(o => o.Buyer)
+                    .Where(o => o.ListingId == listingId)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .Select(o => new
+                    {
+                        Id = o.Id,
+                        BuyerId = o.BuyerId,
+                        BuyerName = $"{o.Buyer.FirstName} {o.Buyer.LastName}",
+                        OfferAmount = o.OfferAmount,
+                        Message = o.Message,
+                        Status = o.Status.ToString(),
+                        CreatedAt = o.CreatedAt
+                    })
+                    .ToListAsync();
+
+                return Json(new { success = true, offers });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving offers: {ex.Message}" });
+            }
+        }
+
+        #endregion
     }
 }

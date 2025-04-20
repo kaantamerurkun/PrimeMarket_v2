@@ -1,4 +1,4 @@
-namespace PrimeMarket.Models
+namespace PrimeMarket.Models.ViewModel
 {
     public class ErrorViewModel
     {

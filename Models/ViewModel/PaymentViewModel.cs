@@ -1,0 +1,11 @@
+﻿namespace PrimeMarket.Models.ViewModel
+{
+    public class PaymentViewModel
+    {
+        public int ListingId { get; set; }
+        public string CardholderName { get; set; }
+        public string CardNumber { get; set; }
+        public string ExpiryDate { get; set; }
+        public string Cvv { get; set; }
+    }
+}

@@ -9,6 +9,7 @@ using System.Text;
 using System.Net;
 using System.Net.Mail;
 using PrimeMarket.Filters;
+using PrimeMarket.Models.ViewModel;
 
 namespace PrimeMarket.Controllers
 {

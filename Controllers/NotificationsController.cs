@@ -221,5 +221,74 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = $"Error clearing notifications: {ex.Message}" });
             }
         }
+
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> Details(int id)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            var notification = await _context.Notifications
+                .FirstOrDefaultAsync(n => n.Id == id && n.UserId == userId);
+
+            if (notification == null)
+            {
+                return NotFound();
+            }
+
+            // Mark as read
+            if (!notification.IsRead)
+            {
+                notification.IsRead = true;
+                notification.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+            }
+
+            // Redirect based on notification type
+            switch (notification.Type)
+            {
+                case NotificationType.ListingApproved:
+                case NotificationType.ListingRejected:
+                    return RedirectToAction("MyListing", "User", new { id = notification.RelatedEntityId });
+                case NotificationType.NewMessage:
+                    // Need to get the conversation details first
+                    var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == notification.RelatedEntityId);
+                    if (message != null)
+                    {
+                        int otherUserId = message.SenderId == userId ? message.ReceiverId : message.SenderId;
+                        return RedirectToAction("Conversation", "Message", new { userId = otherUserId, listingId = message.ListingId });
+                    }
+                    break;
+                case NotificationType.NewOffer:
+                case NotificationType.OfferAccepted:
+                case NotificationType.OfferRejected:
+                    var offer = await _context.Offers.FirstOrDefaultAsync(o => o.Id == notification.RelatedEntityId);
+                    return RedirectToAction("Details", "Listing", new { id = offer?.ListingId ?? notification.RelatedEntityId });
+                case NotificationType.VerificationApproved:
+                case NotificationType.VerificationRejected:
+                    return RedirectToAction("MyProfilePage", "User");
+                case NotificationType.PurchaseCompleted:
+                    var purchase = await _context.Purchases.FindAsync(notification.RelatedEntityId);
+                    if (purchase != null)
+                    {
+                        if (purchase.BuyerId == userId)
+                        {
+                            return RedirectToAction("PurchaseComplete", "Payment", new { purchaseId = purchase.Id });
+                        }
+                        else
+                        {
+                            return RedirectToAction("MySales", "Payment");
+                        }
+                    }
+                    break;
+            }
+
+            // Default fallback
+            return RedirectToAction("Index");
+        }
     }
 }

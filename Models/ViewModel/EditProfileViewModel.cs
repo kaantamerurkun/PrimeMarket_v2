@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PrimeMarket.Models
+namespace PrimeMarket.Models.ViewModel
 {
     public class EditProfileViewModel
     {
