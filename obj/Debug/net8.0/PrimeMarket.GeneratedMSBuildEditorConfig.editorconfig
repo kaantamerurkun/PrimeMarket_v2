@@ -96,6 +96,18 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxDaGVja291dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/CheckoutMultiple.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxDaGVja291dE11bHRpcGxlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/MyPurchase.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxNeVB1cmNoYXNlLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/MySales.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxNeVNhbGVzLmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/PurchaseComplete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxQdXJjaGFzZUNvbXBsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 

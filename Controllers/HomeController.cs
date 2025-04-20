@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using PrimeMarket.Models;
+using PrimeMarket.Models.ViewModel;
 
 namespace PrimeMarket.Controllers;
 
