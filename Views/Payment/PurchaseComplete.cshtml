@@ -1,0 +1,174 @@
+﻿@model PrimeMarket.Controllers.PurchaseCompleteViewModel
+@{
+    ViewData["Title"] = "Purchase Complete";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <div class="success-container">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h1>Thank You for Your Purchase!</h1>
+        <p class="success-message">Your payment has been processed successfully.</p>
+
+        <div class="order-details">
+            <h2>Order Details</h2>
+            <div class="order-item">
+                <div class="item-image">
+                    <img src="@(string.IsNullOrEmpty(Model.ListingImage) ? "/images/placeholder.png" : Model.ListingImage)"
+                         alt="@Model.ListingTitle" width="120" height="120">
+                </div>
+                <div class="item-info">
+                    <h3>@Model.ListingTitle</h3>
+                    <p>Seller: @Model.SellerName</p>
+                    <p>Purchase Date: @Model.PurchaseDate.ToString("MMMM dd, yyyy HH:mm")</p>
+                    <p>Purchase ID: #@Model.PurchaseId</p>
+                    <p class="item-price">@Model.Amount.ToString("C")</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="next-steps">
+            <p>An email confirmation has been sent to your registered email address.</p>
+            <p>You can view your purchase details anytime in your account.</p>
+
+            <div class="action-buttons">
+                <a href="@Url.Action("MyPurchases")" class="btn-primary">View My Purchases</a>
+                <a href="@Url.Action("User_MainPage", "User")" class="btn-secondary">Continue Shopping</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .success-container {
+        max-width: 800px;
+        margin: 0 auto;
+        text-align: center;
+        background-color: white;
+        border-radius: 10px;
+        padding: 30px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .success-icon {
+        font-size: 80px;
+        color: #28a745;
+        margin-bottom: 20px;
+    }
+
+    .success-message {
+        font-size: 18px;
+        margin-bottom: 30px;
+        color: #666;
+    }
+
+    .order-details {
+        margin: 30px 0;
+        text-align: left;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+        .order-details h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+    .order-item {
+        display: flex;
+        align-items: center;
+    }
+
+    .item-image {
+        margin-right: 20px;
+    }
+
+        .item-image img {
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+    .item-info h3 {
+        margin: 0 0 10px 0;
+        color: #333;
+    }
+
+    .item-info p {
+        margin: 5px 0;
+        color: #666;
+    }
+
+    .item-price {
+        font-weight: bold;
+        font-size: 18px;
+        color: #0066cc;
+        margin-top: 10px !important;
+    }
+
+    .next-steps {
+        margin-top: 30px;
+        color: #666;
+    }
+
+    .action-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .btn-primary {
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            background-color: #0055b3;
+        }
+
+    .btn-secondary {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #e0e0e0;
+        }
+
+    @@media (max-width: 768px) {
+        .order-item
+
+    {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .item-image {
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .action-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    }
+</style>
+
+<!-- Add Font Awesome for the check icon -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+```

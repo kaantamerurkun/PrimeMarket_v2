@@ -1,0 +1,445 @@
+﻿@model PrimeMarket.Controllers.AdminReportViewModel
+@{
+    ViewData["Title"] = "Usage Report";
+    Layout = null;
+    var userName = Context.Session.GetString("AdminUsername") ?? "Admin";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"] - PrimeMarket Admin</title>
+    <link rel="stylesheet" href="~/css/AdminDashboard.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+    <style>
+        .report-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            margin: 0 0 20px 0;
+            font-size: 18px;
+            color: #333;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+            .data-table th {
+                background-color: #0066cc;
+                color: white;
+                padding: 10px;
+                text-align: left;
+            }
+
+            .data-table td {
+                padding: 10px;
+                border-bottom: 1px solid #ddd;
+            }
+
+            .data-table tr:hover {
+                background-color: #f5f5f5;
+            }
+
+        .chart-container {
+            height: 300px;
+            margin: 20px 0;
+        }
+
+        .category-chart {
+            display: flex;
+            flex-direction: column;
+            margin-top: 20px;
+        }
+
+        .category-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .category-label {
+            width: 150px;
+            font-weight: bold;
+        }
+
+        .category-bar-container {
+            flex: 1;
+            background-color: #f0f0f0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .category-bar {
+            height: 100%;
+            background-color: #0066cc;
+            border-radius: 10px;
+        }
+
+        .category-percentage {
+            margin-left: 10px;
+            font-weight: bold;
+            width: 60px;
+            text-align: right;
+        }
+
+        .export-actions {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-export {
+            padding: 8px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .page-button {
+            padding: 5px 10px;
+            margin: 0 5px;
+            background-color: #f0f0f0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .page-button.active {
+                background-color: #0066cc;
+                color: white;
+                border-color: #0066cc;
+            }
+
+        .search-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+            .search-filter input {
+                flex: 1;
+                padding: 8px 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
+
+            .search-filter button {
+                padding: 8px 15px;
+                background-color: #0066cc;
+                color: white;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
+                <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
+                <p>@userName</p>
+
+                <!-- Notification Bell -->
+                <div class="notification-wrapper">
+                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
+                    <div id="listingNotificationDropdown" class="notification-dropdown">
+                        <p class="notification-item">An item is waiting to be approved or rejected</p>
+                        <p class="notification-item">A user sent ID for verification.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <ul>
+                <li onclick="window.location.href='@Url.Action("PendingVerifications", "Admin")'" class="nav-item">User ID Verifications</li>
+                <li onclick="window.location.href='@Url.Action("PendingListings", "Admin")'" class="nav-item">Pending Listings</li>
+                <li onclick="window.location.href='@Url.Action("UsageReport", "Admin")'" class="nav-item active">Usage Report</li>
+            </ul>
+        </div>
+
+        <div class="dashboard-content">
+            <h1>Platform Usage Report</h1>
+
+            <div class="report-section">
+                <h2 class="section-title">Overview</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.TotalUsers</div>
+                        <div class="stat-label">Total Users</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.TotalListings</div>
+                        <div class="stat-label">Total Listings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.PendingListings</div>
+                        <div class="stat-label">Pending Approval</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">@Model.SoldListings</div>
+                        <div class="stat-label">Sold Items</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h2 class="section-title">Category Distribution</h2>
+                <div class="category-chart">
+                    @foreach (var category in Model.CategoryStats)
+                    {
+                        <div class="category-item">
+                            <div class="category-label">@category.Category</div>
+                            <div class="category-bar-container">
+                                <div class="category-bar" style="width: @category.Percentage%"></div>
+                            </div>
+                            <div class="category-percentage">@category.Percentage.ToString("0.0")%</div>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="report-section">
+                <h2 class="section-title">User Activity</h2>
+
+                <div class="search-filter">
+                    <input type="text" id="userSearch" placeholder="Search by name or email" onkeyup="filterUsers()">
+                    <button onclick="filterUsers()">Search</button>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="data-table" id="userTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Sign Up Date</th>
+                                <th>Listings</th>
+                                <th>Sales</th>
+                                <th>Purchases</th>
+                                <th>Last Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>@user.FullName</td>
+                                    <td>@user.Email</td>
+                                    <td>@user.SignUpDate.ToString("MMM dd, yyyy")</td>
+                                    <td>@user.TotalListings</td>
+                                    <td>@user.TotalSales</td>
+                                    <td>@user.TotalPurchases</td>
+                                    <td>@user.DaysSinceLastActive days ago</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="pagination" id="userPagination"></div>
+            </div>
+
+            <div class="export-actions">
+                <a href="@Url.Action("ExportUsageReport")" class="btn-export">
+                    <i class="fas fa-file-export"></i> Export as CSV
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle notification dropdown
+            const notificationBell = document.getElementById('listingNotificationBell');
+            const notificationDropdown = document.getElementById('listingNotificationDropdown');
+
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
+                        notificationDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            // Initialize user table pagination
+            initPagination();
+        });
+
+        // Pagination variables
+        let currentPage = 1;
+        const rowsPerPage = 10;
+
+        function initPagination() {
+            const table = document.getElementById('userTable');
+            const rows = table.querySelectorAll('tbody tr');
+
+            // Show first page by default
+            updatePagination(rows);
+            showPage(currentPage, rows);
+        }
+
+        function showPage(page, rows) {
+            // Hide all rows
+            rows.forEach(row => {
+                row.style.display = 'none';
+            });
+
+            // Calculate start and end index
+            const startIndex = (page - 1) * rowsPerPage;
+            const endIndex = Math.min(startIndex + rowsPerPage, rows.length);
+
+            // Show rows for current page
+            for (let i = startIndex; i < endIndex; i++) {
+                rows[i].style.display = '';
+            }
+        }
+
+        function updatePagination(rows) {
+            const paginationContainer = document.getElementById('userPagination');
+            paginationContainer.innerHTML = '';
+
+            const pageCount = Math.ceil(rows.length / rowsPerPage);
+
+            // Add previous button
+            if (pageCount > 1) {
+                const prevButton = document.createElement('button');
+                prevButton.className = 'page-button';
+                prevButton.innerHTML = '&laquo;';
+                prevButton.addEventListener('click', function() {
+                    if (currentPage > 1) {
+                        currentPage--;
+                        updatePaginationButtons();
+                        showPage(currentPage, rows);
+                    }
+                });
+                paginationContainer.appendChild(prevButton);
+            }
+
+            // Add page buttons
+            for (let i = 1; i <= pageCount; i++) {
+                const pageButton = document.createElement('button');
+                pageButton.className = 'page-button' + (i === currentPage ? ' active' : '');
+                pageButton.textContent = i;
+                pageButton.addEventListener('click', function() {
+                    currentPage = i;
+                    updatePaginationButtons();
+                    showPage(currentPage, rows);
+                });
+                paginationContainer.appendChild(pageButton);
+            }
+
+            // Add next button
+            if (pageCount > 1) {
+                const nextButton = document.createElement('button');
+                nextButton.className = 'page-button';
+                nextButton.innerHTML = '&raquo;';
+                nextButton.addEventListener('click', function() {
+                    if (currentPage < pageCount) {
+                        currentPage++;
+                        updatePaginationButtons();
+                        showPage(currentPage, rows);
+                    }
+                });
+                paginationContainer.appendChild(nextButton);
+            }
+        }
+
+        function updatePaginationButtons() {
+            const pageButtons = document.querySelectorAll('.page-button');
+            pageButtons.forEach(button => {
+                button.classList.remove('active');
+                if (button.textContent == currentPage) {
+                    button.classList.add('active');
+                }
+            });
+        }
+
+        function filterUsers() {
+            const searchTerm = document.getElementById('userSearch').value.toLowerCase();
+            const table = document.getElementById('userTable');
+            const rows = table.querySelectorAll('tbody tr');
+
+            let visibleRows = [];
+
+            rows.forEach(row => {
+                const name = row.cells[0].textContent.toLowerCase();
+                const email = row.cells[1].textContent.toLowerCase();
+
+                if (name.includes(searchTerm) || email.includes(searchTerm)) {
+                    visibleRows.push(row);
+                }
+            });
+
+            // Reset pagination
+            currentPage = 1;
+
+            // Update pagination and show first page
+            updatePagination(visibleRows);
+            showPage(currentPage, visibleRows);
+        }
+    </script>
+
+    <!-- Add Font Awesome for icons -->
+</body>
+</html>

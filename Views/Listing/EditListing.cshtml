@@ -1,0 +1,514 @@
+﻿@model PrimeMarket.Controllers.ListingViewModel
+@{
+    ViewData["Title"] = "Edit Listing";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <div class="edit-listing-header">
+        <h1>Edit Listing</h1>
+        <a href="@Url.Action("MyListings")" class="btn-back">
+            <i class="fas fa-arrow-left"></i> Back to My Listings
+        </a>
+    </div>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            <ul>
+                @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    <li>@error.ErrorMessage</li>
+                }
+            </ul>
+        </div>
+    }
+
+    <div class="edit-form-container">
+        <form id="editListingForm" method="post" action="@Url.Action("EditListing")" enctype="multipart/form-data">
+            @Html.AntiForgeryToken()
+            <input type="hidden" asp-for="Id" value="@Model.Id" />
+            <input type="hidden" asp-for="Category" value="@Model.Category" />
+            <input type="hidden" asp-for="SubCategory" value="@Model.SubCategory" />
+            <input type="hidden" asp-for="DetailCategory" value="@Model.DetailCategory" />
+            <input type="hidden" asp-for="Condition" value="@Model.Condition" />
+
+            <div class="form-section">
+                <h2>Basic Information</h2>
+
+                <div class="form-group">
+                    <label asp-for="Title">Title</label>
+                    <input type="text" asp-for="Title" class="form-control" required />
+                    <span asp-validation-for="Title" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Price">Price (TL)</label>
+                    <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
+                    <span asp-validation-for="Price" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Description">Description</label>
+                    <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
+                    <span asp-validation-for="Description" class="text-danger"></span>
+                </div>
+
+                <div class="form-group">
+                    <label asp-for="Location">Location</label>
+                    <select asp-for="Location" class="form-control" required>
+                        <option value="">Select Location</option>
+                        <option value="Istanbul">Istanbul</option>
+                        <option value="Ankara">Ankara</option>
+                        <option value="Izmir">Izmir</option>
+                        <option value="Bursa">Bursa</option>
+                        <option value="Antalya">Antalya</option>
+                        <option value="Other">Other</option>
+                    </select>
+                    <span asp-validation-for="Location" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Images</h2>
+                <p class="info-text">Current images will remain unless you add new ones.</p>
+
+                <div class="current-images">
+                    @if (Model.Images != null && Model.Images.Count > 0)
+                    {
+                        <h3>Current Images</h3>
+                        <div class="image-gallery">
+                            @foreach (var image in Model.Images)
+                            {
+                                <div class="image-item">
+                                    <img src="@image.ImagePath" alt="Listing Image">
+                                    @if (image.IsMainImage)
+                                    {
+                                        <span class="main-image-badge">Main Image</span>
+                                    }
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+
+                <div class="form-group">
+                    <label for="newImages">Add New Images</label>
+                    <input type="file" id="newImages" name="newImages" multiple accept="image/*" class="form-control" />
+                    <div id="image-preview" class="image-preview"></div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h2>Specific Details</h2>
+                <p class="category-info">Category: @Model.Category > @Model.SubCategory @(!string.IsNullOrEmpty(Model.DetailCategory) ? $"> {Model.DetailCategory}" : "")</p>
+
+                <div id="dynamicFields" class="dynamic-fields">
+                    <!-- Dynamic fields will be populated by JavaScript based on the category -->
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <a href="@Url.Action("MyListings")" class="btn-cancel">Cancel</a>
+                <button type="submit" class="btn-save">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .edit-listing-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .btn-back {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 8px 15px;
+        background-color: #f0f0f0;
+        color: #333;
+        border-radius: 5px;
+        text-decoration: none;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+        .alert-danger ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+    .edit-form-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .form-section {
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .form-section h2 {
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 22px;
+        }
+
+    .info-text {
+        color: #666;
+        margin-bottom: 15px;
+    }
+
+    .category-info {
+        background-color: #e2f0fd;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        color: #0066cc;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    textarea.form-control {
+        resize: vertical;
+        min-height: 120px;
+    }
+
+    .form-control:focus {
+        border-color: #0066cc;
+        outline: none;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 14px;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .current-images h3 {
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .image-gallery {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .image-item {
+        position: relative;
+        border-radius: 5px;
+        overflow: hidden;
+        height: 150px;
+    }
+
+        .image-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .main-image-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background-color: #0066cc;
+        color: white;
+        padding: 3px 8px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
+
+    .image-preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+        .image-preview img {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 5px;
+        }
+
+    .dynamic-fields {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 15px;
+    }
+
+    .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .btn-cancel {
+        padding: 10px 20px;
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+    .btn-save {
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn-save:hover {
+            background-color: #0055b3;
+        }
+
+    @@media (max-width: 768px) {
+        .edit-listing-header
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .dynamic-fields {
+        grid-template-columns: 1fr;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Image preview functionality
+        const imagesInput = document.getElementById('newImages');
+        const previewContainer = document.getElementById('image-preview');
+
+        imagesInput.addEventListener('change', function() {
+            previewContainer.innerHTML = '';
+
+            if (this.files) {
+                Array.from(this.files).forEach(file => {
+                    if (!file.type.match('image.*')) return;
+
+                    const reader = new FileReader();
+
+                    reader.onload = function(e) {
+                        const img = document.createElement('img');
+                        img.src = e.target.result;
+                        img.alt = file.name;
+                        previewContainer.appendChild(img);
+                    };
+
+                    reader.readAsDataURL(file);
+                });
+            }
+        });
+
+        // Load product-specific fields based on category and subcategory
+        loadDynamicFields();
+
+        function loadDynamicFields() {
+            const category = '@Model.Category';
+            const subcategory = '@Model.SubCategory';
+            const detailCategory = '@Model.DetailCategory';
+            const fieldsContainer = document.getElementById('dynamicFields');
+
+            const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
+
+            if (!fieldDefinitions || fieldDefinitions.length === 0) {
+                fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
+                return;
+            }
+
+            fieldsContainer.innerHTML = '';
+
+            fieldDefinitions.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.setAttribute('for', field.name);
+                label.textContent = field.label;
+                fieldDiv.appendChild(label);
+
+                if (field.type === 'select') {
+                    const select = document.createElement('select');
+                    select.id = field.name;
+                    select.name = `DynamicProperties[${field.name}]`;
+                    select.className = 'form-control';
+
+                    const emptyOption = document.createElement('option');
+                    emptyOption.value = '';
+                    emptyOption.textContent = `Select ${field.label}`;
+                    select.appendChild(emptyOption);
+
+                    field.options.forEach(option => {
+                        const optEl = document.createElement('option');
+                        optEl.value = option;
+                        optEl.textContent = option;
+                        select.appendChild(optEl);
+                    });
+
+                    fieldDiv.appendChild(select);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = field.type || 'text';
+                    input.id = field.name;
+                    input.name = `DynamicProperties[${field.name}]`;
+                    input.className = 'form-control';
+                    input.placeholder = field.placeholder || '';
+
+                    fieldDiv.appendChild(input);
+                }
+
+                fieldsContainer.appendChild(fieldDiv);
+            });
+        }
+
+        function getCategoryFields(subcategory) {
+            // This is a simplified version - in a real application, you might want to fetch this from server
+            const categoryFields = {
+                "Laptops": [
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 16GB" },
+                    { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
+                    { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
+    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA GTX 1650" },
+                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3200MHz" },
+                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Backlit" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 15.6 inch" },
+                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. Intel i7-12700H" },
+                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 512GB SSD" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Desktops": [
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 32GB" },
+                        { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
+                        { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
+                        { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA RTX 3080" },
+                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3600MHz" },
+                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Mechanical" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 27 inch" },
+                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. AMD Ryzen 9" },
+                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "IOS Phone": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 3200mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.1 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Lightning, USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    "Android Phone": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 108MP quad camera" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 5000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.7 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Other Phones": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 13MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 4000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.5 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 6GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    "IOS Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ],
+                    "Android Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 8MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 7000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.4 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 64GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                    ],
+                    "Other Tablets": [
+                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 5MP" },
+                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 6000mAh" },
+                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 8 inch" },
+                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Micro USB" },
+                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 3GB" },
+                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
+                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                    ]
+                    // Add more subcategories as needed
+                };
+
+                return categoryFields[subcategory] || [];
+            }
+        });
+</script>
+
+<!-- Add Font Awesome for icons -->
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+```

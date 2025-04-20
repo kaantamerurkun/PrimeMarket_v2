@@ -69,14 +69,17 @@ namespace PrimeMarket.Controllers
                 if (emailInUse)
                 {
                     ModelState.AddModelError("Email", "This email is already in use.");
+                    TempData["ErrorMessage"] = "Email is already in use by another account.";
                     return RedirectToAction("EditProfile");
                 }
 
-                user.Email = model.Email;
-                user.IsEmailVerified = false;
-
                 try
                 {
+                    // Store the new email in TempData so we can access it after verification
+                    TempData["NewEmail"] = model.Email;
+                    TempData["IsEmailUpdate"] = true;
+
+                    // Send verification code to the new email
                     SendVerificationCodeInternal(model.Email);
                 }
                 catch (Exception ex)
@@ -85,8 +88,8 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("EditProfile");
                 }
 
-                await _context.SaveChangesAsync();
-                HttpContext.Session.SetString("UserEmail", user.Email);
+                // Redirect to the existing email verification page
+                return RedirectToAction("EmailVerification", new { email = model.Email });
             }
 
             return RedirectToAction("EditProfile");
@@ -277,23 +280,59 @@ namespace PrimeMarket.Controllers
         }
 
         [HttpPost]
-        public IActionResult VerifyEmailCode([FromForm] string email, [FromForm] string code)
+        public async Task<IActionResult> VerifyEmailCode([FromForm] string email, [FromForm] string code)
         {
-            var verification = _context.EmailVerifications
-                .FirstOrDefault(v => v.Email == email && v.Code == code);
+            var verification = await _context.EmailVerifications
+                .FirstOrDefaultAsync(v => v.Email == email && v.Code == code);
 
             if (verification == null || verification.Expiration < DateTime.UtcNow)
                 return BadRequest("Invalid or expired verification code.");
 
-            var user = _context.Users.FirstOrDefault(u => u.Email == email);
-            if (user == null)
-                return NotFound("User not found.");
+            // Check if this is an email update or new account verification
+            bool isEmailUpdate = TempData["IsEmailUpdate"] != null && (bool)TempData["IsEmailUpdate"];
 
-            user.IsEmailVerified = true;
+            if (isEmailUpdate)
+            {
+                // This is an email change verification
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                    return NotFound("User not found.");
+
+                var user = await _context.Users.FindAsync(userId);
+                if (user == null)
+                    return NotFound("User not found.");
+
+                // Update the user's email
+                user.Email = email;
+                user.IsEmailVerified = true;
+                user.UpdatedAt = DateTime.UtcNow;
+
+                // Update session with new email
+                HttpContext.Session.SetString("UserEmail", user.Email);
+
+                // Set success message
+                TempData["SuccessMessage"] = "Your email has been successfully updated and verified.";
+            }
+            else
+            {
+                // This is a new account verification
+                var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+                if (user == null)
+                    return NotFound("User not found.");
+
+                user.IsEmailVerified = true;
+            }
+
+            // Remove the verification code from database
             _context.EmailVerifications.Remove(verification);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
 
-            return Ok(new { redirectUrl = Url.Action("Login", "User") });
+            // Determine redirect URL based on type of verification
+            string redirectUrl = isEmailUpdate
+                ? Url.Action("EditProfile", "User")
+                : Url.Action("Login", "User");
+
+            return Ok(new { redirectUrl });
         }
 
         private string ComputeSha256Hash(string rawData)

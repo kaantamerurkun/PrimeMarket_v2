@@ -1,0 +1,692 @@
+﻿@model List<PrimeMarket.Models.VerificationDocument>
+@{
+    ViewData["Title"] = "Pending Verifications";
+    Layout = null;
+    var userName = Context.Session.GetString("AdminUsername") ?? "Admin";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"] - PrimeMarket Admin</title>
+    <link rel="stylesheet" href="~/css/AdminDashboard.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+    <style>
+        .verification-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .verification-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 20px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+        }
+
+        .user-details h3 {
+            margin: 0 0 5px 0;
+            font-size: 18px;
+        }
+
+        .user-email {
+            color: #666;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .verification-images {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .id-image-container {
+            flex: 1;
+            position: relative;
+        }
+
+            .id-image-container h4 {
+                margin: 0 0 5px 0;
+                font-size: 16px;
+            }
+
+        .id-image {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+            .id-image:hover {
+                transform: scale(1.03);
+            }
+
+        .verification-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .verification-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-approve, .btn-reject {
+            flex: 1;
+            padding: 10px 0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .btn-approve {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+            .empty-state i {
+                font-size: 50px;
+                color: #ddd;
+                margin-bottom: 20px;
+            }
+
+            .empty-state p {
+                color: #666;
+                font-size: 18px;
+            }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .count-badge {
+            background-color: #0066cc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 900px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-header {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .modal-images {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .modal-image-container {
+            flex: 1;
+        }
+
+            .modal-image-container h4 {
+                margin: 0 0 10px 0;
+                text-align: center;
+                font-size: 18px;
+            }
+
+        .modal-image {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            object-fit: contain;
+            border-radius: 5px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+            .modal-actions button {
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-weight: bold;
+            }
+
+        .reject-reasons {
+            display: none;
+            margin-top: 20px;
+        }
+
+            .reject-reasons h3 {
+                margin: 0 0 15px 0;
+                font-size: 18px;
+            }
+
+        .reasons-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-confirm-reject {
+            padding: 10px 20px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .approval-message {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #d4edda;
+            color: #155724;
+            border-radius: 5px;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
+                <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
+                <p>@userName</p>
+
+                <!-- Notification Bell -->
+                <div class="notification-wrapper">
+                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
+                    <div id="listingNotificationDropdown" class="notification-dropdown">
+                        <p class="notification-item">An item is waiting to be approved or rejected</p>
+                        <p class="notification-item">A user sent ID for verification.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <ul>
+                <li onclick="window.location.href='@Url.Action("PendingVerifications", "Admin")'" class="nav-item active">User ID Verifications</li>
+                <li onclick="window.location.href='@Url.Action("PendingListings", "Admin")'" class="nav-item">Pending Listings</li>
+                <li onclick="window.location.href='@Url.Action("UsageReport", "Admin")'" class="nav-item">Usage Report</li>
+            </ul>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="section-header">
+                <h1>Pending ID Verifications <span class="count-badge">@Model.Count</span></h1>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="empty-state">
+                    <i class="fas fa-id-card"></i>
+                    <p>No pending ID verifications to review!</p>
+                </div>
+            }
+            else
+            {
+                <div class="verification-grid">
+                    @foreach (var verification in Model)
+                    {
+                        <div class="verification-card" data-id="@verification.Id">
+                            <div class="user-info">
+                                <img src="@(string.IsNullOrEmpty(verification.User?.ProfileImagePath) ? "/images/user-placeholder.png" : verification.User.ProfileImagePath)" alt="User" class="user-image">
+                                <div class="user-details">
+                                    <h3>@verification.User?.FirstName @verification.User?.LastName</h3>
+                                    <p class="user-email">@verification.User?.Email</p>
+                                </div>
+                            </div>
+
+                            <div class="verification-images">
+                                <div class="id-image-container">
+                                    <h4>ID Front</h4>
+                                    <img src="@verification.FrontImagePath" alt="ID Front" class="id-image front-image" onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath')">
+                                </div>
+                                <div class="id-image-container">
+                                    <h4>ID Back</h4>
+                                    <img src="@verification.BackImagePath" alt="ID Back" class="id-image back-image" onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath')">
+                                </div>
+                            </div>
+
+                            <p class="verification-date">Submitted: @(((DateTime)verification.CreatedAt).ToString("MMM dd, yyyy"))</p>
+
+                            <div class="verification-actions">
+                                <button class="btn-approve" onclick="approveVerification('@verification.Id')">Approve</button>
+                                <button class="btn-reject" onclick="openRejectModal('@verification.Id')">Reject</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Modal for enlarged image -->
+    <div id="idModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div class="modal-header">
+                <h3 id="modalUserName">User ID Verification</h3>
+            </div>
+            <div class="modal-images">
+                <div class="modal-image-container">
+                    <h4>ID Front</h4>
+                    <img id="modalImageFront" class="modal-image" src="" alt="ID Front">
+                </div>
+                <div class="modal-image-container">
+                    <h4>ID Back</h4>
+                    <img id="modalImageBack" class="modal-image" src="" alt="ID Back">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="modalApproveBtn" class="btn-approve" onclick="approveVerification()">Approve</button>
+                <button id="modalRejectBtn" class="btn-reject" onclick="showRejectReasons()">Reject</button>
+            </div>
+
+            <!-- Reject reasons checklist -->
+            <div id="rejectReasons" class="reject-reasons">
+                <h3>Select Reason(s) for Rejection:</h3>
+                <div class="reasons-checklist">
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason1" name="reason" value="Image is blurry or unclear">
+                        <label for="reason1">Image is blurry or unclear</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason2" name="reason" value="ID appears to be damaged or altered">
+                        <label for="reason2">ID appears to be damaged or altered</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason3" name="reason" value="Information on ID doesn't match user account">
+                        <label for="reason3">Information on ID doesn't match user account</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason4" name="reason" value="ID is expired">
+                        <label for="reason4">ID is expired</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason5" name="reason" value="Document type not acceptable">
+                        <label for="reason5">Document type not acceptable</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason6" name="reason" value="Both sides of ID not provided">
+                        <label for="reason6">Both sides of ID not provided</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason7" name="reason" value="ID information not legible">
+                        <label for="reason7">ID information not legible</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason8" name="reason" value="Security features not visible">
+                        <label for="reason8">Security features not visible</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason9" name="reason" value="Photo on ID doesn't match user">
+                        <label for="reason9">Photo on ID doesn't match user</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reasonOther" name="reason" value="Other">
+                        <label for="reasonOther">Other</label>
+                        <input type="text" id="otherReasonText" placeholder="Please specify..." style="display:none; margin-top:5px; width:100%; padding:5px;">
+                    </div>
+                </div>
+                <button id="confirmRejectBtn" class="btn-confirm-reject" onclick="rejectVerification()">Confirm Rejection</button>
+            </div>
+
+            <!-- Approval message -->
+            <div id="approvalMessage" class="approval-message">
+                <p>ID verification has been approved successfully!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentVerificationId = null;
+
+        function openImageModal(id, userName, frontImage, backImage) {
+            currentVerificationId = id;
+
+            document.getElementById('modalUserName').textContent = userName + ' - ID Verification';
+            document.getElementById('modalImageFront').src = frontImage;
+            document.getElementById('modalImageBack').src = backImage;
+            document.getElementById('idModal').style.display = 'block';
+
+            document.getElementById('rejectReasons').style.display = 'none';
+            document.getElementById('approvalMessage').style.display = 'none';
+            document.getElementById('modalApproveBtn').style.display = 'block';
+            document.getElementById('modalRejectBtn').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('idModal').style.display = 'none';
+            resetModalState();
+        }
+
+        function resetModalState() {
+            document.getElementById('rejectReasons').style.display = 'none';
+            document.getElementById('approvalMessage').style.display = 'none';
+            document.getElementById('modalApproveBtn').style.display = 'block';
+            document.getElementById('modalRejectBtn').style.display = 'block';
+
+            // Reset checkboxes
+            document.querySelectorAll('input[name="reason"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            document.getElementById('otherReasonText').style.display = 'none';
+            document.getElementById('otherReasonText').value = '';
+        }
+
+        function showRejectReasons() {
+            document.getElementById('modalApproveBtn').style.display = 'none';
+            document.getElementById('modalRejectBtn').style.display = 'none';
+            document.getElementById('rejectReasons').style.display = 'block';
+        }
+
+        function openRejectModal(id) {
+            const card = document.querySelector(`.verification-card[data-id="${id}"]`);
+            if (!card) return;
+
+            const userName = card.querySelector('.user-details h3').textContent;
+            const frontImage = card.querySelector('.front-image').src;
+            const backImage = card.querySelector('.back-image').src;
+
+            openImageModal(id, userName, frontImage, backImage);
+            showRejectReasons();
+        }
+
+        function approveVerification(id = null) {
+            const verificationId = id || currentVerificationId;
+            if (!verificationId) return;
+
+            // Show loading state
+            const approveBtn = document.getElementById('modalApproveBtn');
+            if (approveBtn) {
+                approveBtn.textContent = 'Approving...';
+                approveBtn.disabled = true;
+            }
+
+            fetch('/Admin/ApproveVerification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: `id=${verificationId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (approveBtn) {
+                        document.getElementById('modalApproveBtn').style.display = 'none';
+                        document.getElementById('modalRejectBtn').style.display = 'none';
+                        document.getElementById('approvalMessage').style.display = 'block';
+
+                        setTimeout(() => {
+                            closeModal();
+                            removeVerificationCard(verificationId);
+                        }, 2000);
+                    } else {
+                        removeVerificationCard(verificationId);
+                    }
+                } else {
+                    alert(data.message || 'Error approving verification. Please try again.');
+                    if (approveBtn) {
+                        approveBtn.textContent = 'Approve';
+                        approveBtn.disabled = false;
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error approving verification:', error);
+                alert('Error approving verification. Please try again.');
+                if (approveBtn) {
+                    approveBtn.textContent = 'Approve';
+                    approveBtn.disabled = false;
+                }
+            });
+        }
+
+        function rejectVerification() {
+            if (!currentVerificationId) return;
+
+            // Get selected reasons
+            const selectedReasons = [];
+            document.querySelectorAll('input[name="reason"]:checked').forEach(checkbox => {
+                if (checkbox.id === 'reasonOther') {
+                    const otherReason = document.getElementById('otherReasonText').value.trim();
+                    if (otherReason) {
+                        selectedReasons.push(otherReason);
+                    }
+                } else {
+                    selectedReasons.push(checkbox.value);
+                }
+            });
+
+            if (selectedReasons.length === 0) {
+                alert('Please select at least one rejection reason.');
+                return;
+            }
+
+            // Show loading state
+            const confirmRejectBtn = document.getElementById('confirmRejectBtn');
+            confirmRejectBtn.textContent = 'Rejecting...';
+            confirmRejectBtn.disabled = true;
+
+            fetch('/Admin/RejectVerification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                },
+                body: `id=${currentVerificationId}&rejectionReason=${encodeURIComponent(selectedReasons.join(', '))}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+                    removeVerificationCard(currentVerificationId);
+                } else {
+                    alert(data.message || 'Error rejecting verification. Please try again.');
+                    confirmRejectBtn.textContent = 'Confirm Rejection';
+                    confirmRejectBtn.disabled = false;
+                }
+            })
+            .catch(error => {
+                console.error('Error rejecting verification:', error);
+                alert('Error rejecting verification. Please try again.');
+                confirmRejectBtn.textContent = 'Confirm Rejection';
+                confirmRejectBtn.disabled = false;
+            });
+        }
+
+        function removeVerificationCard(id) {
+            const card = document.querySelector(`.verification-card[data-id="${id}"]`);
+            if (card) {
+                card.style.opacity = '0';
+                card.style.transform = 'scale(0.8)';
+
+                setTimeout(() => {
+                    card.remove();
+
+                    const remainingCards = document.querySelectorAll('.verification-card');
+                    if (remainingCards.length === 0) {
+                        document.querySelector('.dashboard-content').innerHTML = `
+                            <div class="section-header">
+                                <h1>Pending ID Verifications <span class="count-badge">0</span></h1>
+                            </div>
+                            <div class="empty-state">
+                                <i class="fas fa-id-card"></i>
+                                <p>No pending ID verifications to review!</p>
+                            </div>
+                        `;
+                    }
+
+                    // Update the counter
+                    const countBadge = document.querySelector('.count-badge');
+                    if (countBadge) {
+                        const currentCount = parseInt(countBadge.textContent);
+                        countBadge.textContent = currentCount - 1;
+                    }
+                }, 300);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle notification dropdown
+            const notificationBell = document.getElementById('listingNotificationBell');
+            const notificationDropdown = document.getElementById('listingNotificationDropdown');
+
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
+                        notificationDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            // Toggle "Other" reason text input
+            const reasonOther = document.getElementById('reasonOther');
+            const otherReasonText = document.getElementById('otherReasonText');
+
+            if (reasonOther && otherReasonText) {
+                reasonOther.addEventListener('change', function() {
+                    otherReasonText.style.display = this.checked ? 'block' : 'none';
+                });
+            }
+
+            // Close modal when clicking outside
+            const modal = document.getElementById('idModal');
+            if (modal) {
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal) {
+                        closeModal();
+                    }
+                });
+            }
+        });
+    </script>
+
+
+</body>
+</html>

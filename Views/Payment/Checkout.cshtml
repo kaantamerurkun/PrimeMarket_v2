@@ -1,0 +1,284 @@
+﻿
+@model PrimeMarket.Controllers.CheckoutViewModel
+@{
+    ViewData["Title"] = "Checkout";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <h1>Checkout</h1>
+
+    <div class="checkout-container">
+        <div class="checkout-summary">
+            <h2>Order Summary</h2>
+            <div class="item-summary">
+                <div class="item-image">
+                    <img src="@Model.ListingImage" alt="@Model.ListingTitle" width="120" height="120">
+                </div>
+                <div class="item-details">
+                    <h3>@Model.ListingTitle</h3>
+                    <p class="seller">Seller: @Model.SellerName</p>
+                    <p class="price">@Model.ListingPrice.ToString("C")</p>
+                </div>
+            </div>
+            <div class="order-total">
+                <div class="total-label">Total</div>
+                <div class="total-amount">@Model.ListingPrice.ToString("C")</div>
+            </div>
+        </div>
+
+        <div class="checkout-payment">
+            <h2>Payment Details</h2>
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            <form id="paymentForm" method="post" action="@Url.Action("ProcessPayment")">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="ListingId" value="@Model.ListingId">
+
+                <div class="form-group">
+                    <label for="fullname">Cardholder Name</label>
+                    <input type="text" id="fullname" name="CardholderName" placeholder="Name on card" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="cardnumber">Card Number</label>
+                    <input type="text" id="cardnumber" name="CardNumber" placeholder="1234 5678 9012 3456" required
+                           maxlength="19" pattern="[0-9\s]{13,19}">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group half">
+                        <label for="expiry">Expiry Date</label>
+                        <input type="text" id="expiry" name="ExpiryDate" placeholder="MM/YY" required
+                               maxlength="5" pattern="(0[1-9]|1[0-2])\/[0-9]{2}">
+                    </div>
+
+                    <div class="form-group half">
+                        <label for="cvv">CVV</label>
+                        <input type="password" id="cvv" name="Cvv" placeholder="123" required
+                               maxlength="4" pattern="[0-9]{3,4}">
+                    </div>
+                </div>
+
+                <div class="payment-actions">
+                    <a href="@Url.Action("User_Listing_Details", "User", new { id = Model.ListingId })" class="btn-cancel">Cancel</a>
+                    <button type="submit" class="btn-pay">Pay Now @Model.ListingPrice.ToString("C")</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .checkout-container {
+        display: flex;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .checkout-summary {
+        flex: 0 0 35%;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .checkout-payment {
+        flex: 0 0 60%;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .item-summary {
+        display: flex;
+        margin: 20px 0;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .item-image {
+        margin-right: 15px;
+    }
+
+        .item-image img {
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+    .item-details h3 {
+        margin: 0 0 10px 0;
+        font-size: 18px;
+    }
+
+    .seller {
+        color: #666;
+        margin-bottom: 10px;
+    }
+
+    .price {
+        font-weight: bold;
+        font-size: 18px;
+        color: #0066cc;
+    }
+
+    .order-total {
+        display: flex;
+        justify-content: space-between;
+        padding-top: 15px;
+        font-size: 18px;
+        font-weight: bold;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 20px;
+    }
+
+    .form-group.half {
+        flex: 1;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    input:focus {
+        border-color: #0066cc;
+        outline: none;
+    }
+
+    .payment-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+
+    .btn-cancel {
+        padding: 12px 24px;
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        text-align: center;
+    }
+
+    .btn-pay {
+        padding: 12px 24px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+        .btn-pay:hover {
+            background-color: #0055b3;
+        }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 768px) {
+        .checkout-container
+
+    {
+        flex-direction: column;
+    }
+
+    .checkout-summary,
+    .checkout-payment {
+        flex: 0 0 100%;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Format card number with spaces
+        const cardInput = document.getElementById('cardnumber');
+        cardInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                value = value.match(/.{1,4}/g).join(' ');
+            }
+            e.target.value = value;
+        });
+
+        // Format expiry date with slash
+        const expiryInput = document.getElementById('expiry');
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length > 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+            }
+            e.target.value = value;
+        });
+
+        // Validate form on submit
+        const paymentForm = document.getElementById('paymentForm');
+        paymentForm.addEventListener('submit', function(e) {
+            const cardNumber = cardInput.value.replace(/\s/g, '');
+            const expiry = expiryInput.value;
+            const cvv = document.getElementById('cvv').value;
+
+            let isValid = true;
+
+            // Validate card number (basic check)
+            if (cardNumber.length < 13 || cardNumber.length > 19) {
+                alert('Please enter a valid card number');
+                isValid = false;
+            }
+
+            // Validate expiry date
+            const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!expiryRegex.test(expiry)) {
+                alert('Please enter a valid expiry date in MM/YY format');
+                isValid = false;
+            }
+
+            // Validate CVV
+            if (cvv.length < 3 || cvv.length > 4) {
+                alert('Please enter a valid CVV code');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>

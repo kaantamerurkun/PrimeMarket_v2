@@ -1,0 +1,357 @@
+﻿@model PrimeMarket.Controllers.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <h1>Shopping Cart</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="cart-container">
+        @if (Model.Items == null || Model.Items.Count == 0)
+        {
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart fa-4x"></i>
+                <h2>Your cart is empty</h2>
+                <p>Browse listings and add items to your cart.</p>
+                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
+            </div>
+        }
+        else
+        {
+            <div class="cart-items">
+                @foreach (var item in Model.Items)
+                {
+                    <div class="cart-item" id="item-@item.BookmarkId">
+                        <div class="item-image">
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
+                                 alt="@item.Title" width="100" height="100">
+                        </div>
+                        <div class="item-details">
+                            <h3>@item.Title</h3>
+                            <p class="seller">Seller: @item.SellerName</p>
+                        </div>
+                        <div class="item-price">@item.Price.ToString("C")</div>
+                        <div class="item-actions">
+                            <a href="@Url.Action("Checkout", new { listingId = item.ListingId })" class="btn-checkout">
+                                Buy Now
+                            </a>
+                            <button class="btn-remove" data-id="@item.BookmarkId">Remove</button>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="cart-summary">
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <div class="summary-label">Subtotal (@Model.Items.Count items)</div>
+                        <div class="summary-value">@Model.TotalPrice.ToString("C")</div>
+                    </div>
+                    <div class="summary-row total">
+                        <div class="summary-label">Total</div>
+                        <div class="summary-value" id="cart-total">@Model.TotalPrice.ToString("C")</div>
+                    </div>
+                </div>
+                <a href="@Url.Action("CheckoutMultiple")" class="btn-checkout-all">Checkout All Items</a>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .cart-container {
+        margin-top: 30px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .empty-cart {
+        text-align: center;
+        padding: 50px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+        .empty-cart i {
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-cart h2 {
+            margin-bottom: 10px;
+        }
+
+        .empty-cart p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+    .btn-browse {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-browse:hover {
+            background-color: #0055b3;
+        }
+
+    .cart-items {
+        margin-bottom: 20px;
+    }
+
+    .cart-item {
+        display: flex;
+        align-items: center;
+        padding: 15px;
+        margin-bottom: 15px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .item-image {
+        margin-right: 15px;
+    }
+
+        .item-image img {
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+    .item-details {
+        flex: 1;
+    }
+
+        .item-details h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+        }
+
+    .seller {
+        color: #666;
+    }
+
+    .item-price {
+        font-weight: bold;
+        font-size: 18px;
+        color: #0066cc;
+        margin: 0 20px;
+    }
+
+    .item-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .btn-checkout {
+        padding: 8px 15px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+    }
+
+        .btn-checkout:hover {
+            background-color: #0055b3;
+        }
+
+    .btn-remove {
+        padding: 8px 15px;
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn-remove:hover {
+            background-color: #e0e0e0;
+        }
+
+    .cart-summary {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    .summary-details {
+        margin-bottom: 20px;
+    }
+
+    .summary-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+        .summary-row.total {
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+    .btn-checkout-all {
+        display: block;
+        width: 100%;
+        padding: 12px 0;
+        background-color: #0066cc;
+        color: white;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+        .btn-checkout-all:hover {
+            background-color: #0055b3;
+        }
+
+    @@media (max-width: 768px) {
+        .cart-item
+
+    {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .item-image {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .item-price {
+        margin: 10px 0;
+    }
+
+    .item-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle remove button clicks
+        const removeButtons = document.querySelectorAll('.btn-remove');
+        removeButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const bookmarkId = this.getAttribute('data-id');
+                removeCartItem(bookmarkId);
+            });
+        });
+
+        function removeCartItem(bookmarkId) {
+            fetch('/Payment/RemoveFromCart', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `bookmarkId=${bookmarkId}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Remove item from UI
+                    const itemElement = document.getElementById(`item-${bookmarkId}`);
+                    if (itemElement) {
+                        itemElement.remove();
+                    }
+
+                    // Check if cart is empty
+                    const cartItems = document.querySelectorAll('.cart-item');
+                    if (cartItems.length === 0) {
+                        // Show empty cart message
+                        const cartContainer = document.querySelector('.cart-container');
+                        cartContainer.innerHTML = `
+                            <div class="empty-cart">
+                                <i class="fas fa-shopping-cart fa-4x"></i>
+                                <h2>Your cart is empty</h2>
+                                <p>Browse listings and add items to your cart.</p>
+                                <a href="/User/User_MainPage" class="btn-browse">Browse Listings</a>
+                            </div>
+                        `;
+                    } else {
+                        // Update total
+                        updateTotal();
+                    }
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error removing item from cart:', error);
+                alert('Error removing item from cart. Please try again.');
+            });
+        }
+
+        function updateTotal() {
+            // Recalculate total price
+            let total = 0;
+            const priceElements = document.querySelectorAll('.item-price');
+            priceElements.forEach(element => {
+                const priceText = element.textContent;
+                const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
+                if (!isNaN(price)) {
+                    total += price;
+                }
+            });
+
+            // Update subtotal and total in the summary
+            const summaryRows = document.querySelectorAll('.summary-row');
+            if (summaryRows.length >= 2) {
+                const subtotalElement = summaryRows[0].querySelector('.summary-value');
+                const totalElement = summaryRows[1].querySelector('.summary-value');
+
+                const itemCount = document.querySelectorAll('.cart-item').length;
+
+                subtotalElement.textContent = `$${total.toFixed(2)}`;
+                totalElement.textContent = `$${total.toFixed(2)}`;
+
+                // Update subtotal label with item count
+                const subtotalLabel = summaryRows[0].querySelector('.summary-label');
+                subtotalLabel.textContent = `Subtotal (${itemCount} item${itemCount !== 1 ? 's' : ''})`;
+            }
+        }
+    });
+</script>

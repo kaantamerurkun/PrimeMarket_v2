@@ -62,7 +62,10 @@
     <br />
     <h2 style="text-align: center">My Listings</h2>
     <div class="items-container">
-        <div class="items-grid">
+        <a asp-controller="Listing" asp-action="MyListings">
+            <button class="btn-editprofile">My Listings</button>
+        </a>
+@*         <div class="items-grid">
             <a asp-action="MyListing" asp-controller="User">
                 <div class="item-card">
             </a>
@@ -82,12 +85,12 @@
                 <button class="edit-btn">Edit</button>
                 <button class="remove-btn">Remove</button>
             </div>
-        </div>
+        </div> *@
     </div>
-    </div>
+    
 
     <!-- Edit Modal -->
-    <div id="editModal">
+@*     <div id="editModal">
         <div class="modal-content">
             <h2 style="text-align:center;">Enter Details of the Item</h2>
             <form id="editForm">
@@ -124,7 +127,7 @@
                 </div>
             </form>
         </div>
-    </div>
+    </div> *@
 
     <script>
         function openModal() {

@@ -1,6 +1,7 @@
 ﻿@{
     ViewBag.Title = "Email Verification";
     var email = ViewBag.Email as string;
+    var isEmailUpdate = TempData["IsEmailUpdate"] as bool? ?? false;
 }
 
 <!DOCTYPE html>
@@ -19,7 +20,9 @@
                 <a>
                     <img style="height: 200px" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" />
                 </a>
-                <h2>Enter the 6-digit Verification Code</h2>
+                <h2>@(isEmailUpdate ? "Verify Your New Email Address" : "Enter the 6-digit Verification Code")</h2>
+                <p>A verification code has been sent to <strong>@email</strong></p>
+
                 <form id="codeForm">
                     <label for="verificationCode">Verification Code</label>
                     <input class="search-box-input"
@@ -37,9 +40,11 @@
                                   transition: border-color 0.3s ease;" />
                     <br /><br />
                     <input type="hidden" id="email" value="@email" />
+                    <input type="hidden" id="isEmailUpdate" value="@isEmailUpdate.ToString().ToLower()" />
                     <div>
                         <button class="send-btn" type="submit">Verify</button>
                     </div>
+                    <div id="resultMessage" style="margin-top: 10px; display: none;"></div>
                 </form>
             </div>
         </center>
@@ -64,9 +69,18 @@
             })
             .catch(err => {
                 console.error(err);
-                alert("Failed to send verification code. Please refresh the page and try again.");
+                showMessage("Failed to send verification code. Please refresh the page and try again.", true);
             });
         });
+
+        // Helper function to show success/error messages
+        function showMessage(message, isError = false) {
+            const messageEl = document.getElementById("resultMessage");
+            messageEl.textContent = message;
+            messageEl.style.display = "block";
+            messageEl.style.color = isError ? "red" : "green";
+            messageEl.style.fontWeight = "bold";
+        }
 
         // Handle form submission for code verification
         document.getElementById("codeForm").addEventListener("submit", function (e) {
@@ -74,15 +88,31 @@
 
             const email = document.getElementById("email").value;
             const code = document.getElementById("verificationCode").value;
+            const submitBtn = document.querySelector(".send-btn");
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = "Verifying...";
 
             fetch('/User/VerifyEmailCode', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 body: new URLSearchParams({ email, code })
             })
-            .then(res => res.ok ? res.json() : Promise.reject())
-            .then(data => window.location.href = data.redirectUrl)
-            .catch(() => alert("Invalid or expired verification code."));
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Verification failed");
+                }
+                return res.json();
+            })
+            .then(data => {
+                showMessage("Verification successful! Redirecting...");
+                setTimeout(() => window.location.href = data.redirectUrl, 1500);
+            })
+            .catch(() => {
+                showMessage("Invalid or expired verification code. Please try again.", true);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Verify";
+            });
         });
     </script>
 </body>

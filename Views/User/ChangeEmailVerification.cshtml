@@ -1,1 +1,139 @@
 ﻿
+@{
+    ViewBag.Title = "Verify New Email";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    var email = ViewBag.NewEmail as string;
+}
+
+<div class="container" id="codeSection" style="margin-top: 100px;">
+    <center>
+        <div style="padding-top: 20px">
+            <h2>Verify Your New Email Address</h2>
+            <p>A verification code has been sent to <strong>@email</strong></p>
+            <p>Please enter the 6-digit code below to verify your new email address</p>
+
+            <form id="codeForm">
+                <div id="statusMessage" style="color: green; margin-bottom: 10px; display: none;"></div>
+                <div id="errorMessage" style="color: red; margin-bottom: 10px; display: none;"></div>
+
+                <label for="verificationCode">Verification Code</label>
+                <input class="search-box-input"
+                       type="text"
+                       id="verificationCode"
+                       name="verificationCode"
+                       maxlength="6"
+                       required
+                       placeholder="Enter code"
+                       style="padding: 8px 16px;
+                              border: 1px solid #ddd;
+                              border-radius: 20px;
+                              width: 250px;
+                              outline: none;
+                              transition: border-color 0.3s ease;" />
+                <br /><br />
+                <input type="hidden" id="newEmail" value="@email" />
+                <div>
+                    <button class="btn-savechangesandgoprofile" type="submit">Verify</button>
+                    <button class="btn-logout" type="button" id="resendBtn">Resend Code</button>
+                </div>
+            </form>
+        </div>
+    </center>
+</div>
+
+<script>
+    // Function to show status or error message
+    function showMessage(message, isError = false) {
+        const statusEl = document.getElementById("statusMessage");
+        const errorEl = document.getElementById("errorMessage");
+
+        if (isError) {
+            errorEl.textContent = message;
+            errorEl.style.display = "block";
+            statusEl.style.display = "none";
+        } else {
+            statusEl.textContent = message;
+            statusEl.style.display = "block";
+            errorEl.style.display = "none";
+        }
+    }
+
+    // When the page loads, trigger sending verification code
+    window.addEventListener("DOMContentLoaded", function () {
+        const email = document.getElementById("newEmail").value;
+        if (email) {
+            sendVerificationCode(email);
+        }
+    });
+
+    // Handle resend button
+    document.getElementById("resendBtn").addEventListener("click", function() {
+        const email = document.getElementById("newEmail").value;
+        if (email) {
+            this.disabled = true;
+            this.textContent = "Sending...";
+
+            sendVerificationCode(email)
+                .finally(() => {
+                    this.disabled = false;
+                    this.textContent = "Resend Code";
+                });
+        }
+    });
+
+    // Function to send verification code
+    function sendVerificationCode(email) {
+        return fetch('/User/SendVerificationCode', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email })
+        })
+        .then(res => {
+            if (!res.ok) throw new Error("Failed to send code.");
+            return res.json();
+        })
+        .then(data => {
+            showMessage("Verification code sent to your new email.");
+        })
+        .catch(err => {
+            console.error(err);
+            showMessage("Failed to send verification code. Please try again.", true);
+        });
+    }
+
+    // Handle form submission for code verification
+    document.getElementById("codeForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+
+        const email = document.getElementById("newEmail").value;
+        const code = document.getElementById("verificationCode").value;
+        const submitBtn = this.querySelector('button[type="submit"]');
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = "Verifying...";
+
+        fetch('/User/VerifyNewEmail', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ email, code })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success) {
+                showMessage(data.message || "Email verified successfully!");
+                setTimeout(() => {
+                    window.location.href = data.redirectUrl || '/User/EditProfile';
+                }, 1500);
+            } else {
+                showMessage(data.message || "Invalid or expired verification code.", true);
+                submitBtn.disabled = false;
+                submitBtn.textContent = "Verify";
+            }
+        })
+        .catch(() => {
+            showMessage("An error occurred. Please try again.", true);
+            submitBtn.disabled = false;
+            submitBtn.textContent = "Verify";
+        });
+    });
+</script>

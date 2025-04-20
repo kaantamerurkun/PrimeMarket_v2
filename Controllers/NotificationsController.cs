@@ -1,0 +1,225 @@
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PrimeMarket.Data;
+using PrimeMarket.Filters;
+using PrimeMarket.Models;
+using PrimeMarket.Models.Enum;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace PrimeMarket.Controllers
+{
+    public class NotificationsController : Controller
+    {
+        private readonly ApplicationDbContext _context;
+
+        public NotificationsController(ApplicationDbContext context)
+        {
+            _context = context;
+        }
+
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> GetNotifications()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var notifications = await _context.Notifications
+                    .Where(n => n.UserId == userId)
+                    .OrderByDescending(n => n.CreatedAt)
+                    .Take(5)
+                    .ToListAsync();
+
+                var unreadCount = await _context.Notifications
+                    .CountAsync(n => n.UserId == userId && !n.IsRead);
+
+                var notificationsList = notifications.Select(n => new
+                {
+                    id = n.Id,
+                    message = n.Message,
+                    type = n.Type.ToString(),
+                    relatedEntityId = n.RelatedEntityId,
+                    isRead = n.IsRead,
+                    createdAt = n.CreatedAt
+                }).ToList();
+
+                return Json(new { success = true, notifications = notificationsList, unreadCount });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error retrieving notifications: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> MarkAsRead(int notificationId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var notification = await _context.Notifications
+                    .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
+
+                if (notification == null)
+                {
+                    return Json(new { success = false, message = "Notification not found" });
+                }
+
+                notification.IsRead = true;
+                notification.UpdatedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error marking notification as read: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> MarkAllAsRead()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var unreadNotifications = await _context.Notifications
+                    .Where(n => n.UserId == userId && !n.IsRead)
+                    .ToListAsync();
+
+                foreach (var notification in unreadNotifications)
+                {
+                    notification.IsRead = true;
+                    notification.UpdatedAt = DateTime.UtcNow;
+                }
+
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error marking notifications as read: {ex.Message}" });
+            }
+        }
+
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> Index()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            var notifications = await _context.Notifications
+                .Where(n => n.UserId == userId)
+                .OrderByDescending(n => n.CreatedAt)
+                .ToListAsync();
+
+            return View(notifications);
+        }
+
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> GetUnreadCount()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var unreadCount = await _context.Notifications
+                    .CountAsync(n => n.UserId == userId && !n.IsRead);
+
+                return Json(new { success = true, unreadCount });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error getting unread count: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> DeleteNotification(int notificationId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var notification = await _context.Notifications
+                    .FirstOrDefaultAsync(n => n.Id == notificationId && n.UserId == userId);
+
+                if (notification == null)
+                {
+                    return Json(new { success = false, message = "Notification not found" });
+                }
+
+                _context.Notifications.Remove(notification);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error deleting notification: {ex.Message}" });
+            }
+        }
+
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> ClearAll()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                var notifications = await _context.Notifications
+                    .Where(n => n.UserId == userId)
+                    .ToListAsync();
+
+                _context.Notifications.RemoveRange(notifications);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Error clearing notifications: {ex.Message}" });
+            }
+        }
+    }
+}

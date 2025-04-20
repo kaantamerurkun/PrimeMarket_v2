@@ -1,0 +1,239 @@
+﻿@model List<PrimeMarket.Models.Listing>
+@{
+    ViewData["Title"] = "Pending Listings";
+    Layout = null;
+    var userName = Context.Session.GetString("AdminUsername") ?? "Admin";
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>@ViewData["Title"] - PrimeMarket Admin</title>
+    <link rel="stylesheet" href="~/css/AdminDashboard.css" />
+    <link rel="stylesheet" href="/css/notificationstyle.css" />
+    <link rel="stylesheet" href="/css/messagenotifications.css" />
+    <style>
+        .listing-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .listing-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .listing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .listing-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+            .listing-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .listing-details {
+            padding: 15px;
+        }
+
+        .listing-title {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            font-weight: bold;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .listing-price {
+            color: #0066cc;
+            font-weight: bold;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .listing-seller, .listing-category, .listing-date {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .listing-action {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-view {
+            flex: 1;
+            padding: 8px 0;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-align: center;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+            .btn-view:hover {
+                background-color: #0055b3;
+            }
+
+        .empty-state {
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+            .empty-state i {
+                font-size: 50px;
+                color: #ddd;
+                margin-bottom: 20px;
+            }
+
+            .empty-state p {
+                color: #666;
+                font-size: 18px;
+            }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .count-badge {
+            background-color: #0066cc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <header class="main-header">
+        <div class="header-content">
+            <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
+                <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
+            </a>
+            <div class="header-actions">
+                <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
+                <p>@userName</p>
+
+                <!-- Notification Bell -->
+                <div class="notification-wrapper">
+                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
+                    <div id="listingNotificationDropdown" class="notification-dropdown">
+                        <p class="notification-item">An item is waiting to be approved or rejected</p>
+                        <p class="notification-item">A user sent ID for verification.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="dashboard">
+        <div class="sidebar">
+            <ul>
+                <li onclick="window.location.href='@Url.Action("PendingVerifications", "Admin")'" class="nav-item">User ID Verifications</li>
+                <li onclick="window.location.href='@Url.Action("PendingListings", "Admin")'" class="nav-item active">Pending Listings</li>
+                <li onclick="window.location.href='@Url.Action("UsageReport", "Admin")'" class="nav-item">Usage Report</li>
+            </ul>
+        </div>
+
+        <div class="dashboard-content">
+            <div class="section-header">
+                <h1>Pending Listings <span class="count-badge">@Model.Count</span></h1>
+            </div>
+
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success">
+                    @TempData["SuccessMessage"]
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["ErrorMessage"]
+                </div>
+            }
+
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="empty-state">
+                    <i class="fas fa-check-circle"></i>
+                    <p>No pending listings to review!</p>
+                </div>
+            }
+            else
+            {
+                <div class="listing-grid">
+                    @foreach (var listing in Model)
+                    {
+                        var mainImage = listing.Images != null && listing.Images.Any()
+                        ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
+                        : "/images/placeholder.png";
+
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                <img src="@mainImage" alt="@listing.Title">
+                            </div>
+                            <div class="listing-details">
+                                <h3 class="listing-title">@listing.Title</h3>
+                                <p class="listing-price">@listing.Price.ToString("C")</p>
+                                <p class="listing-seller">Seller: @(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</p>
+                                <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
+                                <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
+                                <div class="listing-action">
+                                    <a href="@Url.Action("ListingDetails", new { id = listing.Id })" class="btn-view">Review</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Toggle notification dropdown
+            const notificationBell = document.getElementById('listingNotificationBell');
+            const notificationDropdown = document.getElementById('listingNotificationDropdown');
+
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
+                        notificationDropdown.style.display = 'none';
+                    }
+                });
+            }
+        });
+    </script>
+
+</body>
+</html>
