@@ -102,7 +102,7 @@
                             <option value="Other">Other</option>
                         </select>
 
-                        <a asp-action="CreateListing" asp-controller="Listing"><button type="submit" class="submit-btn">List the Item</button></a>
+                        <button type="submit" class="submit-btn">List the Item</button>
                     </form>
                 </div>
             </div>
@@ -500,26 +500,26 @@
                 }
             });
 
-            // // Form submission
-            // listingForm.addEventListener('submit', function(e) {
-            //     // Basic validation before submit
-            //     const title = document.getElementById('title').value;
-            //     const price = document.getElementById('price').value;
-            //     const description = document.getElementById('description').value;
-            //     const images = document.getElementById('images').files;
-            //     const location = document.getElementById('location').value;
+            // Form submission
+            listingForm.addEventListener('submit', function(e) {
+                // Basic validation before submit
+                const title = document.getElementById('title').value;
+                const price = document.getElementById('price').value;
+                const description = document.getElementById('description').value;
+                const images = document.getElementById('images').files;
+                const location = document.getElementById('location').value;
 
-            //     if (!title || !price || !description || images.length === 0 || !location) {
-            //         e.preventDefault();
-            //         alert('Please fill in all required fields and upload at least one image.');
-            //         return false;
-            //     }
+                if (!title || !price || !description || images.length === 0 || !location) {
+                    e.preventDefault();
+                    alert('Please fill in all required fields and upload at least one image.');
+                    return false;
+                }
 
-            //     // Set button to loading state
-            //     const submitButton = this.querySelector('button[type="submit"]');
-            //     submitButton.disabled = true;
-            //     submitButton.textContent = 'Creating listing...';
-            // });
+                // Set button to loading state
+                const submitButton = this.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.textContent = 'Creating listing...';
+            });
         });
     </script>
 </body>
