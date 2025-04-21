@@ -56,18 +56,18 @@
             padding-bottom: 10px;
         }
 
-        .thumbnail-container img {
-            width: 80px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.3s ease;
-        }
+            .thumbnail-container img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: transform 0.3s ease;
+            }
 
-        .thumbnail-container img:hover {
-            transform: scale(1.05);
-        }
+                .thumbnail-container img:hover {
+                    transform: scale(1.05);
+                }
 
         .listing-details {
             flex: 1;
@@ -89,12 +89,12 @@
             margin-bottom: 20px;
         }
 
-        .detail-section h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 5px;
-        }
+            .detail-section h3 {
+                margin: 0 0 10px 0;
+                font-size: 18px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 5px;
+            }
 
         .detail-item {
             display: flex;
@@ -116,10 +116,10 @@
             margin-top: 30px;
         }
 
-        .description-section h3 {
-            margin: 0 0 15px 0;
-            font-size: 18px;
-        }
+            .description-section h3 {
+                margin: 0 0 15px 0;
+                font-size: 18px;
+            }
 
         .description-content {
             line-height: 1.6;
@@ -134,10 +134,10 @@
             margin-bottom: 30px;
         }
 
-        .seller-info h3 {
-            margin: 0 0 15px 0;
-            font-size: 18px;
-        }
+            .seller-info h3 {
+                margin: 0 0 15px 0;
+                font-size: 18px;
+            }
 
         .seller-details {
             display: flex;
@@ -169,11 +169,11 @@
             margin-bottom: 30px;
         }
 
-        .admin-actions h3 {
-            margin: 0 0 15px 0;
-            font-size: 18px;
-            color: #0066cc;
-        }
+            .admin-actions h3 {
+                margin: 0 0 15px 0;
+                font-size: 18px;
+                color: #0066cc;
+            }
 
         .action-buttons {
             display: flex;
@@ -205,29 +205,29 @@
             display: none;
         }
 
-        .rejection-form label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-        }
+            .rejection-form label {
+                display: block;
+                margin-bottom: 8px;
+                font-weight: bold;
+            }
 
-        .rejection-form select {
-            width: 100%;
-            padding: 10px;
-            margin-bottom: 15px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
+            .rejection-form select {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+            }
 
-        .rejection-form textarea {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            resize: vertical;
-            min-height: 100px;
-            margin-bottom: 15px;
-        }
+            .rejection-form textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                resize: vertical;
+                min-height: 100px;
+                margin-bottom: 15px;
+            }
 
         .btn-confirm-reject {
             padding: 10px 20px;
@@ -288,17 +288,17 @@
 
         <div class="dashboard-content">
             <div class="container">
-                <a href="@Url.Action("PendingListings")" class="back-link">
+                <a href="@Url.Action("PendingListings", "Admin")" class="back-link">
                     <i class="fas fa-arrow-left"></i> Back to Pending Listings
                 </a>
-                
+
                 @if (TempData["SuccessMessage"] != null)
                 {
                     <div class="alert alert-success">
                         @TempData["SuccessMessage"]
                     </div>
                 }
-                
+
                 @if (TempData["ErrorMessage"] != null)
                 {
                     <div class="alert alert-danger">
@@ -312,7 +312,7 @@
                         {
                             var mainImage = Model.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? Model.Images.First().ImagePath;
                             <img src="@mainImage" alt="@Model.Title" class="main-image" id="main-image">
-                            
+
                             <div class="thumbnail-container">
                                 @foreach (var image in Model.Images)
                                 {
@@ -329,7 +329,7 @@
                     <div class="listing-details">
                         <h1 class="listing-title">@Model.Title</h1>
                         <p class="listing-price">@Model.Price.ToString("C")</p>
-                        
+
                         <div class="admin-actions">
                             <h3>Admin Review</h3>
                             <div class="action-buttons">
@@ -340,29 +340,14 @@
                                 </form>
                                 <button class="btn-reject" id="show-rejection-form">Reject Listing</button>
                             </div>
-                            
+
                             <div class="rejection-form" id="rejection-form">
                                 <form asp-action="RejectListing" asp-controller="Admin" method="post">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@Model.Id">
-                                    
+
                                     <label for="rejectionReason">Rejection Reason</label>
-                                    <select id="rejection-reason-select" onchange="showCustomReason()">
-                                        <option value="">-- Select a reason --</option>
-                                        <option value="Inappropriate content">Inappropriate content</option>
-                                        <option value="Incorrect pricing">Incorrect pricing</option>
-                                        <option value="Misleading information">Misleading information</option>
-                                        <option value="Poor quality images">Poor quality images</option>
-                                        <option value="Prohibited item">Prohibited item</option>
-                                        <option value="Duplicate listing">Duplicate listing</option>
-                                        <option value="custom">Other (specify)</option>
-                                    </select>
-
-                                    <div id="custom-reason" style="display: none;">
-                                        <label for="rejectionReason">Custom Reason</label>
-                                        <textarea name="rejectionReason" id="rejection-reason" required></textarea>
-                                    </div>
-
+                                    <textarea name="rejectionReason" id="rejection-reason" required placeholder="Please provide a reason for rejection"></textarea>
                                     <button type="submit" class="btn-confirm-reject">Confirm Rejection</button>
                                 </form>
                             </div>
@@ -481,24 +466,6 @@
                 });
             }
         });
-
-        function showCustomReason() {
-            const reasonSelect = document.getElementById('rejection-reason-select');
-            const customReasonDiv = document.getElementById('custom-reason');
-            const rejectionReasonTextarea = document.getElementById('rejection-reason');
-
-            if (reasonSelect.value === 'custom') {
-                customReasonDiv.style.display = 'block';
-                rejectionReasonTextarea.setAttribute('required', 'required');
-            } else {
-                customReasonDiv.style.display = 'none';
-                rejectionReasonTextarea.removeAttribute('required');
-                rejectionReasonTextarea.value = reasonSelect.value;
-            }
-        }
     </script>
-
-    <!-- Add Font Awesome for icons -->
 </body>
 </html>
-```

@@ -125,6 +125,22 @@
             border-radius: 15px;
             font-size: 14px;
         }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
     </style>
 </head>
 <body>
@@ -204,7 +220,7 @@
                                 <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
                                 <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
                                 <div class="listing-action">
-                                    <a href="@Url.Action("ListingDetails", new { id = listing.Id })" class="btn-view">Review</a>
+                                    <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })" class="btn-view">Review</a>
                                 </div>
                             </div>
                         </div>
@@ -234,6 +250,5 @@
             }
         });
     </script>
-
 </body>
 </html>
