@@ -40,10 +40,45 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
+            // Add validation error messages for missing required fields
+            if (string.IsNullOrEmpty(model.Title))
+                ModelState.AddModelError("Title", "Title is required");
+
+            if (model.Price <= 0)
+                ModelState.AddModelError("Price", "Price must be greater than 0");
+
+            if (string.IsNullOrEmpty(model.Description))
+                ModelState.AddModelError("Description", "Description is required");
+
+            if (string.IsNullOrEmpty(model.Condition))
+                ModelState.AddModelError("Condition", "Condition is required");
+
+            if (string.IsNullOrEmpty(model.Category))
+                ModelState.AddModelError("Category", "Category is required");
+
+            if (string.IsNullOrEmpty(model.Location))
+                ModelState.AddModelError("Location", "Location is required");
+
+            if (images == null || images.Count == 0)
+                ModelState.AddModelError("images", "At least one image is required");
+
             // Check model validity
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Model state is invalid: {@ModelState}", ModelState);
+
+                // Log the model values for debugging
+                foreach (var prop in model.GetType().GetProperties())
+                {
+                    _logger.LogInformation($"Property {prop.Name} = {prop.GetValue(model)}");
+                }
+
+                // Pass the selected values back to the view
+                ViewBag.SelectedCondition = model.Condition;
+                ViewBag.SelectedCategory = model.Category;
+                ViewBag.SelectedSubCategory = model.SubCategory;
+                ViewBag.SelectedDetailCategory = model.DetailCategory;
+
                 // Return to the create view with the model to retain form data
                 return View("~/Views/User/CreateListing.cshtml", model);
             }
