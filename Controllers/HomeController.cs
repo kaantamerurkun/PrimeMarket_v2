@@ -1,6 +1,9 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using PrimeMarket.Data;
 using PrimeMarket.Models;
+using PrimeMarket.Models.Enum;
 using PrimeMarket.Models.ViewModel;
 
 namespace PrimeMarket.Controllers;
@@ -8,16 +11,24 @@ namespace PrimeMarket.Controllers;
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
+    private readonly ApplicationDbContext _context;
 
-    public HomeController(ILogger<HomeController> logger)
+    public HomeController(ApplicationDbContext context,ILogger<HomeController> logger)
     {
+        _context = context;
         _logger = logger;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var approvedListings = await _context.Listings
+            .Where(l => l.Status == ListingStatus.Approved)
+            .OrderByDescending(l => l.CreatedAt)
+            .ToListAsync();
+
+        return View(approvedListings);
     }
+
 
     public IActionResult Privacy()
     {
