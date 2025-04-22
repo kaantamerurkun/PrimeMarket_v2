@@ -40,39 +40,56 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Add validation error messages for missing required fields
+            // Basic validation for required fields
+            var isValid = true;
+
             if (string.IsNullOrEmpty(model.Title))
+            {
                 ModelState.AddModelError("Title", "Title is required");
+                isValid = false;
+            }
 
             if (model.Price <= 0)
+            {
                 ModelState.AddModelError("Price", "Price must be greater than 0");
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(model.Description))
+            {
                 ModelState.AddModelError("Description", "Description is required");
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(model.Condition))
+            {
                 ModelState.AddModelError("Condition", "Condition is required");
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(model.Category))
+            {
                 ModelState.AddModelError("Category", "Category is required");
+                isValid = false;
+            }
 
             if (string.IsNullOrEmpty(model.Location))
-                ModelState.AddModelError("Location", "Location is required");
-
-            // FIXED: Only add image validation if no images were provided in the request
-            if ((images == null || images.Count == 0) && (model.Images == null || model.Images.Count == 0))
-                ModelState.AddModelError("images", "At least one image is required");
-
-            // Check model validity
-            if (!ModelState.IsValid)
             {
-                _logger.LogWarning("Model state is invalid: {@ModelState}", ModelState);
+                ModelState.AddModelError("Location", "Location is required");
+                isValid = false;
+            }
 
-                // Log the model values for debugging
-                foreach (var prop in model.GetType().GetProperties())
-                {
-                    _logger.LogInformation($"Property {prop.Name} = {prop.GetValue(model)}");
-                }
+            // Image validation - FIX: Only validate if both collections are empty
+            if ((images == null || images.Count == 0) &&
+                (model.Images == null || model.Images.Count == 0))
+            {
+                ModelState.AddModelError("Images", "At least one image is required");
+                isValid = false;
+            }
+
+            if (!isValid)
+            {
+                _logger.LogWarning("Model validation failed: {@ModelState}", ModelState);
 
                 // Pass the selected values back to the view
                 ViewBag.SelectedCondition = model.Condition;
@@ -96,7 +113,8 @@ namespace PrimeMarket.Controllers
                     Condition = model.Condition,
                     Category = model.Category,
                     SubCategory = model.SubCategory,
-                    DetailCategory = model.DetailCategory,
+                    DetailCategory = model.DetailCategory ?? string.Empty,
+                    RejectionReason = null,
                     Location = model.Location,
                     Status = ListingStatus.Pending,
                     CreatedAt = DateTime.UtcNow
@@ -273,6 +291,7 @@ namespace PrimeMarket.Controllers
             }
         }
 
+        // Rest of the controller methods remain unchanged
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> MyListings()

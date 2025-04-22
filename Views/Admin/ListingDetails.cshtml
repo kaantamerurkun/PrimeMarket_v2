@@ -305,7 +305,7 @@
                         @TempData["ErrorMessage"]
                     </div>
                 }
-
+                <a asp-action="ListingDetails" asp-controller="Admin">
                 <div class="listing-container">
                     <div class="image-gallery">
                         @if (Model.Images != null && Model.Images.Any())
@@ -421,6 +421,7 @@
                         </div>
                     </div>
                 </div>
+                </a>
 
                 <div class="description-section">
                     <h3>Description</h3>

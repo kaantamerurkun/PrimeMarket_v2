@@ -38,7 +38,7 @@ namespace PrimeMarket.Models
         [Required]
         public ListingStatus Status { get; set; } = ListingStatus.Pending;
 
-        public string RejectionReason { get; set; }
+        public string ?RejectionReason { get; set; }
 
         // Navigation properties
         [ForeignKey("SellerId")]

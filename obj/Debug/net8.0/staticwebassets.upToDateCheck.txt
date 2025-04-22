@@ -28,6 +28,8 @@ wwwroot\css\UserListingDetails.css
 wwwroot\css\UserMainPage.css
 wwwroot\favicon.ico
 wwwroot\images\bookmark-button.png
+wwwroot\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png
+wwwroot\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png
 wwwroot\images\MessagesIcon.png
 wwwroot\images\NotificationBell.png
 wwwroot\images\PrimeMarket_Logo.png

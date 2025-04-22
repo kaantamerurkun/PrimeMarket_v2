@@ -137,6 +137,14 @@
       "PackagePath": "staticwebassets\\images\\bookmark-button.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\4_0105595f-daa3-4159-9b3e-48a87f506900.png",
+      "PackagePath": "staticwebassets\\images\\listings\\4_0105595f-daa3-4159-9b3e-48a87f506900.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\5_131dd15b-04b3-48e7-b670-c498a05ca223.png",
+      "PackagePath": "staticwebassets\\images\\listings\\5_131dd15b-04b3-48e7-b670-c498a05ca223.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png",
       "PackagePath": "staticwebassets\\images\\profiles\\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png"
     },

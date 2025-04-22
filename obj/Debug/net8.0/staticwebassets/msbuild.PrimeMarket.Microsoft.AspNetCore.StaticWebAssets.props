@@ -540,6 +540,42 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\bookmark-button.png'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/4_0105595f-daa3-4159-9b3e-48a87f506900.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>b3jbp1yc5k</Fingerprint>
+      <Integrity>mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/5_131dd15b-04b3-48e7-b670-c498a05ca223.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>xfmkcc1ygi</Fingerprint>
+      <Integrity>nXp9mQM3l1VwD4f8aFSyjpv3qqcibZu4gU51+fFva8s=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\MessagesIcon.png'))">
       <SourceType>Package</SourceType>
       <SourceId>PrimeMarket</SourceId>

@@ -11,24 +11,24 @@ namespace PrimeMarket.Models.Products
         public bool FaceRecognition { get; set; }
 
         [Display(Name = "Camera")]
-        public string Camera { get; set; }
+        public string? Camera { get; set; }
 
         [Display(Name = "Battery Power")]
-        public string BatteryPower { get; set; }
+        public string? BatteryPower { get; set; }
 
         [Display(Name = "Screen Size")]
-        public string ScreenSize { get; set; }
+        public string? ScreenSize { get; set; }
 
         [Display(Name = "Charging Port")]
-        public string ChargingPort { get; set; }
+        public string? ChargingPort { get; set; }
 
         [Display(Name = "RAM")]
-        public string Ram { get; set; }
+        public string? Ram { get; set; }
 
         [Display(Name = "Storage")]
-        public string Storage { get; set; }
+        public string? Storage { get; set; }
 
         [Display(Name = "Warranty Period")]
-        public string Warranty { get; set; }
+        public string? Warranty { get; set; }
     }
 }
