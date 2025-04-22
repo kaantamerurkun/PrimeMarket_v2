@@ -17,27 +17,33 @@ namespace PrimeMarket.Controllers
     public class ListingController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly ILogger<ListingController> _logger;
 
-        public ListingController(ApplicationDbContext context)
+        public ListingController(ApplicationDbContext context, ILogger<ListingController> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [UserAuthenticationFilter] // Added authentication filter
         public async Task<IActionResult> CreateListing(ListingViewModel model, List<IFormFile> images)
         {
-            Console.WriteLine("CreateListing called");
+            _logger.LogInformation("CreateListing called with model: {@Model}", model);
+
             // Check if the user is authenticated
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
+                _logger.LogWarning("User not authenticated");
                 return RedirectToAction("Login", "User");
             }
 
             // Check model validity
             if (!ModelState.IsValid)
             {
+                _logger.LogWarning("Model state is invalid: {@ModelState}", ModelState);
                 // Return to the create view with the model to retain form data
                 return View("~/Views/User/CreateListing.cshtml", model);
             }
@@ -62,6 +68,8 @@ namespace PrimeMarket.Controllers
 
                 _context.Listings.Add(listing);
                 await _context.SaveChangesAsync();
+
+                _logger.LogInformation("Listing created with ID: {ListingId}", listing.Id);
 
                 // Create the appropriate product model based on the category/subcategory
                 if (!string.IsNullOrEmpty(model.Category) && !string.IsNullOrEmpty(model.SubCategory))
@@ -107,7 +115,7 @@ namespace PrimeMarket.Controllers
                                         catch (Exception ex)
                                         {
                                             // Log the error but continue
-                                            Console.WriteLine($"Error setting property {prop.Key}: {ex.Message}");
+                                            _logger.LogError(ex, "Error setting property {PropertyName}: {ErrorMessage}", prop.Key, ex.Message);
                                         }
                                     }
                                 }
@@ -124,27 +132,28 @@ namespace PrimeMarket.Controllers
                                     if (addMethod != null)
                                     {
                                         addMethod.Invoke(dbSet, new[] { product });
+                                        _logger.LogInformation("Product of type {ProductType} added for listing {ListingId}", product.GetType().Name, listing.Id);
                                     }
                                     else
                                     {
-                                        Console.WriteLine($"Error: Could not find Add method for DbSet of type {product.GetType().Name}s");
+                                        _logger.LogError("Could not find Add method for DbSet of type {ProductType}", product.GetType().Name + "s");
                                     }
                                 }
                                 else
                                 {
-                                    Console.WriteLine($"Error: DbSet property returned null for {product.GetType().Name}s");
+                                    _logger.LogError("DbSet property returned null for {ProductType}", product.GetType().Name + "s");
                                 }
                             }
                             else
                             {
-                                Console.WriteLine($"Error: DbSet property not found for {product.GetType().Name}s");
+                                _logger.LogError("DbSet property not found for {ProductType}", product.GetType().Name + "s");
                             }
                         }
                     }
                     catch (Exception ex)
                     {
                         // Log the error but continue with listing creation
-                        Console.WriteLine($"Error creating product: {ex.Message}");
+                        _logger.LogError(ex, "Error creating product for listing {ListingId}: {ErrorMessage}", listing.Id, ex.Message);
                     }
                 }
 
@@ -155,6 +164,7 @@ namespace PrimeMarket.Controllers
                     if (!Directory.Exists(uploadsFolder))
                     {
                         Directory.CreateDirectory(uploadsFolder);
+                        _logger.LogInformation("Created uploads folder: {FolderPath}", uploadsFolder);
                     }
 
                     bool isFirstImage = true;
@@ -178,35 +188,50 @@ namespace PrimeMarket.Controllers
                             };
 
                             _context.ListingImages.Add(listingImage);
+                            _logger.LogInformation("Image added for listing {ListingId}: {ImagePath}", listing.Id, listingImage.ImagePath);
                             isFirstImage = false;
                         }
                     }
+                }
+                else
+                {
+                    _logger.LogWarning("No images provided for listing {ListingId}", listing.Id);
                 }
 
                 await _context.SaveChangesAsync();
 
                 // Create notifications for all admins
                 var admins = await _context.Admins.ToListAsync();
-                foreach (var admin in admins)
+                if (admins.Any())
                 {
-                    var adminNotification = new Notification
+                    foreach (var admin in admins)
                     {
-                        UserId = admin.Id,
-                        Message = $"New listing '{model.Title}' needs review",
-                        Type = NotificationType.ListingApproved,
-                        RelatedEntityId = listing.Id,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.Notifications.Add(adminNotification);
+                        var adminNotification = new Notification
+                        {
+                            UserId = admin.Id,
+                            Message = $"New listing '{model.Title}' needs review",
+                            Type = NotificationType.ListingApproved,
+                            RelatedEntityId = listing.Id,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.Notifications.Add(adminNotification);
+                        _logger.LogInformation("Notification created for admin {AdminId}", admin.Id);
+                    }
+
+                    await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    _logger.LogWarning("No admins found to notify about new listing {ListingId}", listing.Id);
                 }
 
-                await _context.SaveChangesAsync();
-
+                _logger.LogInformation("Listing process completed successfully for listing {ListingId}", listing.Id);
                 TempData["SuccessMessage"] = "Your listing has been created and is pending approval.";
                 return RedirectToAction("MyProfilePage", "User");
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error creating listing: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error creating listing: {ex.Message}");
                 return View("~/Views/User/CreateListing.cshtml", model);
             }

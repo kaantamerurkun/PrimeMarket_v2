@@ -4,14 +4,36 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
 using PrimeMarket.Models.Products;
 
-
 namespace PrimeMarket.Models.Factory
 {
     public static class ProductFactory
     {
         public static BaseProduct CreateProduct(string category, string subcategory)
         {
-            return (category, subcategory) switch
+            // Normalize subcategory to match with switch cases
+            string normalizedSubcategory = subcategory?.Trim();
+
+            // Handle subcategories for Electronics category
+            if (category == "Electronics")
+            {
+                // Check for known subcategories in Electronics
+                return normalizedSubcategory switch
+                {
+                    "Laptops" => new Laptop(),
+                    "Desktops" => new Desktop(),
+                    "Computer Accessories" => new ComputerAccessory(),
+                    "Fridges" => new Fridge(),
+                    "Washers" => new Washer(),
+                    "Dishwashers" => new Dishwasher(),
+                    "Ovens" => new Oven(),
+                    "Vacuum Cleaner" => new VacuumCleaner(),
+                    "Televisions" => new Television(),
+                    _ => throw new ArgumentException($"Unsupported subcategory in Electronics: {normalizedSubcategory}")
+                };
+            }
+
+            // Main switch for standard category/subcategory combinations
+            return (category, normalizedSubcategory) switch
             {
                 ("Phone", "IOS Phone") => new IOSPhone(),
                 ("Phone", "Android Phone") => new AndroidPhone(),
@@ -23,20 +45,23 @@ namespace PrimeMarket.Models.Factory
                 ("Tablets", "Other Tablets") => new OtherTablet(),
                 ("Tablets", "Tablet Accessories") => new TabletAccessory(),
 
-                ("Electronics", "Laptops") => new Laptop(),
-                ("Electronics", "Desktops") => new Desktop(),
-                ("Electronics", "Computer Accessories") => new ComputerAccessory(),
+                // Special case for just "Tablets" (might come from selection)
+                ("Tablets", "Tablets") => new OtherTablet(),
 
-                ("Electronics", "Fridges") => new Fridge(),
-                ("Electronics", "Washers") => new Washer(),
-                ("Electronics", "Dishwashers") => new Dishwasher(),
-                ("Electronics", "Ovens") => new Oven(),
+                // Handle potential mismatches in categorization
+                var (cat, sub) when cat == "Phone" && sub.Contains("Phone") => new OtherPhone(),
+                var (cat, sub) when cat == "Tablets" && sub.Contains("Tablet") => new OtherTablet(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Laptop") => new Laptop(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Desktop") => new Desktop(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Fridge") => new Fridge(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Wash") => new Washer(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Dishwasher") => new Dishwasher(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Oven") => new Oven(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Vacuum") => new VacuumCleaner(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("Television") => new Television(),
+                var (cat, sub) when cat == "Electronics" && sub.Contains("TV") => new Television(),
 
-                ("Electronics", "Vacuum Cleaner") => new VacuumCleaner(),
-
-                ("Electronics", "Televisions") => new Television(),
-
-                _ => throw new ArgumentException($"Unsupported product type: {category} - {subcategory}")
+                _ => throw new ArgumentException($"Unsupported product type: {category} - {normalizedSubcategory}")
             };
         }
     }

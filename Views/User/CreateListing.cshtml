@@ -6,23 +6,6 @@
 
     // Pull whatever you stored when the user signed‑in.
     var userIdInSession = Context.Session.GetInt32("UserId");
-
-    @if (userIdInSession is null)
-    {
-        <div style="position:fixed;top:0;right:0;background:#ffebee;
-                        color:#c62828;padding:6px 10px;font-size:.85rem;
-                        border:1px solid #c62828;z-index:9999">
-            <strong>DEBUG:</strong> No <code>UserId</code> in session 😱
-        </div>
-    }
-    else
-    {
-        <div style="position:fixed;top:0;right:0;background:#e8f5e9;
-                        color:#2e7d32;padding:6px 10px;font-size:.85rem;
-                        border:1px solid #2e7d32;z-index:9999">
-            <strong>DEBUG:</strong> <code>UserId</code> in session =&nbsp;@userIdInSession
-        </div>
-    }
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -76,7 +59,7 @@
                         <input type="hidden" id="hiddenDetail" asp-for="DetailCategory" />
 
                         <label>Images:</label>
-                        <input style="border-radius:50px" type="file" id="images" asp-for="Images" multiple accept="image/*" required />
+                        <input style="border-radius:50px" type="file" id="images" name="images" multiple accept="image/*" required />
                         <div id="imagePreview" style="display:flex; gap:10px; margin-top:10px;"></div>
 
                         <label for="title">Title:</label>
