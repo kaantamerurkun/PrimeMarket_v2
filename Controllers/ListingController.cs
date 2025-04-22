@@ -59,7 +59,8 @@ namespace PrimeMarket.Controllers
             if (string.IsNullOrEmpty(model.Location))
                 ModelState.AddModelError("Location", "Location is required");
 
-            if (images == null || images.Count == 0)
+            // FIXED: Only add image validation if no images were provided in the request
+            if ((images == null || images.Count == 0) && (model.Images == null || model.Images.Count == 0))
                 ModelState.AddModelError("images", "At least one image is required");
 
             // Check model validity
