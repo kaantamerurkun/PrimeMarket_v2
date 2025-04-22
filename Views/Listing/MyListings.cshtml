@@ -71,7 +71,7 @@
                             }
                         </div>
                         <div class="listing-actions">
-                            <a href="@Url.Action("User_Listing_Details", "User", new { id = listing.Id })" class="btn-view">View</a>
+                            <a href="@Url.Action("MyListing", "User", new { id = listing.Id })" class="btn-view">View</a>
 
                             @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
                             {
@@ -547,7 +547,3 @@
         }
     });
 </script>
-
-<!-- Add Font Awesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-```

@@ -209,22 +209,23 @@
                         ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
                         : "/images/placeholder.png";
 
-                        <a asp-action="ListingDetails" asp-controller="Admin"><div class="listing-card">
-                            <div class="listing-image">
-                                <img src="@mainImage" alt="@listing.Title">
-                            </div>
-                            <div class="listing-details">
-                                <h3 class="listing-title">@listing.Title</h3>
-                                <p class="listing-price">@listing.Price.ToString("C")</p>
-                                <p class="listing-seller">Seller: @(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</p>
-                                <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
-                                <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
-                                <div class="listing-action">
-                                    <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })" class="btn-view">Review</a>
+                        <div class="listing-card">
+                            <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })">
+                                <div class="listing-image">
+                                    <img src="@mainImage" alt="@listing.Title">
                                 </div>
+                                <div class="listing-details">
+                                    <h3 class="listing-title">@listing.Title</h3>
+                                    <p class="listing-price">@listing.Price.ToString("C")</p>
+                                    <p class="listing-seller">Seller: @(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</p>
+                                    <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
+                                    <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
+                                </div>
+                            </a>
+                            <div class="listing-action">
+                                <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })" class="btn-view">Review</a>
                             </div>
-                            </div>
-                        </a>
+                        </div>
                     }
                 </div>
             }
