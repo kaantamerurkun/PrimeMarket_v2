@@ -611,6 +611,12 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
+            // Ensure DeletedImageIds is not null to avoid NullReferenceException
+            if (DeletedImageIds == null)
+            {
+                DeletedImageIds = new List<int>();
+            }
+
             // Ensure DetailCategory is never null - fix for "DetailCategory is required" error
             if (model.DetailCategory == null)
             {
@@ -618,7 +624,9 @@ namespace PrimeMarket.Controllers
             }
 
             // Check if there will be at least one image after processing
-            bool willHaveImages = (listing.Images.Count - (DeletedImageIds?.Count ?? 0) > 0) || (newImages != null && newImages.Count > 0);
+            // Count existing images that won't be deleted
+            int remainingImagesCount = listing.Images.Count(i => !DeletedImageIds.Contains(i.Id));
+            bool willHaveImages = remainingImagesCount > 0 || (newImages != null && newImages.Count > 0);
 
             if (!willHaveImages)
             {
@@ -649,7 +657,7 @@ namespace PrimeMarket.Controllers
                 }
 
                 // Handle deleted images
-                if (DeletedImageIds != null && DeletedImageIds.Count > 0)
+                if (DeletedImageIds.Count > 0)
                 {
                     foreach (var imageId in DeletedImageIds)
                     {
@@ -699,7 +707,7 @@ namespace PrimeMarket.Controllers
                     }
 
                     // Check if we need to set one image as main (either all images were deleted or no main image exists)
-                    bool needsMainImage = !listing.Images.Any(i => i.IsMainImage && !DeletedImageIds?.Contains(i.Id) == true);
+                    bool needsMainImage = !listing.Images.Any(i => i.IsMainImage && !DeletedImageIds.Contains(i.Id));
 
                     foreach (var image in newImages)
                     {
