@@ -10,7 +10,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace PrimeMarket.Controllers
 {
@@ -166,42 +168,73 @@ namespace PrimeMarket.Controllers
                         {
                             product.ListingId = listing.Id;
 
-                            // Use reflection to set properties from the model's DynamicProperties
+                            // Modify the section in CreateListing method that handles setting dynamic properties
+                            // around line 153 in ListingController.cs
+
+                            // Inside the if(product != null) block, replace the existing DynamicProperties section with this:
+
                             if (model.DynamicProperties != null)
                             {
                                 foreach (var prop in model.DynamicProperties)
                                 {
-                                    var productProp = product.GetType().GetProperty(prop.Key);
+                                    // Find property with case-insensitive comparison
+                                    PropertyInfo productProp = null;
+                                    foreach (var p in product.GetType().GetProperties())
+                                    {
+                                        if (string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase))
+                                        {
+                                            productProp = p;
+                                            break;
+                                        }
+                                    }
+
                                     if (productProp != null)
                                     {
                                         try
                                         {
+                                            // Skip if value is empty
+                                            if (string.IsNullOrWhiteSpace(prop.Value))
+                                                continue;
+
                                             // Handle different property types
                                             if (productProp.PropertyType == typeof(bool))
                                             {
                                                 bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
                                                 productProp.SetValue(product, boolValue);
+                                                _logger.LogInformation("Set bool property {PropertyName} to {Value}", productProp.Name, boolValue);
                                             }
                                             else if (productProp.PropertyType == typeof(int))
                                             {
-                                                int.TryParse(prop.Value, out int intValue);
-                                                productProp.SetValue(product, intValue);
+                                                if (int.TryParse(prop.Value, out int intValue))
+                                                {
+                                                    productProp.SetValue(product, intValue);
+                                                    _logger.LogInformation("Set int property {PropertyName} to {Value}", productProp.Name, intValue);
+                                                }
                                             }
                                             else if (productProp.PropertyType == typeof(decimal))
                                             {
-                                                decimal.TryParse(prop.Value, out decimal decimalValue);
-                                                productProp.SetValue(product, decimalValue);
+                                                if (decimal.TryParse(prop.Value, out decimal decimalValue))
+                                                {
+                                                    productProp.SetValue(product, decimalValue);
+                                                    _logger.LogInformation("Set decimal property {PropertyName} to {Value}", productProp.Name, decimalValue);
+                                                }
                                             }
                                             else
                                             {
                                                 productProp.SetValue(product, prop.Value);
+                                                _logger.LogInformation("Set string property {PropertyName} to {Value}", productProp.Name, prop.Value);
                                             }
                                         }
                                         catch (Exception ex)
                                         {
                                             // Log the error but continue
-                                            _logger.LogError(ex, "Error setting property {PropertyName}: {ErrorMessage}", prop.Key, ex.Message);
+                                            _logger.LogError(ex, "Error setting property {PropertyName}: {ErrorMessage}", productProp.Name, ex.Message);
                                         }
+                                    }
+                                    else
+                                    {
+                                        _logger.LogWarning("Property {PropertyName} not found on product type {ProductType}",
+                                            prop.Key, product.GetType().Name);
                                     }
                                 }
                             }
@@ -548,26 +581,44 @@ namespace PrimeMarket.Controllers
                     {
                         foreach (var prop in model.DynamicProperties)
                         {
-                            var productProp = product.GetType().GetProperty(prop.Key);
+                            // Find property with case-insensitive comparison
+                            PropertyInfo productProp = null;
+                            foreach (var p in product.GetType().GetProperties())
+                            {
+                                if (string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase))
+                                {
+                                    productProp = p;
+                                    break;
+                                }
+                            }
+
                             if (productProp != null)
                             {
                                 try
                                 {
+                                    // Skip if value is empty
+                                    if (string.IsNullOrWhiteSpace(prop.Value))
+                                        continue;
+
                                     // Convert value to appropriate type
                                     if (productProp.PropertyType == typeof(bool))
                                     {
-                                        bool.TryParse(prop.Value, out bool boolValue);
+                                        bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
                                         productProp.SetValue(product, boolValue);
                                     }
                                     else if (productProp.PropertyType == typeof(int))
                                     {
-                                        int.TryParse(prop.Value, out int intValue);
-                                        productProp.SetValue(product, intValue);
+                                        if (int.TryParse(prop.Value, out int intValue))
+                                        {
+                                            productProp.SetValue(product, intValue);
+                                        }
                                     }
                                     else if (productProp.PropertyType == typeof(decimal))
                                     {
-                                        decimal.TryParse(prop.Value, out decimal decimalValue);
-                                        productProp.SetValue(product, decimalValue);
+                                        if (decimal.TryParse(prop.Value, out decimal decimalValue))
+                                        {
+                                            productProp.SetValue(product, decimalValue);
+                                        }
                                     }
                                     else
                                     {
@@ -577,8 +628,12 @@ namespace PrimeMarket.Controllers
                                 catch (Exception ex)
                                 {
                                     // Log error but continue
-                                    Console.WriteLine($"Error updating property {prop.Key}: {ex.Message}");
+                                    Console.WriteLine($"Error updating property {productProp.Name}: {ex.Message}");
                                 }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Property {prop.Key} not found on product type {product.GetType().Name}");
                             }
                         }
                     }
@@ -763,7 +818,7 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Laptops":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-                        // Add cases for other product types
+
                 }
             }
 
