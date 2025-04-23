@@ -165,6 +165,25 @@
         </div>
     </header>
 
+
+@foreach (var listing in Model)
+{
+    <div class="listing-card">
+        <h3>@listing.Title</h3>
+        <p>@listing.Description</p>
+        <p>Price: @listing.Price TL</p>
+        <p>Location: @listing.Location</p>
+
+        <form method="post" asp-action="ApproveListing" asp-controller="Listing">
+            <input type="hidden" name="id" value="@listing.Id" />
+            <button type="submit" class="btn-approve">Approve</button>
+        </form>
+
+        <button onclick="openRejectModal(@listing.Id)">Reject</button>
+    </div>
+}
+
+
     <div class="dashboard">
         <div class="sidebar">
             <ul>

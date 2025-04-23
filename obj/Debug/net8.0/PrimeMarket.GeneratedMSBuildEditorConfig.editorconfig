@@ -17,193 +17,191 @@ build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = PrimeMarket
 build_property.RootNamespace = PrimeMarket
-build_property.ProjectDir = C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\
+build_property.ProjectDir = C:\Users\ylmz4\Downloads\PrimeMarket_v2-main\PrimeMarket_v2-main\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket
+build_property.MSBuildProjectDirectory = C:\Users\ylmz4\Downloads\PrimeMarket_v2-main\PrimeMarket_v2-main
 build_property._RazorSourceGeneratorDebug = 
-build_property.EffectiveAnalysisLevelStyle = 8.0
-build_property.EnableCodeStyleSeverity = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/AdminDashboard.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/AdminDashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5EYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/AdminLogin.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/AdminLogin.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cQWRtaW5Mb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/ListingDetails.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/ListingDetails.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cTGlzdGluZ0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/PendingListings.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/PendingListings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUGVuZGluZ0xpc3RpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/PendingVerifications.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/PendingVerifications.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cUGVuZGluZ1ZlcmlmaWNhdGlvbnMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Admin/UsageReport.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Admin/UsageReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNhZ2VSZXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Home/Guest_Listing_Details.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Home/Guest_Listing_Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxHdWVzdF9MaXN0aW5nX0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Home/Index.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Home/Search_Page.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Home/Search_Page.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxTZWFyY2hfUGFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/Details.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Listing/Details.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGluZ1xEZXRhaWxzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/EditListing.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Listing/EditListing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGluZ1xFZGl0TGlzdGluZy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/MyListings.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Listing/MyListings.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGluZ1xNeUxpc3RpbmdzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Message/Conversation.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Message/Conversation.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVzc2FnZVxDb252ZXJzYXRpb24uY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Message/Conversations.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Message/Conversations.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTWVzc2FnZVxDb252ZXJzYXRpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Notifications/Index.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Notifications/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTm90aWZpY2F0aW9uc1xJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/Cart.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/Cart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxDYXJ0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/Checkout.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/Checkout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxDaGVja291dC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/CheckoutMultiple.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/CheckoutMultiple.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxDaGVja291dE11bHRpcGxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/MyPurchase.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/MyPurchase.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxNeVB1cmNoYXNlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/MySales.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/MySales.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxNeVNhbGVzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Payment/PurchaseComplete.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Payment/PurchaseComplete.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcUGF5bWVudFxQdXJjaGFzZUNvbXBsZXRlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Shared/Error.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Shared/Error.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Shared/_LayoutGuest.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Shared/_LayoutGuest.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRHdWVzdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Shared/_LayoutUser.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Shared/_LayoutUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXRVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/AllMessages.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/AllMessages.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxBbGxNZXNzYWdlcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/AllNotifications.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/AllNotifications.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxBbGxOb3RpZmljYXRpb25zLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/ChangeEmailVerification.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/ChangeEmailVerification.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDaGFuZ2VFbWFpbFZlcmlmaWNhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/CreateListing.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/CreateListing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxDcmVhdGVMaXN0aW5nLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/EditProfile.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/EditProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxFZGl0UHJvZmlsZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/EmailVerification.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/EmailVerification.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxFbWFpbFZlcmlmaWNhdGlvbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/LiveChat.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/LiveChat.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMaXZlQ2hhdC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/Login.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/Login.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxMb2dpbi5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/MyBookmarks.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/MyBookmarks.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeUJvb2ttYXJrcy5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/MyListing.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/MyListing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeUxpc3RpbmcuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/MyProfilePage.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/MyProfilePage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeVByb2ZpbGVQYWdlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/MyProfitLossReport.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/MyProfitLossReport.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeVByb2ZpdExvc3NSZXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/MyShoppingCart.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/MyShoppingCart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxNeVNob3BwaW5nQ2FydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/OtherUserProfile.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/OtherUserProfile.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxPdGhlclVzZXJQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/PaymentPage.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/PaymentPage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxQYXltZW50UGFnZS5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/ResetPassword.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/ResetPassword.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxSZXNldFBhc3N3b3JkLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/SignUp.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/SignUp.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxTaWduVXAuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/User/User_MainPage.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/User/User_MainPage.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcVXNlclxVc2VyX01haW5QYWdlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/_ViewImports.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/_ViewStart.cshtml]
+[C:/Users/ylmz4/Downloads/PrimeMarket_v2-main/PrimeMarket_v2-main/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 

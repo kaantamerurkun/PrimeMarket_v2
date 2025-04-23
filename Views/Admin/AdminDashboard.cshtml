@@ -35,8 +35,8 @@
         </div>
     </header>
 
-    <div class="dashboard">
-        <div class="sidebar">
+    <div style="padding-top:30px" class="dashboard">
+        <div style="height:250px" class="sidebar">
             <ul>
                 <li onclick="window.location.href='@Url.Action("PendingVerifications", "Admin")'" class="nav-item">User ID Verifications</li>
                 <li onclick="window.location.href='@Url.Action("PendingListings", "Admin")'" class="nav-item">Pending Listings</li>
@@ -47,32 +47,24 @@
         <div class="dashboard-content">
             <div class="welcome-message">
                 <h1>Welcome, @userName!</h1>
-                <p>Select a section from the sidebar to manage listings and verifications.</p>
-            </div>
-
-            <div class="dashboard-summary">
-                <div class="summary-box">
-                    <h2>Pending Listings</h2>
-                    <p>Review and approve or reject listings submitted by users.</p>
-                    <a href="@Url.Action("PendingListings", "Admin")" class="btn-view">View Listings</a>
-                </div>
-
-                <div class="summary-box">
-                    <h2>ID Verifications</h2>
-                    <p>Verify user identity documents to enable user accounts.</p>
-                    <a href="@Url.Action("PendingVerifications", "Admin")" class="btn-view">View Verifications</a>
-                </div>
-
-                <div class="summary-box">
-                    <h2>Usage Reports</h2>
-                    <p>View platform statistics and generate reports.</p>
-                    <a href="@Url.Action("UsageReport", "Admin")" class="btn-view">View Reports</a>
-                </div>
+                <h3 style="margin-top:10px">Select a section from the sidebar to manage listings and verifications.</h3>
             </div>
         </div>
+
+        <div id="rejectModal" style="display:none;" class="modal">
+            <form method="post" asp-action="RejectListing" asp-controller="Listing">
+                <input type="hidden" id="rejectListingId" name="id" />
+                <label for="reason">Rejection Reason:</label>
+                <textarea id="rejectionReason" name="reason" required></textarea>
+                <button type="submit">Reject Listing</button>
+            </form>
+        </div>
+
+
     </div>
 
     <script>
+        
         document.addEventListener("DOMContentLoaded", function() {
             // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');

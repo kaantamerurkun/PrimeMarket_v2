@@ -26,6 +26,33 @@ namespace PrimeMarket.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> ApproveListing(int id)
+        {
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null) return NotFound();
+
+            listing.Status = ListingStatus.Approved;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("PendingListings", "Admin");
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> RejectListing(int id, string reason)
+        {
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null) return NotFound();
+
+            listing.RejectionReason = reason;
+            _context.Listings.Remove(listing);
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("PendingListings", "Admin");
+        }
+
+
+
+        [HttpPost]
         [ValidateAntiForgeryToken]
         [UserAuthenticationFilter] // Added authentication filter
         public async Task<IActionResult> CreateListing(ListingViewModel model, List<IFormFile> images)
@@ -613,47 +640,19 @@ namespace PrimeMarket.Controllers
         }
 
         [HttpPost]
-        [UserAuthenticationFilter]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteListing(int id)
-        {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return RedirectToAction("Login", "User");
-            }
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> DeleteListing(int id)
+{
+    var listing = await _context.Listings.FindAsync(id);
+    if (listing == null)
+        return Json(new { success = false, message = "Listing not found." });
 
-            var listing = await _context.Listings
-                .FirstOrDefaultAsync(l => l.Id == id && l.SellerId == userId.Value);
+    _context.Listings.Remove(listing);
+    await _context.SaveChangesAsync();
 
-            if (listing == null)
-            {
-                return NotFound();
-            }
+    return Json(new { success = true });
+}
 
-            try
-            {
-                // Check if the listing can be deleted (not already sold)
-                if (listing.Status == ListingStatus.Sold)
-                {
-                    TempData["ErrorMessage"] = "Cannot delete a sold listing.";
-                    return RedirectToAction("MyListings");
-                }
-
-                // Set as Archived instead of actually deleting
-                listing.Status = ListingStatus.Archived;
-                listing.UpdatedAt = DateTime.UtcNow;
-                await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "Your listing has been deleted.";
-                return RedirectToAction("MyListings");
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = $"Error deleting listing: {ex.Message}";
-                return RedirectToAction("MyListings");
-            }
-        }
 
         
 
