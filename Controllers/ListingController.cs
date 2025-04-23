@@ -514,17 +514,88 @@ namespace PrimeMarket.Controllers
             model.DynamicProperties = dynamicProperties;
             return View(model);
         }
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> DeleteImage(int imageId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                // Find the image and check if it belongs to the user's listing
+                var image = await _context.ListingImages
+                    .Include(i => i.Listing)
+                    .FirstOrDefaultAsync(i => i.Id == imageId);
+
+                if (image == null)
+                {
+                    return Json(new { success = false, message = "Image not found" });
+                }
+
+                if (image.Listing.SellerId != userId)
+                {
+                    return Json(new { success = false, message = "You don't have permission to delete this image" });
+                }
+
+                // Check if this is the only image for the listing
+                var imageCount = await _context.ListingImages.CountAsync(i => i.ListingId == image.ListingId);
+                if (imageCount <= 1)
+                {
+                    return Json(new { success = false, message = "Cannot delete the only image. Please upload a new image first." });
+                }
+
+                // If this is the main image, set another image as main
+                if (image.IsMainImage)
+                {
+                    var newMainImage = await _context.ListingImages
+                        .FirstOrDefaultAsync(i => i.ListingId == image.ListingId && i.Id != imageId);
+
+                    if (newMainImage != null)
+                    {
+                        newMainImage.IsMainImage = true;
+                    }
+                }
+
+                // Delete the image file from disk
+                string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                string imagePath = image.ImagePath.TrimStart('/');
+                string fullPath = Path.Combine(webRootPath, imagePath);
+
+                if (System.IO.File.Exists(fullPath))
+                {
+                    try
+                    {
+                        System.IO.File.Delete(fullPath);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Error deleting image file: {FilePath}", fullPath);
+                        // Continue with DB deletion even if file deletion fails
+                    }
+                }
+
+                // Remove the image from the database
+                _context.ListingImages.Remove(image);
+                await _context.SaveChangesAsync();
+
+                return Json(new { success = true, message = "Image deleted successfully" });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting image: {ErrorMessage}", ex.Message);
+                return Json(new { success = false, message = "An error occurred while deleting the image" });
+            }
+        }
 
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> EditListing(ListingViewModel model, List<IFormFile> newImages)
+        public async Task<IActionResult> EditListing(ListingViewModel model, List<IFormFile> newImages, List<int> DeletedImageIds)
         {
-            if (!ModelState.IsValid)
-            {
-                return View(model);
-            }
-
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
@@ -540,6 +611,26 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
+            // Ensure DetailCategory is never null - fix for "DetailCategory is required" error
+            if (model.DetailCategory == null)
+            {
+                model.DetailCategory = string.Empty;
+            }
+
+            // Check if there will be at least one image after processing
+            bool willHaveImages = (listing.Images.Count - (DeletedImageIds?.Count ?? 0) > 0) || (newImages != null && newImages.Count > 0);
+
+            if (!willHaveImages)
+            {
+                ModelState.AddModelError("", "At least one image is required. Please upload a new image.");
+                return View(model);
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
             try
             {
                 // Update listing properties
@@ -547,6 +638,7 @@ namespace PrimeMarket.Controllers
                 listing.Price = model.Price;
                 listing.Description = model.Description;
                 listing.Location = model.Location;
+                listing.DetailCategory = model.DetailCategory; // Ensure DetailCategory is saved
                 listing.UpdatedAt = DateTime.UtcNow;
 
                 // Reset status to pending if it was previously rejected
@@ -554,6 +646,87 @@ namespace PrimeMarket.Controllers
                 {
                     listing.Status = ListingStatus.Pending;
                     listing.RejectionReason = null;
+                }
+
+                // Handle deleted images
+                if (DeletedImageIds != null && DeletedImageIds.Count > 0)
+                {
+                    foreach (var imageId in DeletedImageIds)
+                    {
+                        var imageToDelete = listing.Images.FirstOrDefault(i => i.Id == imageId);
+                        if (imageToDelete != null)
+                        {
+                            // If this was the main image and there are other images, set a new main image
+                            if (imageToDelete.IsMainImage && listing.Images.Count > DeletedImageIds.Count)
+                            {
+                                var newMainImage = listing.Images.FirstOrDefault(i => !DeletedImageIds.Contains(i.Id));
+                                if (newMainImage != null)
+                                {
+                                    newMainImage.IsMainImage = true;
+                                }
+                            }
+
+                            // Delete the image file from disk if needed
+                            string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
+                            string imagePath = imageToDelete.ImagePath.TrimStart('/');
+                            string fullPath = Path.Combine(webRootPath, imagePath);
+
+                            if (System.IO.File.Exists(fullPath))
+                            {
+                                try
+                                {
+                                    System.IO.File.Delete(fullPath);
+                                }
+                                catch (Exception ex)
+                                {
+                                    // Log the error but continue with DB deletion
+                                    _logger.LogError(ex, "Error deleting image file: {FilePath}", fullPath);
+                                }
+                            }
+
+                            _context.ListingImages.Remove(imageToDelete);
+                        }
+                    }
+                }
+
+                // Process and save new images
+                if (newImages != null && newImages.Count > 0)
+                {
+                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "listings");
+                    if (!Directory.Exists(uploadsFolder))
+                    {
+                        Directory.CreateDirectory(uploadsFolder);
+                    }
+
+                    // Check if we need to set one image as main (either all images were deleted or no main image exists)
+                    bool needsMainImage = !listing.Images.Any(i => i.IsMainImage && !DeletedImageIds?.Contains(i.Id) == true);
+
+                    foreach (var image in newImages)
+                    {
+                        if (image.Length > 0)
+                        {
+                            var uniqueFileName = $"{listing.Id}_{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
+                            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                            using (var fileStream = new FileStream(filePath, FileMode.Create))
+                            {
+                                await image.CopyToAsync(fileStream);
+                            }
+
+                            var listingImage = new ListingImage
+                            {
+                                ListingId = listing.Id,
+                                ImagePath = $"/images/listings/{uniqueFileName}",
+                                IsMainImage = needsMainImage // First new image becomes main if needed
+                            };
+
+                            _context.ListingImages.Add(listingImage);
+                            _logger.LogInformation("New image added for listing {ListingId}: {ImagePath}", listing.Id, listingImage.ImagePath);
+
+                            // Only set the first image as main
+                            needsMainImage = false;
+                        }
+                    }
                 }
 
                 // Update product-specific properties if applicable
@@ -573,7 +746,38 @@ namespace PrimeMarket.Controllers
                         case "Laptops":
                             product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
                             break;
-                            // Add more cases for other subcategories
+                        case "Desktops":
+                            product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "IOS Tablets":
+                        case "Android Tablets":
+                        case "Other Tablets":
+                        case "Tablets":
+                            // Check all tablet types
+                            product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            if (product == null)
+                                product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            if (product == null)
+                                product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Washers":
+                            product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Dishwashers":
+                            product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Fridges":
+                            product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Ovens":
+                            product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Vacuum Cleaner":
+                            product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
+                        case "Televisions":
+                            product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                            break;
                     }
 
                     // Update product properties if product exists
@@ -628,53 +832,13 @@ namespace PrimeMarket.Controllers
                                 catch (Exception ex)
                                 {
                                     // Log error but continue
-                                    Console.WriteLine($"Error updating property {productProp.Name}: {ex.Message}");
+                                    _logger.LogError(ex, "Error updating property {PropertyName}: {ErrorMessage}",
+                                        productProp.Name, ex.Message);
                                 }
                             }
-                            else
-                            {
-                                Console.WriteLine($"Property {prop.Key} not found on product type {product.GetType().Name}");
-                            }
                         }
                     }
                 }
-
-                // Process and save new images
-                if (newImages != null && newImages.Count > 0)
-                {
-                    var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "listings");
-                    if (!Directory.Exists(uploadsFolder))
-                    {
-                        Directory.CreateDirectory(uploadsFolder);
-                    }
-
-                    bool isFirstImage = !listing.Images.Any();
-                    foreach (var image in newImages)
-                    {
-                        if (image.Length > 0)
-                        {
-                            var uniqueFileName = $"{listing.Id}_{Guid.NewGuid()}{Path.GetExtension(image.FileName)}";
-                            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-                            using (var fileStream = new FileStream(filePath, FileMode.Create))
-                            {
-                                await image.CopyToAsync(fileStream);
-                            }
-
-                            var listingImage = new ListingImage
-                            {
-                                ListingId = listing.Id,
-                                ImagePath = $"/images/listings/{uniqueFileName}",
-                                IsMainImage = isFirstImage
-                            };
-
-                            _context.ListingImages.Add(listingImage);
-                            isFirstImage = false;
-                        }
-                    }
-                }
-
-                await _context.SaveChangesAsync();
 
                 // Create notification for admin about the update
                 var adminNotification = new Notification
@@ -686,6 +850,7 @@ namespace PrimeMarket.Controllers
                     CreatedAt = DateTime.UtcNow
                 };
                 _context.Notifications.Add(adminNotification);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Your listing has been updated and is pending review.";
@@ -693,6 +858,7 @@ namespace PrimeMarket.Controllers
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error updating listing: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error updating listing: {ex.Message}");
                 return View(model);
             }

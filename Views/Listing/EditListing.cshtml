@@ -24,13 +24,20 @@
         </div>
     }
 
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
     <div class="edit-form-container">
         <form id="editListingForm" method="post" action="@Url.Action("EditListing")" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
             <input type="hidden" asp-for="Id" value="@Model.Id" />
             <input type="hidden" asp-for="Category" value="@Model.Category" />
             <input type="hidden" asp-for="SubCategory" value="@Model.SubCategory" />
-            <input type="hidden" asp-for="DetailCategory" value="@Model.DetailCategory" />
+            <input type="hidden" asp-for="DetailCategory" value="@(Model.DetailCategory ?? "")" />
             <input type="hidden" asp-for="Condition" value="@Model.Condition" />
 
             <div class="form-section">
@@ -71,31 +78,44 @@
 
             <div class="form-section">
                 <h2>Images</h2>
-                <p class="info-text">Current images will remain unless you add new ones.</p>
+                <p class="info-text">Current images will remain unless you delete them or add new ones.</p>
 
-                <div class="current-images">
+                <div id="imagesErrorContainer" class="text-danger" style="display: none; margin-bottom: 15px;">
+                    <p>At least one image is required. Please add a new image before removing all existing ones.</p>
+                </div>
+
+                
                     @if (Model.Images != null && Model.Images.Count > 0)
                     {
+                    <div class="current-images">
                         <h3>Current Images</h3>
                         <div class="image-gallery">
                             @foreach (var image in Model.Images)
                             {
-                                <div class="image-item">
-                                    <img src="@image.ImagePath" alt="Listing Image">
-                                    @if (image.IsMainImage)
-                                    {
-                                        <span class="main-image-badge">Main Image</span>
-                                    }
+                                <div class="image-item" data-id="@image.Id">
+                                    <div class="image-container">
+                                        <img src="@image.ImagePath" alt="Listing Image">
+                                        @if (image.IsMainImage)
+                                        {
+                                            <span class="main-image-badge">Main Image</span>
+                                        }
+                                        <button type="button" class="delete-image-btn" onclick="deleteImage(@image.Id, this)">&times;</button>
+                                    </div>
                                 </div>
                             }
                         </div>
-                    }
-                </div>
+                        <button type="button" id="deleteAllImages" class="btn-danger">Delete All Images</button>
+                    </div>
+                }
 
                 <div class="form-group">
                     <label for="newImages">Add New Images</label>
                     <input type="file" id="newImages" name="newImages" multiple accept="image/*" class="form-control" />
                     <div id="image-preview" class="image-preview"></div>
+                </div>
+
+                <div id="deletedImagesContainer">
+                    <!-- Hidden inputs for deleted images will be added here by JavaScript -->
                 </div>
             </div>
 
@@ -239,21 +259,63 @@
         height: 150px;
     }
 
-        .image-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+    .image-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .image-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
 
     .main-image-badge {
         position: absolute;
         top: 10px;
-        right: 10px;
+        left: 10px;
         background-color: #0066cc;
         color: white;
         padding: 3px 8px;
         border-radius: 3px;
         font-size: 12px;
+    }
+
+    .delete-image-btn {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        width: 25px;
+        height: 25px;
+        background-color: rgba(220, 53, 69, 0.8);
+        color: white;
+        border: none;
+        border-radius: 50%;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+    }
+
+    .delete-image-btn:hover {
+        background-color: #dc3545;
+    }
+
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        padding: 8px 15px;
+        cursor: pointer;
+        margin-bottom: 15px;
+    }
+
+    .btn-danger:hover {
+        background-color: #c82333;
     }
 
     .image-preview {
@@ -307,29 +369,32 @@
         }
 
     @@media (max-width: 768px) {
-        .edit-listing-header
+        .edit-listing-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-    {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .dynamic-fields {
-        grid-template-columns: 1fr;
-    }
-
+        .dynamic-fields {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Track deleted image IDs
+        const deletedImageIds = [];
+        const newImagesInput = document.getElementById('newImages');
+        const deletedImagesContainer = document.getElementById('deletedImagesContainer');
+        const imagesErrorContainer = document.getElementById('imagesErrorContainer');
+        
         // Image preview functionality
-        const imagesInput = document.getElementById('newImages');
         const previewContainer = document.getElementById('image-preview');
 
-        imagesInput.addEventListener('change', function() {
+        newImagesInput.addEventListener('change', function() {
             previewContainer.innerHTML = '';
+            updateImagesValidation();
 
             if (this.files) {
                 Array.from(this.files).forEach(file => {
@@ -349,66 +414,196 @@
             }
         });
 
+        // Delete single image
+        window.deleteImage = function(imageId, buttonElement) {
+            const imageItem = buttonElement.closest('.image-item');
+            
+            // Check if this would remove all images
+            const currentImageCount = document.querySelectorAll('.image-item').length;
+            const hasNewImages = newImagesInput.files.length > 0;
+            
+            if (currentImageCount <= 1 && !hasNewImages) {
+                imagesErrorContainer.style.display = 'block';
+                return;
+            }
+            
+            // Add to deleted IDs array
+            deletedImageIds.push(imageId);
+            
+            // Create hidden input for the server
+            const hiddenInput = document.createElement('input');
+            hiddenInput.type = 'hidden';
+            hiddenInput.name = 'DeletedImageIds';
+            hiddenInput.value = imageId;
+            deletedImagesContainer.appendChild(hiddenInput);
+            
+            // Remove from UI
+            imageItem.remove();
+            
+            // Hide error message if it was showing
+            imagesErrorContainer.style.display = 'none';
+            
+            // Check if all images are now deleted
+            updateImagesUI();
+        };
+
+        // Delete all images button
+        const deleteAllBtn = document.getElementById('deleteAllImages');
+        if (deleteAllBtn) {
+            deleteAllBtn.addEventListener('click', function() {
+                // Check if there are new images uploaded
+                const hasNewImages = newImagesInput.files.length > 0;
+                
+                if (!hasNewImages) {
+                    imagesErrorContainer.style.display = 'block';
+                    return;
+                }
+                
+                // Confirm deletion
+                if (confirm('Are you sure you want to delete all current images? Your new uploaded images will be used instead.')) {
+                    // Get all image elements
+                    const imageItems = document.querySelectorAll('.image-item');
+                    
+                    // For each image, add its ID to deletedImageIds and create hidden input
+                    imageItems.forEach(item => {
+                        const imageId = item.getAttribute('data-id');
+                        deletedImageIds.push(imageId);
+                        
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = 'DeletedImageIds';
+                        hiddenInput.value = imageId;
+                        deletedImagesContainer.appendChild(hiddenInput);
+                        
+                        // Remove from UI
+                        item.remove();
+                    });
+                    
+                    // Update UI to show all images deleted
+                    updateImagesUI();
+                    
+                    // Hide error message if it was showing
+                    imagesErrorContainer.style.display = 'none';
+                }
+            });
+        }
+
+        // Helper function to update the images UI
+        function updateImagesUI() {
+            const imageItems = document.querySelectorAll('.image-item');
+            const currentImages = document.querySelector('.current-images');
+            
+            if (imageItems.length === 0 && currentImages) {
+                currentImages.innerHTML = '<p>All current images will be deleted. New uploaded images will be used instead.</p>';
+                if (deleteAllBtn) {
+                    deleteAllBtn.style.display = 'none';
+                }
+            }
+        }
+
+        // Helper function to check image validation state
+        function updateImagesValidation() {
+            const imageItems = document.querySelectorAll('.image-item');
+            const hasExistingImages = imageItems.length > 0;
+            const hasNewImages = newImagesInput.files.length > 0;
+            
+            if (!hasExistingImages && !hasNewImages) {
+                imagesErrorContainer.style.display = 'block';
+            } else {
+                imagesErrorContainer.style.display = 'none';
+            }
+        }
+
+        // Form submission validation
+        document.getElementById('editListingForm').addEventListener('submit', function(e) {
+            const imageItems = document.querySelectorAll('.image-item');
+            const hasExistingImages = imageItems.length > 0;
+            const hasNewImages = newImagesInput.files.length > 0;
+            
+            if (!hasExistingImages && !hasNewImages) {
+                e.preventDefault();
+                imagesErrorContainer.style.display = 'block';
+                
+                // Scroll to the error message
+                imagesErrorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        });
+
         // Load product-specific fields based on category and subcategory
         loadDynamicFields();
 
-        function loadDynamicFields() {
-            const category = '@Model.Category';
-            const subcategory = '@Model.SubCategory';
-            const detailCategory = '@Model.DetailCategory';
-            const fieldsContainer = document.getElementById('dynamicFields');
+    function loadDynamicFields() {
+        const category = '@Model.Category';
+        const subcategory = '@Model.SubCategory';
+        const detailCategory = '@(Model.DetailCategory ?? "")';
+        const fieldsContainer = document.getElementById('dynamicFields');
 
-            const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
+        const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
 
-            if (!fieldDefinitions || fieldDefinitions.length === 0) {
-                fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
-                return;
-            }
+        const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
 
-            fieldsContainer.innerHTML = '';
+        if (!fieldDefinitions || fieldDefinitions.length === 0) {
+            fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
+            return;
+        }
 
-            fieldDefinitions.forEach(field => {
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'form-group';
+        fieldsContainer.innerHTML = '';
 
-                const label = document.createElement('label');
-                label.setAttribute('for', field.name);
-                label.textContent = field.label;
-                fieldDiv.appendChild(label);
+        fieldDefinitions.forEach(field => {
+            const fieldDiv = document.createElement('div');
+            fieldDiv.className = 'form-group';
 
-                if (field.type === 'select') {
-                    const select = document.createElement('select');
-                    select.id = field.name;
-                    select.name = `DynamicProperties[${field.name}]`;
-                    select.className = 'form-control';
+            const label = document.createElement('label');
+            label.setAttribute('for', field.name);
+            label.textContent = field.label;
+            fieldDiv.appendChild(label);
 
-                    const emptyOption = document.createElement('option');
-                    emptyOption.value = '';
-                    emptyOption.textContent = `Select ${field.label}`;
-                    select.appendChild(emptyOption);
+            const existingValue = dynamicProperties[field.name];
 
-                    field.options.forEach(option => {
-                        const optEl = document.createElement('option');
-                        optEl.value = option;
-                        optEl.textContent = option;
-                        select.appendChild(optEl);
-                    });
+            if (field.type === 'select') {
+                const select = document.createElement('select');
+                select.id = field.name;
+                select.name = `DynamicProperties[${field.name}]`;
+                select.className = 'form-control';
 
-                    fieldDiv.appendChild(select);
-                } else {
-                    const input = document.createElement('input');
-                    input.type = field.type || 'text';
-                    input.id = field.name;
-                    input.name = `DynamicProperties[${field.name}]`;
-                    input.className = 'form-control';
-                    input.placeholder = field.placeholder || '';
+                const emptyOption = document.createElement('option');
+                emptyOption.value = '';
+                emptyOption.textContent = `Select ${field.label}`;
+                select.appendChild(emptyOption);
 
-                    fieldDiv.appendChild(input);
+                field.options.forEach(option => {
+                    const optEl = document.createElement('option');
+                    optEl.value = option;
+                    optEl.textContent = option;
+
+                    if (existingValue && existingValue.toLowerCase() === option.toLowerCase()) {
+                        optEl.selected = true;
+                    }
+
+                    select.appendChild(optEl);
+                });
+
+                fieldDiv.appendChild(select);
+            } else {
+                const input = document.createElement('input');
+                input.type = field.type || 'text';
+                input.id = field.name;
+                input.name = `DynamicProperties[${field.name}]`;
+                input.className = 'form-control';
+                input.placeholder = field.placeholder || '';
+
+                if (existingValue) {
+                    input.value = existingValue;
                 }
 
-                fieldsContainer.appendChild(fieldDiv);
-            });
-        }
+                fieldDiv.appendChild(input);
+            }
+
+            fieldsContainer.appendChild(fieldDiv);
+        });
+    }
+
 
         function getCategoryFields(subcategory) {
             // This is a simplified version - in a real application, you might want to fetch this from server
@@ -417,98 +612,164 @@
                     { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 16GB" },
                     { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
                     { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
-    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 4GB" },
-                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA GTX 1650" },
-                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3200MHz" },
-                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Backlit" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 15.6 inch" },
-                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. Intel i7-12700H" },
-                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
-                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 512GB SSD" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                    ],
-                    "Desktops": [
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 32GB" },
-                        { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
-                        { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
-                        { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 8GB" },
-                        { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA RTX 3080" },
-                        { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3600MHz" },
-                        { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Mechanical" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 27 inch" },
-                        { name: "processor", label: "Processor", type: "text", placeholder: "e.g. AMD Ryzen 9" },
-                        { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
-                        { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                    ],
-                    "IOS Phone": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 3200mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.1 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Lightning, USB-C" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                    ],
-                    "Android Phone": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 108MP quad camera" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 5000mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.7 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                    ],
-                    "Other Phones": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 13MP" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 4000mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.5 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 6GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                    ],
-                    "IOS Tablets": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                    ],
-                    "Android Tablets": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 8MP" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 7000mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.4 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 64GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                    ],
-                    "Other Tablets": [
-                        { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                        { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 5MP" },
-                        { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 6000mAh" },
-                        { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 8 inch" },
-                        { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Micro USB" },
-                        { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 3GB" },
-                        { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
-                        { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                    ]
-                    // Add more subcategories as needed
-                };
+                    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 4GB" },
+                    { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA GTX 1650" },
+                    { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3200MHz" },
+                    { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Backlit" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 15.6 inch" },
+                    { name: "processor", label: "Processor", type: "text", placeholder: "e.g. Intel i7-12700H" },
+                    { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                    { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 512GB SSD" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Desktops": [
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 32GB" },
+                    { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
+                    { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
+                    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 8GB" },
+                    { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA RTX 3080" },
+                    { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3600MHz" },
+                    { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Mechanical" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 27 inch" },
+                    { name: "processor", label: "Processor", type: "text", placeholder: "e.g. AMD Ryzen 9" },
+                    { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
+                    { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "IOS Phone": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 3200mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.1 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Lightning, USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                ],
+                "Android Phone": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 108MP quad camera" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 5000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.7 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Other Phones": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 13MP" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 4000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.5 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 6GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                ],
+                "IOS Tablets": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                ],
+                "Android Tablets": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 8MP" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 7000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.4 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 64GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Other Tablets": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 5MP" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 6000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 8 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Micro USB" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 3GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                ],
+                "Washers": [
+                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
+                    { name: "color", label: "Color", type: "text", placeholder: "e.g. White" },
+                    { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 8 kg" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
+                ],
+                "Dishwashers": [
+                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
+                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
+                    { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 12 place settings" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Fridges": [
+                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
+                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 70x180x65 cm" },
+                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
+                    { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 350L" },
+                    { name: "freezer", label: "Freezer", type: "select", options: ["Yes", "No"] },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
+                ],
+                "Ovens": [
+                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A+" },
+                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x60x55 cm" },
+                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Black" },
+                    { name: "timer", label: "Timer", type: "select", options: ["Yes", "No"] },
+                    { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 65L" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Vacuum Cleaner": [
+                    { name: "cableLength", label: "Cable Length", type: "text", placeholder: "e.g. 7m" },
+                    { name: "waterContainer", label: "Water Container", type: "select", options: ["Yes", "No"] },
+                    { name: "weight", label: "Weight", type: "text", placeholder: "e.g. 4.5 kg" },
+                    { name: "power", label: "Power", type: "text", placeholder: "e.g. 900W" },
+                    { name: "dustContainer", label: "Dust Container", type: "text", placeholder: "e.g. 2L" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                "Televisions": [
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 55 inch" },
+                    { name: "smartTV", label: "Smart TV", type: "select", options: ["Yes", "No"] },
+                    { name: "hdmi", label: "HDMI", type: "text", placeholder: "e.g. 3 ports" },
+                    { name: "resolution", label: "Resolution", type: "text", placeholder: "e.g. 4K UHD" },
+                    { name: "displayTechnology", label: "Display Technology", type: "text", placeholder: "e.g. OLED" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
+                ],
+                // For tablets specifically, include all variations
+                "Tablets": [
+                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
+                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
+                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
+                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
+                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
+                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
+                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
+                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
+                ]
+            };
 
-                return categoryFields[subcategory] || [];
+            // Try to find the exact category match first
+            if (categoryFields[subcategory]) {
+                return categoryFields[subcategory];
             }
-        });
+            
+            // If not found, try some common fallbacks
+            if (subcategory.includes("Tablet")) {
+                return categoryFields["Tablets"];
+            }
+            if (subcategory.includes("Phone")) {
+                return categoryFields["Other Phones"];
+            }
+            
+            // Return empty array if no match found
+            return [];
+        }
+    });
 </script>
-
-<!-- Add Font Awesome for icons -->
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-```
