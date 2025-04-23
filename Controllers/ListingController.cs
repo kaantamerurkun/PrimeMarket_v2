@@ -140,7 +140,11 @@ namespace PrimeMarket.Controllers
                     Condition = model.Condition,
                     Category = model.Category,
                     SubCategory = model.SubCategory,
-                    DetailCategory = model.DetailCategory ?? string.Empty,
+                    // Improved handling of DetailCategory
+                    DetailCategory = (model.DetailCategory == null ||
+                  model.DetailCategory == "undefined" ||
+                  string.IsNullOrEmpty(model.DetailCategory))? string.Empty
+                  : model.DetailCategory,
                     RejectionReason = null,
                     Location = model.Location,
                     Status = ListingStatus.Pending,

@@ -450,7 +450,8 @@
                 document.getElementById("hiddenCondition").value = selectedCondition;
                 document.getElementById("hiddenCategory").value = selectedCategory;
                 document.getElementById("hiddenSubcategory").value = selectedSubcategory;
-                document.getElementById("hiddenDetail").value = selectedDetail;
+                // Make sure we set an empty string if selectedDetail is undefined or empty
+                document.getElementById("hiddenDetail").value = selectedDetail || "";;
 
                 // Generate the dynamic fields based on selection
                 generateDynamicFields();
