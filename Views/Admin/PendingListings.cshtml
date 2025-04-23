@@ -77,7 +77,7 @@
             margin-top: 15px;
         }
 
-        .btn-view {
+        .btn-view, .btn-approve, .btn-reject {
             flex: 1;
             padding: 8px 0;
             background-color: #0066cc;
@@ -89,9 +89,25 @@
             cursor: pointer;
         }
 
-            .btn-view:hover {
-                background-color: #0055b3;
-            }
+        .btn-approve {
+            background-color: #28a745;
+        }
+
+        .btn-reject {
+            background-color: #dc3545;
+        }
+
+        .btn-view:hover {
+            background-color: #0055b3;
+        }
+
+        .btn-approve:hover {
+            background-color: #218838;
+        }
+
+        .btn-reject:hover {
+            background-color: #c82333;
+        }
 
         .empty-state {
             text-align: center;
@@ -141,6 +157,53 @@
             background-color: #f8d7da;
             color: #721c24;
         }
+
+        /* Modal styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .approval-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+            min-height: 100px;
+        }
     </style>
 </head>
 <body>
@@ -164,25 +227,6 @@
             </div>
         </div>
     </header>
-
-
-@foreach (var listing in Model)
-{
-    <div class="listing-card">
-        <h3>@listing.Title</h3>
-        <p>@listing.Description</p>
-        <p>Price: @listing.Price TL</p>
-        <p>Location: @listing.Location</p>
-
-        <form method="post" asp-action="ApproveListing" asp-controller="Listing">
-            <input type="hidden" name="id" value="@listing.Id" />
-            <button type="submit" class="btn-approve">Approve</button>
-        </form>
-
-        <button onclick="openRejectModal(@listing.Id)">Reject</button>
-    </div>
-}
-
 
     <div class="dashboard">
         <div class="sidebar">
@@ -228,7 +272,7 @@
                         ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
                         : "/images/placeholder.png";
 
-                        <div class="listing-card">
+                        <div class="listing-card" data-id="@listing.Id">
                             <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })">
                                 <div class="listing-image">
                                     <img src="@mainImage" alt="@listing.Title">
@@ -242,7 +286,7 @@
                                 </div>
                             </a>
                             <div class="listing-action">
-                                <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })" class="btn-view">Review</a>
+                                <button onclick="openListingActions('@listing.Id')" class="btn-view">Review</button>
                             </div>
                         </div>
                     }
@@ -251,7 +295,119 @@
         </div>
     </div>
 
+    <!-- Modal for listing actions -->
+    <div id="listingActionsModal" class="modal">
+        <div class="modal-content" style="max-width: 800px; width: 90%;">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2>Review Listing</h2>
+
+            <!-- Listing details section -->
+            <div class="listing-review-details" style="display: flex; margin: 20px 0; border-bottom: 1px solid #ddd; padding-bottom: 20px;">
+                <div id="modalListingImage" style="width: 200px; height: 200px; border-radius: 8px; overflow: hidden; margin-right: 20px; flex-shrink: 0;">
+                    <img src="" alt="Listing Image" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div style="flex: 1;">
+                    <h3 id="modalListingTitle" style="margin-top: 0; margin-bottom: 10px;"></h3>
+                    <p id="modalListingPrice" style="font-weight: bold; color: #0066cc; font-size: 18px; margin-bottom: 10px;"></p>
+                    <p id="modalListingSeller" style="margin-bottom: 5px;"></p>
+                    <p id="modalListingCategory" style="margin-bottom: 5px;"></p>
+                    <p id="modalListingDate" style="margin-bottom: 5px;"></p>
+                    <p id="modalListingDescription" style="margin-top: 15px; max-height: 150px; overflow-y: auto;"></p>
+                </div>
+            </div>
+
+            <p>Would you like to approve or reject this listing?</p>
+
+            <div class="approval-actions">
+                <form id="approveForm" method="post" asp-action="ApproveListing" asp-controller="Admin">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="approveListingId" name="id" value="">
+                    <button type="submit" class="btn-approve">Approve</button>
+                </form>
+
+                <button class="btn-reject" onclick="showRejectForm()">Reject</button>
+
+                <!-- View Details link -->
+                <a id="viewDetailsLink" href="#" style="flex: 1; display: flex; justify-content: center; align-items: center; text-decoration: none;">
+                    <button style="width: 100%; background-color: #0066cc;" class="btn-view">View Full Details</button>
+                </a>
+            </div>
+
+            <div id="rejectForm" style="display: none; margin-top: 15px;">
+                <form method="post" asp-action="RejectListing" asp-controller="Admin">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="rejectListingId" name="id" value="">
+                    <label for="rejectionReason">Rejection Reason:</label>
+                    <textarea id="rejectionReason" name="rejectionReason" required></textarea>
+                    <div style="text-align: right; margin-top: 10px;">
+                        <button type="submit" class="btn-reject">Confirm Rejection</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentListingId = null;
+
+        // Function to open listing actions modal
+        function openListingActions(listingId) {
+            currentListingId = listingId;
+
+            // Set the listing ID in the forms
+            document.getElementById('approveListingId').value = listingId;
+            document.getElementById('rejectListingId').value = listingId;
+
+            // Get listing details from the card
+            const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
+            const imageElement = listingCard.querySelector('.listing-image img');
+            const titleElement = listingCard.querySelector('.listing-title');
+            const priceElement = listingCard.querySelector('.listing-price');
+            const sellerElement = listingCard.querySelector('.listing-seller');
+            const categoryElement = listingCard.querySelector('.listing-category');
+            const dateElement = listingCard.querySelector('.listing-date');
+
+            // Populate the modal with listing details
+            document.getElementById('modalListingImage').querySelector('img').src = imageElement.src;
+            document.getElementById('modalListingTitle').textContent = titleElement.textContent;
+            document.getElementById('modalListingPrice').textContent = priceElement.textContent;
+            document.getElementById('modalListingSeller').textContent = sellerElement.textContent;
+            document.getElementById('modalListingCategory').textContent = categoryElement.textContent;
+            document.getElementById('modalListingDate').textContent = dateElement.textContent;
+
+            // Set the "View Full Details" link
+            document.getElementById('viewDetailsLink').href = `/Admin/ListingDetails/${listingId}`;
+
+            // Use AJAX to get the listing description (optional, if not shown in the listing card)
+            fetch(`/Admin/GetListingDescription/${listingId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('modalListingDescription').textContent = data.description;
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching listing description:', err);
+                    document.getElementById('modalListingDescription').textContent = 'Click "View Full Details" to see the complete listing information.';
+                });
+
+            // Show the modal
+            document.getElementById('listingActionsModal').style.display = 'block';
+
+            // Hide reject form initially
+            document.getElementById('rejectForm').style.display = 'none';
+        }
+
+        // Function to close the modal
+        function closeModal() {
+            document.getElementById('listingActionsModal').style.display = 'none';
+        }
+
+        // Function to show the reject form
+        function showRejectForm() {
+            document.getElementById('rejectForm').style.display = 'block';
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
@@ -268,6 +424,13 @@
                         notificationDropdown.style.display = 'none';
                     }
                 });
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                if (event.target == document.getElementById('listingActionsModal')) {
+                    closeModal();
+                }
             }
         });
     </script>
