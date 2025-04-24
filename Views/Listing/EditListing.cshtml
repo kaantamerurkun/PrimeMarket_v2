@@ -84,9 +84,9 @@
                     <p>At least one image is required. Please add a new image before removing all existing ones.</p>
                 </div>
 
-                
-                    @if (Model.Images != null && Model.Images.Count > 0)
-                    {
+
+                @if (Model.Images != null && Model.Images.Count > 0)
+                {
                     <div class="current-images">
                         <h3>Current Images</h3>
                         <div class="image-gallery">
@@ -300,9 +300,9 @@
         padding: 0;
     }
 
-    .delete-image-btn:hover {
-        background-color: #dc3545;
-    }
+        .delete-image-btn:hover {
+            background-color: #dc3545;
+        }
 
     .btn-danger {
         background-color: #dc3545;
@@ -314,9 +314,9 @@
         margin-bottom: 15px;
     }
 
-    .btn-danger:hover {
-        background-color: #c82333;
-    }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
 
     .image-preview {
         display: flex;
@@ -388,7 +388,7 @@
         const newImagesInput = document.getElementById('newImages');
         const deletedImagesContainer = document.getElementById('deletedImagesContainer');
         const imagesErrorContainer = document.getElementById('imagesErrorContainer');
-        
+
         // Image preview functionality
         const previewContainer = document.getElementById('image-preview');
 
@@ -417,32 +417,32 @@
         // Delete single image
         window.deleteImage = function(imageId, buttonElement) {
             const imageItem = buttonElement.closest('.image-item');
-            
+
             // Check if this would remove all images
             const currentImageCount = document.querySelectorAll('.image-item').length;
             const hasNewImages = newImagesInput.files.length > 0;
-            
+
             if (currentImageCount <= 1 && !hasNewImages) {
                 imagesErrorContainer.style.display = 'block';
                 return;
             }
-            
+
             // Add to deleted IDs array
             deletedImageIds.push(imageId);
-            
+
             // Create hidden input for the server
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'DeletedImageIds';
             hiddenInput.value = imageId;
             deletedImagesContainer.appendChild(hiddenInput);
-            
+
             // Remove from UI
             imageItem.remove();
-            
+
             // Hide error message if it was showing
             imagesErrorContainer.style.display = 'none';
-            
+
             // Check if all images are now deleted
             updateImagesUI();
         };
@@ -453,35 +453,35 @@
             deleteAllBtn.addEventListener('click', function() {
                 // Check if there are new images uploaded
                 const hasNewImages = newImagesInput.files.length > 0;
-                
+
                 if (!hasNewImages) {
                     imagesErrorContainer.style.display = 'block';
                     return;
                 }
-                
+
                 // Confirm deletion
                 if (confirm('Are you sure you want to delete all current images? Your new uploaded images will be used instead.')) {
                     // Get all image elements
                     const imageItems = document.querySelectorAll('.image-item');
-                    
+
                     // For each image, add its ID to deletedImageIds and create hidden input
                     imageItems.forEach(item => {
                         const imageId = item.getAttribute('data-id');
                         deletedImageIds.push(imageId);
-                        
+
                         const hiddenInput = document.createElement('input');
                         hiddenInput.type = 'hidden';
                         hiddenInput.name = 'DeletedImageIds';
                         hiddenInput.value = imageId;
                         deletedImagesContainer.appendChild(hiddenInput);
-                        
+
                         // Remove from UI
                         item.remove();
                     });
-                    
+
                     // Update UI to show all images deleted
                     updateImagesUI();
-                    
+
                     // Hide error message if it was showing
                     imagesErrorContainer.style.display = 'none';
                 }
@@ -492,7 +492,7 @@
         function updateImagesUI() {
             const imageItems = document.querySelectorAll('.image-item');
             const currentImages = document.querySelector('.current-images');
-            
+
             if (imageItems.length === 0 && currentImages) {
                 currentImages.innerHTML = '<p>All current images will be deleted. New uploaded images will be used instead.</p>';
                 if (deleteAllBtn) {
@@ -506,7 +506,7 @@
             const imageItems = document.querySelectorAll('.image-item');
             const hasExistingImages = imageItems.length > 0;
             const hasNewImages = newImagesInput.files.length > 0;
-            
+
             if (!hasExistingImages && !hasNewImages) {
                 imagesErrorContainer.style.display = 'block';
             } else {
@@ -519,11 +519,11 @@
             const imageItems = document.querySelectorAll('.image-item');
             const hasExistingImages = imageItems.length > 0;
             const hasNewImages = newImagesInput.files.length > 0;
-            
+
             if (!hasExistingImages && !hasNewImages) {
                 e.preventDefault();
                 imagesErrorContainer.style.display = 'block';
-                
+
                 // Scroll to the error message
                 imagesErrorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
@@ -759,7 +759,7 @@
             if (categoryFields[subcategory]) {
                 return categoryFields[subcategory];
             }
-            
+
             // If not found, try some common fallbacks
             if (subcategory.includes("Tablet")) {
                 return categoryFields["Tablets"];
@@ -767,9 +767,35 @@
             if (subcategory.includes("Phone")) {
                 return categoryFields["Other Phones"];
             }
-            
+
             // Return empty array if no match found
             return [];
         }
+            // Add this function to your JavaScript in EditListing.cshtml
+    function validateImages() {
+        const imageItems = document.querySelectorAll('.image-item');
+        const hasExistingImages = imageItems.length > 0;
+        const hasNewImages = document.getElementById('newImages').files.length > 0;
+
+        // Clear any previous error messages
+        const errorContainer = document.getElementById('imagesErrorContainer');
+
+        if (!hasExistingImages && !hasNewImages) {
+            errorContainer.style.display = 'block';
+            return false;
+        } else {
+            errorContainer.style.display = 'none';
+            return true;
+        }
+    }
+
+    // Then modify the form submission handler
+    document.getElementById('editListingForm').addEventListener('submit', function(e) {
+        if (!validateImages()) {
+            e.preventDefault();
+            // Scroll to the error message
+            document.getElementById('imagesErrorContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    });
     });
 </script>

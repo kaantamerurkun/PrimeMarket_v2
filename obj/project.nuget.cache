@@ -1,11 +1,13 @@
 {
   "version": 2,
-  "dgSpecHash": "mmr3JuJyyus=",
+  "dgSpecHash": "rc9XXrCaZzk=",
   "success": true,
   "projectFilePath": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\PrimeMarket.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\urkun\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\urkun\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",
+    "C:\\Users\\urkun\\.nuget\\packages\\fscheck\\3.2.0\\fscheck.3.2.0.nupkg.sha512",
+    "C:\\Users\\urkun\\.nuget\\packages\\fsharp.core\\5.0.2\\fsharp.core.5.0.2.nupkg.sha512",
     "C:\\Users\\urkun\\.nuget\\packages\\humanizer.core\\2.14.1\\humanizer.core.2.14.1.nupkg.sha512",
     "C:\\Users\\urkun\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\urkun\\.nuget\\packages\\microsoft.build.framework\\17.8.3\\microsoft.build.framework.17.8.3.nupkg.sha512",

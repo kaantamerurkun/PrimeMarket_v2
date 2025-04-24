@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Threading.Tasks;
 using System.Reflection;
 
+
 namespace PrimeMarket.Controllers
 {
     public class ListingController : Controller
@@ -591,6 +592,7 @@ namespace PrimeMarket.Controllers
             }
         }
 
+        // Update the EditListing POST method in ListingController.cs
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
@@ -617,36 +619,46 @@ namespace PrimeMarket.Controllers
                 DeletedImageIds = new List<int>();
             }
 
-            // Ensure DetailCategory is never null - fix for "DetailCategory is required" error
-            if (model.DetailCategory == null)
-            {
-                model.DetailCategory = string.Empty;
-            }
+            // Ensure model.DetailCategory is never null
+            model.DetailCategory = model.DetailCategory ?? string.Empty;
 
-            // Check if there will be at least one image after processing
-            // Count existing images that won't be deleted
+            // Calculate how many images will remain after this edit
             int remainingImagesCount = listing.Images.Count(i => !DeletedImageIds.Contains(i.Id));
-            bool willHaveImages = remainingImagesCount > 0 || (newImages != null && newImages.Count > 0);
+            bool willHaveImages = remainingImagesCount > 0 || (newImages != null && newImages.Any(img => img.Length > 0));
 
             if (!willHaveImages)
             {
-                ModelState.AddModelError("Images", "At least one image is required. Please upload a new image.");
+                ModelState.AddModelError("Images", "At least one image is required. Please add a new image or keep existing ones.");
+
+                // Reload the model with images to prevent data loss when returning the view
+                model.Images = await _context.ListingImages
+                    .Where(i => i.ListingId == model.Id && !DeletedImageIds.Contains(i.Id))
+                    .ToListAsync();
+
                 return View(model);
             }
 
+            // Remove ModelState errors for DetailCategory since we've handled it
+            ModelState.Remove("DetailCategory");
+
             if (!ModelState.IsValid)
             {
+                // Reload the model with images to prevent data loss
+                model.Images = await _context.ListingImages
+                    .Where(i => i.ListingId == model.Id && !DeletedImageIds.Contains(i.Id))
+                    .ToListAsync();
+
                 return View(model);
             }
 
             try
             {
-                // Update listing properties
+                // Update basic listing properties
                 listing.Title = model.Title;
                 listing.Price = model.Price;
                 listing.Description = model.Description;
                 listing.Location = model.Location;
-                listing.DetailCategory = model.DetailCategory; // Ensure DetailCategory is saved
+                listing.DetailCategory = model.DetailCategory;
                 listing.UpdatedAt = DateTime.UtcNow;
 
                 // Reset status to pending if it was previously rejected
@@ -656,6 +668,9 @@ namespace PrimeMarket.Controllers
                     listing.RejectionReason = null;
                 }
 
+                // Track if we need to set a new main image
+                bool needsNewMainImage = false;
+
                 // Handle deleted images
                 if (DeletedImageIds.Count > 0)
                 {
@@ -664,17 +679,13 @@ namespace PrimeMarket.Controllers
                         var imageToDelete = listing.Images.FirstOrDefault(i => i.Id == imageId);
                         if (imageToDelete != null)
                         {
-                            // If this was the main image and there are other images, set a new main image
-                            if (imageToDelete.IsMainImage && listing.Images.Count > DeletedImageIds.Count)
+                            // Check if the main image is being deleted
+                            if (imageToDelete.IsMainImage)
                             {
-                                var newMainImage = listing.Images.FirstOrDefault(i => !DeletedImageIds.Contains(i.Id));
-                                if (newMainImage != null)
-                                {
-                                    newMainImage.IsMainImage = true;
-                                }
+                                needsNewMainImage = true;
                             }
 
-                            // Delete the image file from disk if needed
+                            // Delete the image file from disk
                             string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                             string imagePath = imageToDelete.ImagePath.TrimStart('/');
                             string fullPath = Path.Combine(webRootPath, imagePath);
@@ -687,18 +698,35 @@ namespace PrimeMarket.Controllers
                                 }
                                 catch (Exception ex)
                                 {
-                                    // Log the error but continue with DB deletion
                                     _logger.LogError(ex, "Error deleting image file: {FilePath}", fullPath);
+                                    // Continue with DB deletion even if file deletion fails
                                 }
                             }
 
                             _context.ListingImages.Remove(imageToDelete);
                         }
                     }
+
+                    // Save changes to the database immediately to handle the image deletions
+                    await _context.SaveChangesAsync();
+                }
+
+                // If we need to set a new main image because the main image was deleted
+                if (needsNewMainImage && remainingImagesCount > 0)
+                {
+                    // Get the first remaining image and set it as main
+                    var firstRemainingImage = await _context.ListingImages
+                        .FirstOrDefaultAsync(i => i.ListingId == listing.Id && !DeletedImageIds.Contains(i.Id));
+
+                    if (firstRemainingImage != null)
+                    {
+                        firstRemainingImage.IsMainImage = true;
+                        await _context.SaveChangesAsync();
+                    }
                 }
 
                 // Process and save new images
-                if (newImages != null && newImages.Count > 0)
+                if (newImages != null && newImages.Any(img => img.Length > 0))
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "listings");
                     if (!Directory.Exists(uploadsFolder))
@@ -706,8 +734,11 @@ namespace PrimeMarket.Controllers
                         Directory.CreateDirectory(uploadsFolder);
                     }
 
-                    // Check if we need to set one image as main (either all images were deleted or no main image exists)
-                    bool needsMainImage = !listing.Images.Any(i => i.IsMainImage && !DeletedImageIds.Contains(i.Id));
+                    // Count existing images after deletion to determine if we need a main image
+                    var existingImagesCount = await _context.ListingImages
+                        .CountAsync(i => i.ListingId == listing.Id);
+
+                    bool isFirstImage = existingImagesCount == 0;
 
                     foreach (var image in newImages)
                     {
@@ -725,127 +756,22 @@ namespace PrimeMarket.Controllers
                             {
                                 ListingId = listing.Id,
                                 ImagePath = $"/images/listings/{uniqueFileName}",
-                                IsMainImage = needsMainImage // First new image becomes main if needed
+                                IsMainImage = isFirstImage || needsNewMainImage // Set as main if it's the first image or if we need a new main image
                             };
 
                             _context.ListingImages.Add(listingImage);
-                            _logger.LogInformation("New image added for listing {ListingId}: {ImagePath}", listing.Id, listingImage.ImagePath);
 
-                            // Only set the first image as main
-                            needsMainImage = false;
+                            // Only set the first new image as main
+                            isFirstImage = false;
+                            needsNewMainImage = false;
                         }
                     }
                 }
 
-                // Update product-specific properties if applicable
+                // Process dynamic properties
                 if (model.DynamicProperties != null && !string.IsNullOrEmpty(listing.SubCategory))
                 {
-                    dynamic? product = null;
-
-                    // Get the appropriate product based on subcategory
-                    switch (listing.SubCategory)
-                    {
-                        case "IOS Phone":
-                            product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Android Phone":
-                            product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Laptops":
-                            product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Desktops":
-                            product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "IOS Tablets":
-                        case "Android Tablets":
-                        case "Other Tablets":
-                        case "Tablets":
-                            // Check all tablet types
-                            product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            if (product == null)
-                                product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            if (product == null)
-                                product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Washers":
-                            product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Dishwashers":
-                            product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Fridges":
-                            product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Ovens":
-                            product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Vacuum Cleaner":
-                            product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                        case "Televisions":
-                            product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == model.Id);
-                            break;
-                    }
-
-                    // Update product properties if product exists
-                    if (product != null)
-                    {
-                        foreach (var prop in model.DynamicProperties)
-                        {
-                            // Find property with case-insensitive comparison
-                            PropertyInfo productProp = null;
-                            foreach (var p in product.GetType().GetProperties())
-                            {
-                                if (string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase))
-                                {
-                                    productProp = p;
-                                    break;
-                                }
-                            }
-
-                            if (productProp != null)
-                            {
-                                try
-                                {
-                                    // Skip if value is empty
-                                    if (string.IsNullOrWhiteSpace(prop.Value))
-                                        continue;
-
-                                    // Convert value to appropriate type
-                                    if (productProp.PropertyType == typeof(bool))
-                                    {
-                                        bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
-                                        productProp.SetValue(product, boolValue);
-                                    }
-                                    else if (productProp.PropertyType == typeof(int))
-                                    {
-                                        if (int.TryParse(prop.Value, out int intValue))
-                                        {
-                                            productProp.SetValue(product, intValue);
-                                        }
-                                    }
-                                    else if (productProp.PropertyType == typeof(decimal))
-                                    {
-                                        if (decimal.TryParse(prop.Value, out decimal decimalValue))
-                                        {
-                                            productProp.SetValue(product, decimalValue);
-                                        }
-                                    }
-                                    else
-                                    {
-                                        productProp.SetValue(product, prop.Value);
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    // Log error but continue
-                                    _logger.LogError(ex, "Error updating property {PropertyName}: {ErrorMessage}",
-                                        productProp.Name, ex.Message);
-                                }
-                            }
-                        }
-                    }
+                    await UpdateDynamicProperties(model, listing);
                 }
 
                 // Create notification for admin about the update
@@ -868,7 +794,148 @@ namespace PrimeMarket.Controllers
             {
                 _logger.LogError(ex, "Error updating listing: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error updating listing: {ex.Message}");
+
+                // Reload the model with images to prevent data loss
+                model.Images = await _context.ListingImages
+                    .Where(i => i.ListingId == model.Id && !DeletedImageIds.Contains(i.Id))
+                    .ToListAsync();
+
                 return View(model);
+            }
+        }
+
+        // Helper method to update dynamic properties
+        private async Task UpdateDynamicProperties(ListingViewModel model, Listing listing)
+        {
+            dynamic? product = null;
+
+            // Get the appropriate product based on subcategory
+            switch (listing.SubCategory)
+            {
+                case "IOS Phone":
+                    product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Android Phone":
+                    product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Laptops":
+                    product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Desktops":
+                    product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "IOS Tablets":
+                case "Android Tablets":
+                case "Other Tablets":
+                case "Tablets":
+                    // Check all tablet types
+                    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    if (product == null)
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    if (product == null)
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Washers":
+                    product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Dishwashers":
+                    product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Fridges":
+                    product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Ovens":
+                    product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Vacuum Cleaner":
+                    product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+                case "Televisions":
+                    product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == model.Id);
+                    break;
+            }
+
+            // Update product properties if product exists
+            if (product != null)
+            {
+                //_logger.LogInformation("Found product of type {ProductType} for listing {ListingId}",
+                //    product.GetType().Name, listing.Id);
+
+                foreach (var prop in model.DynamicProperties)
+                {
+                    // Find property with case-insensitive comparison
+                    PropertyInfo productProp = null;
+                    foreach (var p in product.GetType().GetProperties())
+                    {
+                        if (string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase))
+                        {
+                            productProp = p;
+                            break;
+                        }
+                    }
+
+                    if (productProp != null)
+                    {
+                        try
+                        {
+                            // Skip if value is empty
+                            if (string.IsNullOrWhiteSpace(prop.Value))
+                                continue;
+
+                            _logger.LogInformation("Updating property {PropertyName} with value {Value}",
+                                productProp.Name, prop.Value);
+
+                            // Convert value to appropriate type
+                            if (productProp.PropertyType == typeof(bool))
+                            {
+                                bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
+                                productProp.SetValue(product, boolValue);
+                                _logger.LogInformation("Set bool property {PropertyName} to {Value}",
+                                    productProp.Name, boolValue);
+                            }
+                            else if (productProp.PropertyType == typeof(int))
+                            {
+                                if (int.TryParse(prop.Value, out int intValue))
+                                {
+                                    productProp.SetValue(product, intValue);
+                                    _logger.LogInformation("Set int property {PropertyName} to {Value}",
+                                        productProp.Name, intValue);
+                                }
+                            }
+                            else if (productProp.PropertyType == typeof(decimal))
+                            {
+                                if (decimal.TryParse(prop.Value, out decimal decimalValue))
+                                {
+                                    productProp.SetValue(product, decimalValue);
+                                    _logger.LogInformation("Set decimal property {PropertyName} to {Value}",
+                                        productProp.Name, decimalValue);
+                                }
+                            }
+                            else
+                            {
+                                productProp.SetValue(product, prop.Value);
+                                _logger.LogInformation("Set string property {PropertyName} to {Value}",
+                                    productProp.Name, prop.Value);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            // Log error but continue
+                            _logger.LogError(ex, "Error updating property {PropertyName}: {ErrorMessage}",
+                                productProp.Name, ex.Message);
+                        }
+                    }
+                    else
+                    {
+                        //_logger.LogWarning("Property {PropertyName} not found on product type {ProductType}",
+                        //    prop.Key, product.GetType().Name);
+                    }
+                }
+            }
+            else
+            {
+                _logger.LogWarning("No product found for listing {ListingId} with subcategory {SubCategory}",
+                    listing.Id, listing.SubCategory);
             }
         }
 

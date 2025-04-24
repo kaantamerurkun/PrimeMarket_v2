@@ -26,9 +26,8 @@ namespace PrimeMarket.Models.ViewModel
         [Required(ErrorMessage = "Subcategory is required")]
         public string SubCategory { get; set; }
 
-        [Required(ErrorMessage = "Detail category is required")]
+        // Remove the Required attribute from DetailCategory
         public string DetailCategory { get; set; }
-
 
         [Required(ErrorMessage = "Location is required")]
         public string Location { get; set; }
