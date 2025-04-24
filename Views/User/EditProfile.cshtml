@@ -143,82 +143,66 @@
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            // Profile image preview
-            const profileImage = document.querySelector('#profile-image');
-            const imageUploadInput = document.querySelector('#profile-image-upload');
-            const cameraButton = document.querySelector('.camera-button');
+               function sendVerification() {
+            const idFront = document.getElementById("idFront").files[0];
+            const idBack = document.getElementById("idBack").files[0];
+            const messageDiv = document.getElementById("verification-message");
 
-            cameraButton.addEventListener('click', () => imageUploadInput.click());
+            messageDiv.style.display = "none";
 
-            imageUploadInput.addEventListener('change', (e) => {
-                const file = e.target.files[0];
-                if (file) {
-                    const reader = new FileReader();
-                    reader.onload = (e) => profileImage.src = e.target.result;
-                    reader.readAsDataURL(file);
-                }
-            });
-
-            // Verification form AJAX submission
-            const sendVerificationBtn = document.getElementById("sendVerificationBtn");
-            if (sendVerificationBtn) {
-                sendVerificationBtn.addEventListener("click", function () {
-                    const idFront = document.getElementById("idFront").files[0];
-                    const idBack = document.getElementById("idBack").files[0];
-                    const messageDiv = document.getElementById("verification-message");
-
-                    messageDiv.style.display = "none";
-
-                    if (!idFront || !idBack) {
-                        messageDiv.textContent = "Please upload both front and back images of your ID.";
-                        messageDiv.style.backgroundColor = "#f8d7da";
-                        messageDiv.style.color = "#721c24";
-                        messageDiv.style.display = "block";
-                        return;
-                    }
-
-                    const formData = new FormData();
-                    formData.append("idFront", idFront);
-                    formData.append("idBack", idBack);
-                    formData.append("__RequestVerificationToken", document.querySelector('#verification-form input[name="__RequestVerificationToken"]').value);
-
-                    sendVerificationBtn.disabled = true;
-                    sendVerificationBtn.textContent = "Submitting...";
-
-                    fetch('/User/SubmitIdVerification', {
-                        method: 'POST',
-                        body: formData
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            messageDiv.textContent = "Verification submitted successfully.";
-                            messageDiv.style.backgroundColor = "#d4edda";
-                            messageDiv.style.color = "#155724";
-                            document.getElementById("idFront").value = "";
-                            document.getElementById("idBack").value = "";
-                        } else {
-                            messageDiv.textContent = "Error: " + data.message;
-                            messageDiv.style.backgroundColor = "#f8d7da";
-                            messageDiv.style.color = "#721c24";
-                        }
-                        messageDiv.style.display = "block";
-                    })
-                    .catch(err => {
-                        console.error("Error submitting verification:", err);
-                        messageDiv.textContent = "An error occurred. Please try again.";
-                        messageDiv.style.backgroundColor = "#f8d7da";
-                        messageDiv.style.color = "#721c24";
-                        messageDiv.style.display = "block";
-                    })
-                    .finally(() => {
-                        sendVerificationBtn.disabled = false;
-                        sendVerificationBtn.textContent = "Send Verification";
-                    });
-                });
+            if (!idFront || !idBack) {
+                messageDiv.textContent = "Please upload both front and back images of your ID.";
+                messageDiv.style.backgroundColor = "#f8d7da";
+                messageDiv.style.color = "#721c24";
+                messageDiv.style.display = "block";
+                return;
             }
-        });
+
+            const formData = new FormData();
+            formData.append("idFront", idFront);
+            formData.append("idBack", idBack);
+            formData.append("__RequestVerificationToken", document.querySelector('#verification-form input[name="__RequestVerificationToken"]').value);
+
+            const sendVerificationBtn = document.getElementById("sendVerificationBtn");
+            sendVerificationBtn.disabled = true;
+            sendVerificationBtn.textContent = "Submitting...";
+
+            fetch('/User/SubmitIdVerification', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    messageDiv.textContent = "Verification submitted successfully.";
+                    messageDiv.style.backgroundColor = "#d4edda";
+                    messageDiv.style.color = "#155724";
+                    document.getElementById("idFront").value = "";
+                    document.getElementById("idBack").value = "";
+                } else {
+                    messageDiv.textContent = "Error: " + data.message;
+                    messageDiv.style.backgroundColor = "#f8d7da";
+                    messageDiv.style.color = "#721c24";
+                }
+                messageDiv.style.display = "block";
+            })
+            .catch(err => {
+                console.error("Error submitting verification:", err);
+                messageDiv.textContent = "An error occurred. Please try again.";
+                messageDiv.style.backgroundColor = "#f8d7da";
+                messageDiv.style.color = "#721c24";
+                messageDiv.style.display = "block";
+            })
+            .finally(() => {
+                sendVerificationBtn.disabled = false;
+                sendVerificationBtn.textContent = "Send Verification";
+            });
+        }
     </script>
 </body>
 </html>

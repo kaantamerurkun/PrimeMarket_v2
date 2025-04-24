@@ -252,20 +252,18 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Create a notification for admins
-                var adminIds = await _context.Admins.Select(a => a.Id).ToListAsync();
-                foreach (var adminId in adminIds)
+                // Remove the admin notification creation code entirely
+                // OR for a quick fix, replace it with:
+                // Create a notification for the user instead:
+                var userNotification = new Notification
                 {
-                    var notification = new Notification
-                    {
-                        UserId = adminId,
-                        Message = "New ID verification submitted",
-                        Type = PrimeMarket.Models.Enum.NotificationType.ListingApproved, // Using this for now as a generic notification
-                        RelatedEntityId = userId.Value,
-                        CreatedAt = DateTime.UtcNow
-                    };
-                    _context.Notifications.Add(notification);
-                }
+                    UserId = userId.Value, // This is definitely in the Users table
+                    Message = "Your ID verification has been submitted and is pending review",
+                    Type = PrimeMarket.Models.Enum.NotificationType.VerificationApproved,
+                    RelatedEntityId = userId.Value,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Notifications.Add(userNotification);
                 await _context.SaveChangesAsync();
 
                 return Json(new { success = true, message = "ID verification submitted successfully. Our team will review your documents." });
