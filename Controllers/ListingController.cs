@@ -413,7 +413,7 @@ namespace PrimeMarket.Controllers
             var dynamicProperties = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
-                dynamic product = null;
+                dynamic? product = null;
                 // Get the appropriate product type based on subcategory
                 switch (listing.SubCategory)
                 {
@@ -630,7 +630,7 @@ namespace PrimeMarket.Controllers
 
             if (!willHaveImages)
             {
-                ModelState.AddModelError("", "At least one image is required. Please upload a new image.");
+                ModelState.AddModelError("Images", "At least one image is required. Please upload a new image.");
                 return View(model);
             }
 
@@ -740,7 +740,7 @@ namespace PrimeMarket.Controllers
                 // Update product-specific properties if applicable
                 if (model.DynamicProperties != null && !string.IsNullOrEmpty(listing.SubCategory))
                 {
-                    dynamic product = null;
+                    dynamic? product = null;
 
                     // Get the appropriate product based on subcategory
                     switch (listing.SubCategory)
