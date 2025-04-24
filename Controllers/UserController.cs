@@ -10,6 +10,7 @@ using System.Net;
 using System.Net.Mail;
 using PrimeMarket.Filters;
 using PrimeMarket.Models.ViewModel;
+using PrimeMarket.Models.Enum;
 
 namespace PrimeMarket.Controllers
 {
@@ -724,9 +725,14 @@ namespace PrimeMarket.Controllers
         }
 
         [UserAuthenticationFilter]
-        public IActionResult User_MainPage()
+        public async Task<IActionResult> User_MainPageAsync()
         {
-            return View();
+            var approvedListings = await _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            return View(approvedListings);
         }
 
         [UserAuthenticationFilter]

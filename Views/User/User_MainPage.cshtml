@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<PrimeMarket.Models.Listing>
+@{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 <!DOCTYPE html>
@@ -23,12 +24,15 @@
         <section class="listings">
             <h2>Listings</h2>
             <div class="items-grid">
-                <div class="item-card"></div>
-                <div class="item-card"></div>
-                <div class="item-card"></div>
-                <div class="item-card"></div>
-                <div class="item-card"></div>
-                <div class="item-card"></div>
+                @foreach (var item in Model)
+                {
+                    <div class="item-card">
+                        <h3>@item.Title</h3>
+                        <p>@item.Description</p>
+                        <strong>@item.Price ₺</strong>
+                        <p style="font-size: 0.9em; color: gray;">@item.Location</p>
+                    </div>
+                }
             </div>
         </section>
     </main>
