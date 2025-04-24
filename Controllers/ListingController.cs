@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Globalization;
 using System.Reflection;
 
 
@@ -1296,65 +1297,64 @@ public async Task<IActionResult> DeleteListing(int id)
 
         [HttpPost]
         [UserAuthenticationFilter]
-        public async Task<IActionResult> MakeOffer(OfferViewModel model)
+        public async Task<IActionResult> MakeOffer([FromBody] OfferViewModel model)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
-            {
                 return Json(new { success = false, message = "Please log in to make an offer." });
+
+            /* ---------- robust parsing of OfferAmount ---------- */
+            decimal offerAmount = model.OfferAmount;
+
+            // If normal model-binding produced 0 (or the property is 0 by default),
+            // try to parse any raw string the client might have sent.
+            if (offerAmount <= 0 && !string.IsNullOrWhiteSpace(model.OfferAmountRaw))
+            {
+                // 1) try invariant "dot" culture, 2) try current culture (comma)
+                if (!decimal.TryParse(model.OfferAmountRaw, NumberStyles.Any,
+                                      CultureInfo.InvariantCulture, out offerAmount))
+                {
+                    decimal.TryParse(model.OfferAmountRaw, NumberStyles.Any,
+                                     CultureInfo.CurrentCulture, out offerAmount);
+                }
             }
 
-            if (model.OfferAmount <= 0)
-            {
+            if (offerAmount <= 0)
                 return Json(new { success = false, message = "Offer amount must be greater than zero." });
-            }
 
-            try
+            /* ---------- listing & ownership checks ---------- */
+            var listing = await _context.Listings.FindAsync(model.ListingId);
+            if (listing == null)
+                return Json(new { success = false, message = "Listing not found." });
+
+            if (listing.SellerId == userId.Value)
+                return Json(new { success = false, message = "You cannot make an offer on your own listing." });
+
+            /* ---------- create Offer + Notification ---------- */
+            var offer = new Offer
             {
-                var listing = await _context.Listings.FindAsync(model.ListingId);
-                if (listing == null)
-                {
-                    return Json(new { success = false, message = "Listing not found." });
-                }
+                BuyerId = userId.Value,
+                ListingId = model.ListingId,
+                OfferAmount = offerAmount,
+                Message = model.Message,
+                Status = OfferStatus.Pending,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Offers.Add(offer);
 
-                // Check if user is trying to make an offer on their own listing
-                if (listing.SellerId == userId.Value)
-                {
-                    return Json(new { success = false, message = "You cannot make an offer on your own listing." });
-                }
-
-                // Create the offer
-                var offer = new Offer
-                {
-                    BuyerId = userId.Value,
-                    ListingId = model.ListingId,
-                    OfferAmount = model.OfferAmount,
-                    Message = model.Message,
-                    Status = OfferStatus.Pending,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Offers.Add(offer);
-
-                // Create notification for the seller
-                var notification = new Notification
-                {
-                    UserId = listing.SellerId,
-                    Message = $"You have received a new offer of {model.OfferAmount:C} for your listing '{listing.Title}'",
-                    Type = NotificationType.NewOffer,
-                    RelatedEntityId = model.ListingId,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
-
-                await _context.SaveChangesAsync();
-
-                return Json(new { success = true, message = "Your offer has been sent to the seller." });
-            }
-            catch (Exception ex)
+            var notification = new Notification
             {
-                return Json(new { success = false, message = $"Error making offer: {ex.Message}" });
-            }
+                UserId = listing.SellerId,
+                Message = $"You have received a new offer of {offerAmount:C} for your listing '{listing.Title}'",
+                Type = NotificationType.NewOffer,
+                RelatedEntityId = model.ListingId,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Notifications.Add(notification);
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Your offer has been sent to the seller." });
         }
 
         [HttpPost]

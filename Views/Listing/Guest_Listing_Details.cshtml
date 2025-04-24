@@ -520,20 +520,108 @@
     }</style>
 
 <script>
+        // Change main image when thumbnail is clicked
+    function changeMainImage(imageSrc) {
+        document.getElementById('main-image').src = imageSrc;
+    }
+
+    // Open offer modal - ADD THIS FUNCTION
+    function openOfferModal() {
+        document.getElementById('offerModal').style.display = 'block';
+    }
+
+    // Close offer modal - KEEP THIS FUNCTION
+    function closeOfferModal() {
+        document.getElementById('offerModal').style.display = 'none';
+    }
+
+    // Toggle bookmark
+    function toggleBookmark(listingId) {
+        fetch('/Listing/ToggleBookmark', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `listingId=${listingId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const bookmarkBtn = document.getElementById('bookmark-btn');
+                if (data.isBookmarked) {
+                    bookmarkBtn.textContent = "Remove from Bookmark";
+                } else {
+                    bookmarkBtn.textContent = "Add to Bookmark";
+                }
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    // Handle offer submission
+    document.getElementById('offerForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const listingId = document.getElementById('listingId').value;
+        const offerAmount = document.getElementById('offerAmount').value;
+        const message = document.getElementById('offerMessage').value;
+
+        fetch('/Listing/MakeOffer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                listingId: listingId,
+                offerAmount: offerAmount,
+                message: message
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                closeOfferModal();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting your offer. Please try again.');
+        });
+    });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        const modal = document.getElementById('offerModal');
+        if (event.target === modal) {
+            closeOfferModal();
+        }
+    }
+
+    // Optional: Pre-populate offer amount with a percentage of the listing price
+    document.addEventListener('DOMContentLoaded', function() {
+        const offerAmountInput = document.getElementById('offerAmount');
+        if (offerAmountInput) {
+            offerAmountInput.addEventListener('input', function() {
+                // Ensure the offer doesn't exceed the listing price
+                const maxPrice = @Model.Listing.Price;
+                if (parseFloat(this.value) > maxPrice) {
+                    this.value = maxPrice;
+                }
+            });
+        }
+    });
     // Change main image when thumbnail is clicked
     function changeMainImage(imageSrc) {
         document.getElementById('main-image').src = imageSrc;
     }
 
-    // Open offer modal
-    function openOfferModal() {
-        document.getElementById('offerModal').style.display = 'block';
-    }
-
-    // Close offer modal
-    function closeOfferModal() {
-        document.getElementById('offerModal').style.display = 'none';
-    }
 
     // Toggle bookmark
     function toggleBookmark(listingId) {

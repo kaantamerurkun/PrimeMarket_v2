@@ -17,7 +17,7 @@
             <div class="listing-details">
                 <h3>@Model.ListingTitle</h3>
                 <p class="listing-price">@Model.ListingPrice.ToString("C")</p>
-                <a href="@Url.Action("User_Listing_Details", "User", new { id = Model.ListingId })" target="_blank">View Listing</a>
+                <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" target="_blank">View Listing</a>
             </div>
         </div>
     </div>
