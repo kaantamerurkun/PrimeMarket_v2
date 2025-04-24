@@ -1,25 +1,321 @@
-﻿@{
+﻿
+@model List<PrimeMarket.Models.Bookmark>
+@{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    ViewData["Title"] = "My Bookmarks";
 }
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="/css/MyBookmarks.css" />
-    <title>My Bookmarks</title>
-</head>
-<body>
-    <section class="listings" style="display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; min-height: 100vh;">
-        <h2>My Bookmarks</h2>
-        <div class="items-grid" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-            <div class="item-card" style="width: 150px; height: 150px; "></div>
-            <div class="item-card" style="width: 150px; height: 150px; "></div>
-            <div class="item-card" style="width: 150px; height: 150px; "></div>
-            <div class="item-card" style="width: 150px; height: 150px; "></div>
-            <div class="item-card" style="width: 150px; height: 150px; "></div>
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <h1>My Bookmarks</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
         </div>
-    </section>
-</body>
-</html>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="bookmarks-container">
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="empty-bookmarks">
+                <i class="fas fa-bookmark"></i>
+                <h2>You don't have any bookmarks yet</h2>
+                <p>Save items you like by clicking the bookmark button on a listing.</p>
+                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
+            </div>
+        }
+        else
+        {
+            <div class="bookmarks-grid">
+                @foreach (var bookmark in Model)
+                {
+                    <div class="bookmark-item" id="bookmark-@bookmark.Id">
+                        <div class="bookmark-image">
+                            @{
+                                var mainImage = bookmark.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
+                                bookmark.Listing.Images?.FirstOrDefault()?.ImagePath ?? "/images/placeholder.png";
+                            }
+                            <img src="@mainImage" alt="@bookmark.Listing.Title">
+                        </div>
+                        <div class="bookmark-details">
+                            <h3>@bookmark.Listing.Title</h3>
+                            <p class="price">@bookmark.Listing.Price.ToString("C")</p>
+                            <p class="location">@bookmark.Listing.Location</p>
+                            <p class="condition">@bookmark.Listing.Condition</p>
+                        </div>
+                        <div class="bookmark-actions">
+                            <a href="@Url.Action("Details", "Listing", new { id = bookmark.ListingId })" class="btn-view">View</a>
+                            <button class="btn-remove" onclick="removeBookmark(@bookmark.ListingId, @bookmark.Id)">Remove</button>                            <a href="@Url.Action("AddToCart", "Payment", new { listingId = bookmark.ListingId })" class="btn-cart">Add to Cart</a>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .empty-bookmarks {
+        text-align: center;
+        padding: 50px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+        .empty-bookmarks i {
+            font-size: 50px;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+
+        .empty-bookmarks h2 {
+            margin-bottom: 10px;
+        }
+
+        .empty-bookmarks p {
+            margin-bottom: 20px;
+            color: #666;
+        }
+
+    .btn-browse {
+        display: inline-block;
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-browse:hover {
+            background-color: #0055b3;
+        }
+
+    .bookmarks-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .bookmark-item {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+        .bookmark-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .bookmark-image {
+        height: 200px;
+        overflow: hidden;
+    }
+
+        .bookmark-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .bookmark-details {
+        padding: 15px;
+    }
+
+        .bookmark-details h3 {
+            margin: 0 0 10px 0;
+            font-size: 18px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    .price {
+        font-weight: bold;
+        font-size: 18px;
+        color: #0066cc;
+        margin-bottom: 5px;
+    }
+
+    .location, .condition {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .bookmark-actions {
+        display: flex;
+        gap: 5px;
+        padding: 0 15px 15px 15px;
+    }
+
+    .btn-view, .btn-remove, .btn-cart {
+        flex: 1;
+        padding: 8px 0;
+        text-align: center;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        font-size: 14px;
+    }
+
+    .btn-view {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+
+    .btn-remove {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    .btn-cart {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .btn-view:hover {
+        background-color: #e0e0e0;
+    }
+
+    .btn-remove:hover {
+        background-color: #c82333;
+    }
+
+    .btn-cart:hover {
+        background-color: #218838;
+    }
+
+    @@media (max-width: 768px) {
+        .bookmarks-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }</style>
+
+<script>
+            /* ---------- bookmark ---------- */
+    function toggleBookmark(listingId) {
+        fetch('/Listing/ToggleBookmark', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `listingId=${listingId}`
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (!d.success) {
+                alert(d.message);
+            } else {
+                const bookmarkBtn = document.getElementById('bookmark-btn');
+                if (bookmarkBtn) {
+                    bookmarkBtn.textContent = d.isBookmarked ? 'Remove from Bookmark' : 'Add to Bookmark';
+                }
+
+                // Show feedback to user
+                const feedbackDiv = document.createElement('div');
+                feedbackDiv.className = 'bookmark-feedback';
+                feedbackDiv.textContent = d.message;
+                feedbackDiv.style.position = 'fixed';
+                feedbackDiv.style.top = '100px';
+                feedbackDiv.style.left = '50%';
+                feedbackDiv.style.transform = 'translateX(-50%)';
+                feedbackDiv.style.backgroundColor = '#4CAF50';
+                feedbackDiv.style.color = 'white';
+                feedbackDiv.style.padding = '10px 20px';
+                feedbackDiv.style.borderRadius = '5px';
+                feedbackDiv.style.zIndex = '1000';
+
+                document.body.appendChild(feedbackDiv);
+
+                // Remove feedback after 3 seconds
+                setTimeout(() => {
+                    feedbackDiv.style.opacity = '0';
+                    feedbackDiv.style.transition = 'opacity 0.5s ease';
+
+                    setTimeout(() => {
+                        document.body.removeChild(feedbackDiv);
+                    }, 500);
+                }, 3000);
+            }
+        })
+        .catch(error => {
+            console.error('Error toggling bookmark:', error);
+            alert('An error occurred. Please try again.');
+        });
+    }
+    function removeBookmark(listingId, bookmarkDomId) {
+        if (!confirm('Are you sure you want to remove this bookmark?')) return;
+
+        fetch('/Listing/ToggleBookmark', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: `listingId=${encodeURIComponent(listingId)}`
+        })
+        .then(r => r.json())
+        .then(d => {
+            if (!d.success) { alert(d.message); return; }
+
+            // fade-out & remove the card
+            const el = document.getElementById(`bookmark-${bookmarkDomId}`);
+            if (el) {
+                el.style.opacity = '0';
+                el.style.transform = 'scale(.9)';
+                setTimeout(() => {
+                    el.remove();
+
+                    // show empty-state if nothing left
+                    if (!document.querySelector('.bookmark-item')) {
+                        document.querySelector('.bookmarks-container').innerHTML = `
+                            <div class="empty-bookmarks">
+                                <i class="fas fa-bookmark"></i>
+                                <h2>You don't have any bookmarks yet</h2>
+                                <p>Save items you like by clicking the bookmark button on a listing.</p>
+                                <a href="/User/User_MainPage" class="btn-browse">Browse Listings</a>
+                            </div>`;
+                    }
+                }, 300);
+            }
+        })
+        .catch(err => {
+            console.error('Error removing bookmark:', err);
+            alert('An error occurred. Please try again.');
+        });
+    }
+
+</script>

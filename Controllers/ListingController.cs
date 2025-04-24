@@ -1273,10 +1273,19 @@ public async Task<IActionResult> DeleteListing(int id)
                     // Remove bookmark
                     _context.Bookmarks.Remove(existingBookmark);
                     await _context.SaveChangesAsync();
-                    return Json(new { success = true, isBookmarked = false });
+                    return Json(new { success = true, isBookmarked = false, message = "Item removed from bookmarks." });
                 }
                 else
                 {
+                    // Check if listing exists and is available
+                    var listing = await _context.Listings
+                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == Models.Enum.ListingStatus.Approved);
+
+                    if (listing == null)
+                    {
+                        return Json(new { success = false, message = "This listing is not available for bookmarking." });
+                    }
+
                     // Add bookmark
                     var bookmark = new Bookmark
                     {
@@ -1286,12 +1295,13 @@ public async Task<IActionResult> DeleteListing(int id)
                     };
                     _context.Bookmarks.Add(bookmark);
                     await _context.SaveChangesAsync();
-                    return Json(new { success = true, isBookmarked = true });
+                    return Json(new { success = true, isBookmarked = true, message = "Item added to bookmarks." });
                 }
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = ex.Message });
+                _logger.LogError(ex, "Error toggling bookmark for user {UserId} on listing {ListingId}", userId, listingId);
+                return Json(new { success = false, message = "An error occurred while processing your request." });
             }
         }
 

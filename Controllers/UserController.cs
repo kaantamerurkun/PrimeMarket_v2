@@ -747,7 +747,7 @@ namespace PrimeMarket.Controllers
             var bookmarks = await _context.Bookmarks
                 .Include(b => b.Listing)
                 .ThenInclude(l => l.Images)
-                .Where(b => b.UserId == userId)
+                .Where(b => b.UserId == userId && b.Listing.Status == Models.Enum.ListingStatus.Approved)
                 .ToListAsync();
 
             return View(bookmarks);
