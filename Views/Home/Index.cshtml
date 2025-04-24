@@ -2,18 +2,18 @@
 @{
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
 }
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PrimeMarket - Guest Main Page</title>
-    <link rel="stylesheet" href="/css/Index.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PrimeMarket - Main Page</title>
+    <link rel="stylesheet" href="/css/UserMainPage.css" />
 </head>
 <body>
     <div style="margin-top: 80px;">
-        <nav style="box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;" class="container">
+        <nav style="box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;"
+             class="container">
             <ul id="mainCategories" class="category-menu" style="list-style: none; display: flex; gap: 30px; padding: 10px 0;"></ul>
         </nav>
     </div>
@@ -24,15 +24,94 @@
             <div class="items-grid">
                 @foreach (var item in Model)
                 {
-                    <div class="item-card">
-                        <h3>@item.Title</h3>
-                        <p>@item.Description</p>
-                        <strong>@item.Price ₺</strong>
-                        <p style="font-size: 0.9em; color: gray;">@item.Location</p>
-                    </div>
+                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })" class="item-card-link">
+                        <div class="item-card">
+                            @if (item.Images != null && item.Images.Any())
+                            {
+                                var mainImage = item.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? item.Images.First().ImagePath;
+                                <div class="item-image">
+                                    <img src="@mainImage" alt="@item.Title" />
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="item-image">
+                                    <img src="/images/placeholder.png" alt="No image" />
+                                </div>
+                            }
+                            <div class="item-info">
+                                <h3>@item.Title</h3>
+                                <p class="item-description">@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</p>
+                                <p class="item-price">@item.Price.ToString("C")</p>
+                                <p class="item-location">@item.Location</p>
+                            </div>
+                        </div>
+                    </a>
                 }
             </div>
         </section>
     </main>
+
+    <style>
+        .item-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease;
+        }
+
+            .item-card-link:hover {
+                transform: translateY(-5px);
+            }
+
+        .item-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 100%;
+        }
+
+        .item-image {
+            height: 200px;
+            overflow: hidden;
+        }
+
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .item-info {
+            padding: 15px;
+        }
+
+            .item-info h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 18px;
+            }
+
+        .item-description {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .item-price {
+            font-weight: bold;
+            color: #0066cc;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .item-location {
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
 </body>
 </html>
