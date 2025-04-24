@@ -1,5 +1,4 @@
-﻿
-@model User
+﻿@model User
 @{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
     var isVerified = Model.IsIdVerified;
@@ -19,11 +18,11 @@
             align-items: center;
             margin-left: 5px;
         }
-        
-        .verified-badge img {
-            width: 20px;
-            height: 20px;
-        }
+
+            .verified-badge img {
+                width: 20px;
+                height: 20px;
+            }
 
         .user-verified-status {
             display: flex;
@@ -31,11 +30,11 @@
             margin-top: 10px;
             color: #0066cc;
         }
-        
+
         .profile-image-container {
             position: relative;
         }
-        
+
         .verification-badge {
             position: absolute;
             bottom: 10px;
@@ -43,16 +42,41 @@
             background-color: #fff;
             border-radius: 50%;
             padding: 3px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+        }
+
+        /* New user details styling */
+        .user-details-container {
+            background-color: #f0f8ff;
+            margin-top: 12%;
+            width:50%;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            /* justify-content: space-between; */
+            text-align:left;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+            text-align: right;
         }
     </style>
 </head>
 
 <body>
-    <br />
-    <br />
-    <br />
-    <br />
+
 
     <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
         <div style="margin-right: 20px; margin-left: 300px; position: relative;" class="profile-image-container">
@@ -66,17 +90,25 @@
         </div>
 
         <div style="flex: 1; text-align: left">
-            <br>
-            <p>
-                <strong>Name:</strong> @Model.FirstName
-            </p>
-            <p><strong>Last Name:</strong> @Model.LastName</p>
-            <br />
-            <p><strong>Email:</strong> @Model.Email</p>
-            <br />
-            <p><strong>Phone Number:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</p>
-            <br />
-            
+            <div class="user-details-container">
+                <div class="detail-item">
+                    <span class="detail-label">Name:</span>
+                    <span class="detail-value">@Model.FirstName</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Last Name:</span>
+                    <span class="detail-value">@Model.LastName</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email:</span>
+                    <span class="detail-value">@Model.Email</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone Number:</span>
+                    <span class="detail-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</span>
+                </div>
+            </div>
+
             @if (isVerified)
             {
                 <div class="user-verified-status">
@@ -124,7 +156,7 @@
             <button class="btn-editprofile">My Listings</button>
         </a>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
                     function openModal() {
