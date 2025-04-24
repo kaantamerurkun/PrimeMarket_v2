@@ -434,6 +434,14 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
+                // Update session if the user is currently logged in
+                var userIdInSession = verification.UserId.ToString();
+                var sessions = HttpContext.Session.GetString("UserId");
+                if (sessions == userIdInSession)
+                {
+                    HttpContext.Session.SetString("IsUserVerified", "true");
+                }
+
                 TempData["SuccessMessage"] = "ID verification approved successfully.";
                 return RedirectToAction(nameof(PendingVerifications));
             }

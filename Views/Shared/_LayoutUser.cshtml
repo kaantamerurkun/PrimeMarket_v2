@@ -1,5 +1,6 @@
 ﻿@{
     var userName = Context.Session.GetString("UserName") ?? "Guest";
+    var isVerified = Context.Session.GetString("IsUserVerified") == "true";
 }
 <!DOCTYPE html>
 <html>
@@ -9,6 +10,18 @@
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <link rel="stylesheet" href="/css/messagenotifications.css" />
     <title>@ViewBag.Title</title>
+    <style>
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 5px;
+        }
+
+            .verified-badge img {
+                width: 16px;
+                height: 16px;
+            }
+    </style>
 </head>
 <body>
     <header class="main-header">
@@ -23,7 +36,17 @@
                     </a>
                 </div>
 
-                <a asp-action="MyProfilePage" asp-controller="User"><p>@userName</p></a>
+                <a asp-action="MyProfilePage" asp-controller="User">
+                    <p>
+                        @userName
+                        @if (isVerified)
+                        {
+                            <span class="verified-badge">
+                                <img src="/images/verified.png" alt="Verified" title="Verified User" />
+                            </span>
+                        }
+                    </p>
+                </a>
                 <form asp-action="Logout" asp-controller="User" method="post" style="display: inline;">
                     <button type="submit" class="btn-logout">Logout</button>
                 </form>
@@ -74,7 +97,7 @@
         </div>
     </div>
 
-    
+
     <script src="/js/site.js"></script>
 
 </body>

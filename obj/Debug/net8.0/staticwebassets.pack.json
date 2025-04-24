@@ -137,6 +137,10 @@
       "PackagePath": "staticwebassets\\images\\bookmark-button.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\camera-icon.jpg",
+      "PackagePath": "staticwebassets\\images\\camera-icon.jpg"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\10_05e9312e-1e58-45f3-81f4-9db9eb0ca384.png",
       "PackagePath": "staticwebassets\\images\\listings\\10_05e9312e-1e58-45f3-81f4-9db9eb0ca384.png"
     },
@@ -361,6 +365,10 @@
       "PackagePath": "staticwebassets\\images\\verification\\back_17_ae898537-7eeb-4836-b576-e58a2148e3f7.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\back_18_edb24c98-2da8-43ad-b4a5-e018654dad20.png",
+      "PackagePath": "staticwebassets\\images\\verification\\back_18_edb24c98-2da8-43ad-b4a5-e018654dad20.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png",
       "PackagePath": "staticwebassets\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png"
     },
@@ -379,6 +387,10 @@
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_17_b30546a3-92e2-4e57-aa13-271521780d7b.png",
       "PackagePath": "staticwebassets\\images\\verification\\front_17_b30546a3-92e2-4e57-aa13-271521780d7b.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_18_26e0676f-aa9c-4349-a442-9cdb90c061c9.png",
+      "PackagePath": "staticwebassets\\images\\verification\\front_18_26e0676f-aa9c-4349-a442-9cdb90c061c9.png"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verified.png",

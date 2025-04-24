@@ -166,6 +166,9 @@ namespace PrimeMarket.Controllers
                     ProfileImagePath = user.ProfileImagePath
                 };
 
+                // Set the verification status in ViewBag to be used in the view
+                ViewBag.IsVerified = user.IsIdVerified;
+
                 return View(model);
             }
             catch (Exception ex)
@@ -226,7 +229,8 @@ namespace PrimeMarket.Controllers
                     existingVerification.FrontImagePath = $"/images/verification/{frontImageFileName}";
                     existingVerification.BackImagePath = $"/images/verification/{backImageFileName}";
                     existingVerification.Status = PrimeMarket.Models.Enum.VerificationStatus.Pending;
-                    existingVerification.RejectionReason = null;
+                    // Set an empty string instead of null for RejectionReason
+                    existingVerification.RejectionReason = string.Empty;
                     existingVerification.UpdatedAt = DateTime.Now;
                 }
                 else
@@ -238,6 +242,8 @@ namespace PrimeMarket.Controllers
                         FrontImagePath = $"/images/verification/{frontImageFileName}",
                         BackImagePath = $"/images/verification/{backImageFileName}",
                         Status = PrimeMarket.Models.Enum.VerificationStatus.Pending,
+                        // Set an empty string instead of null for RejectionReason
+                        RejectionReason = string.Empty,
                         CreatedAt = DateTime.Now
                     };
 
@@ -548,6 +554,9 @@ namespace PrimeMarket.Controllers
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
             HttpContext.Session.SetString("UserEmail", user.Email);
+
+            // Store verification status in session
+            HttpContext.Session.SetString("IsUserVerified", user.IsIdVerified.ToString().ToLower());
 
             return RedirectToAction("User_MainPage");
         }

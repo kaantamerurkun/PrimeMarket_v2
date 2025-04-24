@@ -270,6 +270,15 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Details", "Listing", new { id = offer?.ListingId ?? notification.RelatedEntityId });
                 case NotificationType.VerificationApproved:
                 case NotificationType.VerificationRejected:
+                    // Update session verification status when user clicks on a verification notification
+                    if (notification.Type == NotificationType.VerificationApproved)
+                    {
+                        var user = await _context.Users.FindAsync(userId);
+                        if (user != null && user.IsIdVerified)
+                        {
+                            HttpContext.Session.SetString("IsUserVerified", "true");
+                        }
+                    }
                     return RedirectToAction("MyProfilePage", "User");
                 case NotificationType.PurchaseCompleted:
                     var purchase = await _context.Purchases.FindAsync(notification.RelatedEntityId);

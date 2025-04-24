@@ -1,6 +1,8 @@
-﻿@model User
+﻿
+@model User
 @{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    var isVerified = Model.IsIdVerified;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -11,6 +13,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/MyProfilePage.css" />
     <title>My Profile</title>
+    <style>
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 5px;
+        }
+        
+        .verified-badge img {
+            width: 20px;
+            height: 20px;
+        }
+
+        .user-verified-status {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+            color: #0066cc;
+        }
+        
+        .profile-image-container {
+            position: relative;
+        }
+        
+        .verification-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            padding: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 
 <body>
@@ -20,18 +55,47 @@
     <br />
 
     <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
-        <div style="margin-right: 20px; margin-left: 300px">
+        <div style="margin-right: 20px; margin-left: 300px; position: relative;" class="profile-image-container">
             <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.ProfileImagePath)" alt="Profile Pic" width="350px" height="350px" />
+            @if (isVerified)
+            {
+                <div class="verification-badge">
+                    <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                </div>
+            }
         </div>
 
         <div style="flex: 1; text-align: left">
             <br>
-            <p><strong>Name:</strong> @Model.FirstName</p>
+            <p>
+                <strong>Name:</strong> @Model.FirstName
+                @if (isVerified)
+                {
+                    <span class="verified-badge">
+                        <img src="/images/verified.png" alt="Verified" title="Verified User">
+                    </span>
+                }
+            </p>
             <p><strong>Last Name:</strong> @Model.LastName</p>
             <br />
             <p><strong>Email:</strong> @Model.Email</p>
             <br />
             <p><strong>Phone Number:</strong> @(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</p>
+            <br />
+            
+            @if (isVerified)
+            {
+                <div class="user-verified-status">
+                    <img src="/images/verified.png" alt="Verified" width="16" height="16" style="margin-right: 5px;">
+                    <span>Your account is verified</span>
+                </div>
+            }
+            else
+            {
+                <div class="user-verified-status" style="color: #dc3545;">
+                    <span>Your account is not verified. Please verify your ID in Edit Profile.</span>
+                </div>
+            }
             <br />
 
             @if (TempData["SuccessMessage"] != null)
@@ -65,72 +129,11 @@
         <a asp-controller="Listing" asp-action="MyListings">
             <button class="btn-editprofile">My Listings</button>
         </a>
-@*         <div class="items-grid">
-            <a asp-action="MyListing" asp-controller="User">
-                <div class="item-card">
-            </a>
-            <div class="button-container">
-                <button class="edit-btn">Edit</button>
-                <button class="remove-btn">Remove</button>
-            </div>
-        </div>
-        <div class="item-card">
-            <div class="button-container">
-                <button class="edit-btn">Edit</button>
-                <button class="remove-btn">Remove</button>
-            </div>
-        </div>
-        <div class="item-card">
-            <div class="button-container">
-                <button class="edit-btn">Edit</button>
-                <button class="remove-btn">Remove</button>
-            </div>
-        </div> *@
     </div>
     
-
-    <!-- Edit Modal -->
-@*     <div id="editModal">
-        <div class="modal-content">
-            <h2 style="text-align:center;">Enter Details of the Item</h2>
-            <form id="editForm">
-                <label>Images:</label>
-                <input type="file" name="images" multiple>
-
-                <label>Title:</label>
-                <input type="text" name="title" placeholder="Enter item title">
-
-                <label>Price (TL):</label>
-                <input type="text" name="price" placeholder="e.g. 100">
-
-                <label>Description:</label>
-                <textarea name="description" placeholder="Describe your item..." style="height:100px;"></textarea>
-
-                <label>Location:</label>
-                <select name="location">
-                    <option>Select Location</option>
-                    <option>Istanbul</option>
-                    <option>Ankara</option>
-                </select>
-
-                <label>Phone Number:</label>
-                <div style="display:flex;">
-                    <select style="margin-right:10px;">
-                        <option>+90</option>
-                    </select>
-                    <input type="text" name="phone" placeholder="Enter phone number">
-                </div>
-
-                <div style="text-align:right; margin-top: 20px;">
-                    <button type="button" onclick="saveEdit()">Save</button>
-                    <button type="button" onclick="closeModal()">Cancel</button>
-                </div>
-            </form>
-        </div>
-    </div> *@
-
     <script>
-        function openModal() {
+        document.addEventListener('DOMContentLoaded', function() {
+                    function openModal() {
             document.getElementById('editModal').style.display = 'flex';
         }
 
@@ -158,6 +161,7 @@
                     }
                 });
             });
+        });
         });
     </script>
 </body>
