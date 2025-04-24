@@ -380,103 +380,73 @@ namespace PrimeMarket.Controllers
             return View(verification);
         }
 
+        // --------------  helper --------------
+        private IActionResult Fail(string msg) =>
+            Json(new { success = false, message = msg });
+
+        // --------------  APPROVE -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveVerification(int id)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
-            if (adminId == null)
-            {
-                return RedirectToAction(nameof(AdminLogin));
-            }
+            if (adminId == null) return Fail("You are not signed-in as an admin.");
 
             var verification = await _context.VerificationDocuments
-                .Include(v => v.User)
-                .FirstOrDefaultAsync(v => v.Id == id);
-
-            if (verification == null)
-            {
-                return NotFound();
-            }
+                                             .Include(v => v.User)
+                                             .FirstOrDefaultAsync(v => v.Id == id);
+            if (verification == null) return Fail("Verification not found.");
 
             try
             {
                 verification.Status = VerificationStatus.Approved;
                 verification.UpdatedAt = DateTime.UtcNow;
-
-                // Update user's ID verification status
                 verification.User.IsIdVerified = true;
                 verification.User.UpdatedAt = DateTime.UtcNow;
 
-                // Create an admin action record
-                var adminAction = new AdminAction
+                _context.AdminActions.Add(new AdminAction
                 {
                     AdminId = adminId.Value,
                     ActionType = "Approve",
                     EntityType = "Verification",
                     EntityId = id,
-                    ActionDetails = $"Approved ID verification for user: {verification.User.FirstName} {verification.User.LastName}",
+                    ActionDetails = $"Approved ID verification for user {verification.User.FirstName} {verification.User.LastName}",
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.AdminActions.Add(adminAction);
+                });
 
-                // Create a notification for the user
-                var notification = new Notification
+                _context.Notifications.Add(new Notification
                 {
                     UserId = verification.UserId,
                     Message = "Your ID verification has been approved!",
                     Type = NotificationType.VerificationApproved,
                     RelatedEntityId = verification.UserId,
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
+                });
 
                 await _context.SaveChangesAsync();
-
-                // Update session if the user is currently logged in
-                var userIdInSession = verification.UserId.ToString();
-                var sessions = HttpContext.Session.GetString("UserId");
-                if (sessions == userIdInSession)
-                {
-                    HttpContext.Session.SetString("IsUserVerified", "true");
-                }
-
-                TempData["SuccessMessage"] = "ID verification approved successfully.";
-                return RedirectToAction(nameof(PendingVerifications));
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error approving verification: {ex.Message}";
-                return RedirectToAction(nameof(VerificationDetails), new { id });
+                return Fail(ex.Message);
             }
         }
 
+        // --------------  REJECT -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectVerification(int id, string rejectionReason)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
-            if (adminId == null)
-            {
-                return RedirectToAction(nameof(AdminLogin));
-            }
-
-            var verification = await _context.VerificationDocuments
-                .Include(v => v.User)
-                .FirstOrDefaultAsync(v => v.Id == id);
-
-            if (verification == null)
-            {
-                return NotFound();
-            }
+            if (adminId == null) return Fail("You are not signed-in as an admin.");
 
             if (string.IsNullOrWhiteSpace(rejectionReason))
-            {
-                TempData["ErrorMessage"] = "Rejection reason is required.";
-                return RedirectToAction(nameof(VerificationDetails), new { id });
-            }
+                return Fail("Rejection reason is required.");
+
+            var verification = await _context.VerificationDocuments
+                                             .Include(v => v.User)
+                                             .FirstOrDefaultAsync(v => v.Id == id);
+            if (verification == null) return Fail("Verification not found.");
 
             try
             {
@@ -484,40 +454,34 @@ namespace PrimeMarket.Controllers
                 verification.RejectionReason = rejectionReason;
                 verification.UpdatedAt = DateTime.UtcNow;
 
-                // Create an admin action record
-                var adminAction = new AdminAction
+                _context.AdminActions.Add(new AdminAction
                 {
                     AdminId = adminId.Value,
                     ActionType = "Reject",
                     EntityType = "Verification",
                     EntityId = id,
-                    ActionDetails = $"Rejected ID verification for user: {verification.User.FirstName} {verification.User.LastName}, Reason: {rejectionReason}",
+                    ActionDetails = $"Rejected ID verification for user {verification.User.FirstName} {verification.User.LastName}. Reason: {rejectionReason}",
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.AdminActions.Add(adminAction);
+                });
 
-                // Create a notification for the user
-                var notification = new Notification
+                _context.Notifications.Add(new Notification
                 {
                     UserId = verification.UserId,
                     Message = $"Your ID verification has been rejected. Reason: {rejectionReason}",
                     Type = NotificationType.VerificationRejected,
                     RelatedEntityId = verification.UserId,
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
+                });
 
                 await _context.SaveChangesAsync();
-
-                TempData["SuccessMessage"] = "ID verification rejected successfully.";
-                return RedirectToAction(nameof(PendingVerifications));
+                return Json(new { success = true });
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = $"Error rejecting verification: {ex.Message}";
-                return RedirectToAction(nameof(VerificationDetails), new { id });
+                return Fail(ex.Message);
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> UsageReport()

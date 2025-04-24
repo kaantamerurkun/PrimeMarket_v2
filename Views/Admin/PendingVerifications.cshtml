@@ -283,6 +283,18 @@
     </style>
 </head>
 <body>
+    @using Microsoft.AspNetCore.Antiforgery
+    @inject IAntiforgery Anti
+
+    @{
+        var tokens = Anti.GetAndStoreTokens(Context);
+    }
+
+    <input type="hidden"
+           id="__RequestVerificationToken"
+           name="__RequestVerificationToken"
+           value="@tokens.RequestToken" />
+
     <header class="main-header">
         <div class="header-content">
             <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
