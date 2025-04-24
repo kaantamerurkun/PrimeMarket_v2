@@ -1151,6 +1151,80 @@ public async Task<IActionResult> DeleteListing(int id)
 
             return View(viewModel);
         }
+        [HttpGet]
+        public async Task<IActionResult> Guest_Listing_Details(int id)
+        {
+            var listing = await _context.Listings
+                .Include(l => l.Images)
+                .Include(l => l.Seller)
+                .FirstOrDefaultAsync(l => l.Id == id);
+
+            if (listing == null)
+            {
+                return NotFound();
+            }
+
+            // If not approved and current user is not the seller or an admin, return not found
+            var userId = HttpContext.Session.GetInt32("UserId");
+            var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
+
+            if (listing.Status != ListingStatus.Approved &&
+                userId != listing.SellerId &&
+                !isAdmin)
+            {
+                return NotFound();
+            }
+
+            // Get product-specific details
+            dynamic product = null;
+
+            if (!string.IsNullOrEmpty(listing.SubCategory))
+            {
+                switch (listing.SubCategory)
+                {
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Laptops":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+
+                }
+            }
+
+            // Check if user has bookmarked this listing
+            bool isBookmarked = false;
+            if (userId.HasValue)
+            {
+                isBookmarked = await _context.Bookmarks
+                    .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
+            }
+
+            // Get related listings (same category)
+            var relatedListings = await _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved &&
+                            l.Id != id &&
+                            l.Category == listing.Category)
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .Take(4)
+                .ToListAsync();
+
+            // Create view model
+            var viewModel = new ListingDetailsViewModel
+            {
+                Listing = listing,
+                Product = product,
+                IsBookmarked = isBookmarked,
+                RelatedListings = relatedListings,
+                IsOwner = userId.HasValue && userId.Value == listing.SellerId
+            };
+
+            return View(viewModel);
+        }
 
         [HttpGet]
         public async Task<IActionResult> Search(string query)

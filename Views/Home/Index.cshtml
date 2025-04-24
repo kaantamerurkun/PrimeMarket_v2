@@ -24,7 +24,7 @@
             <div class="items-grid">
                 @foreach (var item in Model)
                 {
-                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })" class="item-card-link">
+                    <a href="@Url.Action("Guest_Listing_Details", "Listing", new { id = item.Id })" class="item-card-link">
                         <div class="item-card">
                             @if (item.Images != null && item.Images.Any())
                             {

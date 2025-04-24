@@ -52,10 +52,6 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcQWRtaW5cVXNhZ2VSZXBvcnQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Home/Guest_Listing_Details.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxHdWVzdF9MaXN0aW5nX0RldGFpbHMuY3NodG1s
-build_metadata.AdditionalFiles.CssScope = 
-
 [C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
@@ -70,6 +66,10 @@ build_metadata.AdditionalFiles.CssScope =
 
 [C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/EditListing.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGluZ1xFZGl0TGlzdGluZy5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/Guest_Listing_Details.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcTGlzdGluZ1xHdWVzdF9MaXN0aW5nX0RldGFpbHMuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/urkun/source/repos/PrimeMarket_13.04.2025/PrimeMarket/Views/Listing/MyListings.cshtml]
