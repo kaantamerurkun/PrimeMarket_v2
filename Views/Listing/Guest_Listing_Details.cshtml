@@ -135,9 +135,12 @@
                         <button class="btn-sendmessage">Send Message</button>
                     </a>
                     </a>
-                    <a asp-action="Login" asp-controller="User">
-                    <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
-                    </a>
+                    @if (Model.Listing.Condition.Equals("Second-Hand"))
+                    {
+                        <a asp-action="Login" asp-controller="User">
+                            <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
+                        </a>
+                    }
                 }
                 else
                 {

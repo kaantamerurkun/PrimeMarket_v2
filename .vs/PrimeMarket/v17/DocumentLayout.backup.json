@@ -78,6 +78,19 @@
           "Children": [
             {
               "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Details.cshtml",
+              "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Listing\\Details.cshtml",
+              "RelativeDocumentMoniker": "Views\\Listing\\Details.cshtml",
+              "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Listing\\Details.cshtml",
+              "RelativeToolTip": "Views\\Listing\\Details.cshtml",
+              "ViewState": "AgIAAHcAAAAAAAAAAAAAAIMAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
+              "WhenOpened": "2025-04-22T23:32:29.003Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
               "DocumentIndex": 3,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Home\\Index.cshtml",
@@ -97,7 +110,7 @@
               "RelativeDocumentMoniker": "Views\\Listing\\Guest_Listing_Details.cshtml",
               "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Listing\\Guest_Listing_Details.cshtml",
               "RelativeToolTip": "Views\\Listing\\Guest_Listing_Details.cshtml",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAA+AAAAAAAAAA==",
+              "ViewState": "AgIAAI8AAAAAAAAAAAAcwJ8AAAARAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-04-24T09:36:53.748Z",
               "EditorCaption": ""
@@ -117,26 +130,13 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "Details.cshtml",
-              "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Listing\\Details.cshtml",
-              "RelativeDocumentMoniker": "Views\\Listing\\Details.cshtml",
-              "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Listing\\Details.cshtml",
-              "RelativeToolTip": "Views\\Listing\\Details.cshtml",
-              "ViewState": "AgIAADACAAAAAAAAAAAswGMCAAAJAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T23:32:29.003Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 0,
               "Title": "ListingController.cs",
               "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Controllers\\ListingController.cs",
               "RelativeDocumentMoniker": "Controllers\\ListingController.cs",
               "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Controllers\\ListingController.cs",
               "RelativeToolTip": "Controllers\\ListingController.cs",
-              "ViewState": "AgIAAGgEAAAAAAAAAAAkwIAEAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAABAFAAAAAAAAAAAQwDgEAAAvAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-04-22T22:20:34.735Z",
               "EditorCaption": ""
@@ -164,7 +164,8 @@
               "RelativeToolTip": "Views\\Admin\\PendingListings.cshtml",
               "ViewState": "AgIAAHMBAAAAAAAAAAAswK4BAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T22:22:58.159Z"
+              "WhenOpened": "2025-04-22T22:22:58.159Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -176,7 +177,8 @@
               "RelativeToolTip": "Views\\Admin\\AdminDashboard.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T20:38:07.795Z"
+              "WhenOpened": "2025-04-22T20:38:07.795Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -188,7 +190,8 @@
               "RelativeToolTip": "Views\\User\\User_MainPage.cshtml",
               "ViewState": "AgIAAFwAAAAAAAAAAAAswHQAAAAHAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-24T08:56:00.62Z"
+              "WhenOpened": "2025-04-24T08:56:00.62Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -200,7 +203,8 @@
               "RelativeToolTip": "Controllers\\HomeController.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAABcAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-24T08:59:30.318Z"
+              "WhenOpened": "2025-04-24T08:59:30.318Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -212,7 +216,8 @@
               "RelativeToolTip": "Views\\Listing\\EditListing.cshtml",
               "ViewState": "AgIAAAwCAAAAAAAAAAAswBEDAAAQAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T23:25:21.513Z"
+              "WhenOpened": "2025-04-22T23:25:21.513Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -224,7 +229,8 @@
               "RelativeToolTip": "Models\\ViewModel\\ListingViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-23T17:14:38.103Z"
+              "WhenOpened": "2025-04-23T17:14:38.103Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -236,7 +242,8 @@
               "RelativeToolTip": "Views\\User\\CreateListing.cshtml",
               "ViewState": "AgIAAGUAAAAAAAAAAAAcwHIAAAAaAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-23T17:12:18.513Z"
+              "WhenOpened": "2025-04-23T17:12:18.513Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -248,7 +255,8 @@
               "RelativeToolTip": "Controllers\\AdminController.cs",
               "ViewState": "AgIAAEACAAAAAAAAAAAIwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-04-23T19:03:10.416Z"
+              "WhenOpened": "2025-04-23T19:03:10.416Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -260,7 +268,8 @@
               "RelativeToolTip": "Views\\Listing\\MyListings.cshtml",
               "ViewState": "AgIAABUAAAAAAAAAAAAAACACAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T22:24:04.297Z"
+              "WhenOpened": "2025-04-22T22:24:04.297Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -272,7 +281,8 @@
               "RelativeToolTip": "Views\\Admin\\ListingDetails.cshtml",
               "ViewState": "AgIAAI0BAAAAAAAAAAAAAKYBAAAWAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-04-22T22:22:48.47Z"
+              "WhenOpened": "2025-04-22T22:22:48.47Z",
+              "EditorCaption": ""
             }
           ]
         }

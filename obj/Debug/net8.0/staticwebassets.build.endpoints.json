@@ -3201,6 +3201,88 @@
       ]
     },
     {
+      "Route": "images/listings/11_d32f82a9-7e51-478a-9746-4e077cff02be.png",
+      "AssetFile": "images/listings/11_d32f82a9-7e51-478a-9746-4e077cff02be.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "115167"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Apr 2025 10:02:06 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE="
+        }
+      ]
+    },
+    {
+      "Route": "images/listings/11_d32f82a9-7e51-478a-9746-4e077cff02be.w9iei66mrk.png",
+      "AssetFile": "images/listings/11_d32f82a9-7e51-478a-9746-4e077cff02be.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "115167"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 24 Apr 2025 10:02:06 GMT"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "w9iei66mrk"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE="
+        },
+        {
+          "Name": "label",
+          "Value": "images/listings/11_d32f82a9-7e51-478a-9746-4e077cff02be.png"
+        }
+      ]
+    },
+    {
       "Route": "images/listings/12_6ebeb147-322b-4ed0-b54f-531f65e8e8b4.86p80q1g6d.png",
       "AssetFile": "images/listings/12_6ebeb147-322b-4ed0-b54f-531f65e8e8b4.png",
       "Selectors": [],

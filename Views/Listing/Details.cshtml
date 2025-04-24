@@ -73,8 +73,8 @@
             <!-- Action Buttons -->
             <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 15px" class="action-buttons">
                 <button style="display: flex;flex: 0 0 30%;font-size:0.8em" class="btn-bookmark"
-                        onclick="toggleBookmark(@Model.Listing.Id)"
-                        id="bookmark-btn">
+                onclick="toggleBookmark(@Model.Listing.Id)"
+                id="bookmark-btn">
                     @(Model.IsBookmarked ? "Remove from Bookmark" : "Add to Bookmark")
                 </button>
                 <a href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
@@ -118,7 +118,7 @@
     <div class="seller-info">
         <div class="seller-card">
             <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.Listing.Seller.ProfileImagePath)"
-                 alt="Seller Photo" class="seller-photo">
+            alt="Seller Photo" class="seller-photo">
             <div class="seller-details">
                 <h3>@Model.Listing.Seller?.FirstName @Model.Listing.Seller?.LastName</h3>
                 <p class="phone">@(string.IsNullOrEmpty(Model.Listing.Seller?.PhoneNumber) ? "No phone number" : Model.Listing.Seller.PhoneNumber)</p>
@@ -129,7 +129,12 @@
                     <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
                         <button class="btn-sendmessage">Send Message</button>
                     </a>
-                    <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
+                    @if (Model.Listing.Condition.Equals("Second-Hand")) {
+
+                        <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
+
+                    }
+
                 }
                 else
                 {
@@ -510,6 +515,7 @@
     }
 
     }</style>
+
 
 <script>
     // Change main image when thumbnail is clicked
