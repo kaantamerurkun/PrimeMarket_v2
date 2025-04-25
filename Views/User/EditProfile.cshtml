@@ -143,7 +143,15 @@
     </div>
 
     <script>
-               function sendVerification() {
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add event listener to the send verification button
+            const sendVerificationBtn = document.getElementById("sendVerificationBtn");
+            if (sendVerificationBtn) {
+                sendVerificationBtn.addEventListener("click", sendVerification);
+            }
+        });
+
+        function sendVerification() {
             const idFront = document.getElementById("idFront").files[0];
             const idBack = document.getElementById("idBack").files[0];
             const messageDiv = document.getElementById("verification-message");
