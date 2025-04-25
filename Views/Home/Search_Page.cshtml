@@ -1,47 +1,267 @@
-﻿<!DOCTYPE html>
+﻿@{
+    var isUserLoggedIn = Context.Session.GetInt32("UserId") != null;
+    if(isUserLoggedIn)
+    {
+        Layout = "~/Views/Shared/_LayoutUser.cshtml";
+    } else {
+        Layout = "~/Views/Shared/_LayoutGuest.cshtml";
+    }
+}
+@model List<PrimeMarket.Models.Listing>
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Search page</title>
+    <title>Search Results</title>
     <link rel="stylesheet" href="/css/searchpagestyle.css" />
 </head>
 
 <body class="search-body">
-    <header class="main-header">
-        <div class="header-content">
-            <a href="javascript:void(0);" class="logo" id="back-button">
-                <img src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
-            </a>
-            <h1 id="back-text">PrimeMarket</h1>
-            <div class="header-actions"></div>
+    <div class="results-container" style="margin-top: 120px; padding: 0 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+        @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+        {
+            <h2 class="results-title">Search Results for "@ViewBag.SearchTerm"</h2>
+        }
+        else
+        {
+            <h2 class="results-title">Search Results</h2>
+        }
+
+        <!-- ID Search Modal -->
+        <!-- Display search results -->
+        <div class="search-results">
+            @if (ViewBag.ShowIdFormatMessage == true)
+            {
+                <div class="id-format-message">
+                    <p><strong>Note:</strong> When searching for a listing by ID, please use the format <strong>#ID</strong> (e.g., #123)</p>
+                </div>
+            }
+
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="no-results">
+                    <h3>No results found</h3>
+                    <p>Try different keywords or browse categories</p>
+                </div>
+            }
+            else
+            {
+                <p class="results-count">Found @Model.Count results @(!string.IsNullOrEmpty(ViewBag.SearchTerm) ? $"for \"{ViewBag.SearchTerm}\"" : "")</p>
+                <div class="results-grid">
+                    @foreach (var listing in Model)
+                    {
+                        var mainImage = listing.Images != null && listing.Images.Any()
+                        ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
+                        : "/images/placeholder.png";
+
+                        <a href="@(isUserLoggedIn ? Url.Action("Details", "Listing", new { id = listing.Id }) : Url.Action("Guest_Listing_Details", "Listing", new { id = listing.Id }))" class="result-card">
+                            <div class="result-image">
+                                <img src="@mainImage" alt="@listing.Title" />
+                            </div>
+                            <div class="result-details">
+                                <h3>@listing.Title</h3>
+                                <p class="result-price">@listing.Price.ToString("C")</p>
+                                <p class="result-location">@listing.Location</p>
+                                <span class="result-condition">@listing.Condition</span>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
         </div>
-    </header>
 
-    <div class="search-container">
-        <div class="search-bar" id="search-bar">
-            <input type="text" placeholder="Search for a listed item" />
-            <button>Search</button>
+        <!-- ID Search Modal -->
+        <div id="idSearchModal" class="modal">
+            <div class="modal-content">
+                <h2 class="modal-title">ID Search Format</h2>
+                <p>When searching for a listing by ID, please add a # symbol before the number.</p>
+                <p>Example: <strong>#123</strong></p>
+                <div class="modal-buttons">
+                    <button class="modal-button modal-button-primary" id="closeModal">Got it</button>
+                </div>
+            </div>
         </div>
-    </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", () => {
-            const searchInput = document.querySelector('.search-bar input');
-            const searchBar = document.getElementById('search-bar');
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const idSearchModal = document.getElementById('idSearchModal');
+                const closeModalBtn = document.getElementById('closeModal');
 
-            searchInput.addEventListener('focus', () => {
-                searchBar.classList.add('focused');
+                // Close modal button
+                if (closeModalBtn) {
+                    closeModalBtn.addEventListener('click', function() {
+                        idSearchModal.style.display = 'none';
+                    });
+                }
+
+                // Also close modal if clicked outside
+                window.addEventListener('click', function(e) {
+                    if (e.target === idSearchModal) {
+                        idSearchModal.style.display = 'none';
+                    }
+                });
             });
+        </script>
 
-            searchInput.addEventListener('blur', () => {
-                searchBar.classList.remove('focused');
-            });
+        <style>
+            /* Results container styles */
+            .results-container {
+                padding-bottom: 50px;
+            }
 
-            // Go back when image or text is clicked
-            document.getElementById('back-button').onclick = () => history.back();
-            document.getElementById('back-text').onclick = () => history.back();
-        });
-    </script>
+            .results-title {
+                margin-bottom: 20px;
+                color: #333;
+                text-align: center;
+            }
+
+            .results-count {
+                margin-bottom: 20px;
+                color: #666;
+            }
+
+            .no-results {
+                text-align: center;
+                padding: 50px;
+                background-color: #f8f9fa;
+                border-radius: 10px;
+                margin-top: 20px;
+            }
+
+            .results-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .result-card {
+                background-color: white;
+                border-radius: 10px;
+                overflow: hidden;
+                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                transition: transform 0.3s ease, box-shadow 0.3s ease;
+                text-decoration: none;
+                color: inherit;
+                display: block;
+            }
+
+                .result-card:hover {
+                    transform: translateY(-5px);
+                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+                }
+
+            .result-image {
+                height: 200px;
+                overflow: hidden;
+            }
+
+                .result-image img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                }
+
+            .result-details {
+                padding: 15px;
+            }
+
+                .result-details h3 {
+                    margin: 0 0 10px 0;
+                    font-size: 16px;
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+
+            .result-price {
+                font-weight: bold;
+                color: #0066cc;
+                font-size: 18px;
+                margin-bottom: 5px;
+            }
+
+            .result-location {
+                color: #666;
+                font-size: 14px;
+                margin-bottom: 5px;
+            }
+
+            .result-condition {
+                display: inline-block;
+                padding: 3px 8px;
+                background-color: #f0f0f0;
+                border-radius: 4px;
+                font-size: 12px;
+                color: #555;
+            }
+
+            /* Modal styles */
+            .modal {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background-color: rgba(0,0,0,0.5);
+                z-index: 1000;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .modal-content {
+                background-color: white;
+                padding: 30px;
+                border-radius: 10px;
+                max-width: 400px;
+                width: 100%;
+                text-align: center;
+            }
+
+            .modal-title {
+                margin-top: 0;
+                color: #0066cc;
+            }
+
+            .modal-buttons {
+                margin-top: 20px;
+                display: flex;
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .modal-button {
+                padding: 8px 16px;
+                border-radius: 5px;
+                cursor: pointer;
+                border: none;
+                font-weight: bold;
+            }
+
+            .modal-button-primary {
+                background-color: #0066cc;
+                color: white;
+            }
+
+            /* Responsive adjustments */
+            @@media (max-width: 768px) {
+                .results-grid
+
+            {
+                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            }
+
+            }
+
+            @@media (max-width: 480px) {
+                .results-grid
+
+            {
+                grid-template-columns: 1fr;
+            }
+
+            }</style>
 </body>
 </html>

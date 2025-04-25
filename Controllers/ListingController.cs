@@ -1152,6 +1152,73 @@ public async Task<IActionResult> DeleteListing(int id)
 
             return View(viewModel);
         }
+        // Add this method to your ListingController.cs file
+        [HttpGet]
+        public async Task<IActionResult> Search(string query)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (string.IsNullOrEmpty(query))
+            {
+                if (userId == null) { 
+                    return RedirectToAction("Index", "Home"); 
+                }else
+                {
+                    return RedirectToAction("User_MainPage", "User");
+                }
+            }
+
+            ViewBag.SearchTerm = query;
+
+            // Check if search input is just a number without # prefix
+            if (System.Text.RegularExpressions.Regex.IsMatch(query, @"^\d+$"))
+            {
+                // Set ViewBag to show message about using # for ID searches
+                ViewBag.ShowIdFormatMessage = true;
+
+                // We'll still search for this number in titles and descriptions
+                var numberResults = await _context.Listings
+                    .Where(l => l.Status == ListingStatus.Approved &&
+                          (l.Title.Contains(query) ||
+                           l.Description.Contains(query)))
+                    .Include(l => l.Images)
+                    .OrderByDescending(l => l.CreatedAt)
+                    .ToListAsync();
+
+                return View("~/Views/Home/Search_Page.cshtml", numberResults);
+            }
+
+            // Check if it's an ID search (starts with #)
+            if (query.StartsWith("#") && query.Length > 1)
+            {
+                // Try to parse the ID
+                if (int.TryParse(query.Substring(1), out int listingId))
+                {
+                    var listing = await _context.Listings
+                        .Include(l => l.Images)
+                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Approved);
+
+                    if (listing != null)
+                    {
+                        // Return a list with just one item
+                        return View("~/Views/Home/Search_Page.cshtml", new List<Listing> { listing });
+                    }
+                }
+            }
+
+            // For regular search, look for matches in title, category, subcategory, or detail category
+            var results = await _context.Listings
+                .Where(l => l.Status == ListingStatus.Approved &&
+                      (l.Title.Contains(query) ||
+                       l.Category.Contains(query) ||
+                       l.SubCategory.Contains(query) ||
+                       l.DetailCategory.Contains(query) ||
+                       l.Description.Contains(query)))
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            return View("~/Views/Home/Search_Page.cshtml", results);
+        }
         [HttpGet]
         public async Task<IActionResult> Guest_Listing_Details(int id)
         {
@@ -1227,27 +1294,7 @@ public async Task<IActionResult> DeleteListing(int id)
             return View(viewModel);
         }
 
-        [HttpGet]
-        public async Task<IActionResult> Search(string query)
-        {
-            if (string.IsNullOrEmpty(query))
-            {
-                return RedirectToAction("Index");
-            }
 
-            var results = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved &&
-                          (l.Title.Contains(query) ||
-                           l.Description.Contains(query) ||
-                           l.Category.Contains(query) ||
-                           l.SubCategory.Contains(query)))
-                .Include(l => l.Images)
-                .OrderByDescending(l => l.CreatedAt)
-                .Take(20) // Limit results
-                .ToListAsync();
-
-            return View(results);
-        }
 
         #endregion
 

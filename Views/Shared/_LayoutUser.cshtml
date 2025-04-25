@@ -21,6 +21,94 @@
                 width: 16px;
                 height: 16px;
             }
+
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+
+            .search-box input {
+                width: 100%;
+                padding: 8px 40px 8px 16px;
+                border: 1px solid #ddd;
+                border-radius: 50px;
+                outline: none;
+                transition: border-color 0.3s ease;
+            }
+
+                .search-box input:focus {
+                    border-color: #0066cc;
+                }
+
+        .search-button {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 8px;
+        }
+
+        /* Style for searchpagestyle.css */
+        /* This is for the standalone search page */
+
+        .search-body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+
+        .search-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 70vh;
+        }
+
+        .search-bar {
+            display: flex;
+            width: 60%;
+            max-width: 800px;
+            margin: 0 auto;
+            transition: all 0.3s ease;
+        }
+
+            .search-bar.focused {
+                width: 70%;
+            }
+
+            .search-bar input {
+                flex: 1;
+                padding: 15px 20px;
+                border: 1px solid #ddd;
+                border-radius: 50px 0 0 50px;
+                font-size: 18px;
+                outline: none;
+                transition: border-color 0.3s ease;
+            }
+
+                .search-bar input:focus {
+                    border-color: #0066cc;
+                }
+
+            .search-bar button {
+                padding: 15px 30px;
+                background-color: #0066cc;
+                color: white;
+                border: none;
+                border-radius: 0 50px 50px 0;
+                cursor: pointer;
+                font-weight: bold;
+                transition: background-color 0.3s ease;
+            }
+
+                .search-bar button:hover {
+                    background-color: #0055b3;
+                }
     </style>
 </head>
 <body>
@@ -31,9 +119,10 @@
             </a>
             <div class="header-actions">
                 <div class="search-box">
-                    <a asp-action="Search_Page" asp-controller="Home">
-                        <input type="text" placeholder="Search for a listed item" />
-                    </a>
+                    <form action="@Url.Action("Search", "Listing")" method="get" id="header-search-form">
+                        <input type="text" name="query" id="header-search-input" placeholder="Search by title, category or #ID..." />
+                        <button type="submit" class="search-button">Search</button>
+                    </form>
                 </div>
 
                 <a asp-action="MyProfilePage" asp-controller="User">

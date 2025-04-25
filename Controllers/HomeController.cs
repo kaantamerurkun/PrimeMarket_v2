@@ -44,8 +44,18 @@ public class HomeController : Controller
     {
         return View();
     }
-    public IActionResult Search_Page()
+    // Add or update this method in your HomeController.cs file
+    public IActionResult Search_Page(string query = null)
     {
-        return View();
+        ViewBag.SearchTerm = query;
+
+        // If there's a query, redirect to the listing search action
+        if (!string.IsNullOrEmpty(query))
+        {
+            return RedirectToAction("Search", "Listing", new { query });
+        }
+
+        // If no query, return an empty list to display "no results" message
+        return View(new List<Listing>());
     }
 }

@@ -1,9 +1,99 @@
-﻿<!DOCTYPE html>
+﻿
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - PrimeMarket</title>
+    <style>
+        .search-box {
+        position: relative;
+        width: 300px;
+        }
+
+        .search-box input {
+        width: 100%;
+        padding: 8px 40px 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        outline: none;
+        transition: border-color 0.3s ease;
+        }
+
+        .search-box input:focus {
+        border-color: #0066cc;
+        }
+
+        .search-button {
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        }
+
+        /* Style for searchpagestyle.css */
+        /* This is for the standalone search page */
+
+        .search-body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
+        }
+
+        .search-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 70vh;
+        }
+
+        .search-bar {
+        display: flex;
+        width: 60%;
+        max-width: 800px;
+        margin: 0 auto;
+        transition: all 0.3s ease;
+        }
+
+        .search-bar.focused {
+        width: 70%;
+        }
+
+        .search-bar input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #ddd;
+        border-radius: 50px 0 0 50px;
+        font-size: 18px;
+        outline: none;
+        transition: border-color 0.3s ease;
+        }
+
+        .search-bar input:focus {
+        border-color: #0066cc;
+        }
+
+        .search-bar button {
+        padding: 15px 30px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 0 50px 50px 0;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        }
+
+        .search-bar button:hover {
+        background-color: #0055b3;
+        }
+    </style>
     <link rel="stylesheet" href="/css/GuestLayout.css"/>
 </head>
 <body>
@@ -14,9 +104,10 @@
             </a>
             <div class="header-actions">
                 <div class="search-box">
-                    <a asp-action="Search_Page" asp-controller="Home">
-                    <input type="text" placeholder="Search for a listed item" />
-                    </a>
+                    <form action="@Url.Action("Search", "Listing")" method="get" id="header-search-form">
+                        <input type="text" name="query" id="header-search-input" placeholder="Search by title, category or #ID..." />
+                        <button type="submit" class="search-button">Search</button>
+                    </form>
                 </div>
 
 
@@ -182,7 +273,78 @@
                     openSubMenu = null;
                 }
             });
-        });
+
+                document.addEventListener('DOMContentLoaded', function() {
+            const searchForm = document.getElementById('header-search-form');
+            const searchInput = document.getElementById('header-search-input');
+
+            if (searchForm && searchInput) {
+                searchForm.addEventListener('submit', function(e) {
+                    const query = searchInput.value.trim();
+
+                    // If query is just a number without a # prefix
+                    if (/^\d+$/.test(query)) {
+                        // Create or show the ID search modal
+                        showIdSearchModal();
+                        e.preventDefault();
+
+                        // Suggest the correct format
+                        searchInput.value = '#' + query;
+                    }
+                });
+            }
+
+            // Function to show ID search modal
+            function showIdSearchModal() {
+                // Check if modal already exists
+                let modal = document.getElementById('idSearchModal');
+
+                // If not, create it
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'idSearchModal';
+                    modal.className = 'modal';
+                    modal.style.display = 'flex';
+                    modal.style.position = 'fixed';
+                    modal.style.top = '0';
+                    modal.style.left = '0';
+                    modal.style.width = '100%';
+                    modal.style.height = '100%';
+                    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    modal.style.zIndex = '1000';
+                    modal.style.justifyContent = 'center';
+                    modal.style.alignItems = 'center';
+
+                    modal.innerHTML = `
+                        <div style="background-color: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 100%; text-align: center;">
+                            <h2 style="margin-top: 0; color: #0066cc;">ID Search Format</h2>
+                            <p>When searching for a listing by ID, please add a # symbol before the number.</p>
+                            <p>Example: <strong>#123</strong></p>
+                            <div style="margin-top: 20px;">
+                                <button id="closeModal" style="padding: 8px 16px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background-color: #0066cc; color: white;">Got it</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Add event listener to close button
+                    document.getElementById('closeModal').addEventListener('click', function() {
+                        modal.style.display = 'none';
+                    });
+
+                    // Close modal if clicked outside
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Show existing modal
+                    modal.style.display = 'flex';
+                }
+            }
+        });});
     </script>
 </body>
 </html>
