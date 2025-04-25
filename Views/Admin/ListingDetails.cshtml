@@ -13,6 +13,48 @@
     <link rel="stylesheet" href="~/css/AdminDashboard.css" />
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <style>
+        .reasons-checklist {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+            .reason-item input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+
+            .reason-item label {
+                font-weight: normal;
+            }
+
+        .btn-confirm-reject {
+            padding: 8px 16px;
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-cancel {
+            padding: 8px 16px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
         .container {
             max-width: 1200px;
             margin: 0 auto;
@@ -346,9 +388,50 @@
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="id" value="@Model.Id">
 
-                                    <label for="rejectionReason">Rejection Reason</label>
-                                    <textarea name="rejectionReason" id="rejection-reason" required placeholder="Please provide a reason for rejection"></textarea>
-                                    <button type="submit" class="btn-confirm-reject">Confirm Rejection</button>
+                                    <h3>Select Reason(s) for Rejection:</h3>
+                                    <div class="reasons-checklist">
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason1" name="reason" value="Images are blurry or unclear">
+                                            <label for="reason1">Images are blurry or unclear</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason2" name="reason" value="Listing description is incomplete or vague">
+                                            <label for="reason2">Listing description is incomplete or vague</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason3" name="reason" value="Price is not reasonable for this item">
+                                            <label for="reason3">Price is not reasonable for this item</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason4" name="reason" value="Item appears to be damaged or defective">
+                                            <label for="reason4">Item appears to be damaged or defective</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason5" name="reason" value="Item is prohibited or restricted">
+                                            <label for="reason5">Item is prohibited or restricted</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason6" name="reason" value="Information doesn't match the category">
+                                            <label for="reason6">Information doesn't match the category</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason7" name="reason" value="Not enough images provided">
+                                            <label for="reason7">Not enough images provided</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reason8" name="reason" value="Counterfeit or fake item">
+                                            <label for="reason8">Counterfeit or fake item</label>
+                                        </div>
+                                        <div class="reason-item">
+                                            <input type="checkbox" id="reasonOther" name="reason" value="Other">
+                                            <label for="reasonOther">Other</label>
+                                            <input type="text" id="otherReasonText" placeholder="Please specify..." style="display:none; margin-top:5px; width:100%; padding:5px; border-radius:5px;">
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right; margin-top: 15px;">
+                                        <button type="button" class="btn-cancel" onclick="hideRejectForm()">Cancel</button>
+                                        <button type="button" class="btn-confirm-reject" onclick="confirmRejectListing()">Confirm Rejection</button>
+                                    </div>
                                 </form>
                             </div>
                         </div>
@@ -463,6 +546,16 @@
                 showRejectionFormBtn.addEventListener('click', function() {
                     rejectionForm.style.display = rejectionForm.style.display === 'block' ? 'none' : 'block';
                     this.textContent = rejectionForm.style.display === 'block' ? 'Cancel' : 'Reject Listing';
+                });
+            }
+
+            // Handle "Other" reason checkbox
+            const reasonOther = document.getElementById('reasonOther');
+            const otherReasonText = document.getElementById('otherReasonText');
+
+            if (reasonOther && otherReasonText) {
+                reasonOther.addEventListener('change', function() {
+                    otherReasonText.style.display = this.checked ? 'block' : 'none';
                 });
             }
         });

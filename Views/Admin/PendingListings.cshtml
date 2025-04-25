@@ -204,6 +204,38 @@
             resize: vertical;
             min-height: 100px;
         }
+
+        .reasons-checklist {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @@media (max-width: 768px) {
+            .reasons-checklist
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+            .reason-item input[type="checkbox"] {
+                width: 18px;
+                height: 18px;
+            }
+
+            .reason-item label {
+                font-weight: normal;
+            }
     </style>
 </head>
 <body>
@@ -334,29 +366,122 @@
             </div>
 
             <div id="rejectForm" style="display: none; margin-top: 15px;">
-                <form method="post" asp-action="RejectListing" asp-controller="Admin">
-                    @Html.AntiForgeryToken()
-                    <input type="hidden" id="rejectListingId" name="id" value="">
-                    <label for="rejectionReason">Rejection Reason:</label>
-                    <textarea id="rejectionReason" name="rejectionReason" required></textarea>
-                    <div style="text-align: right; margin-top: 10px;">
-                        <button type="submit" class="btn-reject">Confirm Rejection</button>
+                <h3>Select Reason(s) for Rejection:</h3>
+                <div class="reasons-checklist">
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason1" name="reason" value="Images are blurry or unclear">
+                        <label for="reason1">Images are blurry or unclear</label>
                     </div>
-                </form>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason2" name="reason" value="Listing description is incomplete or vague">
+                        <label for="reason2">Listing description is incomplete or vague</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason3" name="reason" value="Price is not reasonable for this item">
+                        <label for="reason3">Price is not reasonable for this item</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason4" name="reason" value="Item appears to be damaged or defective">
+                        <label for="reason4">Item appears to be damaged or defective</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason5" name="reason" value="Item is prohibited or restricted">
+                        <label for="reason5">Item is prohibited or restricted</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason6" name="reason" value="Information doesn't match the category">
+                        <label for="reason6">Information doesn't match the category</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason7" name="reason" value="Not enough images provided">
+                        <label for="reason7">Not enough images provided</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason8" name="reason" value="Counterfeit or fake item">
+                        <label for="reason8">Counterfeit or fake item</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reasonOther" name="reason" value="Other">
+                        <label for="reasonOther">Other</label>
+                        <input type="text" id="otherReasonText" placeholder="Please specify..." style="display:none; margin-top:5px; width:100%; padding:5px; border-radius:5px;">
+                    </div>
+                </div>
+                <div style="text-align: right; margin-top: 15px;">
+                    <button type="button" class="btn-reject" onclick="rejectListing()">Confirm Rejection</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+               document.addEventListener('DOMContentLoaded', function() {
+            // Toggle notification dropdown
+            const notificationBell = document.getElementById('listingNotificationBell');
+            const notificationDropdown = document.getElementById('listingNotificationDropdown');
+
+            if (notificationBell && notificationDropdown) {
+                notificationBell.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
+                });
+
+                document.addEventListener('click', function(event) {
+                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
+                        notificationDropdown.style.display = 'none';
+                    }
+                });
+            }
+
+            // Filter buttons functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const listingCards = document.querySelectorAll('.listing-card');
+
+            if (filterButtons && listingCards) {
+                filterButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const filter = this.getAttribute('data-filter');
+
+                        // Update active button
+                        filterButtons.forEach(btn => btn.classList.remove('active'));
+                        this.classList.add('active');
+
+                        // Filter listings
+                        listingCards.forEach(card => {
+                            if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                                card.style.display = 'block';
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            }
+
+            // Handle "Other" reason checkbox
+            const reasonOtherCheckbox = document.getElementById('reasonOther');
+            if (reasonOtherCheckbox) {
+                reasonOtherCheckbox.addEventListener('change', function() {
+                    document.getElementById('otherReasonText').style.display = this.checked ? 'block' : 'none';
+                });
+            }
+
+            // Close modal when clicking outside
+            window.onclick = function(event) {
+                if (event.target === document.getElementById('listingActionsModal')) {
+                    closeModal();
+                }
+            }
+        });
+
+        // Keep track of which listing we're working with
         let currentListingId = null;
 
-        // Function to open listing actions modal
+        // Function to open the listing actions modal
         function openListingActions(listingId) {
             currentListingId = listingId;
 
             // Set the listing ID in the forms
             document.getElementById('approveListingId').value = listingId;
-            document.getElementById('rejectListingId').value = listingId;
 
             // Get listing details from the card
             const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
@@ -378,61 +503,111 @@
             // Set the "View Full Details" link
             document.getElementById('viewDetailsLink').href = `/Admin/ListingDetails/${listingId}`;
 
-            // Use AJAX to get the listing description (optional, if not shown in the listing card)
-            fetch(`/Admin/GetListingDescription/${listingId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('modalListingDescription').textContent = data.description;
-                    }
-                })
-                .catch(err => {
-                    console.error('Error fetching listing description:', err);
-                    document.getElementById('modalListingDescription').textContent = 'Click "View Full Details" to see the complete listing information.';
-                });
+            // Hide reject form initially
+            document.getElementById('rejectForm').style.display = 'none';
+
+            // Reset any checked checkboxes
+            document.querySelectorAll('input[name="reason"]').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+
+            // Hide the "Other" text field
+            const otherReasonText = document.getElementById('otherReasonText');
+            if (otherReasonText) {
+                otherReasonText.style.display = 'none';
+                otherReasonText.value = '';
+            }
 
             // Show the modal
             document.getElementById('listingActionsModal').style.display = 'block';
-
-            // Hide reject form initially
-            document.getElementById('rejectForm').style.display = 'none';
         }
 
         // Function to close the modal
         function closeModal() {
-            document.getElementById('listingActionsModal').style.display = 'none';
+            const modal = document.getElementById('listingActionsModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
         }
 
-        // Function to show the reject form
+        // Function to show the rejection form
         function showRejectForm() {
-            document.getElementById('rejectForm').style.display = 'block';
+            const approveBtn = document.getElementById('modalApproveBtn');
+            const rejectBtn = document.getElementById('modalRejectBtn');
+            const rejectForm = document.getElementById('rejectForm');
+
+            if (approveBtn) approveBtn.style.display = 'none';
+            if (rejectBtn) rejectBtn.style.display = 'none';
+            if (rejectForm) rejectForm.style.display = 'block';
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle notification dropdown
-            const notificationBell = document.getElementById('listingNotificationBell');
-            const notificationDropdown = document.getElementById('listingNotificationDropdown');
-
-            if (notificationBell && notificationDropdown) {
-                notificationBell.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
-                });
-
-                document.addEventListener('click', function(event) {
-                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
-                        notificationDropdown.style.display = 'none';
-                    }
-                });
-            }
-
-            // Close modal when clicking outside
-            window.onclick = function(event) {
-                if (event.target == document.getElementById('listingActionsModal')) {
-                    closeModal();
+        // Function to handle listing rejection with selected reasons
+        function rejectListing () {
+            // gather selected reasons exactly as before …
+            const selectedReasons = [];
+            document.querySelectorAll('input[name="reason"]:checked').forEach(cb => {
+                if (cb.id === 'reasonOther') {
+                    const txt = document.getElementById('otherReasonText').value.trim();
+                    if (txt) selectedReasons.push(txt);
+                } else {
+                    selectedReasons.push(cb.value);
                 }
+            });
+
+            if (!selectedReasons.length) {
+                alert('Please select at least one rejection reason.');
+                return;
             }
-        });
+
+            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value;
+            if (!token) {
+                alert('CSRF token not found – refresh the page and try again.');
+                return;
+            }
+
+            fetch('/Admin/RejectListing', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token,
+                    'Accept': 'application/json'             // <-- tell server we expect JSON
+                },
+                body: `id=${currentListingId}&rejectionReason=${encodeURIComponent(selectedReasons.join(', '))}`
+            })
+            .then(async res => {
+                if (!res.ok) throw new Error(`Server error ${res.status}`);
+
+                // guard against wrong payload (e.g., HTML if something mis-routes)
+                const ct = res.headers.get('content-type') || '';
+                if (ct.includes('application/json')) return res.json();
+
+                // unexpected – read as text so we don’t crash on .json()
+                const txt = await res.text();
+                throw new Error(txt.slice(0, 200));
+            })
+            .then(data => {
+                if (data.success) {
+                    closeModal();
+
+                    document.querySelector(`.listing-card[data-id="${currentListingId}"]`)?.remove();
+
+                    const ok = document.createElement('div');
+                    ok.className = 'alert alert-success';
+                    ok.textContent = 'Listing rejected successfully.';
+                    document.querySelector('.dashboard-content')
+                            .insertBefore(ok, document.querySelector('.section-header').nextSibling);
+
+                    setTimeout(() => ok.remove(), 3000);
+                } else {
+                    alert(data.message || 'Error rejecting listing. Please try again.');
+                }
+            })
+            .catch(err => {
+                console.error('Error rejecting listing:', err);
+                alert('Error rejecting listing. Please try again.');
+            });
+        }
+
     </script>
 </body>
 </html>

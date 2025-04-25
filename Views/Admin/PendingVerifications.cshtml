@@ -651,9 +651,11 @@
 
                     // Update the counter
                     const countBadge = document.querySelector('.count-badge');
-                    if (countBadge) {
+                    if (countBadge > 0) {
                         const currentCount = parseInt(countBadge.textContent);
                         countBadge.textContent = currentCount - 1;
+                    }else{
+                        countBadge = 0;
                     }
                 }, 300);
             }

@@ -275,28 +275,22 @@ namespace PrimeMarket.Controllers
             }
         }
 
+        // Updated RejectListing method to handle checkbox rejection reasons
+        // --------------  LISTING REJECT -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectListing(int id, string rejectionReason)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
-            {
-                return RedirectToAction(nameof(AdminLogin));
-            }
+                return Json(new { success = false, message = "You are not signed-in as an admin." });
+
+            if (string.IsNullOrWhiteSpace(rejectionReason))
+                return Json(new { success = false, message = "Rejection reason is required." });
 
             var listing = await _context.Listings.FindAsync(id);
             if (listing == null)
-            {
-                return NotFound();
-            }
-
-            if (string.IsNullOrWhiteSpace(rejectionReason))
-            {
-                TempData["ErrorMessage"] = "Rejection reason is required.";
-                return RedirectToAction(nameof(ListingDetails), new { id });
-            }
+                return Json(new { success = false, message = "Listing not found." });
 
             try
             {
@@ -304,8 +298,8 @@ namespace PrimeMarket.Controllers
                 listing.RejectionReason = rejectionReason;
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // Create an admin action record
-                var adminAction = new AdminAction
+                // audit + notification (unchanged)
+                _context.AdminActions.Add(new AdminAction
                 {
                     AdminId = adminId.Value,
                     ActionType = "Reject",
@@ -313,31 +307,39 @@ namespace PrimeMarket.Controllers
                     EntityId = id,
                     ActionDetails = $"Rejected listing: {listing.Title}, Reason: {rejectionReason}",
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.AdminActions.Add(adminAction);
+                });
 
-                // Create a notification for the seller
-                var notification = new Notification
+                _context.Notifications.Add(new Notification
                 {
                     UserId = listing.SellerId,
                     Message = $"Your listing '{listing.Title}' has been rejected. Reason: {rejectionReason}",
                     Type = NotificationType.ListingRejected,
                     RelatedEntityId = id,
                     CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(notification);
+                });
 
                 await _context.SaveChangesAsync();
+
+                // --- key point --------------------------------------------------
+                // If this was an AJAX request (fetch with `Accept: application/json`)
+                // return JSON; otherwise fall back to the old redirect/TempData flow.
+                // ----------------------------------------------------------------
+                if (Request.Headers["Accept"].Any(h => h.Contains("application/json")))
+                    return Json(new { success = true });
 
                 TempData["SuccessMessage"] = "Listing rejected successfully.";
                 return RedirectToAction(nameof(PendingListings));
             }
             catch (Exception ex)
             {
+                if (Request.Headers["Accept"].Any(h => h.Contains("application/json")))
+                    return Json(new { success = false, message = ex.Message });
+
                 TempData["ErrorMessage"] = $"Error rejecting listing: {ex.Message}";
                 return RedirectToAction(nameof(ListingDetails), new { id });
             }
         }
+
 
         [HttpGet]
         public async Task<IActionResult> PendingVerifications()
