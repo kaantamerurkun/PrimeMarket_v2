@@ -125,16 +125,16 @@
                     </form>
                 </div>
 
-                <a asp-action="MyProfilePage" asp-controller="User">
-                    <p>
+                <a asp-action="MyProfilePage" asp-controller="User" style="display: flex; align-items: center; text-decoration: none;">
+                    <span style="display: flex; align-items: center; gap: 5px;">
                         @userName
                         @if (isVerified)
                         {
-                            <span class="verified-badge">
-                                <img src="/images/verified.png" alt="Verified" title="Verified User" />
+                            <span class="verified-badge" style="display: inline-flex; vertical-align: middle;">
+                                <img src="/images/verified.png" alt="Verified" title="Verified User" style="width: 16px; height: 16px;" />
                             </span>
                         }
-                    </p>
+                    </span>
                 </a>
                 <form asp-action="Logout" asp-controller="User" method="post" style="display: inline;">
                     <button type="submit" class="btn-logout">Logout</button>
@@ -188,6 +188,141 @@
 
 
     <script src="/js/site.js"></script>
+    <script>
+                // Enhanced search form handling to prevent layout issues
+        document.addEventListener("DOMContentLoaded", function () {
+            const searchForm = document.getElementById('header-search-form');
+            const searchInput = document.getElementById('header-search-input');
+
+            if (searchForm && searchInput) {
+                // Preserve form state during submission to prevent layout shifts
+                searchForm.addEventListener('submit', function (e) {
+                    const query = searchInput.value.trim();
+
+                    // If query is empty, prevent submission
+                    if (query === '') {
+                        e.preventDefault();
+                        return false;
+                    }
+
+                    // If query is just a number without a # prefix, show modal
+                    if (/^\d+$/.test(query)) {
+                        e.preventDefault();
+
+                        // Show the ID search format modal
+                        showIdSearchModal();
+
+                        // Suggest the correct format
+                        searchInput.value = '#' + query;
+                        return false;
+                    }
+
+                    // Add a loading state to prevent perception of layout shift
+                    document.body.classList.add('searching');
+
+                    // Continue with normal submission
+                    return true;
+                });
+
+                // Focus/blur events to maintain consistent sizing
+                searchInput.addEventListener('focus', function () {
+                    this.parentNode.classList.add('focus');
+                });
+
+                searchInput.addEventListener('blur', function () {
+                    this.parentNode.classList.remove('focus');
+                });
+            }
+
+            // Function to show ID search modal
+            function showIdSearchModal() {
+                // Check if modal already exists
+                let modal = document.getElementById('idSearchModal');
+
+                // If not, create it
+                if (!modal) {
+                    modal = document.createElement('div');
+                    modal.id = 'idSearchModal';
+                    modal.className = 'modal';
+                    modal.style.display = 'flex';
+                    modal.style.position = 'fixed';
+                    modal.style.top = '0';
+                    modal.style.left = '0';
+                    modal.style.width = '100%';
+                    modal.style.height = '100%';
+                    modal.style.backgroundColor = 'rgba(0,0,0,0.5)';
+                    modal.style.zIndex = '1000';
+                    modal.style.justifyContent = 'center';
+                    modal.style.alignItems = 'center';
+
+                    modal.innerHTML = `
+                        <div style="background-color: white; padding: 30px; border-radius: 10px; max-width: 400px; width: 100%; text-align: center;">
+                            <h2 style="margin-top: 0; color: #0066cc;">ID Search Format</h2>
+                            <p>When searching for a listing by ID, please add a # symbol before the number.</p>
+                            <p>Example: <strong>#123</strong></p>
+                            <div style="margin-top: 20px;">
+                                <button id="closeModal" style="padding: 8px 16px; border-radius: 5px; cursor: pointer; border: none; font-weight: bold; background-color: #0066cc; color: white;">Got it</button>
+                            </div>
+                        </div>
+                    `;
+
+                    document.body.appendChild(modal);
+
+                    // Add event listener to close button
+                    document.getElementById('closeModal').addEventListener('click', function () {
+                        modal.style.display = 'none';
+                    });
+
+                    // Close modal if clicked outside
+                    modal.addEventListener('click', function (e) {
+                        if (e.target === modal) {
+                            modal.style.display = 'none';
+                        }
+                    });
+                } else {
+                    // Show existing modal
+                    modal.style.display = 'flex';
+                }
+            }
+
+            // Handle category menu toggling without affecting layout
+            const categoryItems = document.querySelectorAll('#mainCategories li');
+            if (categoryItems.length > 0) {
+                let openMenus = [];
+
+                categoryItems.forEach(item => {
+                    item.addEventListener('click', function (e) {
+                        e.stopPropagation();
+
+                        const submenu = this.querySelector('ul');
+                        if (submenu) {
+                            // Close any open menus
+                            openMenus.forEach(menu => {
+                                if (menu !== submenu) {
+                                    menu.style.display = 'none';
+                                }
+                            });
+
+                            // Toggle current menu
+                            const isOpen = submenu.style.display === 'block';
+                            submenu.style.display = isOpen ? 'none' : 'block';
+
+                            // Update open menus array
+                            openMenus = isOpen ? openMenus.filter(menu => menu !== submenu) : [...openMenus, submenu];
+                        }
+                    });
+                });
+
+                // Close all menus when clicking outside
+                document.addEventListener('click', function () {
+                    openMenus.forEach(menu => {
+                        menu.style.display = 'none';
+                    });
+                    openMenus = [];
+                });
+            }
+        });
+    </script>
 
 </body>
 </html>
