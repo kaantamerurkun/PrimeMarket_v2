@@ -4,60 +4,60 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <div class="conversation-header">
-        <a href="@Url.Action("Conversations")" class="back-link">
+<div class="container" style="margin-top: 120px; margin-bottom: 50px; max-width: 85%; margin-left: auto; margin-right: auto;">
+    <div class="conversation-header" style="border-radius: 50px; background-color: #f8f9fa; padding: 15px; margin-bottom: 20px;">
+        <a href="@Url.Action("Conversations")" class="back-link" style="border-radius: 50px;">
             <i class="fas fa-arrow-left"></i> Back to Messages
         </a>
         <div class="listing-info">
             <div class="listing-image">
-                <img src="@(string.IsNullOrEmpty(Model.ListingImage) ? "/images/placeholder.png" : Model.ListingImage)" 
-                     alt="Listing Image" width="80" height="80" style="border-radius: 8px;">
+                <img src="@(string.IsNullOrEmpty(Model.ListingImage) ? "/images/placeholder.png" : Model.ListingImage)"
+                     alt="Listing Image" width="80" height="80" style="border-radius: 20px;">
             </div>
             <div class="listing-details">
                 <h3>@Model.ListingTitle</h3>
                 <p class="listing-price">@Model.ListingPrice.ToString("C")</p>
-                <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" target="_blank">View Listing</a>
+                <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" target="_blank" style="border-radius: 50px; display: inline-block; padding: 5px 15px; background-color: #f0f0f0; text-decoration: none; color: #333;">View Listing</a>
             </div>
         </div>
     </div>
 
-    <div class="chat-container">
-        <div class="chat-messages" id="chatMessages">
+    <div class="chat-container" style="border-radius: 25px; overflow: hidden;">
+        <div class="chat-messages" id="chatMessages" style="border-radius: 25px 25px 0 0;">
             @if (Model.Messages.Count == 0)
             {
-                    <div class="no-messages">
-                        <p>No messages yet. Start the conversation!</p>
-                    </div>
+                <div class="no-messages" style="border-radius: 25px;">
+                    <p>No messages yet. Start the conversation!</p>
+                </div>
             }
             else
             {
                 @foreach (var message in Model.Messages)
                 {
-                            <div class="message @(message.SentByMe ? "you" : "")">
-                                <img src="@(message.SentByMe ? 
-                                   (string.IsNullOrEmpty(ViewBag.CurrentUserImage) ? "/images/PrimeMarket_Logo_V2.png" : ViewBag.CurrentUserImage) : 
-                                   (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : Model.OtherUserProfileImage))" 
-                                     alt="@(message.SentByMe ? "You" : Model.OtherUserName)" 
-                                     style="width: 40px; height: 40px; border-radius: 50%;">
-                                <div class="message-content">
+                    <div class="message @(message.SentByMe ? "you" : "")" style="margin-bottom: 20px;">
+                        <img src="@(message.SentByMe ?
+                               (string.IsNullOrEmpty(ViewBag.CurrentUserImage) ? "/images/PrimeMarket_Logo_V2.png" : ViewBag.CurrentUserImage) :
+                               (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : Model.OtherUserProfileImage))"
+                             alt="@(message.SentByMe ? "You" : Model.OtherUserName)"
+                             style="width: 40px; height: 40px; border-radius: 50%;">
+                        <div class="message-content" style="border-radius: 25px; max-width: 80%;">
                             @message.Content
-                                    <div class="message-time">@message.Timestamp.ToString("MMM dd, yyyy HH:mm")</div>
-                                </div>
-                            </div>
+                            <div class="message-time">@message.Timestamp.ToString("MMM dd, yyyy HH:mm")</div>
+                        </div>
+                    </div>
                 }
             }
         </div>
 
-        <div class="chat-input">
+        <div class="chat-input" style="border-radius: 0 0 25px 25px;">
             <form id="messageForm" method="post" action="@Url.Action("SendMessage")">
                 <input type="hidden" id="receiverId" name="ReceiverId" value="@Model.OtherUserId">
                 <input type="hidden" id="listingId" name="ListingId" value="@Model.ListingId">
                 <input type="hidden" id="currentUserId" value="@Model.CurrentUserId">
                 <input type="hidden" id="currentUserImage" value="@ViewBag.CurrentUserImage">
 
-                <input type="text" id="messageInput" name="Content" placeholder="Type your message here..." required>
-                <button type="submit" class="send-btn">Send</button>
+                <input type="text" id="messageInput" name="Content" placeholder="Type your message here..." required style="border-radius: 50px;">
+                <button type="submit" class="send-btn" style="border-radius: 50px;">Send</button>
             </form>
         </div>
     </div>
@@ -83,9 +83,9 @@
         transition: all 0.3s ease;
     }
 
-    .back-link:hover {
-        background-color: #e0e0e0;
-    }
+        .back-link:hover {
+            background-color: #e0e0e0;
+        }
 
     .listing-info {
         display: flex;
@@ -112,8 +112,9 @@
         flex-direction: column;
         height: 500px;
         border: 1px solid #ddd;
-        border-radius: 10px;
+        border-radius: 25px;
         overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
     }
 
     .chat-messages {
@@ -129,6 +130,9 @@
         align-items: center;
         height: 100%;
         color: #888;
+        background-color: #f0f7ff;
+        padding: 20px;
+        text-align: center;
     }
 
     .message {
@@ -137,25 +141,27 @@
         align-items: flex-start;
     }
 
-    .message img {
-        margin-right: 10px;
-    }
+        .message img {
+            margin-right: 10px;
+        }
 
-    .message.you {
-        flex-direction: row-reverse;
-    }
+        .message.you {
+            flex-direction: row-reverse;
+            justify-content: flex-start;
+        }
 
-    .message.you img {
-        margin-right: 0;
-        margin-left: 10px;
-    }
+            .message.you img {
+                margin-right: 0;
+                margin-left: 10px;
+            }
 
     .message-content {
         background-color: white;
-        padding: 10px 15px;
+        padding: 12px 18px;
         border-radius: 18px;
         box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         max-width: 70%;
+        word-wrap: break-word;
     }
 
     .message.you .message-content {
@@ -180,36 +186,38 @@
         border-top: 1px solid #ddd;
     }
 
-    .chat-input form {
-        display: flex;
-    }
+        .chat-input form {
+            display: flex;
+        }
 
-    .chat-input input[type="text"] {
-        flex: 1;
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 24px;
-        outline: none;
-    }
+        .chat-input input[type="text"] {
+            flex: 1;
+            padding: 12px 20px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 16px;
+        }
 
-    .chat-input input[type="text"]:focus {
-        border-color: #0066cc;
-    }
+            .chat-input input[type="text"]:focus {
+                border-color: #0066cc;
+            }
 
     .send-btn {
         margin-left: 10px;
-        padding: 10px 20px;
+        padding: 12px 25px;
         background-color: #0066cc;
         color: white;
         border: none;
         border-radius: 24px;
         cursor: pointer;
         transition: background-color 0.3s ease;
+        font-weight: bold;
     }
 
-    .send-btn:hover {
-        background-color: #0055b3;
-    }
+        .send-btn:hover {
+            background-color: #0055b3;
+        }
 </style>
 
 <script>
@@ -252,6 +260,7 @@
 
                     const messageDiv = document.createElement('div');
                     messageDiv.className = 'message you';
+                    messageDiv.style.marginBottom = '20px';
 
                     const timestamp = new Date(data.message.timestamp);
                     const formattedTime = timestamp.toLocaleString('en-US', {
@@ -265,7 +274,7 @@
 
                     messageDiv.innerHTML = `
                         <img src="${currentUserImage}" alt="You" style="width: 40px; height: 40px; border-radius: 50%;">
-                        <div class="message-content">
+                        <div class="message-content" style="border-radius: 25px; max-width: 80%;">
                             ${data.message.content}
                             <div class="message-time">${formattedTime}</div>
                         </div>

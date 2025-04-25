@@ -719,8 +719,22 @@ namespace PrimeMarket.Controllers
                 return NotFound("User not found. Please try logging in again.");
             }
 
-            // Pass the user object to the view
-            return View(user);
+            // Get user's listings
+            var listings = await _context.Listings
+                .Where(l => l.SellerId == userId.Value)
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            // Create a view model to hold both user and listings
+            var viewModel = new UserProfileViewModel
+            {
+                User = user,
+                Listings = listings
+            };
+
+            // Pass the combined view model to the view
+            return View(viewModel);
         }
 
         // Simple route methods for views

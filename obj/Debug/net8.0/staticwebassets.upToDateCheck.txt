@@ -87,6 +87,7 @@ wwwroot\images\shopping_cart_icon.png
 wwwroot\images\user-placeholder.png
 wwwroot\images\verification\back_14_06fc1ad1-884f-412d-a645-24be5439c933.png
 wwwroot\images\verification\back_14_335cfcf4-66e6-49cc-974c-287792b83e7c.png
+wwwroot\images\verification\back_14_6cf3abec-035f-49b0-9788-da867aa6e10b.png
 wwwroot\images\verification\back_14_70917466-7487-4a42-8278-318c14eea0e3.png
 wwwroot\images\verification\back_14_d7dec75b-2bd7-40cd-99e8-a31a2d1d71ab.png
 wwwroot\images\verification\back_14_e4474849-2d96-4be3-a907-eca4b6f14dfb.png
@@ -100,6 +101,7 @@ wwwroot\images\verification\front_14_40492d63-2284-47ea-9d5c-8ba9f08679d6.png
 wwwroot\images\verification\front_14_44bad9b6-21cf-4501-a7d6-6b5ad9fcd472.png
 wwwroot\images\verification\front_14_8b709faa-a677-4791-a031-024e349b3a81.jpg
 wwwroot\images\verification\front_14_bfd9d9d8-0208-449a-a04d-cc2af8da489e.png
+wwwroot\images\verification\front_14_f4cc737f-4a38-4374-854b-6415c262be0f.png
 wwwroot\images\verification\front_15_e8467c90-911e-4ac4-b81f-ee2eb0a16f8f.png
 wwwroot\images\verification\front_17_b30546a3-92e2-4e57-aa13-271521780d7b.png
 wwwroot\images\verification\front_18_26e0676f-aa9c-4349-a442-9cdb90c061c9.png

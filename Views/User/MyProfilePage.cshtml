@@ -1,7 +1,7 @@
-﻿@model User
+﻿@model PrimeMarket.Models.ViewModel.UserProfileViewModel
 @{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
-    var isVerified = Model.IsIdVerified;
+    var isVerified = Model.User.IsIdVerified;
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -45,11 +45,11 @@
             box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
         }
 
-        /* New user details styling */
+        /* User details styling */
         .user-details-container {
             background-color: #f0f8ff;
             margin-top: 12%;
-            width:50%;
+            width: 50%;
             border-radius: 10px;
             padding: 20px;
             margin-bottom: 20px;
@@ -57,8 +57,7 @@
 
         .detail-item {
             display: flex;
-            /* justify-content: space-between; */
-            text-align:left;
+            text-align: left;
             padding: 10px 0;
             border-bottom: 1px solid #f0f0f0;
         }
@@ -72,15 +71,269 @@
             color: #333;
             text-align: right;
         }
+
+        /* Listings section styling */
+        .my-listings-section {
+            margin-top: 40px;
+            margin-bottom: 40px;
+        }
+
+        .listings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .btn-new-listing {
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .listings-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 8px 15px;
+            background-color: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .filter-btn.active {
+                background-color: #0066cc;
+                color: white;
+            }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .listing-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .listing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .listing-image {
+            position: relative;
+            height: 180px;
+        }
+
+            .listing-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .listing-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+            .listing-status.pending {
+                background-color: #ffc107;
+                color: #212529;
+            }
+
+            .listing-status.approved {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .listing-status.rejected {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .listing-status.sold {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+        .listing-details {
+            padding: 15px;
+        }
+
+            .listing-details h3 {
+                margin: 0 0 10px 0;
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        .listing-price {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .listing-date {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .rejection-reason {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .listing-actions {
+            display: flex;
+            gap: 5px;
+            padding: 0 15px 15px 15px;
+        }
+
+        .btn-view, .btn-edit, .btn-delete {
+            flex: 1;
+            padding: 6px 0;
+            text-align: center;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 13px;
+        }
+
+        .btn-view {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-edit {
+            background-color: #17a2b8;
+            color: white;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .empty-listings {
+            text-align: center;
+            padding: 30px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+            .empty-listings i {
+                font-size: 40px;
+                color: #ddd;
+                margin-bottom: 15px;
+            }
+
+            .empty-listings p {
+                color: #666;
+                font-size: 16px;
+                margin-bottom: 15px;
+            }
+
+        .btn-create-first {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #0066cc;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        /* Delete confirmation modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .btn-cancel, .btn-confirm {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-confirm {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50px;
+        }
     </style>
 </head>
 
 <body>
-
-
     <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
         <div style="margin-right: 20px; margin-left: 300px; position: relative;" class="profile-image-container">
-            <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.ProfileImagePath)" alt="Profile Pic" width="350px" height="350px" />
+            <img src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)" alt="Profile Pic" width="350px" height="350px" />
             @if (isVerified)
             {
                 <div class="verification-badge">
@@ -93,19 +346,19 @@
             <div class="user-details-container">
                 <div class="detail-item">
                     <span class="detail-label">Name:</span>
-                    <span class="detail-value">@Model.FirstName</span>
+                    <span class="detail-value">@Model.User.FirstName</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Last Name:</span>
-                    <span class="detail-value">@Model.LastName</span>
+                    <span class="detail-value">@Model.User.LastName</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Email:</span>
-                    <span class="detail-value">@Model.Email</span>
+                    <span class="detail-value">@Model.User.Email</span>
                 </div>
                 <div class="detail-item">
                     <span class="detail-label">Phone Number:</span>
-                    <span class="detail-value">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not provided" : Model.PhoneNumber)</span>
+                    <span class="detail-value">@(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</span>
                 </div>
             </div>
 
@@ -150,44 +403,256 @@
     </div>
 
     <br />
-    <h2 style="text-align: center">My Listings</h2>
-    <div class="items-container">
-        <a asp-controller="Listing" asp-action="MyListings">
-            <button class="btn-editprofile">My Listings</button>
-        </a>
+
+    <!-- My Listings Section -->
+    <div class="my-listings-section container" style="max-width: 85%; margin: 0 auto; text-align: center;">
+        <div class="listings-header">
+            <h2 style="text-align: center; width: 100%;">My Listings</h2>
+            <a href="@Url.Action("CreateListing", "User")" class="btn-new-listing" style="border-radius: 50px;">
+                <i class="fas fa-plus"></i> Create New Listing
+            </a>
+        </div>
+
+        <div class="listings-filter" style="justify-content: center;">
+            <button class="filter-btn active" data-filter="all" style="border-radius: 50px;">All</button>
+            <button class="filter-btn" data-filter="pending" style="border-radius: 50px;">Pending</button>
+            <button class="filter-btn" data-filter="approved" style="border-radius: 50px;">Approved</button>
+            <button class="filter-btn" data-filter="rejected" style="border-radius: 50px;">Rejected</button>
+            <button class="filter-btn" data-filter="sold" style="border-radius: 50px;">Sold</button>
+        </div>
+
+        <div class="my-listings-container">
+            @if (Model.Listings == null || Model.Listings.Count == 0)
+            {
+                <div class="empty-listings">
+                    <i class="fas fa-list-alt"></i>
+                    <p>You don't have any listings yet</p>
+                    <a href="@Url.Action("CreateListing", "User")" class="btn-create-first" style="border-radius: 50px;">Create Your First Listing</a>
+                </div>
+            }
+            else
+            {
+                <div class="listings-grid" style="max-width: 95%; margin: 0 auto;">
+                    @foreach (var listing in Model.Listings)
+                    {
+                        string statusClass = listing.Status.ToString().ToLower();
+                        string mainImage = listing.Images != null && listing.Images.Any()
+                        ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
+                        : "/images/placeholder.png";
+
+                        <div class="listing-card @statusClass" data-status="@listing.Status.ToString().ToLower()" data-id="@listing.Id">
+                            <div class="listing-image">
+                                <img src="@mainImage" alt="@listing.Title">
+                                <div class="listing-status @statusClass" style="border-radius: 50px;">@listing.Status.ToString()</div>
+                            </div>
+                            <div class="listing-details">
+                                <h3>@listing.Title</h3>
+                                <p class="listing-price">@listing.Price.ToString("C")</p>
+                                <p class="listing-date">Listed on @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
+
+                                @if (listing.Status == PrimeMarket.Models.Enum.ListingStatus.Rejected)
+                                {
+                                    <div class="rejection-reason" style="border-radius: 50px;">
+                                        <p><strong>Rejection Reason:</strong> @listing.RejectionReason</p>
+                                    </div>
+                                }
+                            </div>
+                            <div class="listing-actions">
+                                <a href="@Url.Action("MyListing", "User", new { id = listing.Id })" class="btn-view" style="border-radius: 50px;">View</a>
+
+                                @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
+                                {
+                                    <a href="@Url.Action("EditListing", "Listing", new { id = listing.Id })" class="btn-edit" style="border-radius: 50px;">Edit</a>
+                                    <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content" style="border-radius: 50px;">
+            <span class="close">&times;</span>
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this listing?</p>
+            <p>This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button id="cancelDelete" class="btn-cancel" style="border-radius: 50px;">Cancel</button>
+                <button id="confirmDelete" class="btn-confirm" style="border-radius: 50px;">Delete</button>
+            </div>
+        </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-                    function openModal() {
-            document.getElementById('editModal').style.display = 'flex';
-        }
+            // Filter buttons functionality
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const listingCards = document.querySelectorAll('.listing-card');
 
-        function closeModal() {
-            document.getElementById('editModal').style.display = 'none';
-        }
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const filter = this.getAttribute('data-filter');
 
-        function saveEdit() {
-            alert('Edit is saved');
-            closeModal();
-        }
+                    // Update active button
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
 
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelectorAll('.edit-btn').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    openModal();
-                });
-            });
+                    // Filter listings
+                    listingCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-status') === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
 
-            document.querySelectorAll('.remove-btn').forEach(function (btn) {
-                btn.addEventListener('click', function () {
-                    const card = btn.closest('.item-card');
-                    if (card) {
-                        card.remove();
+                    // Show empty state if no listings match the filter
+                    const visibleListings = document.querySelectorAll('.listing-card[style="display: block"]');
+                    const emptyState = document.querySelector('.empty-listings');
+                    const listingsGrid = document.querySelector('.listings-grid');
+
+                    if (visibleListings.length === 0 && listingsGrid) {
+                        if (!emptyState) {
+                            const emptyDiv = document.createElement('div');
+                            emptyDiv.className = 'empty-listings';
+                            emptyDiv.innerHTML = `
+                                <i class="fas fa-filter"></i>
+                                <p>No listings found for this filter</p>
+                                <button class="filter-btn" data-filter="all">Show All Listings</button>
+                            `;
+
+                            listingsGrid.parentNode.appendChild(emptyDiv);
+
+                            // Add event listener to the "Show All Listings" button
+                            emptyDiv.querySelector('.filter-btn').addEventListener('click', function() {
+                                filterButtons.forEach(btn => {
+                                    if (btn.getAttribute('data-filter') === 'all') {
+                                        btn.click();
+                                    }
+                                });
+                                emptyDiv.remove();
+                            });
+
+                            listingsGrid.style.display = 'none';
+                        }
+                    } else {
+                        if (emptyState) {
+                            emptyState.remove();
+                        }
+                        if (listingsGrid) {
+                            listingsGrid.style.display = 'grid';
+                        }
                     }
                 });
             });
-        });
+
+            // Delete listing functionality
+            const deleteButtons = document.querySelectorAll('.btn-delete');
+            const deleteModal = document.getElementById('deleteModal');
+            const closeModal = document.querySelector('.close');
+            const cancelDelete = document.getElementById('cancelDelete');
+            const confirmDelete = document.getElementById('confirmDelete');
+            let listingToDelete = null;
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    listingToDelete = this.getAttribute('data-id');
+                    deleteModal.style.display = 'block';
+                });
+            });
+
+            closeModal.addEventListener('click', function() {
+                deleteModal.style.display = 'none';
+            });
+
+            cancelDelete.addEventListener('click', function() {
+                deleteModal.style.display = 'none';
+            });
+
+            window.addEventListener('click', function(event) {
+                if (event.target === deleteModal) {
+                    deleteModal.style.display = 'none';
+                }
+            });
+
+            confirmDelete.addEventListener('click', function() {
+                if (listingToDelete) {
+                    deleteListing(listingToDelete);
+                }
+            });
+
+            function deleteListing(listingId) {
+                fetch('/Listing/DeleteListing', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `id=${listingId}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        deleteModal.style.display = 'none';
+
+                        // Remove the listing card with animation
+                        const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
+                        if (listingCard) {
+                            listingCard.style.opacity = '0';
+                            listingCard.style.transform = 'scale(0.8)';
+
+                            setTimeout(() => {
+                                listingCard.remove();
+
+                                // Check if there are any listings left
+                                const remainingListings = document.querySelectorAll('.listing-card');
+                                if (remainingListings.length === 0) {
+                                    document.querySelector('.my-listings-container').innerHTML = `
+                                        <div class="empty-listings">
+                                            <i class="fas fa-list-alt"></i>
+                                            <p>You don't have any listings yet</p>
+                                            <a href="/User/CreateListing" class="btn-create-first">Create Your First Listing</a>
+                                        </div>
+                                    `;
+                                }
+                            }, 300);
+                        }
+
+                        // Show success message
+                        const successAlert = document.createElement('div');
+                        successAlert.style.backgroundColor = '#d4edda';
+                        successAlert.style.color = '#155724';
+                        successAlert.style.padding = '10px';
+                        successAlert.style.borderRadius = '4px';
+                        successAlert.style.marginBottom = '15px';
+                        successAlert.style.textAlign = 'center';
+                        successAlert.textContent = 'Listing deleted successfully';
+
+                        const listingsHeader = document.querySelector('.listings-header');
+                        listingsHeader.parentNode.insertBefore(successAlert, listingsHeader.nextSibling);
+
+                        // Remove alert after 3 seconds
+                        setTimeout(() => {
+                            successAlert.style.opacity = '0';
+                            successAlert.style.transition = 'opacity 0.3s ease';
+                            setTimeout(() => successAlert.remove(), 300);
+                        }, 3000);
+                    } else {
+                        // Show error message
+                        alert(data.message || 'Error deleting listing. Please try again.');
+                        deleteModal.style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting listing:', error);
+                    alert('Error deleting listing. Please try again.');
+                    deleteModal.style.display = 'none';
+                });
+            }
         });
     </script>
 </body>
