@@ -7,21 +7,26 @@
 <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
     <div class="report-header">
         <h1>Profit & Loss Report</h1>
-        <div class="time-filter">
-            <label for="timeRange">Time Range:</label>
-            <select id="timeRange" onchange="changeTimeRange(this.value)">
-                <option value="all" selected="@(Model.TimeRange == "all")">All Time</option>
-                <option value="week" selected="@(Model.TimeRange == "week")">Last 7 Days</option>
-                <option value="month" selected="@(Model.TimeRange == "month")">Last 30 Days</option>
-                <option value="quarter" selected="@(Model.TimeRange == "quarter")">Last 3 Months</option>
-                <option value="year" selected="@(Model.TimeRange == "year")">Last 12 Months</option>
-            </select>
-
+        <div class="report-actions">
+            <div class="time-filter">
+                <label for="timeRange">Time Range:</label>
+                <select id="timeRange" onchange="changeTimeRange(this.value)">
+                    <option value="all" selected="@(Model.TimeRange == "all")">All Time</option>
+                    <option value="week" selected="@(Model.TimeRange == "week")">Last 7 Days</option>
+                    <option value="month" selected="@(Model.TimeRange == "month")">Last 30 Days</option>
+                    <option value="quarter" selected="@(Model.TimeRange == "quarter")">Last 3 Months</option>
+                    <option value="year" selected="@(Model.TimeRange == "year")">Last 12 Months</option>
+                </select>
+            </div>
+            <button id="refreshButton" class="btn-refresh" onclick="window.location.reload()">
+                <i class="fas fa-sync-alt"></i> Refresh Data
+            </button>
         </div>
     </div>
 
     <div class="period-label">
         <p>Showing data for: <strong>@Model.PeriodLabel</strong></p>
+        <p class="last-updated">Last updated: <span id="lastUpdatedTime">@DateTime.Now.ToString("MMM dd, yyyy HH:mm:ss")</span></p>
     </div>
 
     <div class="summary-cards">
@@ -120,6 +125,12 @@
         margin-bottom: 20px;
     }
 
+    .report-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
     .time-filter select {
         padding: 8px 16px;
         border: 1px solid #ddd;
@@ -128,10 +139,36 @@
         cursor: pointer;
     }
 
+    .btn-refresh {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 16px;
+        border: 1px solid #0066cc;
+        border-radius: 20px;
+        background-color: #fff;
+        color: #0066cc;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+    }
+
+    .btn-refresh:hover {
+        background-color: #0066cc;
+        color: #fff;
+    }
+
     .period-label {
         margin-bottom: 20px;
         font-size: 16px;
         color: #666;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .last-updated {
+        font-size: 14px;
+        color: #888;
     }
 
     .summary-cards {
@@ -315,7 +352,33 @@
         .report-header {
             flex-direction: column;
             align-items: flex-start;
+            gap: 15px;
+        }
+
+        .report-actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
             gap: 10px;
+        }
+
+        .time-filter {
+            width: 100%;
+        }
+
+        .time-filter select {
+            width: 100%;
+        }
+
+        .btn-refresh {
+            width: 100%;
+            justify-content: center;
+        }
+
+        .period-label {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
         }
     }
 </style>
@@ -323,7 +386,7 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function changeTimeRange(range) {
-        window.location.href = '@Url.Action("ProfitLossReport", "Report")?timeRange=' + range;
+        window.location.href = '@Url.Action("MyProfitLossReport", "Report")?timeRange=' + range;
     }
 
     document.addEventListener('DOMContentLoaded', function () {
