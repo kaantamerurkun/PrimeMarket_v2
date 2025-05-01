@@ -1,5 +1,4 @@
-﻿```html
-@model PrimeMarket.Models.ViewModel.ListingDetailsViewModel
+﻿@model PrimeMarket.Models.ViewModel.ListingDetailsViewModel
 @{
     ViewData["Title"] = Model.Listing.Title;
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -88,7 +87,7 @@
 
                 @if (!Model.IsOwner)
                 {
-                    @if (Model.Listing.Condition == "First-Hand" && Model.Listing.Stock > 0)
+                    @if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock.HasValue && Model.Listing.Stock > 0))
                     {
                         <!-- First-Hand with stock: show Buy Now and Add to Cart buttons -->
                         <a href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
@@ -618,26 +617,23 @@
 
     /* Responsive design */
     @@media (max-width: 768px) {
-        .main-content
+        .main-content {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
-    }
+        .image-gallery {
+            flex: 0 0 100%;
+        }
 
-    .image-gallery {
-        flex: 0 0 100%;
-    }
+        .property-details {
+            flex: 0 0 100%;
+        }
 
-    .property-details {
-        flex: 0 0 100%;
+        .related-listings-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
     }
-
-    .related-listings-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    }
-    </style>
+</style>
 
 <script>
     // Change main image when thumbnail is clicked
