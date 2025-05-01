@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "WeRIeQQTa4lAZmvGGSxabXHFEVpTOIA6uT8VQqwZoDU=",
+  "Hash": "1hJCqMb9OXBnuWIdtveD3R2Jz7qPB5/USOtQURQiHvM=",
   "Source": "PrimeMarket",
   "BasePath": "_content/PrimeMarket",
   "Mode": "Default",
@@ -2432,6 +2432,27 @@
       "OriginalItemSpec": "wwwroot\\images\\verified.png"
     },
     {
+      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\category-filtering.js",
+      "SourceId": "PrimeMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\",
+      "BasePath": "_content/PrimeMarket",
+      "RelativePath": "js/category-filtering#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "akwjxycfzt",
+      "Integrity": "ZsuYQ/ANX6bDbVGIS+UwMZW9C01kzNPLZa3jCBJWNyY=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\category-filtering.js"
+    },
+    {
       "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\site.js",
       "SourceId": "PrimeMarket",
       "SourceType": "Discovered",
@@ -2446,8 +2467,8 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "enle7f3zox",
-      "Integrity": "Glg546a+fk4couJGOHvyx+oRhXGOtsw2U5V5zkYWYGw=",
+      "Fingerprint": "rc2noj0e4r",
+      "Integrity": "qy9ZS+eQQuktU1s7pNgY++U8Kskxx0jvuA982oQNQQY=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\js\\site.js"
@@ -13082,8 +13103,8 @@
       ]
     },
     {
-      "Route": "js/site.enle7f3zox.js",
-      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\site.js",
+      "Route": "js/category-filtering.akwjxycfzt.js",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\category-filtering.js",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -13092,7 +13113,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "29056"
+          "Value": "20621"
         },
         {
           "Name": "Content-Type",
@@ -13100,11 +13121,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Glg546a+fk4couJGOHvyx+oRhXGOtsw2U5V5zkYWYGw=\""
+          "Value": "\"ZsuYQ/ANX6bDbVGIS+UwMZW9C01kzNPLZa3jCBJWNyY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 23 Apr 2025 16:34:54 GMT"
+          "Value": "Thu, 01 May 2025 10:06:11 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13114,15 +13135,52 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "enle7f3zox"
+          "Value": "akwjxycfzt"
         },
         {
           "Name": "label",
-          "Value": "js/site.js"
+          "Value": "js/category-filtering.js"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-Glg546a+fk4couJGOHvyx+oRhXGOtsw2U5V5zkYWYGw="
+          "Value": "sha256-ZsuYQ/ANX6bDbVGIS+UwMZW9C01kzNPLZa3jCBJWNyY="
+        }
+      ]
+    },
+    {
+      "Route": "js/category-filtering.js",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\category-filtering.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "20621"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"ZsuYQ/ANX6bDbVGIS+UwMZW9C01kzNPLZa3jCBJWNyY=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 01 May 2025 10:06:11 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-ZsuYQ/ANX6bDbVGIS+UwMZW9C01kzNPLZa3jCBJWNyY="
         }
       ]
     },
@@ -13137,7 +13195,7 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "29056"
+          "Value": "29308"
         },
         {
           "Name": "Content-Type",
@@ -13145,11 +13203,11 @@
         },
         {
           "Name": "ETag",
-          "Value": "\"Glg546a+fk4couJGOHvyx+oRhXGOtsw2U5V5zkYWYGw=\""
+          "Value": "\"qy9ZS+eQQuktU1s7pNgY++U8Kskxx0jvuA982oQNQQY=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 23 Apr 2025 16:34:54 GMT"
+          "Value": "Thu, 01 May 2025 10:19:36 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -13159,7 +13217,52 @@
       "EndpointProperties": [
         {
           "Name": "integrity",
-          "Value": "sha256-Glg546a+fk4couJGOHvyx+oRhXGOtsw2U5V5zkYWYGw="
+          "Value": "sha256-qy9ZS+eQQuktU1s7pNgY++U8Kskxx0jvuA982oQNQQY="
+        }
+      ]
+    },
+    {
+      "Route": "js/site.rc2noj0e4r.js",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\site.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "29308"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"qy9ZS+eQQuktU1s7pNgY++U8Kskxx0jvuA982oQNQQY=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 01 May 2025 10:19:36 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "rc2noj0e4r"
+        },
+        {
+          "Name": "label",
+          "Value": "js/site.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-qy9ZS+eQQuktU1s7pNgY++U8Kskxx0jvuA982oQNQQY="
         }
       ]
     },

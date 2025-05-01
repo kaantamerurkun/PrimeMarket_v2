@@ -24,7 +24,8 @@
             <div class="items-grid">
                 @foreach (var item in Model)
                 {
-                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })" class="item-card-link">
+                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })" class="item-card-link"
+                       data-category="@item.Category" data-subcategory="@item.SubCategory" data-detail-category="@item.DetailCategory">
                         <div class="item-card">
                             @if (item.Images != null && item.Images.Any())
                             {
@@ -44,6 +45,9 @@
                                 <p class="item-description">@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</p>
                                 <p class="item-price">@item.Price.ToString("C")</p>
                                 <p class="item-location">@item.Location</p>
+                                <span class="item-category" style="display: none;">@item.Category</span>
+                                <span class="item-subcategory" style="display: none;">@item.SubCategory</span>
+                                <span class="item-detail-category" style="display: none;">@item.DetailCategory</span>
                             </div>
                         </div>
                     </a>
@@ -111,6 +115,34 @@
         .item-location {
             font-size: 14px;
             color: #777;
+        }
+
+        #current-filter {
+            display: inline-block;
+            margin-left: 15px;
+            font-size: 16px;
+            font-weight: normal;
+            color: #555;
+        }
+
+        #no-results-message {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin: 20px 0;
+            width: 100%;
+        }
+
+        #clear-filters {
+            padding: 8px 16px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
         }
     </style>
 </body>

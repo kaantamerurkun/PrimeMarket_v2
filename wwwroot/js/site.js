@@ -708,152 +708,152 @@ function createMessageContainer() {
     document.body.appendChild(container);
     return container;
 }
-document.addEventListener("DOMContentLoaded", function () {
+//document.addEventListener("DOMContentLoaded", function () {
 
-    // ✅ Category Dropdown Logic - MODIFIED
-    const allCategories = {
-        "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
-        "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
-        "Electronics": {
-            "Computer": ["Laptops", "Desktops", "Computer Accessories", "Computer Components", "Monitors"],
-            "White Goods": ["Fridges", "Washers", "Dishwashers", "Stoves", "Ovens", "Microwave Ovens"],
-            "Electrical Domestic Appliances": ["Vacuum Cleaner", "Beverage Preparation", "Food Preparation", "Iron", "Sewing Machine"],
-            "Televisions": [],
-            "Heating & Cooling": [],
-            "Cameras": [],
-            "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
-        }
-    };
+//    // ✅ Category Dropdown Logic - MODIFIED
+//    const allCategories = {
+//        "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
+//        "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
+//        "Electronics": {
+//            "Computer": ["Laptops", "Desktops", "Computer Accessories", "Computer Components", "Monitors"],
+//            "White Goods": ["Fridges", "Washers", "Dishwashers", "Stoves", "Ovens", "Microwave Ovens"],
+//            "Electrical Domestic Appliances": ["Vacuum Cleaner", "Beverage Preparation", "Food Preparation", "Iron", "Sewing Machine"],
+//            "Televisions": [],
+//            "Heating & Cooling": [],
+//            "Cameras": [],
+//            "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
+//        }
+//    };
 
-    // Store references to open menus for better control
-    let openMainMenu = null;
-    let openSubMenu = null;
+//    // Store references to open menus for better control
+//    let openMainMenu = null;
+//    let openSubMenu = null;
 
-    function createDropdownItem(name, subItems) {
-        const li = document.createElement("li");
-        li.style.position = "relative";
-        li.style.cursor = "pointer";
-        li.textContent = name;
+//    function createDropdownItem(name, subItems) {
+//        const li = document.createElement("li");
+//        li.style.position = "relative";
+//        li.style.cursor = "pointer";
+//        li.textContent = name;
 
-        if (subItems && Object.keys(subItems).length > 0) {
-            const ul = document.createElement("ul");
-            ul.style.position = "absolute";
-            ul.style.top = "100%";
-            ul.style.listStyle = "none";
-            ul.style.left = "0";
-            ul.style.backgroundColor = "#fff";
-            ul.style.padding = "10px";
-            ul.style.border = "1px solid #ddd";
-            ul.style.borderRadius = "8px";
-            ul.style.boxShadow = "rgba(0, 0, 0, 0.12) 0px 1px 3px";
-            ul.style.display = "none";
-            ul.style.zIndex = 10;
+//        if (subItems && Object.keys(subItems).length > 0) {
+//            const ul = document.createElement("ul");
+//            ul.style.position = "absolute";
+//            ul.style.top = "100%";
+//            ul.style.listStyle = "none";
+//            ul.style.left = "0";
+//            ul.style.backgroundColor = "#fff";
+//            ul.style.padding = "10px";
+//            ul.style.border = "1px solid #ddd";
+//            ul.style.borderRadius = "8px";
+//            ul.style.boxShadow = "rgba(0, 0, 0, 0.12) 0px 1px 3px";
+//            ul.style.display = "none";
+//            ul.style.zIndex = 10;
 
-            if (Array.isArray(subItems)) {
-                subItems.forEach(sub => {
-                    const subLi = document.createElement("li");
-                    subLi.textContent = sub;
-                    subLi.style.padding = "6px 12px";
-                    subLi.style.whiteSpace = "nowrap";
-                    ul.appendChild(subLi);
-                });
-            } else {
-                Object.keys(subItems).forEach(key => {
-                    const innerLi = document.createElement("li");
-                    innerLi.textContent = key;
-                    innerLi.style.padding = "6px 12px";
-                    innerLi.style.whiteSpace = "nowrap";
-                    innerLi.style.position = "relative";
+//            if (Array.isArray(subItems)) {
+//                subItems.forEach(sub => {
+//                    const subLi = document.createElement("li");
+//                    subLi.textContent = sub;
+//                    subLi.style.padding = "6px 12px";
+//                    subLi.style.whiteSpace = "nowrap";
+//                    ul.appendChild(subLi);
+//                });
+//            } else {
+//                Object.keys(subItems).forEach(key => {
+//                    const innerLi = document.createElement("li");
+//                    innerLi.textContent = key;
+//                    innerLi.style.padding = "6px 12px";
+//                    innerLi.style.whiteSpace = "nowrap";
+//                    innerLi.style.position = "relative";
 
-                    if (Array.isArray(subItems[key]) && subItems[key].length > 0) {
-                        const deepUl = document.createElement("ul");
-                        deepUl.style.position = "absolute";
-                        deepUl.style.left = "100%";
-                        deepUl.style.top = "0";
-                        deepUl.style.marginLeft = "5px";
-                        deepUl.style.backgroundColor = "#fff";
-                        deepUl.style.padding = "10px";
-                        deepUl.style.border = "1px solid #ddd";
-                        deepUl.style.borderRadius = "8px";
-                        deepUl.style.listStyle = "none";
-                        deepUl.style.display = "none";
-                        deepUl.style.zIndex = 11;
+//                    if (Array.isArray(subItems[key]) && subItems[key].length > 0) {
+//                        const deepUl = document.createElement("ul");
+//                        deepUl.style.position = "absolute";
+//                        deepUl.style.left = "100%";
+//                        deepUl.style.top = "0";
+//                        deepUl.style.marginLeft = "5px";
+//                        deepUl.style.backgroundColor = "#fff";
+//                        deepUl.style.padding = "10px";
+//                        deepUl.style.border = "1px solid #ddd";
+//                        deepUl.style.borderRadius = "8px";
+//                        deepUl.style.listStyle = "none";
+//                        deepUl.style.display = "none";
+//                        deepUl.style.zIndex = 11;
 
-                        subItems[key].forEach(detail => {
-                            const detailLi = document.createElement("li");
-                            detailLi.textContent = detail;
-                            detailLi.style.padding = "6px 12px";
-                            detailLi.style.whiteSpace = "nowrap";
-                            deepUl.appendChild(detailLi);
-                        });
+//                        subItems[key].forEach(detail => {
+//                            const detailLi = document.createElement("li");
+//                            detailLi.textContent = detail;
+//                            detailLi.style.padding = "6px 12px";
+//                            detailLi.style.whiteSpace = "nowrap";
+//                            deepUl.appendChild(detailLi);
+//                        });
 
-                        innerLi.appendChild(deepUl);
+//                        innerLi.appendChild(deepUl);
 
-                        innerLi.addEventListener("click", (e) => {
-                            e.stopPropagation();
+//                        innerLi.addEventListener("click", (e) => {
+//                            e.stopPropagation();
 
-                            // Close any previously open sub-menu
-                            if (openSubMenu && openSubMenu !== deepUl) {
-                                openSubMenu.style.display = "none";
-                            }
+//                            // Close any previously open sub-menu
+//                            if (openSubMenu && openSubMenu !== deepUl) {
+//                                openSubMenu.style.display = "none";
+//                            }
 
-                            // Toggle the current deep menu
-                            deepUl.style.display = deepUl.style.display === "block" ? "none" : "block";
+//                            // Toggle the current deep menu
+//                            deepUl.style.display = deepUl.style.display === "block" ? "none" : "block";
 
-                            // Update reference to open sub-menu
-                            openSubMenu = deepUl.style.display === "block" ? deepUl : null;
-                        });
-                    }
+//                            // Update reference to open sub-menu
+//                            openSubMenu = deepUl.style.display === "block" ? deepUl : null;
+//                        });
+//                    }
 
-                    ul.appendChild(innerLi);
-                });
-            }
+//                    ul.appendChild(innerLi);
+//                });
+//            }
 
-            li.appendChild(ul);
+//            li.appendChild(ul);
 
-            li.addEventListener("click", (e) => {
-                e.stopPropagation();
+//            li.addEventListener("click", (e) => {
+//                e.stopPropagation();
 
-                // Close any previously open main menu
-                if (openMainMenu && openMainMenu !== ul) {
-                    openMainMenu.style.display = "none";
-                }
+//                // Close any previously open main menu
+//                if (openMainMenu && openMainMenu !== ul) {
+//                    openMainMenu.style.display = "none";
+//                }
 
-                // Close any open sub-menu when clicking a different main category
-                if (openSubMenu && ul !== openMainMenu) {
-                    openSubMenu.style.display = "none";
-                    openSubMenu = null;
-                }
+//                // Close any open sub-menu when clicking a different main category
+//                if (openSubMenu && ul !== openMainMenu) {
+//                    openSubMenu.style.display = "none";
+//                    openSubMenu = null;
+//                }
 
-                // Toggle the current menu
-                ul.style.display = ul.style.display === "block" ? "none" : "block";
+//                // Toggle the current menu
+//                ul.style.display = ul.style.display === "block" ? "none" : "block";
 
-                // Update reference to open main menu
-                openMainMenu = ul.style.display === "block" ? ul : null;
-            });
-        }
+//                // Update reference to open main menu
+//                openMainMenu = ul.style.display === "block" ? ul : null;
+//            });
+//        }
 
-        return li;
-    }
+//        return li;
+//    }
 
-    const mainCategoryList = document.getElementById("mainCategories");
-    if (mainCategoryList) {
-        Object.entries(allCategories).forEach(([name, subs]) => {
-            const item = createDropdownItem(name, subs);
-            mainCategoryList.appendChild(item);
-        });
-    }
+//    const mainCategoryList = document.getElementById("mainCategories");
+//    if (mainCategoryList) {
+//        Object.entries(allCategories).forEach(([name, subs]) => {
+//            const item = createDropdownItem(name, subs);
+//            mainCategoryList.appendChild(item);
+//        });
+//    }
 
-    // Close all menus when clicking outside
-    document.addEventListener("click", () => {
-        if (openMainMenu) {
-            openMainMenu.style.display = "none";
-            openMainMenu = null;
-        }
+//    // Close all menus when clicking outside
+//    document.addEventListener("click", () => {
+//        if (openMainMenu) {
+//            openMainMenu.style.display = "none";
+//            openMainMenu = null;
+//        }
 
-        if (openSubMenu) {
-            openSubMenu.style.display = "none";
-            openSubMenu = null;
-        }
-    });
-});
+//        if (openSubMenu) {
+//            openSubMenu.style.display = "none";
+//            openSubMenu = null;
+//        }
+//    });
+//});

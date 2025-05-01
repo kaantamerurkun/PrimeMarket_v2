@@ -113,6 +113,7 @@ wwwroot\images\verification\front_18_a6ae440d-325a-42dd-a70e-53008338584d.png
 wwwroot\images\verification\front_19_587afc38-51c2-4537-9b79-1c217622e7d5.png
 wwwroot\images\verification\front_20_a1386817-5b5d-449b-b156-57794622692c.png
 wwwroot\images\verified.png
+wwwroot\js\category-filtering.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
 wwwroot\lib\bootstrap\dist\css\bootstrap.css.map
