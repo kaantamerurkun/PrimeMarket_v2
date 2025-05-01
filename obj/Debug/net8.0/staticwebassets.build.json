@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "p5fPJtIwi86VvcuatrNtbRCfdHemkMYhvrWLmn9PO+E=",
+  "Hash": "mLmpossu3IbiPssH//7r+HoYSERtBye8nsQMYrf07wQ=",
   "Source": "PrimeMarket",
   "BasePath": "_content/PrimeMarket",
   "Mode": "Default",
@@ -834,6 +834,27 @@
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
       "OriginalItemSpec": "wwwroot\\images\\listings\\12_6ebeb147-322b-4ed0-b54f-531f65e8e8b4.png"
+    },
+    {
+      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png",
+      "SourceId": "PrimeMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\",
+      "BasePath": "_content/PrimeMarket",
+      "RelativePath": "images/listings/13_424b49f5-32a9-48aa-8531-8b794c21cd86#[.{fingerprint}]?.png",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "b3jbp1yc5k",
+      "Integrity": "mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png"
     },
     {
       "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_d9f6110d-26b0-4668-a409-3c9c66bf9742.png",
@@ -6783,6 +6804,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-kBaYqJdjNw7BmRcR3w7fcx3+A8qq2lyUIBx+MfYUJYk="
+        }
+      ]
+    },
+    {
+      "Route": "images/listings/13_424b49f5-32a9-48aa-8531-8b794c21cd86.b3jbp1yc5k.png",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "64733"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 01 May 2025 07:55:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "b3jbp1yc5k"
+        },
+        {
+          "Name": "label",
+          "Value": "images/listings/13_424b49f5-32a9-48aa-8531-8b794c21cd86.png"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g="
+        }
+      ]
+    },
+    {
+      "Route": "images/listings/13_424b49f5-32a9-48aa-8531-8b794c21cd86.png",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "64733"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/png"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Thu, 01 May 2025 07:55:19 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g="
         }
       ]
     },

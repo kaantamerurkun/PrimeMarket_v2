@@ -31,6 +31,88 @@ namespace PrimeMarket.Controllers
             }
             return View();
         }
+        [HttpGet]
+        public async Task<IActionResult> GetUserDetails(int userId)
+        {
+            // Check if admin is logged in
+            var adminId = HttpContext.Session.GetInt32("AdminId");
+            if (adminId == null)
+            {
+                return Json(new { success = false, message = "Not authorized" });
+            }
+
+            var user = await _context.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+            {
+                return NotFound(new { success = false, message = "User not found" });
+            }
+
+            // Return user details as JSON
+            return Json(new
+            {
+                id = user.Id,
+                firstName = user.FirstName,
+                lastName = user.LastName,
+                email = user.Email,
+                phoneNumber = user.PhoneNumber,
+                profileImagePath = user.ProfileImagePath,
+                isIdVerified = user.IsIdVerified,
+                createdAt = user.CreatedAt,
+                updatedAt = user.UpdatedAt
+            });
+        }
+
+        // GET: /Admin/GetUserListings
+        [HttpGet]
+        public async Task<IActionResult> GetUserListings(int userId)
+        {
+            // Check if admin is logged in
+            var adminId = HttpContext.Session.GetInt32("AdminId");
+            if (adminId == null)
+            {
+                return Json(new { success = false, message = "Not authorized" });
+            }
+
+            var listings = await _context.Listings
+                .Include(l => l.Images)
+                .Where(l => l.SellerId == userId)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            if (listings == null || !listings.Any())
+            {
+                return Json(new List<object>());
+            }
+
+            // Return listings as JSON
+            var result = listings.Select(l => new
+            {
+                id = l.Id,
+                title = l.Title,
+                price = l.Price,
+                description = l.Description,
+                condition = l.Condition,
+                category = l.Category,
+                subCategory = l.SubCategory,
+                detailCategory = l.DetailCategory,
+                location = l.Location,
+                status = l.Status.ToString(),
+                rejectionReason = l.RejectionReason,
+                createdAt = l.CreatedAt,
+                updatedAt = l.UpdatedAt,
+                images = l.Images.Select(i => new
+                {
+                    id = i.Id,
+                    imagePath = i.ImagePath,
+                    isMainImage = i.IsMainImage
+                }).ToList()
+            }).ToList();
+
+            return Json(result);
+        }
 
         // POST: /Admin/AdminLogin
         [HttpPost]
