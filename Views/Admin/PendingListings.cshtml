@@ -71,6 +71,16 @@
             margin-bottom: 5px;
         }
 
+        .seller-name {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+            .seller-name:hover {
+                text-decoration: underline;
+            }
+
         .listing-action {
             display: flex;
             gap: 10px;
@@ -207,7 +217,7 @@
 
         .reasons-checklist {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 10px;
             margin-bottom: 20px;
         }
@@ -236,9 +246,203 @@
             .reason-item label {
                 font-weight: normal;
             }
+
+        /* User Profile Modal Styles */
+        #userProfileModal {
+            z-index: 1010;
+        }
+
+        .user-profile-content {
+            width: 95%;
+            max-width: 1000px;
+            padding: 30px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .profile-header {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: flex-start;
+        }
+
+        .profile-image-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
+        }
+
+            .profile-image-container img {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
+                object-fit: cover;
+            }
+
+        .verification-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .profile-details {
+            flex: 1;
+        }
+
+        .user-details-container {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+        }
+
+        .user-listings-section {
+            margin-top: 30px;
+        }
+
+            .user-listings-section h2 {
+                margin-bottom: 20px;
+                text-align: center;
+            }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .listing-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .listing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .listing-image {
+            position: relative;
+            height: 180px;
+        }
+
+            .listing-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .listing-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+            .listing-status.pending {
+                background-color: #ffc107;
+                color: #212529;
+            }
+
+            .listing-status.approved {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .listing-status.rejected {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .listing-status.sold {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+        .listing-details {
+            padding: 15px;
+        }
+
+            .listing-details h3 {
+                margin: 0 0 10px 0;
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        .listing-price {
+            font-weight: bold;
+            font-size: 16px;
+            color: #0066cc;
+            margin-bottom: 5px;
+        }
+
+        .listing-date {
+            color: #666;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .rejection-reason {
+            background-color: #fff3cd;
+            border-left: 3px solid #ffc107;
+            padding: 8px;
+            margin-top: 8px;
+            font-size: 12px;
+        }
+
+        .empty-listings {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
+    @using Microsoft.AspNetCore.Antiforgery
+    @inject IAntiforgery Anti
+
+    @{
+        var tokens = Anti.GetAndStoreTokens(Context);
+    }
+
+    <input type="hidden"
+           id="__RequestVerificationToken"
+           name="__RequestVerificationToken"
+           value="@tokens.RequestToken" />
+
     <header class="main-header">
         <div class="header-content">
             <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
@@ -312,7 +516,7 @@
                                 <div class="listing-details">
                                     <h3 class="listing-title">@listing.Title</h3>
                                     <p class="listing-price">@listing.Price.ToString("C")</p>
-                                    <p class="listing-seller">Seller: @(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</p>
+                                    <p class="listing-seller">Seller: <span class="seller-name" data-user-id="@listing.SellerId">@(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</span></p>
                                     <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
                                     <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
                                 </div>
@@ -407,14 +611,75 @@
                     </div>
                 </div>
                 <div style="text-align: right; margin-top: 15px;">
+                    <button type="button" class="btn-cancel" onclick="hideRejectForm()">Cancel</button>
                     <button type="button" class="btn-reject" onclick="rejectListing()">Confirm Rejection</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- User Profile Modal -->
+    <div id="userProfileModal" class="modal">
+        <div class="modal-content user-profile-content">
+            <span class="close" onclick="closeUserProfileModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="profileModalUserName">User Profile</h2>
+            </div>
+            <div class="profile-header">
+                <div class="profile-image-container">
+                    <img id="profileModalUserImage" src="/images/user-placeholder.png" alt="User Profile">
+                    <div id="profileModalVerificationBadge" class="verification-badge" style="display: none;">
+                        <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="user-details-container">
+                        <div class="detail-item">
+                            <span class="detail-label">Name:</span>
+                            <span id="profileModalUserFirstName" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Name:</span>
+                            <span id="profileModalUserLastName" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span id="profileModalUserEmail" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone Number:</span>
+                            <span id="profileModalUserPhone" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Registered:</span>
+                            <span id="profileModalUserCreated" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Verification Status:</span>
+                            <span id="profileModalUserVerification" class="detail-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- User's Listings Section -->
+            <div class="user-listings-section">
+                <h2>User's Listings</h2>
+                <div id="profileModalListingsContainer">
+                    <div class="empty-listings">
+                        <p>Loading listings...</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-actions">
+                <button id="closeProfileBtn" class="btn-reject" style="background-color: #6c757d;">Close</button>
+            </div>
+        </div>
+    </div>
     <script>
-               document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function() {
             // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
             const notificationDropdown = document.getElementById('listingNotificationDropdown');
@@ -431,6 +696,18 @@
                     }
                 });
             }
+
+            // Add event listeners for seller name clicks in listing cards
+            const sellerNames = document.querySelectorAll('.seller-name');
+            sellerNames.forEach(name => {
+                name.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const userId = this.getAttribute('data-user-id');
+                    const userName = this.textContent.trim();
+                    openUserProfileModal(userId, userName);
+                });
+            });
 
             // Filter buttons functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
@@ -466,15 +743,23 @@
             }
 
             // Close modal when clicking outside
-            window.onclick = function(event) {
-                if (event.target === document.getElementById('listingActionsModal')) {
+            window.addEventListener('click', function(event) {
+                const listingModal = document.getElementById('listingActionsModal');
+                const userProfileModal = document.getElementById('userProfileModal');
+
+                if (event.target === listingModal) {
                     closeModal();
                 }
-            }
+
+                if (event.target === userProfileModal) {
+                    closeUserProfileModal();
+                }
+            });
         });
 
         // Keep track of which listing we're working with
         let currentListingId = null;
+        let currentSellerId = null;
 
         // Function to open the listing actions modal
         function openListingActions(listingId) {
@@ -492,11 +777,23 @@
             const categoryElement = listingCard.querySelector('.listing-category');
             const dateElement = listingCard.querySelector('.listing-date');
 
+            // Get seller ID
+            const sellerNameElement = listingCard.querySelector('.seller-name');
+            if (sellerNameElement) {
+                currentSellerId = sellerNameElement.getAttribute('data-user-id');
+            }
+
             // Populate the modal with listing details
             document.getElementById('modalListingImage').querySelector('img').src = imageElement.src;
             document.getElementById('modalListingTitle').textContent = titleElement.textContent;
             document.getElementById('modalListingPrice').textContent = priceElement.textContent;
-            document.getElementById('modalListingSeller').textContent = sellerElement.textContent;
+
+            // Set up seller with clickable name
+            const sellerText = sellerElement.textContent;
+            const sellerName = sellerElement.querySelector('.seller-name').textContent;
+            const sellerHtml = `Seller: <span class="seller-name" data-user-id="${currentSellerId}" onclick="openUserProfileModal(${currentSellerId}, '${sellerName}')">${sellerName}</span>`;
+            document.getElementById('modalListingSeller').innerHTML = sellerHtml;
+
             document.getElementById('modalListingCategory').textContent = categoryElement.textContent;
             document.getElementById('modalListingDate').textContent = dateElement.textContent;
 
@@ -532,18 +829,17 @@
 
         // Function to show the rejection form
         function showRejectForm() {
-            const approveBtn = document.getElementById('modalApproveBtn');
-            const rejectBtn = document.getElementById('modalRejectBtn');
-            const rejectForm = document.getElementById('rejectForm');
+            document.getElementById('rejectForm').style.display = 'block';
+        }
 
-            if (approveBtn) approveBtn.style.display = 'none';
-            if (rejectBtn) rejectBtn.style.display = 'none';
-            if (rejectForm) rejectForm.style.display = 'block';
+        // Function to hide the rejection form
+        function hideRejectForm() {
+            document.getElementById('rejectForm').style.display = 'none';
         }
 
         // Function to handle listing rejection with selected reasons
-        function rejectListing () {
-            // gather selected reasons exactly as before …
+        function rejectListing() {
+            // gather selected reasons
             const selectedReasons = [];
             document.querySelectorAll('input[name="reason"]:checked').forEach(cb => {
                 if (cb.id === 'reasonOther') {
@@ -581,7 +877,7 @@
                 const ct = res.headers.get('content-type') || '';
                 if (ct.includes('application/json')) return res.json();
 
-                // unexpected – read as text so we don’t crash on .json()
+                // unexpected – read as text so we don't crash on .json()
                 const txt = await res.text();
                 throw new Error(txt.slice(0, 200));
             })
@@ -608,6 +904,178 @@
             });
         }
 
-    </script>
-</body>
-</html>
+        // User Profile Modal Functions
+        function openUserProfileModal(userId, userName) {
+            if (!userId) return;
+
+            document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
+            document.getElementById('userProfileModal').style.display = 'block';
+
+            // Clear previous data
+            document.getElementById('profileModalUserFirstName').textContent = "";
+            document.getElementById('profileModalUserLastName').textContent = "";
+            document.getElementById('profileModalUserEmail').textContent = "";
+            document.getElementById('profileModalUserPhone').textContent = "Not provided";
+            document.getElementById('profileModalUserCreated').textContent = "";
+            document.getElementById('profileModalUserVerification').textContent = "Pending";
+            document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
+            document.getElementById('profileModalVerificationBadge').style.display = 'none';
+
+            // Set empty listings message
+            document.getElementById('profileModalListingsContainer').innerHTML = `
+                <div class="empty-listings">
+                    <p>Loading listings...</p>
+                </div>
+            `;
+
+            // Fetch user details
+            fetchUserDetails(userId);
+
+            // Set up close button click handler
+            document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
+        }
+
+        function closeUserProfileModal() {
+            document.getElementById('userProfileModal').style.display = 'none';
+        }
+
+        function fetchUserDetails(userId) {
+            fetch(`/Admin/GetUserDetails?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error fetching user details');
+                }
+                return response.json();
+            })
+            .then(user => {
+                // Update the UI with the user details from the database
+                document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
+                document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
+                document.getElementById('profileModalUserEmail').textContent = user.email || "";
+                document.getElementById('profileModalUserPhone').textContent = user.phoneNumber || "Not provided";
+                document.getElementById('profileModalUserCreated').textContent = new Date(user.createdAt).toLocaleDateString();
+                document.getElementById('profileModalUserVerification').textContent = user.isIdVerified ? "Verified" : "Pending";
+
+                if (user.profileImagePath) {
+                    document.getElementById('profileModalUserImage').src = user.profileImagePath;
+                }
+
+                // Show verification badge if user is verified
+                if (user.isIdVerified) {
+                    document.getElementById('profileModalVerificationBadge').style.display = 'block';
+                } else {
+                    document.getElementById('profileModalVerificationBadge').style.display = 'none';
+                }
+
+                // Fetch user listings and generate the listings grid
+                fetchUserListings(userId);
+            })
+            .catch(error => {
+                console.error('Error fetching user details:', error);
+                // Fallback to data from the verification card if API call fails
+                const sellerEl = document.querySelector(`[data-user-id="${userId}"]`);
+                if (sellerEl) {
+                    const userName = sellerEl.textContent.trim().split(' ');
+                    const firstName = userName[0] || "";
+                    const lastName = userName.slice(1).join(' ') || "";
+
+                    // Update the UI with the data we have
+                    document.getElementById('profileModalUserFirstName').textContent = firstName;
+                    document.getElementById('profileModalUserLastName').textContent = lastName;
+                    document.getElementById('profileModalUserEmail').textContent = "Information not available";
+                    document.getElementById('profileModalUserCreated').textContent = "Unknown";
+                    document.getElementById('profileModalUserVerification').textContent = "Unknown";
+                }
+
+                // Still try to fetch user listings
+                fetchUserListings(userId);
+            });
+        }
+
+        function fetchUserListings(userId) {
+            const listingsContainer = document.getElementById('profileModalListingsContainer');
+            listingsContainer.innerHTML = `
+                <div class="empty-listings">
+                    <p>Loading listings...</p>
+                </div>
+            `;
+
+            fetch(`/Admin/GetUserListings?userId=${userId}`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Network response was not ok');
+                    return []; // fallback to empty listings
+                }
+                return response.json();
+            })
+            .then(data => {
+                // If the server sent an object like { success: false }, treat as empty
+                const listings = Array.isArray(data) ? data : [];
+
+                if (listings.length === 0) {
+                    listingsContainer.innerHTML = `
+                        <div class="empty-listings">
+                            <p>This user has no listings.</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Build listings HTML
+                let listingsHTML = '<div class="listings-grid">';
+                listings.forEach(listing => {
+                    let mainImage = "/images/placeholder.png";
+                    if (listing.images && listing.images.length > 0) {
+                        const mainImageObj = listing.images.find(img => img.isMainImage);
+                        mainImage = mainImageObj ? mainImageObj.imagePath : listing.images[0].imagePath;
+                    }
+
+                    const status = listing.status.toLowerCase();
+
+                    listingsHTML += `
+                        <div class="listing-card ${status}">
+                            <div class="listing-image">
+                                <img src="${mainImage}" alt="${listing.title}">
+                                <div class="listing-status ${status}">${listing.status}</div>
+                            </div>
+                            <div class="listing-details">
+                                <h3>${listing.title}</h3>
+                                <p class="listing-price">₺${listing.price.toLocaleString()}</p>
+                                <p class="listing-date">Listed on ${new Date(listing.createdAt).toLocaleDateString()}</p>
+                                <p>Category: ${listing.category}${listing.subCategory ? ` > ${listing.subCategory}` : ''}</p>
+                                ${listing.status === 'Rejected' && listing.rejectionReason ?
+                                    `<p class="rejection-reason"><strong>Rejection Reason:</strong> ${listing.rejectionReason}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                listingsHTML += '</div>';
+                listingsContainer.innerHTML = listingsHTML;
+            })
+            .catch(error => {
+                console.error('Error fetching user listings:', error);
+                listingsContainer.innerHTML = `
+                    <div class="empty-listings">
+                        <p>Error loading listings. Please try again later.</p>
+                    </div>
+                `;
+            });
+        }
+
+
+        </script>
+        </body>
+        </html>
