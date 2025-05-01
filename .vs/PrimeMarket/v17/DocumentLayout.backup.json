@@ -122,8 +122,7 @@
               "RelativeToolTip": "wwwroot\\js\\site.js",
               "ViewState": "AgIAAAkAAAAAAAAAAAAAABIAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001646|",
-              "WhenOpened": "2025-05-01T13:46:59.518Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T13:46:59.518Z"
             },
             {
               "$type": "Document",
@@ -135,8 +134,7 @@
               "RelativeToolTip": "Views\\Shared\\_LayoutUser.cshtml",
               "ViewState": "AgIAADQBAAAAAAAAAAAAAEABAAAKAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-01T13:29:50.962Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T13:29:50.962Z"
             },
             {
               "$type": "Document",
@@ -160,8 +158,7 @@
               "RelativeToolTip": "Views\\Payment\\PurchaseStatus.cshtml",
               "ViewState": "AgIAACcAAAAAAAAAAAAAAAQAAAAxAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-01T11:30:39.656Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T11:30:39.656Z"
             },
             {
               "$type": "Document",
@@ -171,7 +168,7 @@
               "RelativeDocumentMoniker": "Controllers\\NotificationsController.cs",
               "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Controllers\\NotificationsController.cs",
               "RelativeToolTip": "Controllers\\NotificationsController.cs",
-              "ViewState": "AgIAAFkAAAAAAAAAAAAwwF8AAAA2AAAAAAAAAA==",
+              "ViewState": "AgIAAEQAAAAAAAAAAAAwwF8AAAA4AAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-01T13:22:32.231Z",
               "EditorCaption": ""
@@ -186,8 +183,7 @@
               "RelativeToolTip": "Views\\Notifications\\Index.cshtml",
               "ViewState": "AgIAAI4BAAAAAAAAAAAAAL8BAAAJAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-01T13:32:23.945Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T13:32:23.945Z"
             },
             {
               "$type": "Document",
@@ -199,8 +195,7 @@
               "RelativeToolTip": "Controllers\\MessageController.cs",
               "ViewState": "AgIAAI0AAAAAAAAAAAAuwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-01T13:59:34.873Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-01T13:59:34.873Z"
             },
             {
               "$type": "Document",

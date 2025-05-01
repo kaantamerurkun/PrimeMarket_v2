@@ -93,7 +93,7 @@ namespace PrimeMarket.Controllers
 
         [HttpPost]
         [UserAuthenticationFilter]
-        public async Task<IActionResult> MarkAllRead()
+        public async Task<IActionResult> MarkAllAsRead()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
