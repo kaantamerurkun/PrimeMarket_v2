@@ -1,4 +1,5 @@
-﻿@model List<PrimeMarket.Models.Notification>
+﻿@Html.AntiForgeryToken()
+@model List<PrimeMarket.Models.Notification>
 @{
     ViewData["Title"] = "All Notifications";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -360,32 +361,62 @@
             });
         }
 
-        function markAllAsRead() {
-            fetch('/Notifications/MarkAllAsRead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-                    unreadNotifications.forEach(item => {
-                        item.classList.remove('unread');
-                        item.classList.add('read');
+    function markAllAsRead() {
+        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                        const markReadBtn = item.querySelector('.btn-mark-read');
-                        if (markReadBtn) {
-                            markReadBtn.remove();
-                        }
-                    });
-                }
-            })
-            .catch(error => {
-                console.error('Error marking all notifications as read:', error);
-            });
-        }
+        fetch('/Notifications/MarkAllAsRead', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': csrfToken
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                unreadNotifications.forEach(item => {
+                    item.classList.remove('unread');
+                    item.classList.add('read');
+
+                    const markReadBtn = item.querySelector('.btn-mark-read');
+                    if (markReadBtn) {
+                        markReadBtn.remove();
+                    }
+                });
+
+                // Optional: Provide user feedback
+                showNotification('All notifications marked as read');
+            } else {
+                showNotification(data.message || 'Error marking notifications as read', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error marking all notifications as read:', error);
+            showNotification('An error occurred', true);
+        });
+    }
+
+    // Optional helper function for user feedback
+    function showNotification(message, isError = false) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '5px';
+        notification.style.zIndex = '9999';
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => document.body.removeChild(notification), 500);
+        }, 3000);
+    }
 
         function clearAll() {
             if (!confirm('Are you sure you want to delete all notifications?')) {

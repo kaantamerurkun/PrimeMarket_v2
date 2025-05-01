@@ -3,12 +3,12 @@
   "WorkspaceRootPath": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|c:\\users\\urkun\\source\\repos\\primemarket_13.04.2025\\primemarket\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|solutionrelative:controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|c:\\users\\urkun\\source\\repos\\primemarket_13.04.2025\\primemarket\\views\\notifications\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|solutionrelative:views\\notifications\\index.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|c:\\users\\urkun\\source\\repos\\primemarket_13.04.2025\\primemarket\\controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|solutionrelative:controllers\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{B433916C-8221-44C6-A37D-535EFAFD93A8}|PrimeMarket.csproj|c:\\users\\urkun\\source\\repos\\primemarket_13.04.2025\\primemarket\\views\\payment\\purchasestatus.cshtml||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -110,7 +110,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 4,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Document",
@@ -162,28 +162,29 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
+              "DocumentIndex": 1,
               "Title": "NotificationsController.cs",
               "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Controllers\\NotificationsController.cs",
               "RelativeDocumentMoniker": "Controllers\\NotificationsController.cs",
               "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Controllers\\NotificationsController.cs",
               "RelativeToolTip": "Controllers\\NotificationsController.cs",
-              "ViewState": "AgIAAEQAAAAAAAAAAAAwwF8AAAA4AAAAAAAAAA==",
+              "ViewState": "AgIAAFwAAAAAAAAAAAAQwF0AAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2025-05-01T13:22:32.231Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 0,
               "Title": "Index.cshtml",
               "DocumentMoniker": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Notifications\\Index.cshtml",
               "RelativeDocumentMoniker": "Views\\Notifications\\Index.cshtml",
               "ToolTip": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\Views\\Notifications\\Index.cshtml",
               "RelativeToolTip": "Views\\Notifications\\Index.cshtml",
-              "ViewState": "AgIAAI4BAAAAAAAAAAAAAL8BAAAJAAAAAAAAAA==",
+              "ViewState": "AgIAAAkAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-01T13:32:23.945Z"
+              "WhenOpened": "2025-05-01T13:32:23.945Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
