@@ -3,7 +3,8 @@
     ViewData["Title"] = Model.Listing.Title;
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
-
+<html lang="en">
+    <body>
 <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
     <nav class="breadcrumb">
         <a href="@Url.Action("User_MainPage", "User")">Home</a> &gt;
@@ -739,7 +740,7 @@
         });
     });
 
-    // Respond to offer (accept/reject) for sellers
+    // Modify the existing script section to ensure respondToOffer is properly defined
     function respondToOffer(offerId, accept) {
         fetch('/Listing/RespondToOffer', {
             method: 'POST',
@@ -751,10 +752,13 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                // Show success notification
                 showNotification(data.message);
+
                 // Reload the page to reflect changes
                 setTimeout(() => location.reload(), 1500);
             } else {
+                // Show error message
                 alert(data.message);
             }
         })
@@ -762,6 +766,31 @@
             console.error('Error responding to offer:', error);
             alert('An error occurred while processing your response. Please try again.');
         });
+    }
+
+    // Ensure showNotification function is defined
+    function showNotification(message, isError = false) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '5px';
+        notification.style.zIndex = '9999';
+        notification.style.transition = 'opacity 0.5s ease-in-out';
+
+        document.body.appendChild(notification);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
     }
 
     // Close modal when clicking outside
@@ -813,3 +842,5 @@
         }, 3000);
     }
 </script>
+</body>
+</html>
