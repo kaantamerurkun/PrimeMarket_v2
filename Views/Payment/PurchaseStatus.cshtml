@@ -89,9 +89,346 @@
                 <div class="seller-actions">
                     <h3>Confirm Shipping</h3>
                     <p>Please confirm when you have shipped the item to the buyer.</p>
-                    
+
                     <form method="post" action="@Url.Action("ConfirmShipping", "Payment")">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
 
-                        <div class="form-
+                        <div class="form-group">
+                            <label for="trackingNumber">Tracking Number (optional)</label>
+                            <input type="text" id="trackingNumber" name="trackingNumber" class="form-control"
+                                   placeholder="Enter tracking number" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shippingProvider">Shipping Provider (optional)</label>
+                            <input type="text" id="shippingProvider" name="shippingProvider" class="form-control"
+                                   placeholder="Enter shipping provider" />
+                        </div>
+
+                        <div class="confirmation-checkbox">
+                            <input type="checkbox" id="shippingConfirm" required />
+                            <label for="shippingConfirm">I confirm that I have shipped this item to the buyer</label>
+                        </div>
+
+                        <button type="submit" class="btn-confirm">Confirm Shipping</button>
+                    </form>
+                </div>
+            }
+
+            @if (Model.IsViewerBuyer && Model.SellerShippedProduct && !Model.BuyerReceivedProduct)
+            {
+                <div class="buyer-actions">
+                    <h3>Confirm Receipt</h3>
+                    <p>Please confirm when you have received the item from the seller.</p>
+
+                    <form method="post" action="@Url.Action("ConfirmReceived", "Payment")">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
+
+                        <div class="confirmation-checkbox">
+                            <input type="checkbox" id="receiptConfirm" required />
+                            <label for="receiptConfirm">I confirm that I have received this item in good condition</label>
+                        </div>
+
+                        <button type="submit" class="btn-confirm">Confirm Receipt</button>
+                    </form>
+                </div>
+            }
+
+            @if (Model.PaymentReleased)
+            {
+                <div class="transaction-complete">
+                    <h3>Transaction Complete</h3>
+                    <p>This transaction has been completed successfully. Payment has been released to the seller.</p>
+                    <p>Thank you for using PrimeMarket!</p>
+                </div>
+            }
+            else if (Model.BuyerReceivedProduct && !Model.PaymentReleased)
+            {
+                <div class="payment-pending">
+                    <h3>Payment Processing</h3>
+                    <p>The item has been received. Payment will be released to the seller shortly.</p>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .purchase-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .purchase-id {
+        font-size: 18px;
+        color: #666;
+    }
+
+    .alert {
+        padding: 12px 15px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .alert-danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .purchase-container {
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 30px;
+    }
+
+    .item-details {
+        display: flex;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .item-image {
+        width: 150px;
+        height: 150px;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+    .item-info {
+        flex: 1;
+    }
+
+        .item-info h2 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+    .item-price {
+        font-weight: bold;
+        font-size: 20px;
+        color: #0066cc;
+        margin-bottom: 10px;
+    }
+
+    .item-type {
+        display: inline-block;
+        padding: 3px 10px;
+        background-color: #e6f7ff;
+        color: #0066cc;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+    .tracking-info {
+        margin-top: 15px;
+        padding: 10px;
+        background-color: #e6f7ff;
+        border-radius: 5px;
+    }
+
+    .status-progress {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+        .status-progress::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 50px;
+            right: 50px;
+            height: 3px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+
+    .status-step {
+        position: relative;
+        text-align: center;
+        z-index: 2;
+        flex: 1;
+    }
+
+    .step-number {
+        width: 40px;
+        height: 40px;
+        background-color: #f0f0f0;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 10px;
+        font-weight: bold;
+        border: 3px solid #ddd;
+    }
+
+    .status-step.active .step-number {
+        background-color: #0066cc;
+        color: white;
+        border-color: #0066cc;
+    }
+
+    .status-step.completed .step-number {
+        background-color: #28a745;
+        color: white;
+        border-color: #28a745;
+    }
+
+    .step-label {
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+
+    .step-date {
+        font-size: 14px;
+        color: #666;
+    }
+
+    .action-buttons {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .seller-actions, .buyer-actions, .transaction-complete, .payment-pending {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 15px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 16px;
+    }
+
+    .confirmation-checkbox {
+        margin: 20px 0;
+        display: flex;
+        align-items: center;
+    }
+
+        .confirmation-checkbox input {
+            margin-right: 10px;
+        }
+
+    .btn-confirm {
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-confirm:hover {
+            background-color: #0055b3;
+        }
+
+    .transaction-complete, .payment-pending {
+        text-align: center;
+        padding: 20px;
+    }
+
+    .transaction-complete {
+        background-color: #d4edda;
+        color: #155724;
+        border-radius: 5px;
+    }
+
+    .payment-pending {
+        background-color: #fff3cd;
+        color: #856404;
+        border-radius: 5px;
+    }
+
+    @@media (max-width: 768px) {
+        .item-details
+
+    {
+        flex-direction: column;
+    }
+
+    .item-image {
+        width: 100%;
+        height: 200px;
+        margin-right: 0;
+        margin-bottom: 15px;
+    }
+
+    .status-progress {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 20px;
+    }
+
+        .status-progress::before {
+            top: 20px;
+            bottom: 20px;
+            left: 20px;
+            right: auto;
+            width: 3px;
+            height: auto;
+        }
+
+    .status-step {
+        display: flex;
+        align-items: center;
+        text-align: left;
+        padding-left: 60px;
+    }
+
+    .step-number {
+        position: absolute;
+        left: 0;
+        margin: 0;
+    }
+
+    .step-label, .step-date {
+        margin-left: 15px;
+    }
+
+    }
+</style>
