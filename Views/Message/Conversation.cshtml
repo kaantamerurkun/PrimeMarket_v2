@@ -40,8 +40,9 @@
                                (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : Model.OtherUserProfileImage))"
                              alt="@(message.SentByMe ? "You" : Model.OtherUserName)"
                              style="width: 40px; height: 40px; border-radius: 50%;">
+                       
                         <div class="message-content" style="border-radius: 25px; max-width: 80%;">
-                            @message.Content
+                            @Html.Raw(message.Content)
                             <div class="message-time">@message.Timestamp.ToString("MMM dd, yyyy HH:mm")</div>
                         </div>
                     </div>

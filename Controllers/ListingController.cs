@@ -1498,12 +1498,14 @@ public async Task<IActionResult> DeleteListing(int id)
                     _context.Notifications.Add(acceptNotification);
 
                     // Create a message for the conversation
+                    // In the 'if (accept)' block of RespondToOffer method
+                    // Create a message for the conversation
                     var acceptMessage = new Message
                     {
                         SenderId = userId.Value,
                         ReceiverId = offer.BuyerId,
                         ListingId = offer.ListingId,
-                        Content = $"I've accepted your offer of {offer.OfferAmount:C}. You can now proceed with the purchase.",
+                        Content = $"I've accepted your offer of {offer.OfferAmount:C}. You can now proceed with the <a href='/Payment/ProcessOfferPurchase?offerId={offer.Id}'>purchase</a>.",
                         IsRead = false,
                         CreatedAt = DateTime.UtcNow
                     };

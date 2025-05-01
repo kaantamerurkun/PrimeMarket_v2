@@ -30,5 +30,7 @@ namespace PrimeMarket.Models.ViewModel
         // Who is viewing this confirmation page
         public bool IsViewerSeller { get; set; }
         public bool IsViewerBuyer { get; set; }
+        public bool IsSecondHandPurchase { get; set; }
+        public decimal OfferAmount { get; set; }
     }
 }

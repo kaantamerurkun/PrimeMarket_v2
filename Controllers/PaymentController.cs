@@ -505,8 +505,10 @@ namespace PrimeMarket.Controllers
             }
         }
 
+
         // Process offer purchase for second-hand listings
         [HttpPost]
+        [HttpGet]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessOfferPurchase(int offerId)
@@ -537,6 +539,15 @@ namespace PrimeMarket.Controllers
                     TempData["ErrorMessage"] = "This listing is no longer available.";
                     return RedirectToAction("MyOffers", "User");
                 }
+                var model = new OfferPaymentViewModel
+                {
+                    OfferId = offer.Id,
+                    ListingId = offer.ListingId,
+                    ListingTitle = offer.Listing.Title,
+                    SellerName = $"{offer.Listing.Seller.FirstName} {offer.Listing.Seller.LastName}",
+                    OfferAmount = offer.OfferAmount
+                };
+                return View(model);
 
                 // Check that this is a second-hand listing
                 if (offer.Listing.Condition != "Second-Hand")
@@ -750,6 +761,7 @@ namespace PrimeMarket.Controllers
                 .Include(p => p.Listing.Seller)
                 .Include(p => p.Buyer)
                 .Include(p => p.Confirmation)
+                .Include(p => p.Offer) // Include the offer information
                 .FirstOrDefaultAsync(p => p.Id == purchaseId);
 
             if (purchase == null)
@@ -765,6 +777,9 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyPurchases");
             }
 
+            var isSecondHand = purchase.Listing.Condition == "Second-Hand";
+            var offerAmount = purchase.Offer?.OfferAmount ?? purchase.Amount;
+
             var model = new PurchaseConfirmationViewModel
             {
                 PurchaseId = purchase.Id,
@@ -778,7 +793,7 @@ namespace PrimeMarket.Controllers
                 BuyerName = $"{purchase.Buyer.FirstName} {purchase.Buyer.LastName}",
                 PurchaseDate = purchase.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = purchase.PaymentStatus,
-                IsFirstHand = purchase.Listing.Condition == "First-Hand",
+                IsFirstHand = !isSecondHand,
                 SellerShippedProduct = purchase.Confirmation.SellerShippedProduct,
                 ShippingConfirmedDate = purchase.Confirmation.ShippingConfirmedDate,
                 BuyerReceivedProduct = purchase.Confirmation.BuyerReceivedProduct,
@@ -788,7 +803,9 @@ namespace PrimeMarket.Controllers
                 TrackingNumber = purchase.Confirmation.TrackingNumber,
                 ShippingProvider = purchase.Confirmation.ShippingProvider,
                 IsViewerSeller = purchase.Listing.SellerId == userId,
-                IsViewerBuyer = purchase.BuyerId == userId
+                IsViewerBuyer = purchase.BuyerId == userId,
+                IsSecondHandPurchase = isSecondHand,
+                OfferAmount = offerAmount
             };
 
             return View(model);
