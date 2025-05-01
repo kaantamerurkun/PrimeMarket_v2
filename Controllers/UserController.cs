@@ -177,7 +177,123 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyProfilePage");
             }
         }
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> MyOffers()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
 
+            try
+            {
+                // Get all offers made by this user
+                var offers = await _context.Offers
+                    .Include(o => o.Listing)
+                    .ThenInclude(l => l.Images)
+                    .Include(o => o.Listing.Seller)
+                    .Where(o => o.BuyerId == userId)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
+
+                var model = offers.Select(o => new OfferViewModel
+                {
+                    OfferId = o.Id,
+                    ListingId = o.ListingId,
+                    ListingTitle = o.Listing.Title,
+                    ListingImage = o.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
+                                o.Listing.Images?.FirstOrDefault()?.ImagePath ??
+                                "/images/placeholder.png",
+                    SellerName = $"{o.Listing.Seller.FirstName} {o.Listing.Seller.LastName}",
+                    OriginalPrice = o.Listing.Price,
+                    OfferAmount = o.OfferAmount,
+                    Status = o.Status,
+                    CreatedAt = o.CreatedAt ?? DateTime.MinValue,
+                    UpdatedAt = o.UpdatedAt
+                }).ToList();
+
+                return View(model);
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Error getting user offers");
+                TempData["ErrorMessage"] = "An error occurred while loading your offers.";
+                return View(new List<OfferViewModel>());
+            }
+        }
+        [HttpPost]
+        [UserAuthenticationFilter]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelOffer(int offerId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login");
+            }
+
+            try
+            {
+                // Get the offer and check it belongs to the user
+                var offer = await _context.Offers
+                    .Include(o => o.Listing)
+                    .FirstOrDefaultAsync(o => o.Id == offerId && o.BuyerId == userId);
+
+                if (offer == null)
+                {
+                    TempData["ErrorMessage"] = "Offer not found.";
+                    return RedirectToAction("MyOffers");
+                }
+
+                // Check if the offer is in a state that can be canceled
+                if (offer.Status != OfferStatus.Pending)
+                {
+                    TempData["ErrorMessage"] = "Only pending offers can be canceled.";
+                    return RedirectToAction("MyOffers");
+                }
+
+                // Update the offer status
+                offer.Status = OfferStatus.Cancelled;
+                offer.UpdatedAt = DateTime.UtcNow;
+
+                // Create notification for the seller
+                var notification = new Notification
+                {
+                    UserId = offer.Listing.SellerId,
+                    Message = $"A buyer has canceled their offer of {offer.OfferAmount:C} for your listing '{offer.Listing.Title}'.",
+                    Type = NotificationType.OfferCancelled,
+                    RelatedEntityId = offerId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Notifications.Add(notification);
+
+                // Add a message to the conversation about the cancellation
+                var message = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = offer.Listing.SellerId,
+                    ListingId = offer.ListingId,
+                    Content = $"I have canceled my offer of {offer.OfferAmount:C} for this item.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(message);
+
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Your offer has been canceled successfully.";
+                return RedirectToAction("MyOffers");
+            }
+            catch (Exception ex)
+            {
+                //_logger.LogError(ex, "Error canceling offer");
+                TempData["ErrorMessage"] = "An error occurred while canceling your offer: " + ex.Message;
+                return RedirectToAction("MyOffers");
+            }
+        }
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> SubmitIdVerification(IFormFile idFront, IFormFile idBack)

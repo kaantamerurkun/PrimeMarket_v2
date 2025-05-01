@@ -507,10 +507,13 @@ namespace PrimeMarket.Controllers
 
 
         // Process offer purchase for second-hand listings
-        [HttpPost]
+        // Add a new [HttpPost] method named ProcessOfferPurchase that will handle the form submission
+        // This needs to be added to PaymentController.cs
+
+
+        // In PaymentController.cs
         [HttpGet]
         [UserAuthenticationFilter]
-        [ValidateAntiForgeryToken]
         public async Task<IActionResult> ProcessOfferPurchase(int offerId)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -521,10 +524,11 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the offer with listing
+                // Get the offer with listing and images
                 var offer = await _context.Offers
                     .Include(o => o.Listing)
-                    .ThenInclude(l => l.Seller)
+                    .ThenInclude(l => l.Images)
+                    .Include(o => o.Listing.Seller)
                     .FirstOrDefaultAsync(o => o.Id == offerId && o.BuyerId == userId && o.Status == OfferStatus.Accepted);
 
                 if (offer == null)
@@ -539,98 +543,25 @@ namespace PrimeMarket.Controllers
                     TempData["ErrorMessage"] = "This listing is no longer available.";
                     return RedirectToAction("MyOffers", "User");
                 }
+
                 var model = new OfferPaymentViewModel
                 {
                     OfferId = offer.Id,
                     ListingId = offer.ListingId,
                     ListingTitle = offer.Listing.Title,
+                    ListingImage = offer.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
+                                  offer.Listing.Images?.FirstOrDefault()?.ImagePath ??
+                                  "/images/placeholder.png",
                     SellerName = $"{offer.Listing.Seller.FirstName} {offer.Listing.Seller.LastName}",
                     OfferAmount = offer.OfferAmount
                 };
+
                 return View(model);
-
-                // Check that this is a second-hand listing
-                if (offer.Listing.Condition != "Second-Hand")
-                {
-                    TempData["ErrorMessage"] = "Invalid operation. This offer is not for a second-hand listing.";
-                    return RedirectToAction("Details", "Listing", new { id = offer.ListingId });
-                }
-
-                // Create purchase record
-                var purchase = new Purchase
-                {
-                    BuyerId = userId.Value,
-                    ListingId = offer.ListingId,
-                    OfferId = offer.Id,
-                    Amount = offer.OfferAmount, // Use the offer amount, not listing price
-                    PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Purchases.Add(purchase);
-
-                // Create purchase confirmation record for tracking shipping/delivery
-                var confirmation = new PurchaseConfirmation
-                {
-                    PurchaseId = purchase.Id,
-                    SellerShippedProduct = false,
-                    BuyerReceivedProduct = false,
-                    PaymentReleased = false,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.PurchaseConfirmations.Add(confirmation);
-
-                // Update offer status
-                offer.Status = OfferStatus.Purchased;
-                offer.UpdatedAt = DateTime.UtcNow;
-
-                // Update listing status
-                offer.Listing.Status = ListingStatus.Sold;
-                offer.Listing.UpdatedAt = DateTime.UtcNow;
-
-                // Create notifications for buyer and seller
-                var buyerNotification = new Notification
-                {
-                    UserId = userId.Value,
-                    Message = $"You have successfully purchased '{offer.Listing.Title}' via your offer. Please wait for the seller to ship the item.",
-                    Type = NotificationType.PurchaseCompleted,
-                    RelatedEntityId = purchase.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                var sellerNotification = new Notification
-                {
-                    UserId = offer.Listing.SellerId,
-                    Message = $"Your listing '{offer.Listing.Title}' has been purchased through an offer. Please ship the item and confirm shipping.",
-                    Type = NotificationType.PurchaseCompleted,
-                    RelatedEntityId = purchase.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Notifications.Add(buyerNotification);
-                _context.Notifications.Add(sellerNotification);
-
-                // Create a message in the conversation about the purchase
-                var purchaseMessage = new Message
-                {
-                    SenderId = userId.Value,
-                    ReceiverId = offer.Listing.SellerId,
-                    ListingId = offer.ListingId,
-                    Content = $"I have completed the purchase of this item for {offer.OfferAmount:C}.",
-                    IsRead = false,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Messages.Add(purchaseMessage);
-
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("PurchaseComplete", new { purchaseId = purchase.Id });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error processing offer purchase");
-                TempData["ErrorMessage"] = "An error occurred while processing your payment: " + ex.Message;
+                _logger.LogError(ex, "Error loading offer purchase page");
+                TempData["ErrorMessage"] = "An error occurred while processing your request: " + ex.Message;
                 return RedirectToAction("MyOffers", "User");
             }
         }
@@ -1003,6 +934,126 @@ namespace PrimeMarket.Controllers
                 _logger.LogError(ex, "Error confirming receipt");
                 TempData["ErrorMessage"] = "An error occurred while confirming receipt: " + ex.Message;
                 return RedirectToAction("PurchaseStatus", new { purchaseId });
+            }
+        }
+        [HttpPost]
+        [UserAuthenticationFilter]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> ProcessOfferPurchase(int offerId, string CardholderName, string CardNumber, string ExpiryDate, string Cvv)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            try
+            {
+                // Get the offer with listing
+                var offer = await _context.Offers
+                    .Include(o => o.Listing)
+                    .ThenInclude(l => l.Seller)
+                    .FirstOrDefaultAsync(o => o.Id == offerId && o.BuyerId == userId && o.Status == OfferStatus.Accepted);
+
+                if (offer == null)
+                {
+                    TempData["ErrorMessage"] = "Offer not found or not accepted.";
+                    return RedirectToAction("MyOffers", "User");
+                }
+
+                // Check if listing is still available
+                if (offer.Listing.Status != ListingStatus.Approved)
+                {
+                    TempData["ErrorMessage"] = "This listing is no longer available.";
+                    return RedirectToAction("MyOffers", "User");
+                }
+
+                // Check that this is a second-hand listing
+                if (offer.Listing.Condition != "Second-Hand")
+                {
+                    TempData["ErrorMessage"] = "Invalid operation. This offer is not for a second-hand listing.";
+                    return RedirectToAction("Details", "Listing", new { id = offer.ListingId });
+                }
+
+                // Create purchase record
+                var purchase = new Purchase
+                {
+                    BuyerId = userId.Value,
+                    ListingId = offer.ListingId,
+                    OfferId = offer.Id,
+                    Amount = offer.OfferAmount, // Use the offer amount, not listing price
+                    PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                // First add and save the purchase to get its ID
+                _context.Purchases.Add(purchase);
+                await _context.SaveChangesAsync();
+
+                // Now create the purchase confirmation with the valid purchase ID
+                var confirmation = new PurchaseConfirmation
+                {
+                    PurchaseId = purchase.Id, // Now this ID exists in the database
+                    SellerShippedProduct = false,
+                    BuyerReceivedProduct = false,
+                    PaymentReleased = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.PurchaseConfirmations.Add(confirmation);
+
+                // Update offer status
+                offer.Status = OfferStatus.Purchased;
+                offer.UpdatedAt = DateTime.UtcNow;
+
+                // Update listing status
+                offer.Listing.Status = ListingStatus.Sold;
+                offer.Listing.UpdatedAt = DateTime.UtcNow;
+
+                // Create notifications for buyer and seller
+                var buyerNotification = new Notification
+                {
+                    UserId = userId.Value,
+                    Message = $"You have successfully purchased '{offer.Listing.Title}' via your offer. Please wait for the seller to ship the item.",
+                    Type = NotificationType.PurchaseCompleted,
+                    RelatedEntityId = purchase.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var sellerNotification = new Notification
+                {
+                    UserId = offer.Listing.SellerId,
+                    Message = $"Your listing '{offer.Listing.Title}' has been purchased through an offer. Please ship the item and confirm shipping.",
+                    Type = NotificationType.PurchaseCompleted,
+                    RelatedEntityId = purchase.Id,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Notifications.Add(buyerNotification);
+                _context.Notifications.Add(sellerNotification);
+
+                // Create a message in the conversation about the purchase
+                var purchaseMessage = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = offer.Listing.SellerId,
+                    ListingId = offer.ListingId,
+                    Content = $"I have completed the purchase of this item for {offer.OfferAmount:C}.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(purchaseMessage);
+
+                // Save all the changes
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction("PurchaseComplete", new { purchaseId = purchase.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error processing offer purchase");
+                TempData["ErrorMessage"] = "An error occurred while processing your payment: " + ex.Message;
+                return RedirectToAction("MyOffers", "User");
             }
         }
     }

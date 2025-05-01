@@ -36,7 +36,7 @@
                 </div>
             }
 
-            <form id="paymentForm" method="post" action="@Url.Action("ProcessOfferPurchase")">
+            <form id="paymentForm" method="post" action="@Url.Action("ProcessOfferPurchase", "Payment")">
                 @Html.AntiForgeryToken()
                 <input type="hidden" name="offerId" value="@Model.OfferId">
 
