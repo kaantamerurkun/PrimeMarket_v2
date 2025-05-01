@@ -1,0 +1,29 @@
+﻿@model IEnumerable<PrimeMarket.Models.Notification>
+
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle position-relative" data-bs-toggle="dropdown">
+        <i class="bi bi-bell"></i>
+        @if (Model.Any(n => !n.IsRead))
+        {
+            <span class="badge bg-danger position-absolute top-0 start-100 translate-middle">
+                @Model.Count(n => !n.IsRead)
+            </span>
+        }
+    </a>
+    <ul class="dropdown-menu dropdown-menu-end">
+        @foreach (var n in Model.Take(10))
+        {
+            <li class="dropdown-item @(n.IsRead ? "text-muted" : "")">
+                @n.Message
+                <br /><small class="text-muted">@n.CreatedAt?.ToLocalTime().ToString("g")</small>
+            </li>
+        }
+        <li><hr class="dropdown-divider" /></li>
+        <li>
+            <form asp-action="MarkAllRead" asp-controller="Notification" method="post">
+                <button class="dropdown-item text-center">Mark all read</button>
+            </form>
+        </li>
+    </ul>
+</li>

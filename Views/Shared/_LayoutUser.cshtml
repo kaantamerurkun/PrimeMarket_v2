@@ -1,6 +1,20 @@
-﻿@{
+﻿@using PrimeMarket.Data
+@{
     var userName = Context.Session.GetString("UserName") ?? "Guest";
     var isVerified = Context.Session.GetString("IsUserVerified") == "true";
+    int? uid = Context.Session.GetInt32("UserId");
+    IEnumerable<Notification> notifications = Enumerable.Empty<Notification>();
+    if (uid.HasValue) {
+        using var scope = Context.RequestServices.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+        notifications = db.Notifications
+                          .Where(n => n.UserId == uid && n.CreatedAt > DateTime.UtcNow.AddDays(-7))
+                          .OrderByDescending(n => n.CreatedAt)
+                          .ToList();
+    }
+}
+@await Html.PartialAsync("_NotificationDropdown", notifications)
+
 }
 <!DOCTYPE html>
 <html>

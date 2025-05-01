@@ -221,7 +221,15 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = $"Error clearing notifications: {ex.Message}" });
             }
         }
-
+        public async Task<IActionResult> List()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId")!.Value;
+            var notifications = await _context.Notifications
+                                          .Where(n => n.UserId == userId)
+                                          .OrderByDescending(n => n.CreatedAt)
+                                          .ToListAsync();
+            return View(notifications);
+        }
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> Details(int id)
