@@ -822,7 +822,7 @@ namespace PrimeMarket.Controllers
         [UserAuthenticationFilter]
         public IActionResult MyProfitLossReport()
         {
-            return View();
+            return RedirectToAction("MyProfitLossReport", "Report");
         }
 
         [UserAuthenticationFilter]
