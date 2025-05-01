@@ -1,5 +1,4 @@
 ﻿@model PrimeMarket.Models.ViewModel.ListingDetailsViewModel
-
 @{
     ViewData["Title"] = Model.Listing.Title;
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -70,6 +69,14 @@
                 <span class="label">Listed Date:</span>
                 <span class="value">@(((DateTime)Model.Listing.CreatedAt).ToString("MMMM dd, yyyy"))</span>
             </div>
+            
+            @if (Model.Listing.Condition == "First-Hand" && Model.Listing.Stock.HasValue)
+            {
+                <div class="detail-item">
+                    <span class="label">Available Stock:</span>
+                    <span class="value">@Model.Listing.Stock</span>
+                </div>
+            }
 
             <!-- Action Buttons -->
             <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 15px" class="action-buttons">
@@ -78,9 +85,17 @@
                 id="bookmark-btn">
                     @(Model.IsBookmarked ? "Remove from Bookmark" : "Add to Bookmark")
                 </button>
-                <a href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
-                    <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
-                </a>
+                
+                @if (Model.Listing.Condition == "First-Hand" && Model.Listing.Stock > 0)
+                {
+                    <a href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
+                        <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
+                    </a>
+                }
+                else if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock == null || Model.Listing.Stock <= 0))
+                {
+                    <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-outofstock" disabled>Out of Stock</button>
+                }
             </div>
         </div>
     </div>
@@ -130,12 +145,11 @@
                     <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
                         <button class="btn-sendmessage">Send Message</button>
                     </a>
-                    @if (Model.Listing.Condition.Equals("Second-Hand")) {
-
+                    
+                    @if (Model.Listing.Condition.Equals("Second-Hand"))
+                    {
                         <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
-
                     }
-
                 }
                 else
                 {
@@ -174,421 +188,31 @@
 </div>
 
 <!-- Offer Modal -->
-    <!-- Offer Modal -->
-    <div id="offerModal" class="modal">
-        <div class="modal-content">
-            <span class="close-btn" onclick="closeOfferModal()">&times;</span>
-            <h2>Make an Offer</h2>
-
-            <form id="offerForm">
-                <input type="hidden" id="listingId" value="@Model.Listing.Id" />
-
-                <label for="offerAmount">Your Offer (@Model.Listing.Price.ToString("C") is the asking price):</label>
-                <input type="number"
-                       id="offerAmount"
-                       name="offerAmount"
-                       required
-                       min="1"
-                       step="0.01"
-                       max="@Model.Listing.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                       value="@Math.Round(Model.Listing.Price * 0.9m, 2).ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                       style="border-radius:50px; padding:10px" />
-
-                <br /><br />
-
-                <label for="offerMessage">Message (optional):</label><br />
-                <textarea id="offerMessage" name="offerMessage" rows="4" cols="40"
-                          placeholder="Explain why you're making this offer..."></textarea>
-
-                <br /><br />
-
-                <button type="submit" class="btn-sendmessage">Send Offer</button>
-            </form>
-        </div>
-    </div>
-
-<style>
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    .breadcrumb {
-        display: flex;
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #666;
-    }
-
-        .breadcrumb a {
-            color: #0066cc;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-            .breadcrumb a:first-child {
-                margin-left: 0;
-            }
-
-            .breadcrumb a:hover {
-                text-decoration: underline;
-            }
-
-    .listing-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-        .listing-header h1 {
-            margin: 0;
-            font-size: 24px;
-            flex: 1;
-        }
-
-    .price {
-        font-size: 24px;
-        font-weight: bold;
-        color: #0066cc;
-    }
-
-    .main-content {
-        display: flex;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .image-gallery {
-        flex: 0 0 60%;
-    }
-
-    .main-image {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
-
-    .thumbnail-container {
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-
-    .thumbnail {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-        .thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-    .property-details {
-        flex: 0 0 35%;
-    }
-
-    .detail-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .label {
-        font-weight: bold;
-        color: #555;
-    }
-
-    .value {
-        color: #333;
-    }
-
-    .btn-bookmark, .btn-buynow {
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 20px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-        .btn-bookmark:hover {
-            background: #f0f0f0;
-        }
-
-        .btn-buynow:hover {
-            background: #2CB736;
-            color: white;
-        }
-
-    .product-specifications {
-        margin-bottom: 30px;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-    }
-
-        .product-specifications h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-    .description-section {
-        margin-bottom: 30px;
-    }
-
-        .description-section h3 {
-            margin-bottom: 15px;
-        }
-
-    .description-content {
-        line-height: 1.6;
-    }
-
-    .seller-info {
-        margin-bottom: 30px;
-    }
-
-    .seller-card {
-        display: flex;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-    }
-
-    .seller-photo {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-right: 20px;
-        object-fit: cover;
-    }
-
-    .seller-details h3 {
-        margin-top: 0;
-        margin-bottom: 10px;
-    }
-
-    .phone {
-        margin-bottom: 15px;
-        color: #666;
-    }
-
-    .btn-sendmessage, .btn-makeoffer {
-        padding: 8px 15px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        margin-right: 10px;
-        font-size: 14px;
-    }
-
-    .btn-sendmessage {
-        background-color: #0066cc;
-        color: white;
-    }
-
-    .btn-makeoffer {
-        background-color: #f0f0f0;
-        color: #333;
-    }
-
-    .btn-sendmessage:hover {
-        background-color: #0055b3;
-    }
-
-    .btn-makeoffer:hover {
-        background-color: #e0e0e0;
-    }
-
-    .owner-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: #f0f0f0;
-        color: #666;
-        border-radius: 15px;
-        font-size: 14px;
-    }
-
-    .related-listings {
-        margin-top: 40px;
-    }
-
-        .related-listings h3 {
-            margin-bottom: 20px;
-        }
-
-    .related-listings-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-    }
-
-    .related-listing-item {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        transition: transform 0.2s ease;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-        .related-listing-item:hover {
-            transform: translateY(-5px);
-        }
-
-    .related-image {
-        height: 150px;
-        overflow: hidden;
-    }
-
-        .related-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    .related-info {
-        padding: 10px;
-    }
-
-        .related-info h4 {
-            margin: 0 0 5px 0;
-            font-size: 16px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-    .related-price {
-        color: #0066cc;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-    }
-
-    .modal-content {
-        background-color: white;
-        margin: 10% auto;
-        padding: 20px;
-        width: 80%;
-        max-width: 500px;
-        border-radius: 10px;
-        position: relative;
-    }
-
-    .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    /* Responsive design */
-    @@media (max-width: 768px) {
-        .main-content
-
-    {
-        flex-direction: column;
-    }
-
-    .image-gallery {
-        flex: 0 0 100%;
-    }
-
-    .property-details {
-        flex: 0 0 100%;
-    }
-
-    .related-listings-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
-    }</style>
-
-
-    <script>
-        /* ---------- image swap ---------- */
-        function changeMainImage(src) { document.getElementById('main-image').src = src; }
-
-        /* ---------- modal helpers ---------- */
-        const modal = document.getElementById('offerModal');
-        function openOfferModal()  { modal.style.display = 'block'; }
-        function closeOfferModal() { modal.style.display = 'none'; }
-        window.addEventListener('click', e => { if (e.target === modal) closeOfferModal(); });
-
-        /* ---------- bookmark ---------- */
-        function toggleBookmark(id) {
-            fetch('/Listing/ToggleBookmark', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: `listingId=${id}`
-            })
-            .then(r => r.json())
-            .then(d => {
-                if (!d.success) return alert(d.message);
-                document.getElementById('bookmark-btn').textContent =
-                    d.isBookmarked ? 'Remove from Bookmark' : 'Add to Bookmark';
-            })
-            .catch(console.error);
-        }
-
-        /* ---------- offer form ---------- */
-        document.getElementById('offerForm').addEventListener('submit', async e => {
-            e.preventDefault();
-
-            const listingId   = Number(document.getElementById('listingId').value);
-            const rawInput    = document.getElementById('offerAmount').value;
-            const offerAmount = Number(rawInput.replace(',', '.'));
-            const message     = document.getElementById('offerMessage').value;
-
-            if (isNaN(offerAmount) || offerAmount <= 0)
-                return alert('Please enter a valid offer.');
-
-            const res  = await fetch('/Listing/MakeOffer', {
-                method : 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body   : JSON.stringify({ listingId, offerAmount, message })
-            });
-            const data = await res.json();
-
-            alert(data.message);
-            if (data.success) closeOfferModal();
-        });
-
-        /* ---------- clamp input to listing price ---------- */
-        document.addEventListener('DOMContentLoaded', () => {
-            const maxPrice = parseFloat('@Model.Listing.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)');
-            const input    = document.getElementById('offerAmount');
-            input.addEventListener('input', () => {
-                if (parseFloat(input.value) > maxPrice) input.value = maxPrice;
-            });
-        });
-    </script>
-</body>
-</html>
+<div id="offerModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeOfferModal()">&times;</span>
+        <h2>Make an Offer</h2>
+
+        <form id="offerForm">
+            <input type="hidden" id="listingId" value="@Model.Listing.Id" />
+
+            <label for="offerAmount">Your Offer (@Model.Listing.Price.ToString("C") is the asking price):</label>
+            <input type="number"
+                   id="offerAmount"
+                   name="offerAmount"
+                   required
+                   min="1"
+                   step="0.01"
+                   max="@Model.Listing.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                   value="@Math.Round(Model.Listing.Price * 0.9m, 2).ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                   style="border-radius:50px; padding:10px" />
+
+            <br /><br />
+
+            <label for="offerMessage">Message (optional):</label><br />
+            <textarea id="offerMessage" name="offerMessage" rows="4" cols="40"
+                      placeholder="Explain why you're making this offer..."></textarea>
+
+            <br /><br />
+
+            <button type="submit" class="btn-sendm
