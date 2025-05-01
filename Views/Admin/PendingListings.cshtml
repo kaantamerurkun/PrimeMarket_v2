@@ -935,144 +935,267 @@
             document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
         }
 
-        function closeUserProfileModal() {
-            document.getElementById('userProfileModal').style.display = 'none';
+
+                function fetchUserDetails(userId) {
+                    if (!userId) return;
+
+                    // Get the CSRF token
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                    fetch(`/Admin/GetUserDetails?userId=${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'RequestVerificationToken': token
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error(`Server returned ${response.status}: ${response.statusText}`);
+                            throw new Error('Failed to fetch user details');
+                        }
+                        return response.json();
+                    })
+                    .then(user => {
+                        console.log('User details received:', user);
+
+                        // Update the UI with the user details
+                        document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
+                        document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
+                        document.getElementById('profileModalUserEmail').textContent = user.email || "";
+                        document.getElementById('profileModalUserPhone').textContent = user.phoneNumber || "Not provided";
+
+                        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown";
+                        document.getElementById('profileModalUserCreated').textContent = createdDate;
+
+                        document.getElementById('profileModalUserVerification').textContent =
+                            user.isIdVerified ? "Verified" : "Pending";
+
+                        if (user.profileImagePath) {
+                            document.getElementById('profileModalUserImage').src = user.profileImagePath;
+                        }
+
+                        // Show verification badge if user is verified
+                        if (user.isIdVerified) {
+                            document.getElementById('profileModalVerificationBadge').style.display = 'block';
+                        } else {
+                            document.getElementById('profileModalVerificationBadge').style.display = 'none';
+                        }
+
+                        // Fetch user listings after user details are loaded
+                        fetchUserListings(userId);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user details:', error);
+                        document.getElementById('profileModalUserFirstName').textContent = "Error loading data";
+                        document.getElementById('profileModalUserLastName').textContent = "";
+                        document.getElementById('profileModalUserEmail').textContent = "Please try again";
+                        document.getElementById('profileModalUserPhone').textContent = "";
+                        document.getElementById('profileModalUserCreated').textContent = "";
+                        document.getElementById('profileModalUserVerification').textContent = "Unknown";
+
+                        // We'll still try to fetch listings in case user details failed but listings might succeed
+                        fetchUserListings(userId);
+                    });
+                }
+
+                function closeUserProfileModal() {
+                    const modal = document.getElementById('userProfileModal');
+                    if (modal) {
+                        modal.style.display = 'none';
+                    }
+                }
+
+function fetchUserListings(userId) {
+    if (!userId) return;
+    
+    const listingsContainer = document.getElementById('profileModalListingsContainer');
+    if (!listingsContainer) {
+        console.error('Listings container not found in the DOM');
+        return;
+    }
+    
+    // Show loading state
+    listingsContainer.innerHTML = `
+        <div class="empty-listings">
+            <p>Loading listings...</p>
+        </div>
+    `;
+
+    // Get the anti-forgery token
+    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+    fetch(`/Admin/GetUserListings?userId=${userId}`, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'RequestVerificationToken': token
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            console.error(`Server returned ${response.status}: ${response.statusText}`);
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('User listings data received:', data);
+        
+        // Safely handle the response data
+        let listings = [];
+        
+        if (Array.isArray(data)) {
+            listings = data;
+        } else if (data && typeof data === 'object') {
+            // Handle possible object response with listings property
+            if (Array.isArray(data.listings)) {
+                listings = data.listings;
+            } else if (data.success === false) {
+                console.warn('API returned error:', data.message || 'Unknown error');
+                throw new Error(data.message || 'Failed to load listings');
+            }
         }
 
-        function fetchUserDetails(userId) {
-            fetch(`/Admin/GetUserDetails?userId=${userId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Error fetching user details');
-                }
-                return response.json();
-            })
-            .then(user => {
-                // Update the UI with the user details from the database
-                document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
-                document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
-                document.getElementById('profileModalUserEmail').textContent = user.email || "";
-                document.getElementById('profileModalUserPhone').textContent = user.phoneNumber || "Not provided";
-                document.getElementById('profileModalUserCreated').textContent = new Date(user.createdAt).toLocaleDateString();
-                document.getElementById('profileModalUserVerification').textContent = user.isIdVerified ? "Verified" : "Pending";
-
-                if (user.profileImagePath) {
-                    document.getElementById('profileModalUserImage').src = user.profileImagePath;
-                }
-
-                // Show verification badge if user is verified
-                if (user.isIdVerified) {
-                    document.getElementById('profileModalVerificationBadge').style.display = 'block';
-                } else {
-                    document.getElementById('profileModalVerificationBadge').style.display = 'none';
-                }
-
-                // Fetch user listings and generate the listings grid
-                fetchUserListings(userId);
-            })
-            .catch(error => {
-                console.error('Error fetching user details:', error);
-                // Fallback to data from the verification card if API call fails
-                const sellerEl = document.querySelector(`[data-user-id="${userId}"]`);
-                if (sellerEl) {
-                    const userName = sellerEl.textContent.trim().split(' ');
-                    const firstName = userName[0] || "";
-                    const lastName = userName.slice(1).join(' ') || "";
-
-                    // Update the UI with the data we have
-                    document.getElementById('profileModalUserFirstName').textContent = firstName;
-                    document.getElementById('profileModalUserLastName').textContent = lastName;
-                    document.getElementById('profileModalUserEmail').textContent = "Information not available";
-                    document.getElementById('profileModalUserCreated').textContent = "Unknown";
-                    document.getElementById('profileModalUserVerification').textContent = "Unknown";
-                }
-
-                // Still try to fetch user listings
-                fetchUserListings(userId);
-            });
-        }
-
-        function fetchUserListings(userId) {
-            const listingsContainer = document.getElementById('profileModalListingsContainer');
+        if (listings.length === 0) {
             listingsContainer.innerHTML = `
                 <div class="empty-listings">
-                    <p>Loading listings...</p>
+                    <p>This user has no listings.</p>
                 </div>
             `;
+            return;
+        }
 
-            fetch(`/Admin/GetUserListings?userId=${userId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]')?.value || ''
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Network response was not ok');
-                    return []; // fallback to empty listings
-                }
-                return response.json();
-            })
-            .then(data => {
-                // If the server sent an object like { success: false }, treat as empty
-                const listings = Array.isArray(data) ? data : [];
+        // Build listings HTML
+        let listingsHTML = '<div class="listings-grid">';
+        
+        listings.forEach(listing => {
+            // Safely extract the main image
+            let mainImage = "/images/placeholder.png";
+            if (listing.images && listing.images.length > 0) {
+                const mainImageObj = listing.images.find(img => img.isMainImage);
+                mainImage = mainImageObj ? mainImageObj.imagePath : listing.images[0].imagePath;
+            }
 
-                if (listings.length === 0) {
-                    listingsContainer.innerHTML = `
-                        <div class="empty-listings">
-                            <p>This user has no listings.</p>
-                        </div>
-                    `;
-                    return;
-                }
+            // Safely get status and convert to lowercase
+            const status = (listing.status || 'unknown').toLowerCase();
 
-                // Build listings HTML
-                let listingsHTML = '<div class="listings-grid">';
-                listings.forEach(listing => {
-                    let mainImage = "/images/placeholder.png";
-                    if (listing.images && listing.images.length > 0) {
-                        const mainImageObj = listing.images.find(img => img.isMainImage);
-                        mainImage = mainImageObj ? mainImageObj.imagePath : listing.images[0].imagePath;
+            // Safe conversion for price
+            const price = typeof listing.price === 'number' 
+                ? listing.price.toLocaleString() 
+                : listing.price || '0';
+
+            // Build HTML with appropriate escaping
+            listingsHTML += `
+                <div class="listing-card ${status}">
+                    <div class="listing-image">
+                        <img src="${mainImage}" alt="${(listing.title || '').replace(/"/g, '&quot;')}">
+                        <div class="listing-status ${status}">${listing.status || 'Unknown'}</div>
+                    </div>
+                    <div class="listing-details">
+                        <h3>${listing.title || 'Untitled Listing'}</h3>
+                        <p class="listing-price">₺${price}</p>
+                        <p class="listing-date">Listed on ${new Date(listing.createdAt || Date.now()).toLocaleDateString()}</p>
+                        <p>Category: ${listing.category || 'Unknown'}${listing.subCategory ? ` > ${listing.subCategory}` : ''}</p>
+                        ${listing.status === 'Rejected' && listing.rejectionReason ?
+                            `<p class="rejection-reason"><strong>Rejection Reason:</strong> ${listing.rejectionReason}</p>` : ''}
+                    </div>
+                </div>
+            `;
+        });
+
+        listingsHTML += '</div>';
+        listingsContainer.innerHTML = listingsHTML;
+    })
+    .catch(error => {
+        console.error('Error fetching user listings:', error);
+        listingsContainer.innerHTML = `
+            <div class="empty-listings">
+                <p>Error loading listings. Please try again later.</p>
+                <p class="error-details">${error.message || 'Unknown error'}</p>
+            </div>
+        `;
+    });
+}
+        function openUserProfileModal(userId, userName) {
+            if (!userId) {
+                console.error("Cannot open user profile: userId is null or undefined");
+                return;
+            }
+
+            // Show the modal
+            const modal = document.getElementById('userProfileModal');
+            if (!modal) {
+                console.error("User profile modal element not found");
+                return;
+            }
+
+            modal.style.display = 'block';
+
+            // Set modal title with user name
+            const titleEl = document.getElementById('profileModalUserName');
+            if (titleEl) {
+                titleEl.textContent = userName ? `${userName}'s Profile` : 'User Profile';
+            }
+
+            // Clear previous data and show loading indicators
+            resetProfileModalData();
+
+            // Fetch user details
+            fetchUserDetails(userId);
+
+            // Set up close button event handler
+            const closeBtn = document.getElementById('closeProfileBtn');
+            if (closeBtn) {
+                closeBtn.onclick = closeUserProfileModal;
+            }
+
+            // Set up the view verification button if present
+            const viewVerificationBtn = document.getElementById('viewVerificationBtn');
+            if (viewVerificationBtn) {
+                viewVerificationBtn.onclick = function() {
+                    // Find the verification card for this user
+                    const verificationCard = document.querySelector(`.verification-card[data-user-id="${userId}"]`);
+                    if (verificationCard) {
+                        const verificationId = verificationCard.getAttribute('data-id');
+                        closeUserProfileModal();
+
+                        // Determine which openImageModal function to call based on which page we're on
+                        if (typeof openImageModal === 'function') {
+                            // On the verification page
+                            const frontImage = verificationCard.querySelector('.front-image')?.src;
+                            const backImage = verificationCard.querySelector('.back-image')?.src;
+                            openImageModal(verificationId, userName, frontImage, backImage);
+                        }
+                    } else {
+                        console.warn("Could not find verification card for user:", userId);
                     }
+                };
+            }
+        }
 
-                    const status = listing.status.toLowerCase();
+        function resetProfileModalData() {
+            // Reset all user data fields with loading indicators
+            document.getElementById('profileModalUserFirstName').textContent = "Loading...";
+            document.getElementById('profileModalUserLastName').textContent = "Loading...";
+            document.getElementById('profileModalUserEmail').textContent = "Loading...";
+            document.getElementById('profileModalUserPhone').textContent = "Loading...";
+            document.getElementById('profileModalUserCreated').textContent = "Loading...";
+            document.getElementById('profileModalUserVerification').textContent = "Loading...";
+            document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
+            document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
-                    listingsHTML += `
-                        <div class="listing-card ${status}">
-                            <div class="listing-image">
-                                <img src="${mainImage}" alt="${listing.title}">
-                                <div class="listing-status ${status}">${listing.status}</div>
-                            </div>
-                            <div class="listing-details">
-                                <h3>${listing.title}</h3>
-                                <p class="listing-price">₺${listing.price.toLocaleString()}</p>
-                                <p class="listing-date">Listed on ${new Date(listing.createdAt).toLocaleDateString()}</p>
-                                <p>Category: ${listing.category}${listing.subCategory ? ` > ${listing.subCategory}` : ''}</p>
-                                ${listing.status === 'Rejected' && listing.rejectionReason ?
-                                    `<p class="rejection-reason"><strong>Rejection Reason:</strong> ${listing.rejectionReason}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                listingsHTML += '</div>';
-                listingsContainer.innerHTML = listingsHTML;
-            })
-            .catch(error => {
-                console.error('Error fetching user listings:', error);
+            // Clear listings container with loading indicator
+            const listingsContainer = document.getElementById('profileModalListingsContainer');
+            if (listingsContainer) {
                 listingsContainer.innerHTML = `
                     <div class="empty-listings">
-                        <p>Error loading listings. Please try again later.</p>
+                        <p>Loading user data...</p>
                     </div>
                 `;
-            });
+            }
         }
 
 
