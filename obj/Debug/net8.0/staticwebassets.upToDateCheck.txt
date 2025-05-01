@@ -95,6 +95,7 @@ wwwroot\images\verification\back_15_68fafc88-08f1-4cec-8d19-ba465f1c4c4e.png
 wwwroot\images\verification\back_17_ae898537-7eeb-4836-b576-e58a2148e3f7.png
 wwwroot\images\verification\back_18_2f0e8358-b553-4b6e-9229-9d0765840a1d.png
 wwwroot\images\verification\back_18_edb24c98-2da8-43ad-b4a5-e018654dad20.png
+wwwroot\images\verification\back_19_aaa61477-def1-49b5-bd42-4429baca4647.png
 wwwroot\images\verification\back_20_94f35934-d393-45ff-bdc2-1d8bc081f18a.png
 wwwroot\images\verification\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png
 wwwroot\images\verification\front_14_40492d63-2284-47ea-9d5c-8ba9f08679d6.png
@@ -106,6 +107,7 @@ wwwroot\images\verification\front_15_e8467c90-911e-4ac4-b81f-ee2eb0a16f8f.png
 wwwroot\images\verification\front_17_b30546a3-92e2-4e57-aa13-271521780d7b.png
 wwwroot\images\verification\front_18_26e0676f-aa9c-4349-a442-9cdb90c061c9.png
 wwwroot\images\verification\front_18_a6ae440d-325a-42dd-a70e-53008338584d.png
+wwwroot\images\verification\front_19_587afc38-51c2-4537-9b79-1c217622e7d5.png
 wwwroot\images\verification\front_20_a1386817-5b5d-449b-b156-57794622692c.png
 wwwroot\images\verified.png
 wwwroot\js\site.js
