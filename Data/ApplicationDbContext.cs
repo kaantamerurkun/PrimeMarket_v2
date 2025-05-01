@@ -22,6 +22,7 @@ namespace PrimeMarket.Data
         public DbSet<Message> Messages { get; set; }
         public DbSet<Offer> Offers { get; set; }
         public DbSet<Purchase> Purchases { get; set; }
+        public DbSet<PurchaseConfirmation> PurchaseConfirmations { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserRating> UserRatings { get; set; }
         public DbSet<Admin> Admins { get; set; }
@@ -142,12 +143,32 @@ namespace PrimeMarket.Data
             modelBuilder.Entity<Bookmark>()
                 .HasIndex(b => new { b.UserId, b.ListingId })
                 .IsUnique();
+
             modelBuilder.Entity<Bookmark>()
                 .HasOne(b => b.User)
                 .WithMany(u => u.Bookmarks)
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            // Purchase confirmation relationship
+            modelBuilder.Entity<Purchase>()
+                .HasOne(p => p.Confirmation)
+                .WithOne(c => c.Purchase)
+                .HasForeignKey<PurchaseConfirmation>(c => c.PurchaseId);
+
+            // Offer relationships
+            modelBuilder.Entity<Offer>()
+                .HasOne(o => o.Messages)
+                .WithOne()
+                .HasForeignKey<Offer>(o => o.MessageId)
+                .IsRequired(false);
+
+            modelBuilder.Entity<Offer>()
+                .HasOne(o => o.OriginalOffer)
+                .WithMany(o => o.CounterOffers)
+                .HasForeignKey(o => o.OriginalOfferId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<UserRating>()
                 .HasIndex(r => new { r.RaterId, r.RatedUserId })
@@ -249,16 +270,14 @@ namespace PrimeMarket.Data
                 .HasForeignKey<ComputerAccessory>(p => p.ListingId);
 
             modelBuilder.Entity<Offer>()
-    .HasOne(o => o.Buyer)
-    .WithMany(u => u.Offers) // You'll need to add this navigation property to User
-    .HasForeignKey(o => o.BuyerId)
-    .OnDelete(DeleteBehavior.NoAction); // Change to NoAction instead of Cascade
+                .HasOne(o => o.Buyer)
+                .WithMany(u => u.Offers)
+                .HasForeignKey(o => o.BuyerId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             modelBuilder.Entity<Admin>()
-    .HasIndex(a => a.Username)
-    .IsUnique();
-
-
+                .HasIndex(a => a.Username)
+                .IsUnique();
 
             modelBuilder.Entity<Admin>()
                 .HasMany(a => a.AdminActions)

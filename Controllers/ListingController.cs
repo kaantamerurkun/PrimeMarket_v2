@@ -98,6 +98,13 @@ namespace PrimeMarket.Controllers
                 isValid = false;
             }
 
+            // Stock validation for first-hand listings
+            if (model.Condition == "First-Hand" && (!model.Stock.HasValue || model.Stock.Value <= 0))
+            {
+                ModelState.AddModelError("Stock", "Stock quantity is required for first-hand listings");
+                isValid = false;
+            }
+
             if (string.IsNullOrEmpty(model.Category))
             {
                 ModelState.AddModelError("Category", "Category is required");
@@ -142,12 +149,14 @@ namespace PrimeMarket.Controllers
                     Price = model.Price,
                     Description = model.Description,
                     Condition = model.Condition,
+                    // Add stock for first-hand items
+                    Stock = model.Condition == "First-Hand" ? model.Stock : null,
                     Category = model.Category,
                     SubCategory = model.SubCategory,
                     // Improved handling of DetailCategory
                     DetailCategory = (model.DetailCategory == null ||
                   model.DetailCategory == "undefined" ||
-                  string.IsNullOrEmpty(model.DetailCategory))? string.Empty
+                  string.IsNullOrEmpty(model.DetailCategory)) ? string.Empty
                   : model.DetailCategory,
                     RejectionReason = null,
                     Location = model.Location,
@@ -1118,7 +1127,7 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Laptops":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-
+                        // Add other cases from the original code...
                 }
             }
 
@@ -1140,6 +1149,17 @@ public async Task<IActionResult> DeleteListing(int id)
                 .Take(4)
                 .ToListAsync();
 
+            // Get active offers if this is a second-hand listing and the current user is the seller
+            List<Offer> activeOffers = new List<Offer>();
+            if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
+            {
+                activeOffers = await _context.Offers
+                    .Include(o => o.Buyer)
+                    .Where(o => o.ListingId == id && o.Status == OfferStatus.Pending)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
+            }
+
             // Create view model
             var viewModel = new ListingDetailsViewModel
             {
@@ -1147,7 +1167,8 @@ public async Task<IActionResult> DeleteListing(int id)
                 Product = product,
                 IsBookmarked = isBookmarked,
                 RelatedListings = relatedListings,
-                IsOwner = userId.HasValue && userId.Value == listing.SellerId
+                IsOwner = userId.HasValue && userId.Value == listing.SellerId,
+                ActiveOffers = activeOffers
             };
 
             return View(viewModel);

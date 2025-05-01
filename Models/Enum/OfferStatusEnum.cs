@@ -7,9 +7,12 @@ namespace PrimeMarket.Models.Enum
 {
     public enum OfferStatus
     {
-        Pending,
-        Accepted,
-        Rejected,
-        Expired
+        Pending,       // Initial state when offer is made
+        Accepted,      // Offer accepted by seller
+        Rejected,      // Offer rejected by seller
+        Countered,     // Seller made a counter offer
+        Purchased,     // Offer was accepted and purchased
+        Cancelled,     // Buyer cancelled the offer
+        Expired        // Offer expired without response
     }
 }

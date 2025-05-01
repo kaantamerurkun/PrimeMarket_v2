@@ -25,6 +25,9 @@ namespace PrimeMarket.Models
         [Required]
         public string Condition { get; set; } // First-Hand, Second-Hand
 
+        // Add stock tracking for First-Hand listings
+        public int? Stock { get; set; }
+
         [Required]
         public string Category { get; set; }
 
@@ -38,7 +41,7 @@ namespace PrimeMarket.Models
         [Required]
         public ListingStatus Status { get; set; } = ListingStatus.Pending;
 
-        public string ?RejectionReason { get; set; }
+        public string? RejectionReason { get; set; }
 
         // Navigation properties
         [ForeignKey("SellerId")]
