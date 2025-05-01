@@ -600,6 +600,18 @@ namespace PrimeMarket.Controllers
                 _context.Notifications.Add(buyerNotification);
                 _context.Notifications.Add(sellerNotification);
 
+                // Create a message in the conversation about the purchase
+                var purchaseMessage = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = offer.Listing.SellerId,
+                    ListingId = offer.ListingId,
+                    Content = $"I have completed the purchase of this item for {offer.OfferAmount:C}.",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(purchaseMessage);
+
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("PurchaseComplete", new { purchaseId = purchase.Id });
@@ -832,6 +844,19 @@ namespace PrimeMarket.Controllers
                 };
 
                 _context.Notifications.Add(notification);
+
+                // Add a message to the conversation between buyer and seller
+                var message = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = purchase.BuyerId,
+                    ListingId = purchase.ListingId,
+                    Content = $"I've shipped your item. Tracking Number: {trackingNumber}, Shipping Provider: {shippingProvider}",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(message);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Shipping confirmation successful.";
@@ -908,6 +933,18 @@ namespace PrimeMarket.Controllers
                     };
 
                     _context.Notifications.Add(sellerNotification);
+
+                    // Add a message to the conversation about payment release
+                    var paymentMessage = new Message
+                    {
+                        SenderId = userId.Value,
+                        ReceiverId = purchase.Listing.SellerId,
+                        ListingId = purchase.ListingId,
+                        Content = $"I've received the item and confirmed delivery. Payment has been released to you.",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Messages.Add(paymentMessage);
                 }
 
                 // Create notification for seller that item was received
@@ -921,6 +958,19 @@ namespace PrimeMarket.Controllers
                 };
 
                 _context.Notifications.Add(notification);
+
+                // Add a message to the conversation between buyer and seller
+                var receiptMessage = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = purchase.Listing.SellerId,
+                    ListingId = purchase.ListingId,
+                    Content = $"I've received the item. Thank you!",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(receiptMessage);
+
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Receipt confirmation successful.";

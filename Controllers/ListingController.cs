@@ -1405,6 +1405,14 @@ public async Task<IActionResult> DeleteListing(int id)
             if (listing == null)
                 return Json(new { success = false, message = "Listing not found." });
 
+            // Verify this is a second-hand listing
+            if (listing.Condition != "Second-Hand")
+                return Json(new { success = false, message = "You can only make offers on second-hand listings." });
+
+            // Verify listing is active and available
+            if (listing.Status != ListingStatus.Approved)
+                return Json(new { success = false, message = "This listing is not available for offers." });
+
             if (listing.SellerId == userId.Value)
                 return Json(new { success = false, message = "You cannot make an offer on your own listing." });
 
@@ -1429,6 +1437,18 @@ public async Task<IActionResult> DeleteListing(int id)
                 CreatedAt = DateTime.UtcNow
             };
             _context.Notifications.Add(notification);
+
+            // Create a message for the conversation between buyer and seller
+            var message = new Message
+            {
+                SenderId = userId.Value,
+                ReceiverId = listing.SellerId,
+                ListingId = model.ListingId,
+                Content = $"I made an offer of {offerAmount:C}" + (!string.IsNullOrEmpty(model.Message) ? $". Message: {model.Message}" : ""),
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Messages.Add(message);
 
             await _context.SaveChangesAsync();
 
@@ -1456,6 +1476,11 @@ public async Task<IActionResult> DeleteListing(int id)
                     return Json(new { success = false, message = "Offer not found or you don't have permission to respond to it." });
                 }
 
+                if (offer.Status != OfferStatus.Pending)
+                {
+                    return Json(new { success = false, message = "This offer has already been processed." });
+                }
+
                 if (accept)
                 {
                     // Accept the offer
@@ -1465,12 +1490,24 @@ public async Task<IActionResult> DeleteListing(int id)
                     var acceptNotification = new Notification
                     {
                         UserId = offer.BuyerId,
-                        Message = $"Your offer of {offer.OfferAmount:C} for '{offer.Listing.Title}' has been accepted",
+                        Message = $"Your offer of {offer.OfferAmount:C} for '{offer.Listing.Title}' has been accepted. You can now proceed with the purchase.",
                         Type = NotificationType.OfferAccepted,
                         RelatedEntityId = offer.ListingId,
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.Notifications.Add(acceptNotification);
+
+                    // Create a message for the conversation
+                    var acceptMessage = new Message
+                    {
+                        SenderId = userId.Value,
+                        ReceiverId = offer.BuyerId,
+                        ListingId = offer.ListingId,
+                        Content = $"I've accepted your offer of {offer.OfferAmount:C}. You can now proceed with the purchase.",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Messages.Add(acceptMessage);
                 }
                 else
                 {
@@ -1481,14 +1518,27 @@ public async Task<IActionResult> DeleteListing(int id)
                     var rejectNotification = new Notification
                     {
                         UserId = offer.BuyerId,
-                        Message = $"Your offer of {offer.OfferAmount:C} for '{offer.Listing.Title}' has been rejected",
+                        Message = $"Your offer of {offer.OfferAmount:C} for '{offer.Listing.Title}' has been rejected.",
                         Type = NotificationType.OfferRejected,
                         RelatedEntityId = offer.ListingId,
                         CreatedAt = DateTime.UtcNow
                     };
                     _context.Notifications.Add(rejectNotification);
+
+                    // Create a message for the conversation
+                    var rejectMessage = new Message
+                    {
+                        SenderId = userId.Value,
+                        ReceiverId = offer.BuyerId,
+                        ListingId = offer.ListingId,
+                        Content = $"I've rejected your offer of {offer.OfferAmount:C}.",
+                        IsRead = false,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Messages.Add(rejectMessage);
                 }
 
+                offer.ResponseDate = DateTime.UtcNow;
                 offer.UpdatedAt = DateTime.UtcNow;
                 await _context.SaveChangesAsync();
 
@@ -1500,6 +1550,7 @@ public async Task<IActionResult> DeleteListing(int id)
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Error responding to offer");
                 return Json(new { success = false, message = $"Error responding to offer: {ex.Message}" });
             }
         }
