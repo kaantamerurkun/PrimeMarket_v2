@@ -75,7 +75,34 @@ namespace PrimeMarket.Controllers
                 return View(new CartViewModel { Items = new List<CartItemViewModel>() });
             }
         }
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> GetPurchaseIdForOffer(int offerId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
 
+            try
+            {
+                var purchase = await _context.Purchases
+                    .FirstOrDefaultAsync(p => p.OfferId == offerId);
+
+                if (purchase == null)
+                {
+                    return Json(new { success = false, message = "Purchase not found" });
+                }
+
+                return Json(new { success = true, purchaseId = purchase.Id });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting purchase ID for offer");
+                return Json(new { success = false, message = "An error occurred" });
+            }
+        }
         [HttpPost]
         [UserAuthenticationFilter]
         public async Task<IActionResult> AddToCart(int listingId)

@@ -54,7 +54,62 @@ namespace PrimeMarket.Controllers
             return RedirectToAction("PendingListings", "Admin");
         }
 
+        [HttpGet]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> CheckSecondHandOffer(int offerId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
 
+            try
+            {
+                // Get the offer with listing
+                var offer = await _context.Offers
+                    .Include(o => o.Listing)
+                    .FirstOrDefaultAsync(o => o.Id == offerId);
+
+                if (offer == null)
+                {
+                    return Json(new { success = false, message = "Offer not found" });
+                }
+
+                // Check if this is a second-hand listing
+                bool isSecondHand = offer.Listing.Condition == "Second-Hand";
+
+                // Get purchase info if it exists
+                var purchase = await _context.Purchases
+                    .Include(p => p.Confirmation)
+                    .FirstOrDefaultAsync(p => p.OfferId == offerId);
+
+                bool shippingConfirmed = false;
+                bool receiptConfirmed = false;
+
+                if (purchase != null && purchase.Confirmation != null)
+                {
+                    shippingConfirmed = purchase.Confirmation.SellerShippedProduct;
+                    receiptConfirmed = purchase.Confirmation.BuyerReceivedProduct;
+                }
+
+                return Json(new
+                {
+                    success = true,
+                    isSecondHand = isSecondHand,
+                    purchaseId = purchase?.Id,
+                    sellerId = offer.Listing.SellerId,
+                    buyerId = offer.BuyerId,
+                    shippingConfirmed = shippingConfirmed,
+                    receiptConfirmed = receiptConfirmed
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking second-hand offer");
+                return Json(new { success = false, message = "An error occurred" });
+            }
+        }
 
         [HttpPost]
         [ValidateAntiForgeryToken]

@@ -49,7 +49,61 @@
                 }
             }
         </div>
+        <div class="purchase-confirmation" id="purchaseConfirmation" style="display: none; background-color: #f0f7ff; padding: 15px; border-radius: 10px; margin: 15px 0;">
+            <!-- Seller Shipping Confirmation -->
+            <div id="sellerShippingConfirmation" style="display: none;">
+                <h3>Confirm Shipping</h3>
+                <p>Please confirm when you have shipped the item to the buyer.</p>
 
+                <form method="post" action="/Payment/ConfirmShipping" id="shippingForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="purchaseId" id="shippingPurchaseId" value="" />
+
+                    <div class="form-group">
+                        <label for="trackingNumber">Tracking Number (optional)</label>
+                        <input type="text" id="trackingNumber" name="trackingNumber" class="form-control"
+                               placeholder="Enter tracking number" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="shippingProvider">Shipping Provider (optional)</label>
+                        <input type="text" id="shippingProvider" name="shippingProvider" class="form-control"
+                               placeholder="Enter shipping provider" style="width: 100%; padding: 8px; border-radius: 5px; border: 1px solid #ddd; margin-bottom: 10px;" />
+                    </div>
+
+                    <div class="confirmation-checkbox" style="margin: 15px 0; display: flex; align-items: center;">
+                        <input type="checkbox" id="shippingConfirm" required style="margin-right: 10px; width: 20px; height: 20px;" />
+                        <label for="shippingConfirm">I confirm that I have shipped this item to the buyer</label>
+                    </div>
+
+                    <button type="submit" class="btn-confirm" id="confirmShippingBtn" disabled
+                            style="background-color: #0066cc; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%;">
+                        Confirm Shipping
+                    </button>
+                </form>
+            </div>
+
+            <!-- Buyer Receipt Confirmation -->
+            <div id="buyerReceiptConfirmation" style="display: none;">
+                <h3>Confirm Receipt</h3>
+                <p>Please confirm when you have received the item from the seller.</p>
+
+                <form method="post" action="/Payment/ConfirmReceived" id="receiptForm">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" name="purchaseId" id="receiptPurchaseId" value="" />
+
+                    <div class="confirmation-checkbox" style="margin: 15px 0; display: flex; align-items: center;">
+                        <input type="checkbox" id="receiptConfirm" required style="margin-right: 10px; width: 20px; height: 20px;" />
+                        <label for="receiptConfirm">I confirm that I have received this item in good condition</label>
+                    </div>
+
+                    <button type="submit" class="btn-confirm" id="confirmReceiptBtn" disabled
+                            style="background-color: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%;">
+                        Confirm Receipt
+                    </button>
+                </form>
+            </div>
+        </div>
         <div class="chat-input" style="border-radius: 0 0 25px 25px;">
             <form id="messageForm" method="post" action="@Url.Action("SendMessage")">
                 <input type="hidden" id="receiverId" name="ReceiverId" value="@Model.OtherUserId">
@@ -223,6 +277,102 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+    // Check for purchase confirmation in messages
+    function checkForPurchaseConfirmation() {
+        const messages = document.querySelectorAll('.message-content');
+        const currentUserId = parseInt(document.getElementById('currentUserId').value);
+        const otherUserId = parseInt(document.getElementById('receiverId').value);
+        const listingId = parseInt(document.getElementById('listingId').value);
+
+        // Look for accepted offer message from seller
+        let hasAcceptedOffer = false;
+        let hasShippingConfirmation = false;
+        let offerId = null;
+
+        messages.forEach(message => {
+            const content = message.innerHTML;
+
+            // Check for accepted offer message (contains offer amount and purchase link)
+            if (content.includes('accepted your offer') && content.includes('purchase</a>')) {
+                hasAcceptedOffer = true;
+                // Extract offer ID from the link
+                const match = content.match(/offerId=(\d+)/);
+                if (match && match[1]) {
+                    offerId = match[1];
+                }
+            }
+
+            // Check for shipping confirmation
+            if (content.includes('shipped your item') && (content.includes('Tracking Number') || content.includes('Shipping Provider'))) {
+                hasShippingConfirmation = true;
+            }
+
+            // Check for receipt confirmation
+            if (content.includes('received the item') && content.includes('Payment has been released')) {
+                // Transaction is complete, no need to show confirmations
+                hasAcceptedOffer = false;
+            }
+        });
+
+        // Show appropriate confirmation sections
+        const confirmationSection = document.getElementById('purchaseConfirmation');
+        const sellerConfirmation = document.getElementById('sellerShippingConfirmation');
+        const buyerConfirmation = document.getElementById('buyerReceiptConfirmation');
+
+        if (hasAcceptedOffer && offerId) {
+            // First determine if this is a second-hand listing with an accepted offer
+            fetch(`/Listing/CheckSecondHandOffer?offerId=${offerId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.isSecondHand) {
+                        confirmationSection.style.display = 'block';
+
+                        if (data.purchaseId) {
+                            // Set purchase ID in the hidden fields
+                            document.getElementById('shippingPurchaseId').value = data.purchaseId;
+                            document.getElementById('receiptPurchaseId').value = data.purchaseId;
+
+                            // Determine if current user is seller or buyer
+                            const isSeller = data.sellerId === currentUserId;
+                            const isBuyer = data.buyerId === currentUserId;
+
+                            // If current user is seller and hasn't shipped yet
+                            if (isSeller && !hasShippingConfirmation && !data.shippingConfirmed) {
+                                sellerConfirmation.style.display = 'block';
+                            }
+
+                            // If current user is buyer, seller has shipped, but buyer hasn't confirmed receipt
+                            if (isBuyer && hasShippingConfirmation && data.shippingConfirmed && !data.receiptConfirmed) {
+                                buyerConfirmation.style.display = 'block';
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error checking second-hand offer:', error);
+                });
+        }
+    }
+
+    // Enable/disable buttons based on checkbox state
+    const shippingConfirm = document.getElementById('shippingConfirm');
+    if (shippingConfirm) {
+        shippingConfirm.addEventListener('change', function() {
+            document.getElementById('confirmShippingBtn').disabled = !this.checked;
+        });
+    }
+
+    const receiptConfirm = document.getElementById('receiptConfirm');
+    if (receiptConfirm) {
+        receiptConfirm.addEventListener('change', function() {
+            document.getElementById('confirmReceiptBtn').disabled = !this.checked;
+        });
+    }
+
+    // Call the function after messages are loaded
+    document.addEventListener('DOMContentLoaded', function() {
+        checkForPurchaseConfirmation();
+    });
         // Scroll to bottom of chat
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.scrollTop = chatMessages.scrollHeight;
