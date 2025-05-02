@@ -1055,7 +1055,8 @@ public async Task<IActionResult> DeleteListing(int id)
                     l.Title.Contains(searchTerm) ||
                     l.Description.Contains(searchTerm) ||
                     l.Category.Contains(searchTerm) ||
-                    l.SubCategory.Contains(searchTerm)
+                    l.SubCategory.Contains(searchTerm) ||
+                    l.Condition.Contains(searchTerm)
                 );
             }
 

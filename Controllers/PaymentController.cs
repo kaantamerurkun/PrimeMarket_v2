@@ -60,7 +60,8 @@ namespace PrimeMarket.Controllers
                         SellerName = $"{b.Listing.Seller.FirstName} {b.Listing.Seller.LastName}",
                         ImageUrl = b.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                                   b.Listing.Images?.FirstOrDefault()?.ImagePath ??
-                                  "/images/placeholder.png"
+                                  "/images/placeholder.png",
+                        MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null // Set MaxStock based on listing condition
                     }).ToList(),
                     TotalPrice = bookmarks.Sum(b => b.Listing.Price)
                 };
@@ -436,6 +437,37 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
+                // Validate all quantities against stock limits before processing any purchases
+                foreach (var bookmark in bookmarks)
+                {
+                    var listing = bookmark.Listing;
+
+                    // Skip validation for second-hand items
+                    if (listing.Condition != "First-Hand")
+                        continue;
+
+                    // Double-check that it's a first-hand listing with available stock
+                    if (!listing.Stock.HasValue || listing.Stock <= 0)
+                    {
+                        TempData["ErrorMessage"] = $"Item '{listing.Title}' is out of stock.";
+                        return RedirectToAction("CheckoutMultiple");
+                    }
+
+                    // Get quantity for this item (default to 1 if not specified)
+                    int quantity = 1;
+                    if (quantityDict.TryGetValue(bookmark.Id, out int qty))
+                    {
+                        quantity = qty;
+                    }
+
+                    // Check if there's enough stock
+                    if (listing.Stock < quantity)
+                    {
+                        TempData["ErrorMessage"] = $"Not enough stock available for {listing.Title}. Only {listing.Stock} in stock.";
+                        return RedirectToAction("CheckoutMultiple");
+                    }
+                }
+
                 // Process each item as a separate purchase
                 foreach (var bookmark in bookmarks)
                 {
@@ -454,13 +486,6 @@ namespace PrimeMarket.Controllers
                         quantity = qty;
                     }
 
-                    // Check if there's enough stock
-                    if (listing.Stock < quantity)
-                    {
-                        TempData["ErrorMessage"] = $"Not enough stock available for {listing.Title}. Only {listing.Stock} in stock.";
-                        return RedirectToAction("CheckoutMultiple");
-                    }
-
                     // Create purchase record
                     var purchase = new Purchase
                     {
@@ -472,6 +497,7 @@ namespace PrimeMarket.Controllers
                     };
 
                     _context.Purchases.Add(purchase);
+                    await _context.SaveChangesAsync();
 
                     // Create purchase confirmation record
                     var confirmation = new PurchaseConfirmation
@@ -1101,11 +1127,26 @@ namespace PrimeMarket.Controllers
                 foreach (var item in cartItems)
                 {
                     var bookmark = await _context.Bookmarks
+                        .Include(b => b.Listing)
                         .FirstOrDefaultAsync(b => b.Id == item.BookmarkId && b.UserId == userId);
 
                     if (bookmark == null)
                     {
                         return Json(new { success = false, message = "Item not found in your cart." });
+                    }
+
+                    // Validate quantity against stock for first-hand listings
+                    if (bookmark.Listing.Condition == "First-Hand" &&
+                        bookmark.Listing.Stock.HasValue &&
+                        item.Quantity > bookmark.Listing.Stock.Value)
+                    {
+                        return Json(new
+                        {
+                            //success: false,
+                            //message: $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock.",
+                            //itemId: item.BookmarkId,
+                            //maxStock: bookmark.Listing.Stock.Value
+                        });
                     }
                 }
 
@@ -1119,18 +1160,6 @@ namespace PrimeMarket.Controllers
 
                     if (bookmark != null)
                     {
-                        // Ensure the listing has enough stock
-                        if (bookmark.Listing.Condition == "First-Hand" &&
-                            bookmark.Listing.Stock.HasValue &&
-                            item.Quantity > bookmark.Listing.Stock.Value)
-                        {
-                            return Json(new
-                            {
-                                success = false,
-                                message = $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock."
-                            });
-                        }
-
                         total += bookmark.Listing.Price * item.Quantity;
                     }
                 }

@@ -1,5 +1,4 @@
-﻿
-@model PrimeMarket.Models.ViewModel.CartViewModel
+﻿@model PrimeMarket.Models.ViewModel.CartViewModel
 @{
     ViewData["Title"] = "Shopping Cart";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -37,7 +36,7 @@
             <div class="cart-items">
                 @foreach (var item in Model.Items)
                 {
-                    <div class="cart-item" id="item-@item.BookmarkId" data-price="@item.Price">
+                    <div class="cart-item" id="item-@item.BookmarkId" data-price="@item.Price" data-max-stock="@item.MaxStock">
                         <div class="item-image">
                             <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
                                  alt="@item.Title" width="100" height="100">
@@ -45,11 +44,15 @@
                         <div class="item-details">
                             <h3>@item.Title</h3>
                             <p class="seller">Seller: @item.SellerName</p>
+                            @if (item.MaxStock.HasValue)
+                            {
+                                <p class="stock-info">Available: @item.MaxStock items</p>
+                            }
                         </div>
                         <div class="item-price">@item.Price.ToString("C")</div>
                         <div class="item-quantity">
                             <button class="quantity-btn decrease-btn" data-id="@item.BookmarkId">-</button>
-                            <input type="number" class="quantity-input" value="1" min="1" max="99" data-id="@item.BookmarkId">
+                            <input type="number" class="quantity-input" value="1" min="1" max="@item.MaxStock" data-id="@item.BookmarkId">
                             <button class="quantity-btn increase-btn" data-id="@item.BookmarkId">+</button>
                         </div>
                         <div class="item-total">@item.Price.ToString("C")</div>
@@ -172,6 +175,12 @@
         color: #666;
     }
 
+    .stock-info {
+        color: #28a745;
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
     .item-price {
         font-weight: bold;
         font-size: 18px;
@@ -198,6 +207,11 @@
         display: flex;
         justify-content: center;
         align-items: center;
+    }
+
+    .quantity-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
     }
 
     .quantity-input {
@@ -298,38 +312,43 @@
             background-color: #0055b3;
         }
 
+    .error-message {
+        color: #dc3545;
+        font-size: 0.9em;
+        margin-top: 5px;
+        display: none;
+    }
+
     @@media (max-width: 768px) {
-        .cart-item
+        .cart-item {
+            flex-direction: column;
+            align-items: flex-start;
+        }
 
-    {
-        flex-direction: column;
-        align-items: flex-start;
+        .item-image {
+            margin-right: 0;
+            margin-bottom: 10px;
+        }
+
+        .item-price, .item-quantity, .item-total {
+            margin: 10px 0;
+        }
+
+        .item-actions {
+            width: 100%;
+            justify-content: space-between;
+        }
     }
-
-    .item-image {
-        margin-right: 0;
-        margin-bottom: 10px;
-    }
-
-    .item-price, .item-quantity, .item-total {
-        margin: 10px 0;
-    }
-
-    .item-actions {
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    }</style>
+</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Initialize item quantities and totals
         const cartItems = document.querySelectorAll('.cart-item');
-        let totalPrice = 0;
 
         cartItems.forEach(item => {
             updateItemTotal(item);
+            checkStockLimits(item);
         });
 
         updateCartTotals();
@@ -340,13 +359,19 @@
             input.addEventListener('change', function() {
                 const itemId = this.getAttribute('data-id');
                 const cartItem = document.getElementById(`item-${itemId}`);
+                const maxStock = parseInt(cartItem.getAttribute('data-max-stock'));
 
                 // Validate input value
                 if (this.value < 1) this.value = 1;
+                if (maxStock && this.value > maxStock) {
+                    this.value = maxStock;
+                    showStockLimitMessage(cartItem, maxStock);
+                }
                 if (this.value > 99) this.value = 99;
 
                 updateItemTotal(cartItem);
                 updateCartTotals();
+                checkStockLimits(cartItem);
             });
         });
 
@@ -363,6 +388,8 @@
                     const cartItem = document.getElementById(`item-${itemId}`);
                     updateItemTotal(cartItem);
                     updateCartTotals();
+                    checkStockLimits(cartItem);
+                    hideStockLimitMessage(cartItem);
                 }
             });
         });
@@ -372,14 +399,21 @@
         increaseButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const itemId = this.getAttribute('data-id');
+                const cartItem = document.getElementById(`item-${itemId}`);
                 const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
                 const currentValue = parseInt(input.value);
+                const maxStock = parseInt(cartItem.getAttribute('data-max-stock'));
+
+                if (maxStock && currentValue >= maxStock) {
+                    showStockLimitMessage(cartItem, maxStock);
+                    return;
+                }
 
                 if (currentValue < 99) {
                     input.value = currentValue + 1;
-                    const cartItem = document.getElementById(`item-${itemId}`);
                     updateItemTotal(cartItem);
                     updateCartTotals();
+                    checkStockLimits(cartItem);
                 }
             });
         });
@@ -402,6 +436,46 @@
 
             const total = price * quantity;
             itemTotal.textContent = formatCurrency(total);
+        }
+
+        // Function to check stock limits and update UI accordingly
+        function checkStockLimits(item) {
+            const maxStock = parseInt(item.getAttribute('data-max-stock'));
+            if (!maxStock) return; // No stock limit
+
+            const quantityInput = item.querySelector('.quantity-input');
+            const currentValue = parseInt(quantityInput.value);
+            const increaseBtn = item.querySelector('.increase-btn');
+
+            if (currentValue >= maxStock) {
+                increaseBtn.disabled = true;
+            } else {
+                increaseBtn.disabled = false;
+            }
+        }
+
+        // Function to show stock limit message
+        function showStockLimitMessage(item, maxStock) {
+            // Check if message already exists
+            let messageEl = item.querySelector('.error-message');
+
+            if (!messageEl) {
+                messageEl = document.createElement('div');
+                messageEl.className = 'error-message';
+                const itemDetails = item.querySelector('.item-details');
+                itemDetails.appendChild(messageEl);
+            }
+
+            messageEl.textContent = `Maximum available stock is ${maxStock}.`;
+            messageEl.style.display = 'block';
+        }
+
+        // Function to hide stock limit message
+        function hideStockLimitMessage(item) {
+            const messageEl = item.querySelector('.error-message');
+            if (messageEl) {
+                messageEl.style.display = 'none';
+            }
         }
 
         // Function to update cart totals
