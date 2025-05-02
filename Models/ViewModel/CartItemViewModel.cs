@@ -8,5 +8,6 @@
         public decimal Price { get; set; }
         public string SellerName { get; set; }
         public string ImageUrl { get; set; }
+
     }
 }
