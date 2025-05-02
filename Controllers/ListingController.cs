@@ -1418,12 +1418,24 @@ public async Task<IActionResult> DeleteListing(int id)
                 return Json(new { success = false, message = "You cannot make an offer on your own listing." });
 
             /* ---------- create Offer + Notification ---------- */
+            var message = new Message
+            {
+                SenderId = userId.Value,
+                ReceiverId = listing.SellerId,
+                ListingId = model.ListingId,
+                Content = $"I made an offer of {offerAmount:C}" + (!string.IsNullOrEmpty(model.Message) ? $". Message: {model.Message}" : ""),
+                IsRead = false,
+                CreatedAt = DateTime.UtcNow
+            };
+            _context.Messages.Add(message);
+
+            await _context.SaveChangesAsync();
             var offer = new Offer
             {
                 BuyerId = userId.Value,
                 ListingId = model.ListingId,
                 OfferAmount = offerAmount,
-                Message = model.Message,
+                Message = model.Message ?? string.Empty, // Ensure the string Message field is not null
                 Status = OfferStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
@@ -1440,19 +1452,8 @@ public async Task<IActionResult> DeleteListing(int id)
             _context.Notifications.Add(notification);
 
             // Create a message for the conversation between buyer and seller
-            var message = new Message
-            {
-                SenderId = userId.Value,
-                ReceiverId = listing.SellerId,
-                ListingId = model.ListingId,
-                Content = $"I made an offer of {offerAmount:C}" + (!string.IsNullOrEmpty(model.Message) ? $". Message: {model.Message}" : ""),
-                IsRead = false,
-                CreatedAt = DateTime.UtcNow
-            };
-            _context.Messages.Add(message);
-
+            offer.MessageId = message.Id;
             await _context.SaveChangesAsync();
-
             return Json(new { success = true, message = "Your offer has been sent to the seller." });
         }
 

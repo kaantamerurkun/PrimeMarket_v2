@@ -917,13 +917,17 @@ namespace PrimeMarket.Controllers
                 purchase.Confirmation.ReceiptConfirmedDate = DateTime.UtcNow;
                 purchase.Confirmation.UpdatedAt = DateTime.UtcNow;
 
-                // If both shipping and receipt are confirmed, release payment
+                // If both shipping and receipt are confirmed, release payment and update listing status
                 if (purchase.Confirmation.SellerShippedProduct && purchase.Confirmation.BuyerReceivedProduct)
                 {
                     purchase.Confirmation.PaymentReleased = true;
                     purchase.Confirmation.PaymentReleasedDate = DateTime.UtcNow;
                     purchase.PaymentStatus = PaymentStatus.Completed;
                     purchase.UpdatedAt = DateTime.UtcNow;
+
+                    // Update the listing status to Sold
+                    purchase.Listing.Status = ListingStatus.Sold;
+                    purchase.Listing.UpdatedAt = DateTime.UtcNow;
 
                     // Create notification for seller
                     var sellerNotification = new Notification

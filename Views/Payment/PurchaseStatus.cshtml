@@ -116,6 +116,38 @@
                 </div>
             }
 
+            @if (Model.IsViewerSeller && !Model.SellerShippedProduct)
+            {
+                <div class="seller-actions">
+                    <h3>Confirm Shipping</h3>
+                    <p>Please confirm when you have shipped the item to the buyer.</p>
+
+                    <form method="post" action="@Url.Action("ConfirmShipping", "Payment")">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
+
+                        <div class="form-group">
+                            <label for="trackingNumber">Tracking Number (optional)</label>
+                            <input type="text" id="trackingNumber" name="trackingNumber" class="form-control"
+                                   placeholder="Enter tracking number" />
+                        </div>
+
+                        <div class="form-group">
+                            <label for="shippingProvider">Shipping Provider (optional)</label>
+                            <input type="text" id="shippingProvider" name="shippingProvider" class="form-control"
+                                   placeholder="Enter shipping provider" />
+                        </div>
+
+                        <div class="confirmation-checkbox">
+                            <input type="checkbox" id="shippingConfirm" required />
+                            <label for="shippingConfirm">I confirm that I have shipped this item to the buyer</label>
+                        </div>
+
+                        <button type="submit" class="btn-confirm">Confirm Shipping</button>
+                    </form>
+                </div>
+            }
+
             @if (Model.IsViewerBuyer && Model.SellerShippedProduct && !Model.BuyerReceivedProduct)
             {
                 <div class="buyer-actions">
@@ -431,4 +463,110 @@
     }
 
     }
+
+    .confirmation-checkbox {
+        margin: 20px 0;
+        padding: 15px;
+        background-color: #f8f9fa;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+    }
+
+        .confirmation-checkbox input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .confirmation-checkbox label {
+            font-weight: 500;
+            color: #333;
+            cursor: pointer;
+        }
+
+    .btn-confirm {
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+        .btn-confirm:hover {
+            background-color: #0055b3;
+        }
+
+        .btn-confirm:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+    /* Add animation for confirmation */
+    @@keyframes confirm-animation {
+        0%
+
+    {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+
+    }
+
+    .confirmation-complete {
+        animation: confirm-animation 0.5s ease;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle shipping confirmation form
+    const shippingForm = document.getElementById('shipping-form');
+    const shippingConfirmCheckbox = document.getElementById('shippingConfirm');
+    const shippingSubmitButton = document.querySelector('.seller-actions .btn-confirm');
+
+    if (shippingConfirmCheckbox && shippingSubmitButton) {
+        // Initially disable the submit button
+        shippingSubmitButton.disabled = true;
+
+        // Enable/disable button based on checkbox state
+        shippingConfirmCheckbox.addEventListener('change', function() {
+            shippingSubmitButton.disabled = !this.checked;
+        });
+    }
+
+    // Handle receipt confirmation form
+    const receiptForm = document.getElementById('receipt-form');
+    const receiptConfirmCheckbox = document.getElementById('receiptConfirm');
+    const receiptSubmitButton = document.querySelector('.buyer-actions .btn-confirm');
+
+    if (receiptConfirmCheckbox && receiptSubmitButton) {
+        // Initially disable the submit button
+        receiptSubmitButton.disabled = true;
+
+        // Enable/disable button based on checkbox state
+        receiptConfirmCheckbox.addEventListener('change', function() {
+            receiptSubmitButton.disabled = !this.checked;
+        });
+    }
+
+    // Add form IDs for JavaScript reference
+    if (shippingForm) shippingForm.id = 'shipping-form';
+    if (receiptForm) receiptForm.id = 'receipt-form';
+});
+</script>
