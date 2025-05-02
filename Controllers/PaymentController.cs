@@ -23,6 +23,11 @@ namespace PrimeMarket.Controllers
             _context = context;
             _logger = logger;
         }
+        public class CartItemQuantityDto
+        {
+            public int BookmarkId { get; set; }
+            public int Quantity { get; set; }
+        }
 
         [HttpGet]
         [UserAuthenticationFilter]
@@ -392,7 +397,7 @@ namespace PrimeMarket.Controllers
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ProcessMultiplePayment(MultiplePaymentViewModel model)
+        public async Task<IActionResult> ProcessMultiplePayment(MultiplePaymentViewModel model, List<CartItemQuantityDto> quantities)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -421,6 +426,16 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Cart");
                 }
 
+                // Create a Dictionary for easy lookup of quantities
+                var quantityDict = new Dictionary<int, int>();
+                if (quantities != null)
+                {
+                    foreach (var item in quantities)
+                    {
+                        quantityDict[item.BookmarkId] = item.Quantity;
+                    }
+                }
+
                 // Process each item as a separate purchase
                 foreach (var bookmark in bookmarks)
                 {
@@ -432,12 +447,26 @@ namespace PrimeMarket.Controllers
                         continue; // Skip this item
                     }
 
+                    // Get quantity for this item (default to 1 if not specified)
+                    int quantity = 1;
+                    if (quantityDict.TryGetValue(bookmark.Id, out int qty))
+                    {
+                        quantity = qty;
+                    }
+
+                    // Check if there's enough stock
+                    if (listing.Stock < quantity)
+                    {
+                        TempData["ErrorMessage"] = $"Not enough stock available for {listing.Title}. Only {listing.Stock} in stock.";
+                        return RedirectToAction("CheckoutMultiple");
+                    }
+
                     // Create purchase record
                     var purchase = new Purchase
                     {
                         BuyerId = userId.Value,
                         ListingId = listing.Id,
-                        Amount = listing.Price,
+                        Amount = listing.Price * quantity, // Multiply by quantity
                         PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
                         CreatedAt = DateTime.UtcNow
                     };
@@ -456,8 +485,8 @@ namespace PrimeMarket.Controllers
 
                     _context.PurchaseConfirmations.Add(confirmation);
 
-                    // Reduce stock
-                    listing.Stock -= 1;
+                    // Reduce stock by quantity
+                    listing.Stock -= quantity;
 
                     // If stock reaches 0, mark as sold out
                     if (listing.Stock <= 0)
@@ -471,7 +500,7 @@ namespace PrimeMarket.Controllers
                     var buyerNotification = new Notification
                     {
                         UserId = userId.Value,
-                        Message = $"You have successfully purchased '{listing.Title}'. Please wait for the seller to ship the item.",
+                        Message = $"You have successfully purchased {quantity} {(quantity > 1 ? "units" : "unit")} of '{listing.Title}'. Please wait for the seller to ship the item.",
                         Type = NotificationType.PurchaseCompleted,
                         RelatedEntityId = purchase.Id,
                         CreatedAt = DateTime.UtcNow
@@ -480,7 +509,7 @@ namespace PrimeMarket.Controllers
                     var sellerNotification = new Notification
                     {
                         UserId = listing.SellerId,
-                        Message = $"Your listing '{listing.Title}' has been purchased. Please ship the item and confirm shipping.",
+                        Message = $"Your listing '{listing.Title}' has been purchased ({quantity} {(quantity > 1 ? "units" : "unit")}). Please ship the item and confirm shipping.",
                         Type = NotificationType.PurchaseCompleted,
                         RelatedEntityId = purchase.Id,
                         CreatedAt = DateTime.UtcNow
@@ -1054,6 +1083,64 @@ namespace PrimeMarket.Controllers
                 _logger.LogError(ex, "Error processing offer purchase");
                 TempData["ErrorMessage"] = "An error occurred while processing your payment: " + ex.Message;
                 return RedirectToAction("MyOffers", "User");
+            }
+        }
+        [HttpPost]
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> UpdateCartQuantities([FromBody] List<CartItemQuantityDto> cartItems)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Please log in to manage your cart." });
+            }
+
+            try
+            {
+                // Validate that all bookmarks belong to the user
+                foreach (var item in cartItems)
+                {
+                    var bookmark = await _context.Bookmarks
+                        .FirstOrDefaultAsync(b => b.Id == item.BookmarkId && b.UserId == userId);
+
+                    if (bookmark == null)
+                    {
+                        return Json(new { success = false, message = "Item not found in your cart." });
+                    }
+                }
+
+                // Calculate the updated total
+                decimal total = 0;
+                foreach (var item in cartItems)
+                {
+                    var bookmark = await _context.Bookmarks
+                        .Include(b => b.Listing)
+                        .FirstOrDefaultAsync(b => b.Id == item.BookmarkId);
+
+                    if (bookmark != null)
+                    {
+                        // Ensure the listing has enough stock
+                        if (bookmark.Listing.Condition == "First-Hand" &&
+                            bookmark.Listing.Stock.HasValue &&
+                            item.Quantity > bookmark.Listing.Stock.Value)
+                        {
+                            return Json(new
+                            {
+                                success = false,
+                                message = $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock."
+                            });
+                        }
+
+                        total += bookmark.Listing.Price * item.Quantity;
+                    }
+                }
+
+                return Json(new { success = true, total = total });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error updating cart quantities");
+                return Json(new { success = false, message = "An error occurred while updating your cart." });
             }
         }
     }

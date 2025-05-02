@@ -13,21 +13,32 @@
 
             @foreach (var item in Model.Items)
             {
-                <div class="item-summary">
+                <div class="item-summary" data-bookmark-id="@item.BookmarkId" data-price="@item.Price">
                     <div class="item-image">
                         <img src="@item.ImageUrl" alt="@item.Title" width="80" height="80">
                     </div>
                     <div class="item-details">
                         <h3>@item.Title</h3>
                         <p class="seller">Seller: @item.SellerName</p>
-                        <p class="price">@item.Price.ToString("C")</p>
+                        <div class="quantity-wrapper">
+                            <label>Quantity: </label>
+                            <span class="quantity-display">@ViewData[$"Quantity_{item.BookmarkId}"] ?? 1</span>
+                            <input type="hidden" name="quantities[@item.BookmarkId]"
+                                   class="item-quantity"
+                                   value="@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)" />
+                        </div>
+                        <p class="price">
+                            <span class="unit-price">@item.Price.ToString("C")</span> ×
+                            <span class="quantity-text">@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)</span> =
+                            <span class="item-total">@((item.Price * (ViewData[$"Quantity_{item.BookmarkId}"] != null ? Convert.ToInt32(ViewData[$"Quantity_{item.BookmarkId}"]) : 1)).ToString("C"))</span>
+                        </p>
                     </div>
                 </div>
             }
 
             <div class="order-total">
                 <div class="total-label">Total</div>
-                <div class="total-amount">@Model.TotalPrice.ToString("C")</div>
+                <div class="total-amount" id="checkout-total">@Model.TotalPrice.ToString("C")</div>
             </div>
         </div>
 
@@ -69,9 +80,20 @@
                     </div>
                 </div>
 
+                <!-- Hidden fields for quantities -->
+                <div id="quantities-container">
+                    @foreach (var item in Model.Items)
+                    {
+                        <input type="hidden" name="quantities[@item.BookmarkId].BookmarkId" value="@item.BookmarkId" />
+                        <input type="hidden" name="quantities[@item.BookmarkId].Quantity"
+                               value="@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)"
+                               id="quantity-input-@item.BookmarkId" />
+                    }
+                </div>
+
                 <div class="payment-actions">
                     <a href="@Url.Action("Cart")" class="btn-cancel">Cancel</a>
-                    <button type="submit" class="btn-pay">Pay Now @Model.TotalPrice.ToString("C")</button>
+                    <button type="submit" class="btn-pay">Pay Now <span id="payment-amount">@Model.TotalPrice.ToString("C")</span></button>
                 </div>
             </form>
         </div>
@@ -131,6 +153,24 @@
         color: #0066cc;
     }
 
+    .quantity-wrapper {
+        margin: 5px 0;
+        color: #555;
+    }
+
+    .quantity-display {
+        font-weight: bold;
+    }
+
+    .unit-price {
+        color: #666;
+    }
+
+    .item-total {
+        font-weight: bold;
+        color: #28a745;
+    }
+
     .order-total {
         display: flex;
         justify-content: space-between;
@@ -154,134 +194,4 @@
 
     label {
         display: block;
-        margin-bottom: 8px;
-        font-weight: 500;
-    }
-
-    input[type="text"],
-    input[type="password"] {
-        width: 100%;
-        padding: 12px 15px;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        font-size: 16px;
-    }
-
-    input:focus {
-        border-color: #0066cc;
-        outline: none;
-    }
-
-    .payment-actions {
-        display: flex;
-        justify-content: space-between;
-        margin-top: 30px;
-    }
-
-    .btn-cancel {
-        padding: 12px 24px;
-        background-color: #f0f0f0;
-        color: #333;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        text-align: center;
-    }
-
-    .btn-pay {
-        padding: 12px 24px;
-        background-color: #0066cc;
-        color: white;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: bold;
-    }
-
-        .btn-pay:hover {
-            background-color: #0055b3;
-        }
-
-    .alert-danger {
-        background-color: #f8d7da;
-        color: #721c24;
-        padding: 10px 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-
-    @@media (max-width: 768px) {
-        .checkout-container
-
-    {
-        flex-direction: column;
-    }
-
-    .checkout-summary,
-    .checkout-payment {
-        flex: 0 0 100%;
-    }
-
-    }
-</style>
-
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Format card number with spaces
-        const cardInput = document.getElementById('cardNumber');
-        cardInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                value = value.match(/.{1,4}/g).join(' ');
-            }
-            e.target.value = value;
-        });
-
-        // Format expiry date with slash
-        const expiryInput = document.getElementById('expiryDate');
-        expiryInput.addEventListener('input', function(e) {
-            let value = e.target.value.replace(/\D/g, '');
-            if (value.length > 0) {
-                if (value.length > 2) {
-                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                }
-            }
-            e.target.value = value;
-        });
-
-        // Validate form on submit
-        const paymentForm = document.getElementById('paymentForm');
-        paymentForm.addEventListener('submit', function(e) {
-            const cardNumber = cardInput.value.replace(/\s/g, '');
-            const expiry = expiryInput.value;
-            const cvv = document.getElementById('cvv').value;
-
-            let isValid = true;
-
-            // Validate card number (basic check)
-            if (cardNumber.length < 13 || cardNumber.length > 19) {
-                alert('Please enter a valid card number');
-                isValid = false;
-            }
-
-            // Validate expiry date
-            const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
-            if (!expiryRegex.test(expiry)) {
-                alert('Please enter a valid expiry date in MM/YY format');
-                isValid = false;
-            }
-
-            // Validate CVV
-            if (cvv.length < 3 || cvv.length > 4) {
-                alert('Please enter a valid CVV code');
-                isValid = false;
-            }
-
-            if (!isValid) {
-                e.preventDefault();
-            }
-        });
-    });
-</script>
+        margin-bottom: 8

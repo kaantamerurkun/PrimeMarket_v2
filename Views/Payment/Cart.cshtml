@@ -1,4 +1,5 @@
-﻿@model PrimeMarket.Models.ViewModel.CartViewModel
+﻿```csharp
+@model PrimeMarket.Models.ViewModel.CartViewModel
 @{
     ViewData["Title"] = "Shopping Cart";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -36,7 +37,7 @@
             <div class="cart-items">
                 @foreach (var item in Model.Items)
                 {
-                    <div class="cart-item" id="item-@item.BookmarkId">
+                    <div class="cart-item" id="item-@item.BookmarkId" data-price="@item.Price">
                         <div class="item-image">
                             <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
                                  alt="@item.Title" width="100" height="100">
@@ -46,6 +47,12 @@
                             <p class="seller">Seller: @item.SellerName</p>
                         </div>
                         <div class="item-price">@item.Price.ToString("C")</div>
+                        <div class="item-quantity">
+                            <button class="quantity-btn decrease-btn" data-id="@item.BookmarkId">-</button>
+                            <input type="number" class="quantity-input" value="1" min="1" max="99" data-id="@item.BookmarkId">
+                            <button class="quantity-btn increase-btn" data-id="@item.BookmarkId">+</button>
+                        </div>
+                        <div class="item-total">@item.Price.ToString("C")</div>
                         <div class="item-actions">
                             <a href="@Url.Action("Checkout", new { listingId = item.ListingId })" class="btn-checkout">
                                 Buy Now
@@ -60,7 +67,7 @@
                 <div class="summary-details">
                     <div class="summary-row">
                         <div class="summary-label">Subtotal (@Model.Items.Count items)</div>
-                        <div class="summary-value">@Model.TotalPrice.ToString("C")</div>
+                        <div class="summary-value" id="subtotal">@Model.TotalPrice.ToString("C")</div>
                     </div>
                     <div class="summary-row total">
                         <div class="summary-label">Total</div>
@@ -170,6 +177,52 @@
         font-size: 18px;
         color: #0066cc;
         margin: 0 20px;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .item-quantity {
+        display: flex;
+        align-items: center;
+        margin: 0 20px;
+    }
+
+    .quantity-btn {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 1px solid #ddd;
+        background-color: #f8f9fa;
+        font-size: 16px;
+        cursor: pointer;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .quantity-input {
+        width: 40px;
+        height: 30px;
+        text-align: center;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        margin: 0 5px;
+        -moz-appearance: textfield;
+    }
+
+        .quantity-input::-webkit-inner-spin-button,
+        .quantity-input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+    .item-total {
+        font-weight: bold;
+        font-size: 18px;
+        color: #28a745;
+        margin: 0 20px;
+        min-width: 80px;
+        text-align: center;
     }
 
     .item-actions {
@@ -258,7 +311,7 @@
         margin-bottom: 10px;
     }
 
-    .item-price {
+    .item-price, .item-quantity, .item-total {
         margin: 10px 0;
     }
 
@@ -267,11 +320,70 @@
         justify-content: space-between;
     }
 
-    }
-</style>
+    }</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Initialize item quantities and totals
+        const cartItems = document.querySelectorAll('.cart-item');
+        let totalPrice = 0;
+
+        cartItems.forEach(item => {
+            updateItemTotal(item);
+        });
+
+        updateCartTotals();
+
+        // Handle quantity changes
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const itemId = this.getAttribute('data-id');
+                const cartItem = document.getElementById(`item-${itemId}`);
+
+                // Validate input value
+                if (this.value < 1) this.value = 1;
+                if (this.value > 99) this.value = 99;
+
+                updateItemTotal(cartItem);
+                updateCartTotals();
+            });
+        });
+
+        // Handle decrease button clicks
+        const decreaseButtons = document.querySelectorAll('.decrease-btn');
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
+                const currentValue = parseInt(input.value);
+
+                if (currentValue > 1) {
+                    input.value = currentValue - 1;
+                    const cartItem = document.getElementById(`item-${itemId}`);
+                    updateItemTotal(cartItem);
+                    updateCartTotals();
+                }
+            });
+        });
+
+        // Handle increase button clicks
+        const increaseButtons = document.querySelectorAll('.increase-btn');
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
+                const currentValue = parseInt(input.value);
+
+                if (currentValue < 99) {
+                    input.value = currentValue + 1;
+                    const cartItem = document.getElementById(`item-${itemId}`);
+                    updateItemTotal(cartItem);
+                    updateCartTotals();
+                }
+            });
+        });
+
         // Handle remove button clicks
         const removeButtons = document.querySelectorAll('.btn-remove');
         removeButtons.forEach(button => {
@@ -281,6 +393,41 @@
             });
         });
 
+        // Function to update an item's total price
+        function updateItemTotal(item) {
+            const price = parseFloat(item.getAttribute('data-price'));
+            const quantityInput = item.querySelector('.quantity-input');
+            const quantity = parseInt(quantityInput.value);
+            const itemTotal = item.querySelector('.item-total');
+
+            const total = price * quantity;
+            itemTotal.textContent = formatCurrency(total);
+        }
+
+        // Function to update cart totals
+        function updateCartTotals() {
+            let subtotal = 0;
+            let itemCount = 0;
+
+            cartItems.forEach(item => {
+                const price = parseFloat(item.getAttribute('data-price'));
+                const quantityInput = item.querySelector('.quantity-input');
+                const quantity = parseInt(quantityInput.value);
+
+                subtotal += price * quantity;
+                itemCount += quantity;
+            });
+
+            const subtotalElement = document.getElementById('subtotal');
+            const totalElement = document.getElementById('cart-total');
+            const summaryLabel = document.querySelector('.summary-row .summary-label');
+
+            subtotalElement.textContent = formatCurrency(subtotal);
+            totalElement.textContent = formatCurrency(subtotal);
+            summaryLabel.textContent = `Subtotal (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
+        }
+
+        // Function to remove item from cart
         function removeCartItem(bookmarkId) {
             fetch('/Payment/RemoveFromCart', {
                 method: 'POST',
@@ -299,8 +446,8 @@
                     }
 
                     // Check if cart is empty
-                    const cartItems = document.querySelectorAll('.cart-item');
-                    if (cartItems.length === 0) {
+                    const remainingItems = document.querySelectorAll('.cart-item');
+                    if (remainingItems.length === 0) {
                         // Show empty cart message
                         const cartContainer = document.querySelector('.cart-container');
                         cartContainer.innerHTML = `
@@ -313,7 +460,7 @@
                         `;
                     } else {
                         // Update total
-                        updateTotal();
+                        updateCartTotals();
                     }
                 } else {
                     alert(data.message);
@@ -325,33 +472,9 @@
             });
         }
 
-        function updateTotal() {
-            // Recalculate total price
-            let total = 0;
-            const priceElements = document.querySelectorAll('.item-price');
-            priceElements.forEach(element => {
-                const priceText = element.textContent;
-                const price = parseFloat(priceText.replace(/[^\d.]/g, ''));
-                if (!isNaN(price)) {
-                    total += price;
-                }
-            });
-
-            // Update subtotal and total in the summary
-            const summaryRows = document.querySelectorAll('.summary-row');
-            if (summaryRows.length >= 2) {
-                const subtotalElement = summaryRows[0].querySelector('.summary-value');
-                const totalElement = summaryRows[1].querySelector('.summary-value');
-
-                const itemCount = document.querySelectorAll('.cart-item').length;
-
-                subtotalElement.textContent = `$${total.toFixed(2)}`;
-                totalElement.textContent = `$${total.toFixed(2)}`;
-
-                // Update subtotal label with item count
-                const subtotalLabel = summaryRows[0].querySelector('.summary-label');
-                subtotalLabel.textContent = `Subtotal (${itemCount} item${itemCount !== 1 ? 's' : ''})`;
-            }
+        // Function to format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
         }
     });
 </script>
