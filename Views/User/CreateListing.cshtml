@@ -430,32 +430,44 @@
                 }
             });
 
-            continueBtn.addEventListener("click", () => {
-                if (
-                    !selectedCondition ||
-                    !selectedCategory ||
-                    (subcategories.style.visibility === "visible" && !selectedSubcategory) ||
-                    (details.style.visibility === "visible" && details.childElementCount > 0 && !selectedDetail)
-                ) {
-                    alert("Please make sure to select all category levels before continuing.");
-                    return;
-                }
+        continueBtn.addEventListener("click", () => {
+            if (
+                !selectedCondition ||
+                !selectedCategory ||
+                (subcategories.style.visibility === "visible" && !selectedSubcategory) ||
+                (details.style.visibility === "visible" && details.childElementCount > 0 && !selectedDetail)
+            ) {
+                alert("Please make sure to select all category levels before continuing.");
+                return;
+            }
 
-                document.querySelector(".selection-grid").style.display = "none";
-                document.getElementById("categoryHeaderWrapper").style.display = "none";
-                continueBtn.style.display = "none";
-                formContainer.style.display = "block";
-                document.getElementById("backToCategory").style.display = "block";
+            document.querySelector(".selection-grid").style.display = "none";
+            document.getElementById("categoryHeaderWrapper").style.display = "none";
+            continueBtn.style.display = "none";
+            formContainer.style.display = "block";
+            document.getElementById("backToCategory").style.display = "block";
 
-                document.getElementById("hiddenCondition").value = selectedCondition;
-                document.getElementById("hiddenCategory").value = selectedCategory;
-                document.getElementById("hiddenSubcategory").value = selectedSubcategory;
-                // Make sure we set an empty string if selectedDetail is undefined or empty
-                document.getElementById("hiddenDetail").value = selectedDetail || "";;
+            document.getElementById("hiddenCondition").value = selectedCondition;
+            document.getElementById("hiddenCategory").value = selectedCategory;
+            document.getElementById("hiddenSubcategory").value = selectedSubcategory;
+            document.getElementById("hiddenDetail").value = selectedDetail || "";
 
-                // Generate the dynamic fields based on selection
-                generateDynamicFields();
-            });
+            // Add stock field if First-Hand condition is selected
+            if (selectedCondition === "First-Hand" && !document.getElementById("stock")) {
+                const stockField = document.createElement("div");
+                stockField.innerHTML = `
+                    <label for="stock">Stock Quantity:</label>
+                    <input style="border-radius:50px" type="number" id="stock" name="Stock" placeholder="Enter available quantity" min="1" required />
+                `;
+
+                const form = document.querySelector("#detailsForm form");
+                const insertBeforeEl = form.querySelector("label"); // Insert before first label
+                form.insertBefore(stockField, insertBeforeEl);
+            }
+
+            generateDynamicFields();
+        });
+
 
             document.querySelector(".btn-back").addEventListener("click", () => {
                 document.querySelector(".selection-grid").style.display = "grid";

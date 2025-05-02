@@ -230,6 +230,17 @@
 
             <div class="property-details">
                 <div class="detail-item">
+                    <span class="label">Listing No:</span>
+                    <span class="value">#@Model.Id</span>
+                </div>
+                @if (Model.Condition.Equals("First-Hand"))
+                {
+                    <div class="detail-item">
+                        <span class="label">Stock Count:</span>
+                        <span class="value">@Model.Stock</span>
+                    </div>
+                }
+                <div class="detail-item">
                     <span class="label">Condition:</span>
                     <span class="value">@Model.Condition</span>
                 </div>
