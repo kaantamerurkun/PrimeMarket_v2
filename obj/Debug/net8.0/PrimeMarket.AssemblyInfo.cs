@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PrimeMarket")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+834327dde196a0daa2dfc58cc83a3513b1e405d8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d813ac389cec22104363b85ff567bdfd3a9c73be")]
 [assembly: System.Reflection.AssemblyProductAttribute("PrimeMarket")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PrimeMarket")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
