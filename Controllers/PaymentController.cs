@@ -200,7 +200,7 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
-        public async Task<IActionResult> Checkout(int listingId)
+        public async Task<IActionResult> Checkout(int listingId ,int quantity = 1)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -234,6 +234,20 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Details", "Listing", new { id = listingId });
             }
 
+            // Validate quantity against available stock
+            if (quantity > listing.Stock)
+            {
+                quantity = listing.Stock.Value; // Limit to max available stock
+            }
+
+            if (quantity < 1)
+            {
+                quantity = 1; // Ensure minimum quantity is 1
+            }
+
+            // Store quantity in ViewBag for the view
+            ViewBag.Quantity = quantity;
+
             // Prepare checkout model
             var model = new CheckoutViewModel
             {
@@ -243,7 +257,9 @@ namespace PrimeMarket.Controllers
                 SellerName = $"{listing.Seller.FirstName} {listing.Seller.LastName}",
                 ListingImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                               listing.Images?.FirstOrDefault()?.ImagePath ??
-                              "/images/placeholder.png"
+                              "/images/placeholder.png",
+                Quantity = quantity, // Add quantity to model
+                TotalPrice = listing.Price * quantity // Calculate total price with quantity
             };
 
             return View(model);
@@ -287,6 +303,16 @@ namespace PrimeMarket.Controllers
                     TempData["ErrorMessage"] = $"'{bookmark.Listing.Title}' is out of stock.";
                     return RedirectToAction("Cart");
                 }
+
+                // Get quantity from session if available
+                int quantity = 1;
+                if (HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}") != null)
+                {
+                    quantity = HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}").Value;
+                }
+
+                // Pass the quantity to the view via ViewData
+                ViewData[$"Quantity_{bookmark.Id}"] = quantity;
             }
 
             // Prepare checkout model
@@ -301,13 +327,23 @@ namespace PrimeMarket.Controllers
                     SellerName = $"{b.Listing.Seller.FirstName} {b.Listing.Seller.LastName}",
                     ImageUrl = b.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                               b.Listing.Images?.FirstOrDefault()?.ImagePath ??
-                              "/images/placeholder.png"
+                              "/images/placeholder.png",
+                    // Add MaxStock information
+                    MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null
                 }).ToList(),
-                TotalPrice = bookmarks.Sum(b => b.Listing.Price)
+                TotalPrice = bookmarks.Sum(b => {
+                    int quantity = 1;
+                    if (HttpContext.Session.GetInt32($"Quantity_{b.Id}") != null)
+                    {
+                        quantity = HttpContext.Session.GetInt32($"Quantity_{b.Id}").Value;
+                    }
+                    return b.Listing.Price * quantity;
+                })
             };
 
             return View(model);
         }
+
 
         [HttpPost]
         [UserAuthenticationFilter]
@@ -353,13 +389,23 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Details", "Listing", new { id = model.ListingId });
                 }
 
+                // Get and validate quantity
+                int quantity = model.Quantity > 0 ? model.Quantity : 1;
+
+                // Ensure we don't exceed available stock
+                if (quantity > listing.Stock.Value)
+                {
+                    quantity = listing.Stock.Value;
+                }
+
                 // Create purchase record
                 var purchase = new Purchase
                 {
                     BuyerId = userId.Value,
                     ListingId = listing.Id,
-                    Amount = listing.Price,
+                    Amount = listing.Price * quantity, // Multiply by quantity
                     PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
+                    Quantity = quantity, // Store the quantity (add this field to Purchase model)
                     CreatedAt = DateTime.UtcNow
                 };
 
@@ -377,8 +423,8 @@ namespace PrimeMarket.Controllers
 
                 _context.PurchaseConfirmations.Add(confirmation);
 
-                // Reduce stock of first-hand listing
-                listing.Stock -= 1;
+                // Reduce stock of first-hand listing by the purchased quantity
+                listing.Stock -= quantity;
 
                 // If stock reaches 0, mark as sold out
                 if (listing.Stock <= 0)
@@ -392,7 +438,7 @@ namespace PrimeMarket.Controllers
                 var buyerNotification = new Notification
                 {
                     UserId = userId.Value,
-                    Message = $"You have successfully purchased '{listing.Title}'. Please wait for the seller to ship the item.",
+                    Message = $"You have successfully purchased {quantity} {(quantity > 1 ? "units" : "unit")} of '{listing.Title}'. Please wait for the seller to ship the item.",
                     Type = NotificationType.PurchaseCompleted,
                     RelatedEntityId = purchase.Id,
                     CreatedAt = DateTime.UtcNow
@@ -401,7 +447,7 @@ namespace PrimeMarket.Controllers
                 var sellerNotification = new Notification
                 {
                     UserId = listing.SellerId,
-                    Message = $"Your listing '{listing.Title}' has been purchased. Please ship the item and confirm shipping.",
+                    Message = $"Your listing '{listing.Title}' has been purchased ({quantity} {(quantity > 1 ? "units" : "unit")}). Please ship the item and confirm shipping.",
                     Type = NotificationType.PurchaseCompleted,
                     RelatedEntityId = purchase.Id,
                     CreatedAt = DateTime.UtcNow
@@ -456,6 +502,19 @@ namespace PrimeMarket.Controllers
 
                 // Create a Dictionary for easy lookup of quantities
                 var quantityDict = new Dictionary<int, int>();
+
+                // First check session for quantities
+                foreach (var bookmark in bookmarks)
+                {
+                    int quantity = 1;
+                    if (HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}") != null)
+                    {
+                        quantity = HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}").Value;
+                    }
+                    quantityDict[bookmark.Id] = quantity;
+                }
+
+                // Then check if quantities were submitted in the form (override session values)
                 if (quantities != null)
                 {
                     foreach (var item in quantities)
@@ -573,6 +632,9 @@ namespace PrimeMarket.Controllers
 
                     // Remove from bookmarks/cart
                     _context.Bookmarks.Remove(bookmark);
+
+                    // Remove quantity from session
+                    HttpContext.Session.Remove($"Quantity_{bookmark.Id}");
                 }
 
                 await _context.SaveChangesAsync();
@@ -680,7 +742,8 @@ namespace PrimeMarket.Controllers
                               "/images/placeholder.png",
                 Amount = purchase.Amount,
                 SellerName = $"{purchase.Listing.Seller.FirstName} {purchase.Listing.Seller.LastName}",
-                PurchaseDate = purchase.CreatedAt ?? DateTime.UtcNow
+                PurchaseDate = purchase.CreatedAt ?? DateTime.UtcNow,
+                Quantity = purchase.Quantity // Include the quantity
             };
 
             return View(model);
@@ -715,6 +778,7 @@ namespace PrimeMarket.Controllers
                               "/images/placeholder.png",
                 SellerName = $"{p.Listing.Seller.FirstName} {p.Listing.Seller.LastName}",
                 Amount = p.Amount,
+                Quantity = p.Quantity, // Include the quantity
                 PurchaseDate = p.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = p.PaymentStatus
             }).ToList();
@@ -751,6 +815,7 @@ namespace PrimeMarket.Controllers
                               "/images/placeholder.png",
                 BuyerName = $"{p.Buyer.FirstName} {p.Buyer.LastName}",
                 Amount = p.Amount,
+                Quantity = p.Quantity, // Include the quantity
                 SaleDate = p.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = p.PaymentStatus
             }).ToList();
@@ -818,7 +883,8 @@ namespace PrimeMarket.Controllers
                 IsViewerSeller = purchase.Listing.SellerId == userId,
                 IsViewerBuyer = purchase.BuyerId == userId,
                 IsSecondHandPurchase = isSecondHand,
-                OfferAmount = offerAmount
+                OfferAmount = offerAmount,
+                Quantity = purchase.Quantity // Include the quantity
             };
 
             return View(model);
@@ -1173,12 +1239,15 @@ namespace PrimeMarket.Controllers
                     {
                         return Json(new
                         {
-                            //success: false,
-                            //message: $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock.",
-                            //itemId: item.BookmarkId,
-                            //maxStock: bookmark.Listing.Stock.Value
+                            success = false,
+                            message = $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock.",
+                            itemId = item.BookmarkId,
+                            maxStock = bookmark.Listing.Stock.Value
                         });
                     }
+
+                    // Store the quantity in session for later use in checkout
+                    HttpContext.Session.SetInt32($"Quantity_{item.BookmarkId}", item.Quantity);
                 }
 
                 // Calculate the updated total

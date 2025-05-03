@@ -19,6 +19,9 @@ namespace PrimeMarket.Models
         [Required]
         public decimal Amount { get; set; }
 
+        // Add this field to store quantity
+        public int Quantity { get; set; } = 1;
+
         [Required]
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
 

@@ -14,23 +14,25 @@ namespace PrimeMarket.Models.ViewModel
         public DateTime PurchaseDate { get; set; }
         public PaymentStatus PaymentStatus { get; set; }
         public bool IsFirstHand { get; set; }
-
-        // Purchase flow tracking
         public bool SellerShippedProduct { get; set; }
         public DateTime? ShippingConfirmedDate { get; set; }
         public bool BuyerReceivedProduct { get; set; }
         public DateTime? ReceiptConfirmedDate { get; set; }
         public bool PaymentReleased { get; set; }
         public DateTime? PaymentReleasedDate { get; set; }
-
-        // For the seller to provide
         public string TrackingNumber { get; set; }
         public string ShippingProvider { get; set; }
-
-        // Who is viewing this confirmation page
         public bool IsViewerSeller { get; set; }
         public bool IsViewerBuyer { get; set; }
         public bool IsSecondHandPurchase { get; set; }
         public decimal OfferAmount { get; set; }
+        public int Quantity { get; set; } = 1; // Default to 1
+
+        // Helper property to calculate unit price
+
+        
+
+        // Helper property to calculate unit price
+        public decimal UnitPrice => Quantity > 0 ? Amount / Quantity : Amount;
     }
 }

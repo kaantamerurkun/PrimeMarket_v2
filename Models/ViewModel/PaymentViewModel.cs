@@ -7,5 +7,6 @@
         public string CardNumber { get; set; }
         public string ExpiryDate { get; set; }
         public string Cvv { get; set; }
+        public int Quantity { get; set; } = 1; // Default to 1
     }
 }

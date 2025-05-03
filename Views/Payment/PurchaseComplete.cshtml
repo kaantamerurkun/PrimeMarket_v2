@@ -24,7 +24,8 @@
                     <p>Seller: @Model.SellerName</p>
                     <p>Purchase Date: @Model.PurchaseDate.ToString("MMMM dd, yyyy HH:mm")</p>
                     <p>Purchase ID: #@Model.PurchaseId</p>
-                    <p class="item-price">@Model.Amount.ToString("C")</p>
+                    <p>Quantity: @Model.Quantity</p>
+                    <p class="item-price">@Model.Amount.ToString("C") @(Model.Quantity > 1 ? $"(@(Model.Amount / Model.Quantity) per item)" : "")</p>
                 </div>
             </div>
         </div>
@@ -166,5 +167,4 @@
         gap: 10px;
     }
 
-    }
-</style>
+    }</style>

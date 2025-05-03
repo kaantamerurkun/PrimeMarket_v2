@@ -1,4 +1,5 @@
-﻿@model List<PrimeMarket.Models.ViewModel.PurchaseViewModel>
+﻿<!-- MyPurchases.cshtml -->
+@model List<PrimeMarket.Models.ViewModel.PurchaseViewModel>
 @{
     ViewData["Title"] = "My Purchases";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -46,12 +47,23 @@
                             <h3>@purchase.ListingTitle</h3>
                             <p class="seller">Seller: @purchase.SellerName</p>
                             <p class="purchase-date">Purchased: @purchase.PurchaseDate.ToString("MMMM dd, yyyy")</p>
-                            <p class="purchase-price">@purchase.Amount.ToString("C")</p>
+                            @if (purchase.Quantity > 1)
+                            {
+                                <p class="purchase-quantity">Quantity: @purchase.Quantity</p>
+                                <p class="purchase-price">@purchase.UnitPrice.ToString("C") × @purchase.Quantity = @purchase.Amount.ToString("C")</p>
+                            }
+                            else
+                            {
+                                <p class="purchase-price">@purchase.Amount.ToString("C")</p>
+                            }
                             <p class="payment-status @purchase.PaymentStatus.ToString().ToLower()">
                                 Status: <span>@purchase.PaymentStatus.ToString()</span>
                             </p>
                         </div>
                         <div class="purchase-actions">
+                            <a href="@Url.Action("PurchaseStatus", "Payment", new { purchaseId = purchase.PurchaseId })" class="btn-view">
+                                View Purchase
+                            </a>
                             <a href="@Url.Action("Details", "Listing", new { id = purchase.ListingId })" class="btn-view">
                                 View Listing
                             </a>
@@ -62,168 +74,3 @@
         }
     </div>
 </div>
-
-<style>
-    .my-purchases-header {
-        margin-bottom: 20px;
-    }
-
-    .alert {
-        padding: 12px 15px;
-        border-radius: 5px;
-        margin-bottom: 20px;
-    }
-
-    .alert-success {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .alert-danger {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .empty-purchases {
-        text-align: center;
-        padding: 50px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-    }
-
-        .empty-purchases i {
-            font-size: 50px;
-            color: #ddd;
-            margin-bottom: 20px;
-        }
-
-        .empty-purchases h2 {
-            margin-bottom: 10px;
-        }
-
-        .empty-purchases p {
-            margin-bottom: 20px;
-            color: #666;
-        }
-
-    .btn-browse {
-        display: inline-block;
-        padding: 10px 20px;
-        background-color: #0066cc;
-        color: white;
-        text-decoration: none;
-        border-radius: 5px;
-        transition: background-color 0.3s ease;
-    }
-
-        .btn-browse:hover {
-            background-color: #0055b3;
-        }
-
-    .purchases-list {
-        display: flex;
-        flex-direction: column;
-        gap: 15px;
-    }
-
-    .purchase-item {
-        display: flex;
-        background-color: white;
-        border-radius: 10px;
-        overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        padding: 15px;
-    }
-
-    .purchase-image {
-        width: 100px;
-        height: 100px;
-        margin-right: 15px;
-    }
-
-        .purchase-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-
-    .purchase-details {
-        flex: 1;
-    }
-
-        .purchase-details h3 {
-            margin: 0 0 10px 0;
-            font-size: 18px;
-        }
-
-    .seller, .purchase-date {
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    .purchase-price {
-        font-weight: bold;
-        color: #0066cc;
-        margin-bottom: 5px;
-    }
-
-    .payment-status {
-        margin-bottom: 5px;
-    }
-
-        .payment-status.completed span {
-            color: #28a745;
-        }
-
-        .payment-status.pending span {
-            color: #ffc107;
-        }
-
-        .payment-status.failed span {
-            color: #dc3545;
-        }
-
-    .purchase-actions {
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        margin-left: 15px;
-    }
-
-    .btn-view {
-        padding: 8px 15px;
-        background-color: #f0f0f0;
-        color: #333;
-        border: none;
-        border-radius: 5px;
-        text-decoration: none;
-        text-align: center;
-        transition: background-color 0.3s ease;
-    }
-
-        .btn-view:hover {
-            background-color: #e0e0e0;
-        }
-
-    @@media (max-width: 768px) {
-        .purchase-item
-
-    {
-        flex-direction: column;
-    }
-
-    .purchase-image {
-        width: 100%;
-        height: 200px;
-        margin-right: 0;
-        margin-bottom: 15px;
-    }
-
-    .purchase-actions {
-        margin-left: 0;
-        margin-top: 15px;
-    }
-
-    }
-</style>
