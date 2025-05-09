@@ -59,7 +59,10 @@ wwwroot\images\listings\22_32b286a9-fc19-4582-b28c-669aefc3b38e.png
 wwwroot\images\listings\22_38f510ca-9955-4334-b8b1-7ed3259a1766.png
 wwwroot\images\listings\22_4a578056-8c2f-4ddf-b4f3-6103bb460514.png
 wwwroot\images\listings\22_9a118728-92a1-42d4-a6c9-6c566b027ed8.png
+wwwroot\images\listings\22_cacdeba1-c00d-4a67-8862-10f75ec449c8.jpg
 wwwroot\images\listings\22_e2fdb988-e9e8-488f-9ac5-6dd38a5c71a3.png
+wwwroot\images\listings\23_35a276db-29b1-4618-aa78-81a21e786d50.jpg
+wwwroot\images\listings\24_ebe4e5c8-3633-4915-8943-b1f8bad42ecb.png
 wwwroot\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png
 wwwroot\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png
 wwwroot\images\listings\5_eeec6a1d-f09c-401d-9f77-ca8e987ce59c.jpg

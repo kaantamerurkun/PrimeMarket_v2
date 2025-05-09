@@ -345,6 +345,8 @@ namespace PrimeMarket.Controllers
         }
 
 
+        // Modified ProcessPayment method in PaymentController.cs
+
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
@@ -405,16 +407,18 @@ namespace PrimeMarket.Controllers
                     ListingId = listing.Id,
                     Amount = listing.Price * quantity, // Multiply by quantity
                     PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
-                    Quantity = quantity, // Store the quantity (add this field to Purchase model)
+                    Quantity = quantity, // Store the quantity
                     CreatedAt = DateTime.UtcNow
                 };
 
                 _context.Purchases.Add(purchase);
+                // Save changes to generate the purchase ID before creating the confirmation
+                await _context.SaveChangesAsync();
 
                 // Create purchase confirmation record for tracking shipping/delivery
                 var confirmation = new PurchaseConfirmation
                 {
-                    PurchaseId = purchase.Id,
+                    PurchaseId = purchase.Id, // Now this is a valid ID
                     SellerShippedProduct = false,
                     BuyerReceivedProduct = false,
                     PaymentReleased = false,
@@ -579,10 +583,12 @@ namespace PrimeMarket.Controllers
                         ListingId = listing.Id,
                         Amount = listing.Price * quantity, // Multiply by quantity
                         PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
+                        Quantity = quantity, // Store the quantity
                         CreatedAt = DateTime.UtcNow
                     };
 
                     _context.Purchases.Add(purchase);
+                    // Save changes to get the purchase ID
                     await _context.SaveChangesAsync();
 
                     // Create purchase confirmation record
@@ -1135,6 +1141,7 @@ namespace PrimeMarket.Controllers
                     OfferId = offer.Id,
                     Amount = offer.OfferAmount, // Use the offer amount, not listing price
                     PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
+                    Quantity = 1, // Second-hand items always have quantity 1
                     CreatedAt = DateTime.UtcNow
                 };
 

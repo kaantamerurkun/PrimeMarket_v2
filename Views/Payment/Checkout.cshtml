@@ -226,6 +226,55 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Get elements
+        const decreaseBtn = document.getElementById('decreaseQuantity');
+        const increaseBtn = document.getElementById('increaseQuantity');
+        const quantityInput = document.getElementById('quantity');
+        const hiddenQuantityInput = document.getElementById('quantityInput');
+        const totalAmount = document.getElementById('totalAmount');
+        const payAmount = document.getElementById('payAmount');
+
+        // Get price from model
+        const unitPrice = @Model.ListingPrice;
+
+        // Update total price based on quantity
+        function updateTotalPrice() {
+            const quantity = parseInt(quantityInput.value);
+            const total = unitPrice * quantity;
+
+            // Format as currency
+            const formatter = new Intl.NumberFormat('tr-TR', {
+                style: 'currency',
+                currency: 'TRY'
+            });
+
+            totalAmount.textContent = formatter.format(total);
+            payAmount.textContent = formatter.format(total);
+
+            // Update hidden input for form submission
+            hiddenQuantityInput.value = quantity;
+        }
+
+        // Handle decrease button click
+        decreaseBtn.addEventListener('click', function() {
+            let quantity = parseInt(quantityInput.value);
+            if (quantity > 1) {
+                quantityInput.value = --quantity;
+                updateTotalPrice();
+            }
+        });
+
+        // Handle increase button click
+        increaseBtn.addEventListener('click', function() {
+            let quantity = parseInt(quantityInput.value);
+            // You might want to add a maximum limit here based on stock
+            // For now we'll use a reasonable limit of 100
+            if (quantity < 100) {
+                quantityInput.value = ++quantity;
+                updateTotalPrice();
+            }
+        });
+
         // Format card number with spaces
         const cardInput = document.getElementById('cardnumber');
         cardInput.addEventListener('input', function(e) {
@@ -245,6 +294,7 @@
                     value = value.substring(0, 2) + '/' + value.substring(2, 4);
                 }
             }
+            
             e.target.value = value;
         });
 
