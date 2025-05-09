@@ -1,4 +1,262 @@
-﻿@model PrimeMarket.Models.ViewModel.PurchaseConfirmationViewModel
+﻿<style>
+    .purchase-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .purchase-id {
+        font-size: 16px;
+        color: #666;
+    }
+
+    .purchase-container {
+        display: flex;
+        flex-direction: column;
+        gap: 30px;
+    }
+
+    .item-details {
+        display: flex;
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        padding: 20px;
+    }
+
+    .item-image {
+        flex: 0 0 150px;
+        margin-right: 20px;
+    }
+
+        .item-image img {
+            width: 100%;
+            height: auto;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+    .item-info {
+        flex: 1;
+    }
+
+        .item-info h2 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+    .item-price {
+        font-weight: bold;
+        color: #0066cc;
+        margin-bottom: 10px;
+        font-size: 18px;
+    }
+
+    .item-type {
+        display: inline-block;
+        background-color: #f0f0f0;
+        padding: 5px 10px;
+        border-radius: 20px;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .tracking-info {
+        background-color: #f8f9fa;
+        padding: 10px 15px;
+        border-radius: 5px;
+        margin-top: 15px;
+    }
+
+    .status-progress {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 30px;
+        position: relative;
+    }
+
+        .status-progress:after {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background-color: #ddd;
+            z-index: 1;
+        }
+
+    .status-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+        flex: 1;
+        text-align: center;
+    }
+
+    .step-number {
+        width: 50px;
+        height: 50px;
+        background-color: #f0f0f0;
+        color: #666;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+
+    .status-step.active .step-number {
+        background-color: #0066cc;
+        color: white;
+    }
+
+    .status-step.completed .step-number {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .step-label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    .step-date {
+        font-size: 12px;
+        color: #666;
+    }
+
+    .action-buttons {
+        background-color: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .seller-actions, .buyer-actions {
+        margin-bottom: 20px;
+    }
+
+        .seller-actions h3, .buyer-actions h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            color: #333;
+        }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 14px;
+    }
+
+    .confirmation-checkbox {
+        display: flex;
+        align-items: center;
+        margin: 15px 0;
+    }
+
+        .confirmation-checkbox input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+    .btn-confirm {
+        padding: 10px 20px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-confirm:hover {
+            background-color: #0055b3;
+        }
+
+        .btn-confirm:disabled {
+            background-color: #99c1e5;
+            cursor: not-allowed;
+        }
+
+    .transaction-complete, .payment-pending {
+        background-color: #d4edda;
+        border-radius: 5px;
+        padding: 15px;
+    }
+
+        .transaction-complete h3, .payment-pending h3 {
+            color: #155724;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+    .payment-pending {
+        background-color: #fff3cd;
+    }
+
+        .payment-pending h3 {
+            color: #856404;
+        }
+
+    @@media (max-width: 768px) {
+        .item-details
+
+    {
+        flex-direction: column;
+    }
+
+    .item-image {
+        margin-right: 0;
+        margin-bottom: 15px;
+        flex: 0 0 auto;
+    }
+
+    .status-progress {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+        .status-progress:after {
+            top: 0;
+            bottom: 0;
+            left: 25px;
+            right: auto;
+            width: 2px;
+            height: auto;
+        }
+
+    .status-step {
+        flex-direction: row;
+        text-align: left;
+        align-items: flex-start;
+    }
+
+    .step-number {
+        margin-right: 15px;
+        margin-bottom: 0;
+    }
+
+    }
+</style>
+@model PrimeMarket.Models.ViewModel.PurchaseConfirmationViewModel
 @{
     ViewData["Title"] = "Purchase Status";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
