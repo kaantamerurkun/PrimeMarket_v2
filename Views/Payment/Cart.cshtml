@@ -1,89 +1,4 @@
-﻿@model PrimeMarket.Models.ViewModel.CartViewModel
-@{
-    ViewData["Title"] = "Shopping Cart";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
-}
-
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <h1>Shopping Cart</h1>
-
-    @if (TempData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
-        </div>
-    }
-
-    @if (TempData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
-    }
-
-    <div class="cart-container">
-        @if (Model.Items == null || Model.Items.Count == 0)
-        {
-            <div class="empty-cart">
-                <i class="fas fa-shopping-cart fa-4x"></i>
-                <h2>Your cart is empty</h2>
-                <p>Browse listings and add items to your cart.</p>
-                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
-            </div>
-        }
-        else
-        {
-            <div class="cart-items">
-                @foreach (var item in Model.Items)
-                {
-                    <div class="cart-item" id="item-@item.BookmarkId" data-price="@item.Price" data-max-stock="@item.MaxStock">
-                        <div class="item-image">
-                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
-                                 alt="@item.Title" width="100" height="100">
-                        </div>
-                        <div class="item-details">
-                            <h3>@item.Title</h3>
-                            <p class="seller">Seller: @item.SellerName</p>
-                            @if (item.MaxStock.HasValue)
-                            {
-                                <p class="stock-info">Available: @item.MaxStock items</p>
-                            }
-                        </div>
-                        <div class="item-price">@item.Price.ToString("C")</div>
-                        <div class="item-quantity">
-                            <button class="quantity-btn decrease-btn" data-id="@item.BookmarkId">-</button>
-                            <input type="number" class="quantity-input" value="1" min="1" max="@item.MaxStock" data-id="@item.BookmarkId">
-                            <button class="quantity-btn increase-btn" data-id="@item.BookmarkId">+</button>
-                        </div>
-                        <div class="item-total">@item.Price.ToString("C")</div>
-                        <div class="item-actions">
-                            <a href="@Url.Action("Checkout", new { listingId = item.ListingId })" class="btn-checkout">
-                                Buy Now
-                            </a>
-                            <button class="btn-remove" data-id="@item.BookmarkId">Remove</button>
-                        </div>
-                    </div>
-                }
-            </div>
-
-            <div class="cart-summary">
-                <div class="summary-details">
-                    <div class="summary-row">
-                        <div class="summary-label">Subtotal (@Model.Items.Count items)</div>
-                        <div class="summary-value" id="subtotal">@Model.TotalPrice.ToString("C")</div>
-                    </div>
-                    <div class="summary-row total">
-                        <div class="summary-label">Total</div>
-                        <div class="summary-value" id="cart-total">@Model.TotalPrice.ToString("C")</div>
-                    </div>
-                </div>
-                <a href="@Url.Action("CheckoutMultiple")" class="btn-checkout-all">Checkout All Items</a>
-            </div>
-        }
-    </div>
-</div>
-
-<style>
+﻿<style>
     .cart-container {
         margin-top: 30px;
     }
@@ -209,10 +124,10 @@
         align-items: center;
     }
 
-    .quantity-btn:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
 
     .quantity-input {
         width: 40px;
@@ -340,215 +255,218 @@
         }
     }
 </style>
+@model PrimeMarket.Models.ViewModel.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
+<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+    <h1>Shopping Cart</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["SuccessMessage"]
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">
+            @TempData["ErrorMessage"]
+        </div>
+    }
+
+    <div class="cart-container">
+        @if (Model.Items == null || Model.Items.Count == 0)
+        {
+            <div class="empty-cart">
+                <i class="fas fa-shopping-cart fa-4x"></i>
+                <h2>Your cart is empty</h2>
+                <p>Browse listings and add items to your cart.</p>
+                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
+            </div>
+        }
+        else
+        {
+            <div class="cart-items">
+                @foreach (var item in Model.Items)
+                {
+                    var initialQty = 1;          // if you store qty in session, pull it here
+
+                    <div id="item-@item.BookmarkId"
+                         class="cart-item"
+                         data-id="@item.BookmarkId"
+                         data-price="@item.Price"
+                         data-max-stock="@(item.MaxStock ?? 0)">
+
+                        <!-- thumbnail -->
+                        <div class="item-image">
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
+                                 alt="@item.Title"
+                                 width="100" height="100" />
+                        </div>
+
+                        <!-- title / seller -->
+                        <div class="item-details flex-grow-1">
+                            <h3>@item.Title</h3>
+                            <p class="seller">Seller: @item.SellerName</p>
+                            @if (item.MaxStock.HasValue)
+                            {
+                                <p class="stock-info">Available: @item.MaxStock</p>
+                            }
+                        </div>
+
+                        <!-- unit price -->
+                        <div class="item-price">@item.Price.ToString("C")</div>
+
+                        <!-- quantity controls -->
+                        <div class="item-quantity">
+                            <button type="button"
+                                    class="quantity-btn decrease-btn"
+                                    data-id="@item.BookmarkId">
+                                ‑
+                            </button>
+
+                            <span class="quantity-display">@initialQty</span>
+
+                            <button type="button"
+                                    class="quantity-btn increase-btn"
+                                    data-id="@item.BookmarkId">
+                                +
+                            </button>
+                        </div>
+
+                        <!-- line total -->
+                        <div class="item-total">
+                            <span class="unit">@item.Price.ToString("C")</span>
+                            × <span class="line-qty">@initialQty</span>
+                            = <span class="line-total">@(@item.Price * initialQty).ToString("C")</span>
+                        </div>
+
+                        <!-- actions -->
+                        <div class="item-actions">
+                            <a class="btn-checkout"
+                               href="@Url.Action("Checkout", new { listingId = item.ListingId, quantity = initialQty })">
+                                Buy Now
+                            </a>
+                            <button type="button"
+                                    class="btn-remove"
+                                    data-id="@item.BookmarkId">
+                                Remove
+                            </button>
+                        </div>
+
+                        <!-- hidden qty for CheckoutMultiple POST -->
+                        <input type="hidden"
+                               name="Quantities"
+                               value="@initialQty"
+                               data-id="@item.BookmarkId" />
+                    </div>
+                }
+            </div>
+
+
+            <div class="cart-summary">
+                <div class="summary-details">
+                    <div class="summary-row">
+                        <div class="summary-label">Subtotal (<span id="item-count">@Model.Items.Count</span> items)</div>
+                        <div class="summary-value" id="subtotal">@Model.TotalPrice.ToString("C")</div>
+                    </div>
+
+                    <div class="summary-row total">
+                        <div class="summary-label">Total</div>
+                        <div class="summary-value" id="cart-total">@Model.TotalPrice.ToString("C")</div>
+                    </div>
+                </div>
+                <a href="@Url.Action("CheckoutMultiple")" class="btn-checkout-all">Checkout All Items</a>
+            </div>
+        }
+    </div>
+</div>
+
+
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Initialize item quantities and totals
-        const cartItems = document.querySelectorAll('.cart-item');
+    document.addEventListener('DOMContentLoaded', () => {
 
-        cartItems.forEach(item => {
-            updateItemTotal(item);
-            checkStockLimits(item);
-        });
+        const moneyFmt = new Intl.NumberFormat('tr-TR',
+                        { style: 'currency', currency: 'TRY' });
 
-        updateCartTotals();
+        function recalcLine(row) {
+            const unit   = parseFloat(row.dataset.price);
+            const qty    = parseInt(row.querySelector('.quantity-display').textContent);
+            const lineEl = row.querySelector('.line-total');
+            const qtyEl  = row.querySelector('.line-qty');
+            const hidden = row.querySelector('input[name="Quantities"]');
 
-        // Handle quantity changes
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        quantityInputs.forEach(input => {
-            input.addEventListener('change', function() {
-                const itemId = this.getAttribute('data-id');
-                const cartItem = document.getElementById(`item-${itemId}`);
-                const maxStock = parseInt(cartItem.getAttribute('data-max-stock'));
+            const line = unit * qty;
+            lineEl.textContent = moneyFmt.format(line);
+            qtyEl.textContent  = qty;
+            hidden.value       = qty;             // keep in sync for POST
+        }
 
-                // Validate input value
-                if (this.value < 1) this.value = 1;
-                if (maxStock && this.value > maxStock) {
-                    this.value = maxStock;
-                    showStockLimitMessage(cartItem, maxStock);
-                }
-                if (this.value > 99) this.value = 99;
+        function recalcCart() {
+            let subtotal = 0, count = 0;
+            document.querySelectorAll('.cart-item').forEach(row => {
+                const unit = parseFloat(row.dataset.price);
+                const qty  = parseInt(row.querySelector('.quantity-display').textContent);
+                subtotal  += unit * qty;
+                count     += qty;
+            });
 
-                updateItemTotal(cartItem);
-                updateCartTotals();
-                checkStockLimits(cartItem);
+            document.getElementById('subtotal').textContent   = moneyFmt.format(subtotal);
+            document.getElementById('cart-total').textContent = moneyFmt.format(subtotal);
+            document.getElementById('item-count').textContent = count;
+        }
+
+        function clamp(row, qty) {
+            const max = parseInt(row.dataset.maxStock);
+            if (max && qty > max) return max;
+            if (qty < 1) return 1;
+            return qty;
+        }
+
+        // btn handlers
+        document.querySelectorAll('.quantity-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const row  = document.getElementById('item-' + btn.dataset.id);
+                const disp = row.querySelector('.quantity-display');
+                let   qty  = parseInt(disp.textContent);
+
+                qty += btn.classList.contains('increase-btn') ? 1 : -1;
+                qty  = clamp(row, qty);
+
+                disp.textContent = qty;
+                recalcLine(row);
+                recalcCart();
             });
         });
 
-        // Handle decrease button clicks
-        const decreaseButtons = document.querySelectorAll('.decrease-btn');
-        decreaseButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.getAttribute('data-id');
-                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-                const currentValue = parseInt(input.value);
+        // initialise
+        document.querySelectorAll('.cart-item').forEach(recalcLine);
+        recalcCart();
 
-                if (currentValue > 1) {
-                    input.value = currentValue - 1;
-                    const cartItem = document.getElementById(`item-${itemId}`);
-                    updateItemTotal(cartItem);
-                    updateCartTotals();
-                    checkStockLimits(cartItem);
-                    hideStockLimitMessage(cartItem);
-                }
+        /* ---- REMOVE BUTTON (unchanged) ---- */
+        document.querySelectorAll('.btn-remove').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id   = btn.dataset.id;
+                fetch('/Payment/RemoveFromCart', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `bookmarkId=${id}`
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) {
+                        document.getElementById('item-' + id).remove();
+                        recalcCart();
+                        if (!document.querySelectorAll('.cart-item').length) location.reload();
+                    } else alert(res.message);
+                })
+                .catch(() => alert('Error removing item.'));
             });
         });
-
-        // Handle increase button clicks
-        const increaseButtons = document.querySelectorAll('.increase-btn');
-        increaseButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const itemId = this.getAttribute('data-id');
-                const cartItem = document.getElementById(`item-${itemId}`);
-                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-                const currentValue = parseInt(input.value);
-                const maxStock = parseInt(cartItem.getAttribute('data-max-stock'));
-
-                if (maxStock && currentValue >= maxStock) {
-                    showStockLimitMessage(cartItem, maxStock);
-                    return;
-                }
-
-                if (currentValue < 99) {
-                    input.value = currentValue + 1;
-                    updateItemTotal(cartItem);
-                    updateCartTotals();
-                    checkStockLimits(cartItem);
-                }
-            });
-        });
-
-        // Handle remove button clicks
-        const removeButtons = document.querySelectorAll('.btn-remove');
-        removeButtons.forEach(button => {
-            button.addEventListener('click', function() {
-                const bookmarkId = this.getAttribute('data-id');
-                removeCartItem(bookmarkId);
-            });
-        });
-
-        // Function to update an item's total price
-        function updateItemTotal(item) {
-            const price = parseFloat(item.getAttribute('data-price'));
-            const quantityInput = item.querySelector('.quantity-input');
-            const quantity = parseInt(quantityInput.value);
-            const itemTotal = item.querySelector('.item-total');
-
-            const total = price * quantity;
-            itemTotal.textContent = formatCurrency(total);
-        }
-
-        // Function to check stock limits and update UI accordingly
-        function checkStockLimits(item) {
-            const maxStock = parseInt(item.getAttribute('data-max-stock'));
-            if (!maxStock) return; // No stock limit
-
-            const quantityInput = item.querySelector('.quantity-input');
-            const currentValue = parseInt(quantityInput.value);
-            const increaseBtn = item.querySelector('.increase-btn');
-
-            if (currentValue >= maxStock) {
-                increaseBtn.disabled = true;
-            } else {
-                increaseBtn.disabled = false;
-            }
-        }
-
-        // Function to show stock limit message
-        function showStockLimitMessage(item, maxStock) {
-            // Check if message already exists
-            let messageEl = item.querySelector('.error-message');
-
-            if (!messageEl) {
-                messageEl = document.createElement('div');
-                messageEl.className = 'error-message';
-                const itemDetails = item.querySelector('.item-details');
-                itemDetails.appendChild(messageEl);
-            }
-
-            messageEl.textContent = `Maximum available stock is ${maxStock}.`;
-            messageEl.style.display = 'block';
-        }
-
-        // Function to hide stock limit message
-        function hideStockLimitMessage(item) {
-            const messageEl = item.querySelector('.error-message');
-            if (messageEl) {
-                messageEl.style.display = 'none';
-            }
-        }
-
-        // Function to update cart totals
-        function updateCartTotals() {
-            let subtotal = 0;
-            let itemCount = 0;
-
-            cartItems.forEach(item => {
-                const price = parseFloat(item.getAttribute('data-price'));
-                const quantityInput = item.querySelector('.quantity-input');
-                const quantity = parseInt(quantityInput.value);
-
-                subtotal += price * quantity;
-                itemCount += quantity;
-            });
-
-            const subtotalElement = document.getElementById('subtotal');
-            const totalElement = document.getElementById('cart-total');
-            const summaryLabel = document.querySelector('.summary-row .summary-label');
-
-            subtotalElement.textContent = formatCurrency(subtotal);
-            totalElement.textContent = formatCurrency(subtotal);
-            summaryLabel.textContent = `Subtotal (${itemCount} ${itemCount === 1 ? 'item' : 'items'})`;
-        }
-
-        // Function to remove item from cart
-        function removeCartItem(bookmarkId) {
-            fetch('/Payment/RemoveFromCart', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `bookmarkId=${bookmarkId}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Remove item from UI
-                    const itemElement = document.getElementById(`item-${bookmarkId}`);
-                    if (itemElement) {
-                        itemElement.remove();
-                    }
-
-                    // Check if cart is empty
-                    const remainingItems = document.querySelectorAll('.cart-item');
-                    if (remainingItems.length === 0) {
-                        // Show empty cart message
-                        const cartContainer = document.querySelector('.cart-container');
-                        cartContainer.innerHTML = `
-                            <div class="empty-cart">
-                                <i class="fas fa-shopping-cart fa-4x"></i>
-                                <h2>Your cart is empty</h2>
-                                <p>Browse listings and add items to your cart.</p>
-                                <a href="/User/User_MainPage" class="btn-browse">Browse Listings</a>
-                            </div>
-                        `;
-                    } else {
-                        // Update total
-                        updateCartTotals();
-                    }
-                } else {
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error removing item from cart:', error);
-                alert('Error removing item from cart. Please try again.');
-            });
-        }
-
-        // Function to format currency
-        function formatCurrency(amount) {
-            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
-        }
     });
 </script>

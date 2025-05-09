@@ -1,4 +1,10 @@
-﻿<!-- MyPurchases.cshtml -->
+﻿@* MyPurchase.cshtml *@
+@model IEnumerable<PrimeMarket.Models.ViewModel.PurchaseViewModel>
+@{
+    ViewData["Title"] = "My Purchases";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+
 <style>
     .my-purchases-header {
         display: flex;
@@ -35,7 +41,7 @@
         display: inline-block;
         padding: 10px 20px;
         background-color: #0066cc;
-        color: white;
+        color: #fff;
         text-decoration: none;
         border-radius: 5px;
         transition: background-color 0.3s ease;
@@ -53,16 +59,16 @@
 
     .purchase-item {
         display: flex;
-        background-color: white;
+        background-color: #fff;
         border-radius: 10px;
         overflow: hidden;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,.1);
+        transition: transform .3s ease, box-shadow .3s ease;
     }
 
         .purchase-item:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0,0,0,.1);
         }
 
     .purchase-image {
@@ -87,26 +93,23 @@
             font-size: 18px;
         }
 
-    .seller {
-        color: #666;
-        margin-bottom: 5px;
-    }
-
-    .purchase-date, .purchase-quantity {
+    .seller,
+    .purchase-date,
+    .purchase-quantity {
         color: #666;
         font-size: 14px;
         margin-bottom: 5px;
     }
 
     .purchase-price {
-        font-weight: bold;
+        font-weight: 700;
         color: #0066cc;
         margin-bottom: 10px;
     }
 
     .payment-status {
         display: inline-block;
-        padding: 5px 10px;
+        padding: 5px 12px;
         border-radius: 20px;
         font-size: 12px;
         margin-bottom: 10px;
@@ -130,6 +133,7 @@
     .purchase-actions {
         display: flex;
         gap: 10px;
+        flex-wrap: wrap;
         margin-top: 10px;
     }
 
@@ -141,7 +145,7 @@
         border-radius: 5px;
         text-decoration: none;
         font-size: 14px;
-        transition: background-color 0.3s ease;
+        transition: background-color .3s ease;
     }
 
         .btn-view:hover {
@@ -176,76 +180,62 @@
         flex: none;
     }
 
-    }
-</style>
-@model List<PrimeMarket.Models.ViewModel.PurchaseViewModel>
-@{
-    ViewData["Title"] = "My Purchases";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
-}
+    }</style>
 
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+<div class="container" style="margin-top:120px;margin-bottom:50px;">
     <div class="my-purchases-header">
         <h1>My Purchases</h1>
     </div>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
-        </div>
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
     }
 
     <div class="purchases-container">
-        @if (Model == null || Model.Count == 0)
+        @if (Model == null || !Model.Any())
         {
             <div class="empty-purchases">
                 <i class="fas fa-shopping-bag"></i>
                 <h2>You haven't made any purchases yet</h2>
                 <p>Browse listings and start shopping.</p>
-                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
+                <a class="btn-browse" href="@Url.Action("User_MainPage", "User")">Browse Listings</a>
             </div>
         }
         else
         {
             <div class="purchases-list">
-                @foreach (var purchase in Model)
+                @foreach (var p in Model.OrderByDescending(m => m.PurchaseDate))
                 {
                     <div class="purchase-item">
                         <div class="purchase-image">
-                            <img src="@purchase.ListingImage" alt="@purchase.ListingTitle">
+                            <img src="@p.ListingImage" alt="@p.ListingTitle" />
                         </div>
                         <div class="purchase-details">
-                            <h3>@purchase.ListingTitle</h3>
-                            <p class="seller">Seller: @purchase.SellerName</p>
-                            <p class="purchase-date">Purchased: @purchase.PurchaseDate.ToString("MMMM dd, yyyy")</p>
-                            @if (purchase.Quantity > 1)
+                            <h3>@p.ListingTitle</h3>
+                            <p class="seller">Seller: @p.SellerName</p>
+                            <p class="purchase-date">Purchased: @p.PurchaseDate.ToString("dd MMM yyyy HH:mm")</p>
+                            @if (p.Quantity > 1)
                             {
-                                <p class="purchase-quantity">Quantity: @purchase.Quantity</p>
-                                <p class="purchase-price">@purchase.UnitPrice.ToString("C") × @purchase.Quantity = @purchase.Amount.ToString("C")</p>
+                                <p class="purchase-quantity">Quantity: @p.Quantity</p>
+                                <p class="purchase-price">@p.UnitPrice.ToString("C") × @p.Quantity = @p.Amount.ToString("C")</p>
                             }
                             else
                             {
-                                <p class="purchase-price">@purchase.Amount.ToString("C")</p>
+                                <p class="purchase-price">@p.Amount.ToString("C")</p>
                             }
-                            <p class="payment-status @purchase.PaymentStatus.ToString().ToLower()">
-                                Status: <span>@purchase.PaymentStatus.ToString()</span>
-                            </p>
-                        </div>
-                        <div class="purchase-actions">
-                            <a href="@Url.Action("PurchaseStatus", "Payment", new { purchaseId = purchase.PurchaseId })" class="btn-view">
-                                View Purchase
-                            </a>
-                            <a href="@Url.Action("Details", "Listing", new { id = purchase.ListingId })" class="btn-view">
-                                View Listing
-                            </a>
+                            <span class="payment-status @p.PaymentStatus.ToString().ToLower()">
+                                @p.PaymentStatus
+                            </span>
+
+                            <div class="purchase-actions">
+                                <a class="btn-view" href="@Url.Action("PurchaseStatus", "Payment", new { purchaseId = p.PurchaseId })">View Purchase</a>
+                                <a class="btn-view" href="@Url.Action("Details", "Listing", new { id = p.ListingId })">View Listing</a>
+                            </div>
                         </div>
                     </div>
                 }

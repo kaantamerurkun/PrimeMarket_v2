@@ -131,9 +131,10 @@ namespace PrimeMarket.Data
                 .HasForeignKey(o => o.ListingId);
 
             modelBuilder.Entity<Listing>()
-                .HasOne(l => l.Purchase)
+                .HasMany(l => l.Purchases)
                 .WithOne(p => p.Listing)
-                .HasForeignKey<Purchase>(p => p.ListingId);
+                .HasForeignKey(p => p.ListingId);
+
 
             // Configure unique constraints
             modelBuilder.Entity<User>()

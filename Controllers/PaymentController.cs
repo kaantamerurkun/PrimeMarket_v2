@@ -645,7 +645,7 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
             catch (Exception ex)
             {
@@ -736,7 +736,7 @@ namespace PrimeMarket.Controllers
             if (purchase == null)
             {
                 TempData["ErrorMessage"] = "Purchase not found.";
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
 
             var model = new PurchaseCompleteViewModel
@@ -757,7 +757,7 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
-        public async Task<IActionResult> MyPurchases()
+        public async Task<IActionResult> MyPurchase()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -851,14 +851,14 @@ namespace PrimeMarket.Controllers
             if (purchase == null)
             {
                 TempData["ErrorMessage"] = "Purchase not found.";
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
 
             // Check if the user is either the buyer or the seller
             if (purchase.BuyerId != userId && purchase.Listing.SellerId != userId)
             {
                 TempData["ErrorMessage"] = "You don't have permission to view this purchase.";
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
 
             var isSecondHand = purchase.Listing.Condition == "Second-Hand";
@@ -992,14 +992,14 @@ namespace PrimeMarket.Controllers
             if (purchase == null)
             {
                 TempData["ErrorMessage"] = "Purchase not found.";
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
 
             // Check if the user is the buyer
             if (purchase.BuyerId != userId)
             {
                 TempData["ErrorMessage"] = "You don't have permission to confirm receipt for this purchase.";
-                return RedirectToAction("MyPurchases");
+                return RedirectToAction("MyPurchase");
             }
 
             try
