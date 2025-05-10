@@ -4,6 +4,9 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/GuestLayout.css" />
+    <link rel="stylesheet" href="/css/style.css" />
+
     <title>@ViewData["Title"] - PrimeMarket</title>
     <style>
         .search-box {
@@ -94,7 +97,6 @@
         background-color: #0055b3;
         }
     </style>
-    <link rel="stylesheet" href="/css/GuestLayout.css"/>
 </head>
 <body>
     <header class="main-header">
@@ -109,12 +111,9 @@
                         <button type="submit" class="search-button">Search</button>
                     </form>
                 </div>
-
-
                 <a asp-action="SignUp" asp-controller="User"><button class="btn-signup">Sign Up</button></a>
                 <a asp-action="Login" asp-controller="User" ><button class="btn-login">Log in</button></a>
                 <a asp-action="Login" asp-controller="User"><button class="btn-list">List an Item</button></a>
-
             </div>
         </div>
     </header>

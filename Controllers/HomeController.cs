@@ -25,6 +25,7 @@ public class HomeController : Controller
             .Where(l =>
                 l.Status == ListingStatus.Active &&                 // still for sale
                 (!l.Stock.HasValue || l.Stock > 0))                // second?hand OR stock?positive
+                   .Include(l => l.Images)          //  <<– THIS LINE is the key
             .OrderByDescending(l => l.CreatedAt)
             .ToList();
         return View(listings);

@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "HtZwLq3+hn+LOBGFX+vMXN8P5Mrr2WHvGqzqpE5AIkc=",
+  "Hash": "WIQihV4PbG5Ppt765NaAfTwjwCCGoCUB0WdaujsshWY=",
   "Source": "PrimeMarket",
   "BasePath": "_content/PrimeMarket",
   "Mode": "Default",
@@ -1529,12 +1529,12 @@
       "OriginalItemSpec": "wwwroot\\images\\listings\\31_f7e74a4b-9ea7-490c-a611-5365892a914d.jpg"
     },
     {
-      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png",
+      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg",
       "SourceId": "PrimeMarket",
       "SourceType": "Discovered",
       "ContentRoot": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\",
       "BasePath": "_content/PrimeMarket",
-      "RelativePath": "images/listings/32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f#[.{fingerprint}]?.png",
+      "RelativePath": "images/listings/32_0cd1877c-8293-4dad-8eea-b1cc93e65870#[.{fingerprint}]?.jpg",
       "AssetKind": "All",
       "AssetMode": "All",
       "AssetRole": "Primary",
@@ -1543,11 +1543,11 @@
       "RelatedAsset": "",
       "AssetTraitName": "",
       "AssetTraitValue": "",
-      "Fingerprint": "w9iei66mrk",
-      "Integrity": "/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=",
+      "Fingerprint": "39pb586ods",
+      "Integrity": "aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics=",
       "CopyToOutputDirectory": "Never",
       "CopyToPublishDirectory": "PreserveNewest",
-      "OriginalItemSpec": "wwwroot\\images\\listings\\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png"
+      "OriginalItemSpec": "wwwroot\\images\\listings\\32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg"
     },
     {
       "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_f9df6f08-3a06-432e-9f86-3d95eeb8341d.png",
@@ -4729,7 +4729,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 23 Apr 2025 16:34:51 GMT"
+          "Value": "Sat, 10 May 2025 16:31:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -4766,7 +4766,7 @@
         },
         {
           "Name": "Last-Modified",
-          "Value": "Wed, 23 Apr 2025 16:34:51 GMT"
+          "Value": "Sat, 10 May 2025 16:31:05 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -9955,8 +9955,8 @@
       ]
     },
     {
-      "Route": "images/listings/32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png",
-      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png",
+      "Route": "images/listings/32_0cd1877c-8293-4dad-8eea-b1cc93e65870.39pb586ods.jpg",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg",
       "Selectors": [],
       "ResponseHeaders": [
         {
@@ -9965,56 +9965,19 @@
         },
         {
           "Name": "Content-Length",
-          "Value": "115167"
+          "Value": "226324"
         },
         {
           "Name": "Content-Type",
-          "Value": "image/png"
+          "Value": "image/jpeg"
         },
         {
           "Name": "ETag",
-          "Value": "\"/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=\""
+          "Value": "\"aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics=\""
         },
         {
           "Name": "Last-Modified",
-          "Value": "Sat, 10 May 2025 10:34:01 GMT"
-        },
-        {
-          "Name": "Cache-Control",
-          "Value": "max-age=3600, must-revalidate"
-        }
-      ],
-      "EndpointProperties": [
-        {
-          "Name": "integrity",
-          "Value": "sha256-/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE="
-        }
-      ]
-    },
-    {
-      "Route": "images/listings/32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.w9iei66mrk.png",
-      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png",
-      "Selectors": [],
-      "ResponseHeaders": [
-        {
-          "Name": "Accept-Ranges",
-          "Value": "bytes"
-        },
-        {
-          "Name": "Content-Length",
-          "Value": "115167"
-        },
-        {
-          "Name": "Content-Type",
-          "Value": "image/png"
-        },
-        {
-          "Name": "ETag",
-          "Value": "\"/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=\""
-        },
-        {
-          "Name": "Last-Modified",
-          "Value": "Sat, 10 May 2025 10:34:01 GMT"
+          "Value": "Sat, 10 May 2025 15:08:28 GMT"
         },
         {
           "Name": "Cache-Control",
@@ -10024,15 +9987,52 @@
       "EndpointProperties": [
         {
           "Name": "fingerprint",
-          "Value": "w9iei66mrk"
+          "Value": "39pb586ods"
         },
         {
           "Name": "label",
-          "Value": "images/listings/32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png"
+          "Value": "images/listings/32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg"
         },
         {
           "Name": "integrity",
-          "Value": "sha256-/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE="
+          "Value": "sha256-aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics="
+        }
+      ]
+    },
+    {
+      "Route": "images/listings/32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "226324"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "image/jpeg"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Sat, 10 May 2025 15:08:28 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=3600, must-revalidate"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics="
         }
       ]
     },

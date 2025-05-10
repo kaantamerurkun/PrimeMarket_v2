@@ -881,6 +881,7 @@ namespace PrimeMarket.Controllers
         {
             var approvedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active && (!l.Stock.HasValue || l.Stock > 0))
+                .Include(l => l.Images)          //  <<– THIS LINE is the key
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 

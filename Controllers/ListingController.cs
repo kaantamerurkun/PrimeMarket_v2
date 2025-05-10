@@ -827,23 +827,27 @@ namespace PrimeMarket.Controllers
                 }
 
                 // Create notifications
-                if (wasApproved)
-                {
-                    // Notify admins that an approved listing was edited and needs review
-                    var admins = await _context.Admins.ToListAsync();
-                    foreach (var admin in admins)
-                    {
-                        var adminNotification = new Notification
-                        {
-                            UserId = admin.Id,
-                            Message = $"Updated listing '{model.Title}' (previously approved) needs review",
-                            Type = NotificationType.ListingUpdated,
-                            RelatedEntityId = listing.Id,
-                            CreatedAt = DateTime.UtcNow
-                        };
-                        _context.Notifications.Add(adminNotification);
-                    }
-                }
+                //if (wasApproved)
+                //{
+                //    // Notify admins that an approved listing was edited and needs review
+                //    var adminUserId = await _context.Admins
+                //                .Select(a => a.Id)   // Admin row → UserId
+                //                .FirstOrDefaultAsync();
+
+                //    if (adminUserId != 0)      // adjust type if Guid/int
+                //    {
+                //        var adminNotification = new Notification
+                //        {
+                //            UserId = adminUserId,                   // ✅ guaranteed to exist in Users
+                //            Message = $"Updated listing '{model.Title}' needs review",
+                //            Type = NotificationType.ListingApproved,
+                //            RelatedEntityId = listing.Id,
+                //            CreatedAt = DateTime.UtcNow
+                //        };
+
+                //        _context.Notifications.Add(adminNotification);
+                //    }
+                //}
 
                 // Notify user about the status change
                 if (originalStatus != listing.Status)
