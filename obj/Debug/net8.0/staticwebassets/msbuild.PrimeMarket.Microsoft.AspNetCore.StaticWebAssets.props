@@ -1278,6 +1278,42 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\30_555e1dd6-a540-48dc-8e11-0b148eec7ca4.jpg'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\31_f7e74a4b-9ea7-490c-a611-5365892a914d.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/31_f7e74a4b-9ea7-490c-a611-5365892a914d.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>39pb586ods</Fingerprint>
+      <Integrity>aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\31_f7e74a4b-9ea7-490c-a611-5365892a914d.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>w9iei66mrk</Fingerprint>
+      <Integrity>/KHJahD113+e6YwnX2JuVZJIpkIhOQwYqQeUIGJuLLE=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\32_8d125677-5b91-4e80-a772-8eb3b6a8bb1f.png'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png'))">
       <SourceType>Package</SourceType>
       <SourceId>PrimeMarket</SourceId>

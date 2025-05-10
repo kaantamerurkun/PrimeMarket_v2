@@ -31,6 +31,7 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
+        [Route("Payment/Cart")]
         public async Task<IActionResult> Cart()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -203,7 +204,9 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
-        public async Task<IActionResult> Checkout(int listingId ,int quantity = 1)
+        [Route("Payment/Checkout")]
+
+        public async Task<IActionResult> Checkout(int listingId ,int quantity)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -270,6 +273,8 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
+        [Route("Payment/CheckoutMultiple")]
+
         public async Task<IActionResult> CheckoutMultiple()
         {
             var userId = HttpContext.Session.GetInt32("UserId");

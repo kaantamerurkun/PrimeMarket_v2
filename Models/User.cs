@@ -44,6 +44,13 @@ namespace PrimeMarket.Models
         public virtual ICollection<UserRating> RatingsReceived { get; set; }
         public virtual VerificationDocument VerificationDocument { get; set; }
         public virtual ICollection<ProductReview> ProductReviews { get; set; }
+        // Add these navigation properties to your User model class:
+
+        // Ratings given by this user as a buyer
+        public virtual ICollection<SellerRating> RatingsGivenAsBuyer { get; set; }
+
+        // Ratings received by this user as a seller
+        public virtual ICollection<SellerRating> RatingsReceivedAsSeller { get; set; }
         // In your User class
         public virtual ICollection<Offer> Offers { get; set; }
     }

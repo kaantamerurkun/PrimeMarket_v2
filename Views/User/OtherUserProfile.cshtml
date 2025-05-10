@@ -1,4 +1,5 @@
-﻿@{
+﻿@model PrimeMarket.Models.ViewModel.OtherUserProfileViewModel
+@{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 <!DOCTYPE html>
@@ -9,8 +10,122 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/css/OtherUserProfile.css" />
+    <title>@Model.User.FirstName @Model.User.LastName's Profile</title>
+    <style>
+        .profile-image {
+            position: relative;
+            width: 350px;
+            height: 350px;
+            border-radius: 10px;
+            overflow: hidden;
+        }
 
-    <title>Other User Profile</title>
+        .profile-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .verification-badge {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            background-color: #fff;
+            border-radius: 50%;
+            padding: 3px;
+            box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
+        }
+
+        .seller-rating {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .star-rating {
+            display: inline-flex;
+            margin-left: 10px;
+        }
+
+        .star {
+            font-size: 24px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .star.selected,
+        .star.hover {
+            color: #ffa500;
+        }
+
+        .overall-rating {
+            margin-top: 10px;
+            font-size: 16px;
+            color: #666;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .listing-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .listing-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .listing-image {
+            height: 180px;
+            overflow: hidden;
+        }
+
+        .listing-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .listing-details {
+            padding: 15px;
+        }
+
+        .listing-price {
+            font-weight: bold;
+            color: #0066cc;
+            font-size: 18px;
+        }
+
+        .empty-listings {
+            text-align: center;
+            padding: 50px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .rating-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .rating-message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
 </head>
 
 <body>
@@ -20,21 +135,30 @@
     <br />
     <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
         <div style="margin-right: 20px; margin-left: 300px">
-            <img src="/images/PrimeMarket_Logo_V2.png" alt="Profile Pic" width="350px" height="350px" />
+            <div class="profile-image">
+                <img src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)"
+                     alt="Profile Picture" />
+                @if (Model.User.IsIdVerified)
+                {
+                    <div class="verification-badge">
+                        <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                    </div>
+                }
+            </div>
         </div>
 
         <div style="flex: 1; text-align: left">
             <br>
-            <p><strong>Name:</strong>Name</p>
-            <p><strong>Last Name:</strong> LastName</p>
+            <p><strong>Name:</strong> @Model.User.FirstName</p>
+            <p><strong>Last Name:</strong> @Model.User.LastName</p>
             <br />
-            <p><strong>Email:</strong> NameLastname@gmail.com</p>
+            <p><strong>Email:</strong> @Model.User.Email</p>
             <br />
-            <p><strong>Phone Number:</strong> 999999999</p>
+            <p><strong>Phone Number:</strong> @(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</p>
             <br />
             <div class="seller-rating">
-                <span class="rating-label">Your Rating:</span>
-                <div class="star-rating" id="userRating">
+                <span class="rating-label">Rating:</span>
+                <div class="star-rating" id="userRating" data-user-id="@Model.User.Id">
                     <span class="star" data-value="1">&#9733;</span>
                     <span class="star" data-value="2">&#9733;</span>
                     <span class="star" data-value="3">&#9733;</span>
@@ -42,85 +166,135 @@
                     <span class="star" data-value="5">&#9733;</span>
                 </div>
                 <div class="overall-rating" id="overallRatingDisplay">
-                    Overall Rating: <span id="avgRating">0</span>/5 (<span id="ratingCount">0</span> ratings)
+                    Overall Rating: <span id="avgRating">@Model.AverageRating</span>/5 (<span id="ratingCount">@Model.TotalRatings</span> ratings)
                 </div>
+                @if (Model.CanRateUser)
+                {
+                    <div class="rating-message" id="ratingMessage">
+                        @if (Model.UserRating > 0)
+                        {
+                            <text>You've rated this seller @Model.UserRating stars. Click to update your rating.</text>
+                        }
+                        else
+                        {
+                            <text>Click the stars to rate this seller.</text>
+                        }
+                    </div>
+                }
+                else
+                {
+                    <div class="rating-message">
+                        You can only rate sellers from whom you have completed a purchase.
+                    </div>
+                }
             </div>
         </div>
-
     </div>
     <br>
     <br>
     <br>
     <br />
-    <h2 style="text-align: center">User's' Listings</h2>
-    <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;">
-        @*         @foreach (var recipe in Model.Recipes)
+    <h2 style="text-align: center">@Model.User.FirstName's Listings</h2>
+    <div class="container" style="max-width: 1200px; margin: 0 auto;">
+        @if (Model.Listings == null || Model.Listings.Count == 0)
         {
-            <div class="slider-item">
-                <a asp-controller="Home" asp-action="RecipeDetailsGuest" asp-route-id="@recipe.Id">
-                    <img src="@recipe.ImageUrl" alt="Recipe Image" width="200px" height="200px" />
-                </a>
-                <a asp-controller="Home" asp-action="RecipeDetailsGuest" asp-route-id="@recipe.Id">
-                    <h3>@recipe.Title</h3>
-                </a>
-                <p>@recipe.Instructions</p>
-                <a asp-controller="Home" asp-action="OtherUserProfilePageGuest" asp-route-id="@recipe.User.Id">
-                    <h4 style="margin-left: 20px; color: black">Created by @recipe.User.Username</h4>
-                </a>
+            <div class="empty-listings">
+                <p>This user doesn't have any active listings yet.</p>
             </div>
-        } *@
+        }
+        else
+        {
+            <div class="listings-grid">
+                @foreach (var listing in Model.Listings)
+                {
+                    <a href="@Url.Action("Details", "Listing", new { id = listing.Id })" style="text-decoration: none; color: inherit;">
+                        <div class="listing-card">
+                            <div class="listing-image">
+                                @{
+                                    var mainImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                    ?? listing.Images?.FirstOrDefault()?.ImagePath
+                                    ?? "/images/placeholder.png";
+                                }
+                                <img src="@mainImage" alt="@listing.Title" />
+                            </div>
+                            <div class="listing-details">
+                                <h3>@listing.Title</h3>
+                                <p class="listing-price">@listing.Price.ToString("C")</p>
+                                <p>@listing.Location</p>
+                            </div>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
     </div>
     <br />
     <script>
-        let selectedRating = 0;
-        let totalRatings = 0;
-        let totalScore = 0;
-
         const stars = document.querySelectorAll("#userRating .star");
         const avgRatingEl = document.getElementById("avgRating");
         const ratingCountEl = document.getElementById("ratingCount");
+        const userRatingEl = document.getElementById("userRating");
+        const userId = userRatingEl.getAttribute("data-user-id");
+        const canRate = @Model.CanRateUser.ToString().ToLower();
+        let selectedRating = @Model.UserRating;
 
-        // Check if user has already rated
-        const storedRating = localStorage.getItem("userRating");
-
-        if (storedRating) {
-            selectedRating = parseInt(storedRating);
-            totalRatings = 1;
-            totalScore = selectedRating;
-            updateDisplay();
+        // Initialize with existing rating
+        if (selectedRating > 0) {
             highlightStars(selectedRating, false);
-        } else {
-            totalRatings = 0;
-            totalScore = 0;
         }
 
-        stars.forEach(star => {
-            star.addEventListener("mouseover", () => {
-                const hoverValue = parseInt(star.dataset.value);
-                highlightStars(hoverValue, true);
+        if (canRate) {
+            stars.forEach(star => {
+                star.addEventListener("mouseover", () => {
+                    const hoverValue = parseInt(star.dataset.value);
+                    highlightStars(hoverValue, true);
+                });
+
+                star.addEventListener("mouseout", () => {
+                    highlightStars(selectedRating, false);
+                });
+
+                star.addEventListener("click", () => {
+                    const newRating = parseInt(star.dataset.value);
+
+                    // Send rating to server
+                    fetch('/SellerRating/RateSeller', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: `sellerId=${userId}&rating=${newRating}&comment=`
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            selectedRating = newRating;
+                            avgRatingEl.textContent = data.averageRating;
+                            ratingCountEl.textContent = data.totalRatings;
+                            highlightStars(selectedRating, false);
+
+                            // Update message
+                            const messageEl = document.getElementById("ratingMessage");
+                            if (messageEl) {
+                                messageEl.textContent = `You've rated this seller ${newRating} stars. Click to update your rating.`;
+                            }
+                        } else {
+                            alert(data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('An error occurred while submitting your rating.');
+                    });
+                });
             });
-
-            star.addEventListener("mouseout", () => {
-                highlightStars(selectedRating, false);
+        } else {
+            // Disable rating if user can't rate
+            userRatingEl.classList.add('rating-disabled');
+            stars.forEach(star => {
+                star.style.cursor = 'not-allowed';
             });
-
-            star.addEventListener("click", () => {
-                const newRating = parseInt(star.dataset.value);
-
-                if (localStorage.getItem("userRating")) {
-                    // Update score by subtracting old rating and adding new one
-                    totalScore = totalScore - selectedRating + newRating;
-                } else {
-                    totalRatings++;
-                    totalScore += newRating;
-                }
-
-                selectedRating = newRating;
-                localStorage.setItem("userRating", newRating);
-                updateDisplay();
-                highlightStars(selectedRating, false);
-            });
-        });
+        }
 
         function highlightStars(rating, isHover) {
             stars.forEach(star => {
@@ -134,12 +308,22 @@
             });
         }
 
-        function updateDisplay() {
-            const average = (totalScore / totalRatings).toFixed(1);
-            avgRatingEl.textContent = average;
-            ratingCountEl.textContent = totalRatings;
-        }
-
+        // Load rating on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            fetch(`/SellerRating/GetSellerRating?sellerId=${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        avgRatingEl.textContent = data.averageRating;
+                        ratingCountEl.textContent = data.totalRatings;
+                        if (data.userRating > 0) {
+                            selectedRating = data.userRating;
+                            highlightStars(selectedRating, false);
+                        }
+                    }
+                })
+                .catch(error => console.error('Error loading rating:', error));
+        });
     </script>
 </body>
 </html>

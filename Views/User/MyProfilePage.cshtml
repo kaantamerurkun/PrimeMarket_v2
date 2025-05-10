@@ -385,6 +385,42 @@
             }
         </div>
     </div>
+    <!-- Add this code to MyProfilePage.cshtml after the user details container and before the buttons div -->
+    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+        @if (Model.TotalRatings >= 0)
+        {
+            <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px;">
+                <div class="rating-info" style="display: flex; align-items: center; justify-content: center;">
+                    <span style="font-weight: bold; margin-right: 10px;">Your Seller Rating:</span>
+                    <div class="stars" style="color: #ffa500; margin-right: 10px;">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            if (i <= Model.AverageRating)
+                            {
+                                <span>★</span>
+                            }
+                            else if (i - 0.5 <= Model.AverageRating)
+                            {
+                                <span>☆</span>
+                            }
+                            else
+                            {
+                                <span style="color: #ddd;">★</span>
+                            }
+                        }
+                    </div>
+                    <span>@Model.AverageRating.ToString("0.0")/5 (@Model.TotalRatings reviews)</span>
+                </div>
+            </div>
+        }
+        else
+        {
+            <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px; text-align: center;">
+                <span>You haven't received any seller ratings yet.</span>
+            </div>
+        }
+    </div>
+
 
     <br>
     <br>

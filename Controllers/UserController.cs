@@ -815,19 +815,21 @@ namespace PrimeMarket.Controllers
 
         #region User Pages
 
+        // Update the MyProfilePage action in UserController.cs:
+
+        [HttpGet]
         [UserAuthenticationFilter]
+        [Route("User/MyProfilePage")]
         public async Task<IActionResult> MyProfilePage()
         {
-            // Get the user ID from session
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
                 return RedirectToAction("Login");
             }
 
-            // Always fetch the fresh user data from database
             var user = await _context.Users
-                .AsNoTracking() // To ensure we get fresh data
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
@@ -835,23 +837,36 @@ namespace PrimeMarket.Controllers
                 return NotFound("User not found. Please try logging in again.");
             }
 
-            // Get user's listings
             var listings = await _context.Listings
                 .Where(l => l.SellerId == userId.Value)
                 .Include(l => l.Images)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
-            // Create a view model to hold both user and listings
+            var ratings = await _context.SellerRatings
+                .Where(r => r.SellerId == userId.Value)
+                .ToListAsync();
+
+            double averageRating = 0;
+            int totalRatings = 0;
+
+            if (ratings.Any())
+            {
+                averageRating = ratings.Average(r => r.Rating);
+                totalRatings = ratings.Count;
+            }
+
             var viewModel = new UserProfileViewModel
             {
                 User = user,
-                Listings = listings
+                Listings = listings,
+                AverageRating = Math.Round(averageRating, 1),
+                TotalRatings = totalRatings
             };
 
-            // Pass the combined view model to the view
             return View(viewModel);
         }
+
 
         // Simple route methods for views
         [UserAuthenticationFilter]
@@ -896,6 +911,8 @@ namespace PrimeMarket.Controllers
             return View();
         }
 
+        // Add this method to UserController.cs, replacing the existing OtherUserProfile method
+
         [UserAuthenticationFilter]
         public async Task<IActionResult> OtherUserProfile(int id)
         {
@@ -907,7 +924,60 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            return View(user);
+            // Get user's listings
+            var listings = await _context.Listings
+                .Where(l => l.SellerId == id && l.Status == ListingStatus.Active)
+                .Include(l => l.Images)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+
+            // Get rating information
+            var ratings = await _context.SellerRatings
+                .Where(r => r.SellerId == id)
+                .ToListAsync();
+
+            double averageRating = 0;
+            int totalRatings = 0;
+
+            if (ratings.Any())
+            {
+                averageRating = ratings.Average(r => r.Rating);
+                totalRatings = ratings.Count;
+            }
+
+            // Check if current user can rate this seller
+            bool canRateUser = false;
+            int userRating = 0;
+
+            var currentUserId = HttpContext.Session.GetInt32("UserId");
+            if (currentUserId != null)
+            {
+                var existingRating = ratings.FirstOrDefault(r => r.BuyerId == currentUserId);
+                userRating = existingRating?.Rating ?? 0;
+
+                var hasCompletedPurchase = await _context.Purchases
+                    .Include(p => p.Listing)
+                    .Include(p => p.Confirmation)
+                    .AnyAsync(p => p.BuyerId == currentUserId &&
+                                  p.Listing.SellerId == id &&
+                                  p.PaymentStatus == PaymentStatus.Completed &&
+                                  p.Confirmation != null &&
+                                  p.Confirmation.BuyerReceivedProduct);
+
+                canRateUser = hasCompletedPurchase;
+            }
+
+            var viewModel = new OtherUserProfileViewModel
+            {
+                User = user,
+                Listings = listings,
+                AverageRating = Math.Round(averageRating, 1),
+                TotalRatings = totalRatings,
+                CanRateUser = canRateUser,
+                UserRating = userRating
+            };
+
+            return View(viewModel);
         }
 
         [UserAuthenticationFilter]

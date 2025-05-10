@@ -25,6 +25,7 @@ namespace PrimeMarket.Data
         public DbSet<PurchaseConfirmation> PurchaseConfirmations { get; set; }
         public DbSet<Notification> Notifications { get; set; }
         public DbSet<UserRating> UserRatings { get; set; }
+        public DbSet<SellerRating> SellerRatings { get; set; }
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AdminAction> AdminActions { get; set; }
 
@@ -174,6 +175,29 @@ namespace PrimeMarket.Data
 
             modelBuilder.Entity<UserRating>()
                 .HasIndex(r => new { r.RaterId, r.RatedUserId })
+                .IsUnique();
+
+            modelBuilder.Entity<SellerRating>()
+                .HasOne(sr => sr.Buyer)
+                .WithMany(u => u.RatingsGivenAsBuyer)
+                .HasForeignKey(sr => sr.BuyerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SellerRating>()
+                .HasOne(sr => sr.Seller)
+                .WithMany(u => u.RatingsReceivedAsSeller)
+                .HasForeignKey(sr => sr.SellerId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            modelBuilder.Entity<SellerRating>()
+                .HasOne(sr => sr.Purchase)
+                .WithMany()
+                .HasForeignKey(sr => sr.PurchaseId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            // Ensure one rating per purchase
+            modelBuilder.Entity<SellerRating>()
+                .HasIndex(sr => new { sr.BuyerId, sr.SellerId, sr.PurchaseId })
                 .IsUnique();
 
             // Configure one-to-one relationships between Listing and product types
