@@ -194,7 +194,6 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets\msbuild.buildMultiTargeting.PrimeMarket.props
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets\msbuild.buildTransitive.PrimeMarket.props
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.pack.json
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\PrimeMar.5D3A8AF4.Up2Date
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\PrimeMarket.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\refint\PrimeMarket.dll
@@ -382,3 +381,4 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\tr\FSharp.Core.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\zh-Hans\FSharp.Core.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\zh-Hant\FSharp.Core.resources.dll
+C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

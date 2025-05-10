@@ -51,6 +51,7 @@ namespace PrimeMarket.Models
         public virtual ICollection<Message> Messages { get; set; }
         public virtual ICollection<Offer> Offers { get; set; }
         public virtual ICollection<Purchase> Purchases { get; set; }
+        public virtual ICollection<ProductReview> Reviews { get; set; }
 
         // Product type relationships
         public virtual BaseProduct Product { get; set; }

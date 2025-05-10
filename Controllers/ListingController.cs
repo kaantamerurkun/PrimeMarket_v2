@@ -1149,6 +1149,8 @@ public async Task<IActionResult> DeleteListing(int id)
             var listing = await _context.Listings
                 .Include(l => l.Images)
                 .Include(l => l.Seller)
+                .Include(l => l.Reviews)
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (listing == null)
@@ -1167,9 +1169,8 @@ public async Task<IActionResult> DeleteListing(int id)
                 return NotFound();
             }
 
-            // Get product-specific details
+            // Get product-specific details (existing code)
             dynamic product = null;
-
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
@@ -1183,7 +1184,48 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Laptops":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-                        // Add other cases from the original code...
+                    case "Other Phone":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablet":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Tablet":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablet":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Desktop":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessory":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessory":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Accessory":
+                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Fridge":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Dishwasher":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Oven":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Vacuum Cleaner":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Washer":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Television":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                 }
             }
 
@@ -1195,7 +1237,7 @@ public async Task<IActionResult> DeleteListing(int id)
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings (same category)
+            // Get related listings (existing code)
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -1205,7 +1247,7 @@ public async Task<IActionResult> DeleteListing(int id)
                 .Take(4)
                 .ToListAsync();
 
-            // Get active offers if this is a second-hand listing and the current user is the seller
+            // Get active offers if this is a second-hand listing (existing code)
             List<Offer> activeOffers = new List<Offer>();
             if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
             {
@@ -1216,6 +1258,36 @@ public async Task<IActionResult> DeleteListing(int id)
                     .ToListAsync();
             }
 
+            // Check if user can review this product
+            bool canReview = false;
+            bool hasReviewed = false;
+
+            if (userId.HasValue && listing.Condition == "First-Hand")
+            {
+                // Check if user has purchased and received this product
+                var hasPurchased = await _context.Purchases
+                    .Include(p => p.Confirmation)
+                    .AnyAsync(p => p.BuyerId == userId.Value &&
+                                  p.ListingId == id &&
+                                  p.PaymentStatus == PaymentStatus.Completed &&
+                                  p.Confirmation != null &&
+                                  p.Confirmation.BuyerReceivedProduct);
+
+                if (hasPurchased)
+                {
+                    // Check if user has already reviewed
+                    hasReviewed = await _context.ProductReviews
+                        .AnyAsync(r => r.UserId == userId.Value && r.ListingId == id);
+
+                    canReview = !hasReviewed;
+                }
+            }
+
+            // Calculate average rating and total reviews
+            var reviews = listing.Reviews?.ToList() ?? new List<ProductReview>();
+            double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+            int totalReviews = reviews.Count;
+
             // Create view model
             var viewModel = new ListingDetailsViewModel
             {
@@ -1224,7 +1296,12 @@ public async Task<IActionResult> DeleteListing(int id)
                 IsBookmarked = isBookmarked,
                 RelatedListings = relatedListings,
                 IsOwner = userId.HasValue && userId.Value == listing.SellerId,
-                ActiveOffers = activeOffers
+                ActiveOffers = activeOffers,
+                Reviews = reviews,
+                AverageRating = Math.Round(averageRating, 1),
+                TotalReviews = totalReviews,
+                CanReview = canReview,
+                HasReviewed = hasReviewed
             };
 
             return View(viewModel);

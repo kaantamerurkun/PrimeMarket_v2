@@ -857,3 +857,314 @@
         }, 3000);
     }
 </script>
+<!-- Add this section to Views/Listing/Details.cshtml after the seller info section -->
+<!-- Reviews Section -->
+@if (Model.Listing.Condition == "First-Hand")
+{
+    <div class="reviews-section">
+        <h3>Customer Reviews</h3>
+
+        <div class="reviews-summary">
+            <div class="average-rating">
+                <span class="rating-number">@Model.AverageRating</span>
+                <div class="stars">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        <span class="star @(i <= Model.AverageRating ? "filled" : "empty")">★</span>
+                    }
+                </div>
+                <span class="review-count">@Model.TotalReviews @(Model.TotalReviews == 1 ? "review" : "reviews")</span>
+            </div>
+        </div>
+
+        @if (Model.CanReview)
+        {
+            <div class="add-review-section">
+                <h4>Write a Review</h4>
+                <form id="reviewForm">
+                    <input type="hidden" id="listingId" value="@Model.Listing.Id" />
+
+                    <div class="rating-input">
+                        <label>Your Rating:</label>
+                        <div class="star-rating-input">
+                            @for (int i = 5; i >= 1; i--)
+                            {
+                                <input type="radio" id="star@(i)" name="rating" value="@i" />
+                                <label for="star@(i)" title="@i stars">★</label>
+                            }
+                        </div>
+                    </div>
+
+                    <div class="comment-input">
+                        <label for="comment">Your Review:</label>
+                        <textarea id="comment" name="comment" rows="4" required placeholder="Share your experience with this product..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-submit-review">Submit Review</button>
+                </form>
+            </div>
+        }
+        else if (Model.HasReviewed)
+        {
+            <p class="review-notice">You have already reviewed this product.</p>
+        }
+        else if (!Model.IsOwner)
+        {
+            <p class="review-notice">Only customers who have purchased and received this product can write a review.</p>
+        }
+
+        <div class="reviews-list">
+            @if (Model.Reviews.Any())
+            {
+                foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
+                {
+                    <div class="review-item">
+                        <div class="review-header">
+                            <div class="reviewer-info">
+                                <span class="reviewer-name">@review.User.FirstName @review.User.LastName</span>
+                                @if (review.IsVerifiedPurchase)
+                                {
+                                    <span class="verified-purchase">✓ Verified Purchase</span>
+                                }
+                            </div>
+                            <div class="review-date">@(((DateTime)review.CreatedAt).ToString("MMM dd, yyyy"))</div>
+                        </div>
+                        <div class="review-rating">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <span class="star @(i <= review.Rating ? "filled" : "empty")">★</span>
+                            }
+                        </div>
+                        <p class="review-comment">@review.Comment</p>
+                    </div>
+                }
+            }
+            else
+            {
+                <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
+            }
+        </div>
+    </div>
+}
+
+<style>
+    .reviews-section {
+        margin-top: 40px;
+        padding: 20px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+    }
+
+        .reviews-section h3 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+    .reviews-summary {
+        margin-bottom: 30px;
+        text-align: center;
+    }
+
+    .average-rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .rating-number {
+        font-size: 36px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .stars {
+        display: inline-flex;
+    }
+
+    .star {
+        font-size: 24px;
+        margin: 0 2px;
+    }
+
+        .star.filled {
+            color: #ffa500;
+        }
+
+        .star.empty {
+            color: #ddd;
+        }
+
+    .review-count {
+        color: #666;
+        font-size: 16px;
+    }
+
+    .add-review-section {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+        .add-review-section h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+        }
+
+    .rating-input {
+        margin-bottom: 15px;
+    }
+
+    .star-rating-input {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+    }
+
+        .star-rating-input input {
+            display: none;
+        }
+
+        .star-rating-input label {
+            cursor: pointer;
+            font-size: 30px;
+            color: #ddd;
+            margin: 0 5px;
+        }
+
+            .star-rating-input input:checked ~ label,
+            .star-rating-input label:hover,
+            .star-rating-input label:hover ~ label {
+                color: #ffa500;
+            }
+
+    .comment-input {
+        margin-bottom: 15px;
+    }
+
+        .comment-input label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .comment-input textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: vertical;
+        }
+
+    .btn-submit-review {
+        background-color: #0066cc;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+        .btn-submit-review:hover {
+            background-color: #0055b3;
+        }
+
+    .review-notice {
+        text-align: center;
+        padding: 20px;
+        background-color: #f0f0f0;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+
+    .reviews-list {
+        margin-top: 20px;
+    }
+
+    .review-item {
+        background-color: white;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        border: 1px solid #eee;
+    }
+
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+
+    .reviewer-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .reviewer-name {
+        font-weight: bold;
+    }
+
+    .verified-purchase {
+        color: #28a745;
+        font-size: 14px;
+    }
+
+    .review-date {
+        color: #666;
+        font-size: 14px;
+    }
+
+    .review-rating {
+        margin-bottom: 10px;
+    }
+
+    .review-comment {
+        margin: 0;
+        line-height: 1.5;
+    }
+
+    .no-reviews {
+        text-align: center;
+        padding: 20px;
+        color: #666;
+    }
+</style>
+
+<script>
+    // Add review form submission
+    document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const listingId = document.getElementById('listingId').value;
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const comment = document.getElementById('comment').value;
+
+        if (!rating) {
+            alert('Please select a rating');
+            return;
+        }
+
+        fetch('/ProductReview/AddReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: `listingId=${listingId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting your review.');
+        });
+    });
+</script>

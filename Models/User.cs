@@ -43,6 +43,7 @@ namespace PrimeMarket.Models
         public virtual ICollection<UserRating> RatingsGiven { get; set; }
         public virtual ICollection<UserRating> RatingsReceived { get; set; }
         public virtual VerificationDocument VerificationDocument { get; set; }
+        public virtual ICollection<ProductReview> ProductReviews { get; set; }
         // In your User class
         public virtual ICollection<Offer> Offers { get; set; }
     }

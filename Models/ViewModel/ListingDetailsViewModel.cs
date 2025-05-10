@@ -7,6 +7,11 @@
         public bool IsBookmarked { get; set; }
         public List<Listing> RelatedListings { get; set; }
         public bool IsOwner { get; set; }
+        public List<ProductReview> Reviews { get; set; }
+        public double AverageRating { get; set; }
+        public int TotalReviews { get; set; }
+        public bool CanReview { get; set; }
+        public bool HasReviewed { get; set; }
 
         // Flag to identify if offers are allowed (second-hand)
         public bool AllowOffers => Listing?.Condition == "Second-Hand";

@@ -47,6 +47,7 @@ namespace PrimeMarket.Data
         public DbSet<TabletAccessory> TabletAccessories { get; set; }
         public DbSet<ComputerAccessory> ComputerAccessories { get; set; }
         public DbSet<EmailVerification> EmailVerifications { get; set; }
+        public DbSet<ProductReview> ProductReviews { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -269,6 +270,22 @@ namespace PrimeMarket.Data
                 .HasOne(l => l.ComputerAccessory)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<ComputerAccessory>(p => p.ListingId);
+
+            modelBuilder.Entity<ProductReview>()
+                .HasIndex(pr => new { pr.UserId, pr.ListingId })
+                .IsUnique();
+
+            modelBuilder.Entity<ProductReview>()
+                .HasOne(pr => pr.User)
+                .WithMany(u => u.ProductReviews)
+                .HasForeignKey(pr => pr.UserId)
+                .OnDelete(DeleteBehavior.Restrict); // Changed from Cascade to Restrict
+            
+            modelBuilder.Entity<ProductReview>()
+                .HasOne(pr => pr.Listing)
+                .WithMany(l => l.Reviews)
+                .HasForeignKey(pr => pr.ListingId)
+                .OnDelete(DeleteBehavior.Cascade); // Keep cascade for listing deletion
 
             modelBuilder.Entity<Offer>()
                 .HasOne(o => o.Buyer)
