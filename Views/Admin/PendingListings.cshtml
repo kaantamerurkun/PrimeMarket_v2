@@ -14,6 +14,21 @@
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <link rel="stylesheet" href="/css/messagenotifications.css" />
     <style>
+        .listing-updated-badge {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background-color: #17a2b8;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+
+        .listing-card.updated {
+            border: 2px solid #17a2b8;
+        }
         .listing-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -502,23 +517,62 @@
             else
             {
                 <div class="listing-grid">
+                    <!-- Add this style update to PendingListings.cshtml -->
+                    <!-- Add after existing style definitions -->
+                    <style>
+                        /* ... existing styles ... */
+
+                        .listing-updated-badge {
+                            position: absolute;
+                            top: 10px;
+                            left: 10px;
+                            background-color: #17a2b8;
+                            color: white;
+                            padding: 3px 8px;
+                            border-radius: 3px;
+                            font-size: 11px;
+                            font-weight: bold;
+                        }
+
+                        .listing-card.updated {
+                            border: 2px solid #17a2b8;
+                        }
+                    </style>
+
+                    <!-- Update the listing-card section in PendingListings.cshtml -->
+                    <!-- Replace the existing listing card rendering with: -->
                     @foreach (var listing in Model)
                     {
                         var mainImage = listing.Images != null && listing.Images.Any()
                         ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
                         : "/images/placeholder.png";
 
-                        <div class="listing-card" data-id="@listing.Id">
+                        // Check if this is an updated listing
+                        bool isUpdated = listing.UpdatedAt.HasValue &&
+                        listing.UpdatedAt.Value > listing.CreatedAt.Value.AddMinutes(5);
+
+                        <div class="listing-card @(isUpdated ? "updated" : "")" data-id="@listing.Id">
                             <a href="@Url.Action("ListingDetails", "Admin", new { id = listing.Id })">
                                 <div class="listing-image">
                                     <img src="@mainImage" alt="@listing.Title">
+                                    @if (isUpdated)
+                                    {
+                                        <span class="listing-updated-badge">UPDATED</span>
+                                    }
                                 </div>
                                 <div class="listing-details">
                                     <h3 class="listing-title">@listing.Title</h3>
                                     <p class="listing-price">@listing.Price.ToString("C")</p>
                                     <p class="listing-seller">Seller: <span class="seller-name" data-user-id="@listing.SellerId">@(listing.Seller?.FirstName ?? "") @(listing.Seller?.LastName ?? "")</span></p>
                                     <p class="listing-category">Category: @listing.Category > @listing.SubCategory</p>
-                                    <p class="listing-date">Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
+                                    <p class="listing-date">
+                                        Listed: @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))
+                                        @if (isUpdated)
+                                        {
+                                            <br />
+                                            <span style="color: #17a2b8;">Updated: @(((DateTime)listing.UpdatedAt).ToString("MMM dd, yyyy"))</span>
+                                        }
+                                    </p>
                                 </div>
                             </a>
                             <div class="listing-action">

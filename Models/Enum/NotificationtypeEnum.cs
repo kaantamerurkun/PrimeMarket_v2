@@ -16,6 +16,7 @@ namespace PrimeMarket.Models.Enum
         VerificationApproved,
         VerificationRejected,
         PurchaseCompleted,
-        OfferCancelled
+        OfferCancelled,
+        ListingUpdated
     }
 }

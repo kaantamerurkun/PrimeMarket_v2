@@ -660,6 +660,7 @@ namespace PrimeMarket.Controllers
         // Update the EditListing POST method in ListingController.cs
         // Updated EditListing POST method in ListingController.cs
 
+        // Updated EditListing POST method in ListingController.cs
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
@@ -680,49 +681,34 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Ensure DeletedImageIds is not null to avoid NullReferenceException
+            // Ensure DeletedImageIds is not null
             if (DeletedImageIds == null)
             {
                 DeletedImageIds = new List<int>();
             }
 
-            // Ensure DetailCategory is never null - fix for "DetailCategory is required" error
+            // Ensure DetailCategory is never null
             if (model.DetailCategory == null)
             {
                 model.DetailCategory = string.Empty;
             }
 
-            // Count existing images that won't be deleted
+            // Check if listing is being edited - store original status
+            var originalStatus = listing.Status;
+            var wasApproved = listing.Status == ListingStatus.Active;
+
+            // Validate images
             int remainingImagesCount = listing.Images.Count(i => !DeletedImageIds.Contains(i.Id));
             bool willHaveImages = remainingImagesCount > 0 || (newImages != null && newImages.Count > 0);
 
             if (!willHaveImages)
             {
                 ModelState.AddModelError("Images", "At least one image is required. Please upload a new image.");
-
-                // Reload the model with the current data to display the form correctly
                 model.Images = listing.Images.ToList();
-
-                // Get dynamic properties for the specific product type
                 if (!string.IsNullOrEmpty(listing.SubCategory))
                 {
                     model.DynamicProperties = await GetDynamicPropertiesAsync(listing.Id, listing.SubCategory);
                 }
-
-                return View(model);
-            }
-
-            if (!ModelState.IsValid)
-            {
-                // Reload the model with the current data to display the form correctly
-                model.Images = listing.Images.ToList();
-
-                // Get dynamic properties for the specific product type
-                if (!string.IsNullOrEmpty(listing.SubCategory))
-                {
-                    model.DynamicProperties = await GetDynamicPropertiesAsync(listing.Id, listing.SubCategory);
-                }
-
                 return View(model);
             }
 
@@ -733,11 +719,11 @@ namespace PrimeMarket.Controllers
                 listing.Price = model.Price;
                 listing.Description = model.Description;
                 listing.Location = model.Location;
-                listing.DetailCategory = model.DetailCategory; // Ensure DetailCategory is saved
+                listing.DetailCategory = model.DetailCategory;
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // Reset status to pending if it was previously rejected
-                if (listing.Status == ListingStatus.Rejected)
+                // If listing was previously approved or rejected, reset to pending for admin review
+                if (listing.Status == ListingStatus.Active || listing.Status == ListingStatus.Rejected)
                 {
                     listing.Status = ListingStatus.Pending;
                     listing.RejectionReason = null;
@@ -746,12 +732,11 @@ namespace PrimeMarket.Controllers
                 // Handle deleted images
                 if (DeletedImageIds.Count > 0)
                 {
-                    // Get a list of images to delete
                     var imagesToDelete = listing.Images.Where(i => DeletedImageIds.Contains(i.Id)).ToList();
 
                     foreach (var imageToDelete in imagesToDelete)
                     {
-                        // If this was the main image and there are other images not being deleted, set a new main image
+                        // If this was the main image, set a new main image
                         if (imageToDelete.IsMainImage && listing.Images.Count > DeletedImageIds.Count)
                         {
                             var newMainImage = listing.Images.FirstOrDefault(i => !DeletedImageIds.Contains(i.Id));
@@ -761,7 +746,7 @@ namespace PrimeMarket.Controllers
                             }
                         }
 
-                        // Delete the image file from disk if needed
+                        // Delete the image file from disk
                         string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string imagePath = imageToDelete.ImagePath.TrimStart('/');
                         string fullPath = Path.Combine(webRootPath, imagePath);
@@ -774,7 +759,6 @@ namespace PrimeMarket.Controllers
                             }
                             catch (Exception ex)
                             {
-                                // Log the error but continue with DB deletion
                                 _logger.LogError(ex, "Error deleting image file: {FilePath}", fullPath);
                             }
                         }
@@ -792,7 +776,6 @@ namespace PrimeMarket.Controllers
                         Directory.CreateDirectory(uploadsFolder);
                     }
 
-                    // Check if we need to set one image as main (either all current images were deleted or no main image exists)
                     bool needsMainImage = !listing.Images.Any(i => i.IsMainImage && !DeletedImageIds.Contains(i.Id));
 
                     foreach (var image in newImages)
@@ -811,19 +794,18 @@ namespace PrimeMarket.Controllers
                             {
                                 ListingId = listing.Id,
                                 ImagePath = $"/images/listings/{uniqueFileName}",
-                                IsMainImage = needsMainImage // First new image becomes main if needed
+                                IsMainImage = needsMainImage
                             };
 
                             _context.ListingImages.Add(listingImage);
                             _logger.LogInformation("New image added for listing {ListingId}: {ImagePath}", listing.Id, listingImage.ImagePath);
 
-                            // Only set the first image as main
                             needsMainImage = false;
                         }
                     }
                 }
 
-                // Ensure at least one image is marked as main if there are any images left
+                // Ensure at least one image is marked as main
                 var anyMainImage = await _context.ListingImages
                     .AnyAsync(i => i.ListingId == listing.Id && !DeletedImageIds.Contains(i.Id) && i.IsMainImage);
 
@@ -844,20 +826,50 @@ namespace PrimeMarket.Controllers
                     await UpdateDynamicPropertiesAsync(listing.Id, listing.SubCategory, model.DynamicProperties);
                 }
 
-                // Create notification for admin about the update
-                var adminNotification = new Notification
+                // Create notifications
+                if (wasApproved)
                 {
-                    UserId = 1, // Assuming admin ID is 1
-                    Message = $"Updated listing '{model.Title}' needs review",
-                    Type = NotificationType.ListingApproved, // Reusing this type
-                    RelatedEntityId = listing.Id,
-                    CreatedAt = DateTime.UtcNow
-                };
-                _context.Notifications.Add(adminNotification);
+                    // Notify admins that an approved listing was edited and needs review
+                    var admins = await _context.Admins.ToListAsync();
+                    foreach (var admin in admins)
+                    {
+                        var adminNotification = new Notification
+                        {
+                            UserId = admin.Id,
+                            Message = $"Updated listing '{model.Title}' (previously approved) needs review",
+                            Type = NotificationType.ListingUpdated,
+                            RelatedEntityId = listing.Id,
+                            CreatedAt = DateTime.UtcNow
+                        };
+                        _context.Notifications.Add(adminNotification);
+                    }
+                }
+
+                // Notify user about the status change
+                if (originalStatus != listing.Status)
+                {
+                    var userNotification = new Notification
+                    {
+                        UserId = userId.Value,
+                        Message = $"Your listing '{model.Title}' has been updated and is now pending review.",
+                        Type = NotificationType.ListingUpdated,
+                        RelatedEntityId = listing.Id,
+                        CreatedAt = DateTime.UtcNow
+                    };
+                    _context.Notifications.Add(userNotification);
+                }
 
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Your listing has been updated and is pending review.";
+                if (wasApproved)
+                {
+                    TempData["SuccessMessage"] = "Your listing has been updated and is now pending review by administrators.";
+                }
+                else
+                {
+                    TempData["SuccessMessage"] = "Your listing has been updated successfully.";
+                }
+
                 return RedirectToAction("MyListings");
             }
             catch (Exception ex)
@@ -865,10 +877,7 @@ namespace PrimeMarket.Controllers
                 _logger.LogError(ex, "Error updating listing: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error updating listing: {ex.Message}");
 
-                // Reload the model with the current data to display the form correctly
                 model.Images = listing.Images.ToList();
-
-                // Get dynamic properties for the specific product type
                 if (!string.IsNullOrEmpty(listing.SubCategory))
                 {
                     model.DynamicProperties = await GetDynamicPropertiesAsync(listing.Id, listing.SubCategory);

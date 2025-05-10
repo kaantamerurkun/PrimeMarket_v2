@@ -31,6 +31,10 @@
         </div>
     }
 
+    <div class="alert alert-info">
+        <strong>Note:</strong> Editing an already approved listing will require admin review again.
+    </div>
+
     <div class="edit-form-container">
         <form id="editListingForm" method="post" action="@Url.Action("EditListing")" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
@@ -44,25 +48,25 @@
                 <h2>Basic Information</h2>
 
                 <div class="form-group">
-                    <label asp-for="Title">Title</label>
+                    <label asp-for="Title">Title <span class="required">*</span></label>
                     <input type="text" asp-for="Title" class="form-control" required />
                     <span asp-validation-for="Title" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Price">Price (TL)</label>
+                    <label asp-for="Price">Price (TL) <span class="required">*</span></label>
                     <input type="number" asp-for="Price" class="form-control" step="0.01" min="0" required />
                     <span asp-validation-for="Price" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Description">Description</label>
+                    <label asp-for="Description">Description <span class="required">*</span></label>
                     <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
                     <span asp-validation-for="Description" class="text-danger"></span>
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Location">Location</label>
+                    <label asp-for="Location">Location <span class="required">*</span></label>
                     <select asp-for="Location" class="form-control" required>
                         <option value="">Select Location</option>
                         <option value="Istanbul">Istanbul</option>
@@ -78,18 +82,17 @@
 
             <div class="form-section">
                 <h2>Images</h2>
-                <p class="info-text">Current images will remain unless you delete them or add new ones.</p>
+                <p class="info-text">At least one image is required. You can delete existing images and/or add new ones.</p>
 
-                <div id="imagesErrorContainer" class="text-danger" style="display: none; margin-bottom: 15px;">
-                    <p>At least one image is required. Please add a new image before removing all existing ones.</p>
+                <div id="imagesErrorContainer" class="alert alert-danger" style="display: none;">
+                    <p>At least one image is required. Please upload a new image or keep at least one existing image.</p>
                 </div>
-
 
                 @if (Model.Images != null && Model.Images.Count > 0)
                 {
                     <div class="current-images">
                         <h3>Current Images</h3>
-                        <div class="image-gallery">
+                        <div class="image-gallery" id="currentImagesGallery">
                             @foreach (var image in Model.Images)
                             {
                                 <div class="image-item" data-id="@image.Id">
@@ -104,13 +107,13 @@
                                 </div>
                             }
                         </div>
-                        <button type="button" id="deleteAllImages" class="btn-danger">Delete All Images</button>
                     </div>
                 }
 
                 <div class="form-group">
                     <label for="newImages">Add New Images</label>
                     <input type="file" id="newImages" name="newImages" multiple accept="image/*" class="form-control" />
+                    <small class="form-text text-muted">You can select multiple images at once.</small>
                     <div id="image-preview" class="image-preview"></div>
                 </div>
 
@@ -130,13 +133,43 @@
 
             <div class="form-actions">
                 <a href="@Url.Action("MyListings")" class="btn-cancel">Cancel</a>
-                <button type="submit" class="btn-save">Save Changes</button>
+                <button type="submit" class="btn-save" id="submitBtn">Save Changes</button>
             </div>
         </form>
     </div>
 </div>
 
 <style>
+    .required {
+        color: red;
+    }
+
+    .image-item.marked-for-deletion {
+        opacity: 0.5;
+        position: relative;
+    }
+
+        .image-item.marked-for-deletion::after {
+            content: "Will be deleted";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(220, 53, 69, 0.9);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+    .alert-info {
+        background-color: #d1ecf1;
+        border-color: #bee5eb;
+        color: #0c5460;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
     .edit-listing-header {
         display: flex;
         justify-content: space-between;
@@ -533,76 +566,76 @@
         // Load product-specific fields based on category and subcategory
         loadDynamicFields();
 
-    function loadDynamicFields() {
-        const category = '@Model.Category';
-        const subcategory = '@Model.SubCategory';
-        const detailCategory = '@(Model.DetailCategory ?? "")';
-        const fieldsContainer = document.getElementById('dynamicFields');
+        function loadDynamicFields() {
+            const category = '@Model.Category';
+            const subcategory = '@Model.SubCategory';
+            const detailCategory = '@(Model.DetailCategory ?? "")';
+            const fieldsContainer = document.getElementById('dynamicFields');
 
-        const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
+            const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
 
-        const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
+            const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
 
-        if (!fieldDefinitions || fieldDefinitions.length === 0) {
-            fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
-            return;
-        }
-
-        fieldsContainer.innerHTML = '';
-
-        fieldDefinitions.forEach(field => {
-            const fieldDiv = document.createElement('div');
-            fieldDiv.className = 'form-group';
-
-            const label = document.createElement('label');
-            label.setAttribute('for', field.name);
-            label.textContent = field.label;
-            fieldDiv.appendChild(label);
-
-            const existingValue = dynamicProperties[field.name];
-
-            if (field.type === 'select') {
-                const select = document.createElement('select');
-                select.id = field.name;
-                select.name = `DynamicProperties[${field.name}]`;
-                select.className = 'form-control';
-
-                const emptyOption = document.createElement('option');
-                emptyOption.value = '';
-                emptyOption.textContent = `Select ${field.label}`;
-                select.appendChild(emptyOption);
-
-                field.options.forEach(option => {
-                    const optEl = document.createElement('option');
-                    optEl.value = option;
-                    optEl.textContent = option;
-
-                    if (existingValue && existingValue.toLowerCase() === option.toLowerCase()) {
-                        optEl.selected = true;
-                    }
-
-                    select.appendChild(optEl);
-                });
-
-                fieldDiv.appendChild(select);
-            } else {
-                const input = document.createElement('input');
-                input.type = field.type || 'text';
-                input.id = field.name;
-                input.name = `DynamicProperties[${field.name}]`;
-                input.className = 'form-control';
-                input.placeholder = field.placeholder || '';
-
-                if (existingValue) {
-                    input.value = existingValue;
-                }
-
-                fieldDiv.appendChild(input);
+            if (!fieldDefinitions || fieldDefinitions.length === 0) {
+                fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
+                return;
             }
 
-            fieldsContainer.appendChild(fieldDiv);
-        });
-    }
+            fieldsContainer.innerHTML = '';
+
+            fieldDefinitions.forEach(field => {
+                const fieldDiv = document.createElement('div');
+                fieldDiv.className = 'form-group';
+
+                const label = document.createElement('label');
+                label.setAttribute('for', field.name);
+                label.textContent = field.label;
+                fieldDiv.appendChild(label);
+
+                const existingValue = dynamicProperties[field.name];
+
+                if (field.type === 'select') {
+                    const select = document.createElement('select');
+                    select.id = field.name;
+                    select.name = `DynamicProperties[${field.name}]`;
+                    select.className = 'form-control';
+
+                    const emptyOption = document.createElement('option');
+                    emptyOption.value = '';
+                    emptyOption.textContent = `Select ${field.label}`;
+                    select.appendChild(emptyOption);
+
+                    field.options.forEach(option => {
+                        const optEl = document.createElement('option');
+                        optEl.value = option;
+                        optEl.textContent = option;
+
+                        if (existingValue && existingValue.toLowerCase() === option.toLowerCase()) {
+                            optEl.selected = true;
+                        }
+
+                        select.appendChild(optEl);
+                    });
+
+                    fieldDiv.appendChild(select);
+                } else {
+                    const input = document.createElement('input');
+                    input.type = field.type || 'text';
+                    input.id = field.name;
+                    input.name = `DynamicProperties[${field.name}]`;
+                    input.className = 'form-control';
+                    input.placeholder = field.placeholder || '';
+
+                    if (existingValue) {
+                        input.value = existingValue;
+                    }
+
+                    fieldDiv.appendChild(input);
+                }
+
+                fieldsContainer.appendChild(fieldDiv);
+            });
+        }
 
 
         function getCategoryFields(subcategory) {
@@ -771,31 +804,5 @@
             // Return empty array if no match found
             return [];
         }
-            // Add this function to your JavaScript in EditListing.cshtml
-    function validateImages() {
-        const imageItems = document.querySelectorAll('.image-item');
-        const hasExistingImages = imageItems.length > 0;
-        const hasNewImages = document.getElementById('newImages').files.length > 0;
-
-        // Clear any previous error messages
-        const errorContainer = document.getElementById('imagesErrorContainer');
-
-        if (!hasExistingImages && !hasNewImages) {
-            errorContainer.style.display = 'block';
-            return false;
-        } else {
-            errorContainer.style.display = 'none';
-            return true;
-        }
-    }
-
-    // Then modify the form submission handler
-    document.getElementById('editListingForm').addEventListener('submit', function(e) {
-        if (!validateImages()) {
-            e.preventDefault();
-            // Scroll to the error message
-            document.getElementById('imagesErrorContainer').scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-    });
     });
 </script>

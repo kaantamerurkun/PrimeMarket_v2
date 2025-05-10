@@ -24,7 +24,10 @@
                     <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px ; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Listing Notification Bell" />
                     <div id="listingNotificationDropdown" class="notification-dropdown">
                         <a asp-action="PendingListings" asp-controller="Admin">
-                            <p class="notification-item">Items waiting to be approved or rejected</p>
+                            <p class="notification-item">New listings waiting to be approved</p>
+                        </a>
+                        <a asp-action="PendingListings" asp-controller="Admin">
+                            <p class="notification-item">Updated listings need re-approval</p>
                         </a>
                         <a asp-action="PendingVerifications" asp-controller="Admin">
                             <p class="notification-item">Users sent ID for verification</p>
@@ -50,21 +53,9 @@
                 <h3 style="margin-top:10px">Select a section from the sidebar to manage listings and verifications.</h3>
             </div>
         </div>
-
-        <div id="rejectModal" style="display:none;" class="modal">
-            <form method="post" asp-action="RejectListing" asp-controller="Listing">
-                <input type="hidden" id="rejectListingId" name="id" />
-                <label for="reason">Rejection Reason:</label>
-                <textarea id="rejectionReason" name="reason" required></textarea>
-                <button type="submit">Reject Listing</button>
-            </form>
-        </div>
-
-
     </div>
 
     <script>
-        
         document.addEventListener("DOMContentLoaded", function() {
             // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
