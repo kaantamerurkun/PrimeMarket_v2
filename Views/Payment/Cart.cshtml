@@ -1,4 +1,9 @@
-﻿<style>
+﻿@model PrimeMarket.Models.ViewModel.CartViewModel
+@{
+    ViewData["Title"] = "Shopping Cart";
+    Layout = "~/Views/Shared/_LayoutUser.cshtml";
+}
+<style>
     .cart-container {
         margin-top: 30px;
     }
@@ -43,15 +48,15 @@
     .btn-browse {
         display: inline-block;
         padding: 10px 20px;
-        background-color: #0066cc;
-        color: white;
+        background: #0066cc;
+        color: #fff;
         text-decoration: none;
         border-radius: 5px;
-        transition: background-color 0.3s ease;
+        transition: .3s;
     }
 
         .btn-browse:hover {
-            background-color: #0055b3;
+            background: #0055b3;
         }
 
     .cart-items {
@@ -63,9 +68,9 @@
         align-items: center;
         padding: 15px;
         margin-bottom: 15px;
-        background-color: white;
+        background: #fff;
         border-radius: 10px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        box-shadow: 0 2px 5px rgba(0,0,0,.05);
     }
 
     .item-image {
@@ -92,7 +97,7 @@
 
     .stock-info {
         color: #28a745;
-        font-size: 0.9em;
+        font-size: .9em;
         margin-top: 5px;
     }
 
@@ -116,7 +121,7 @@
         height: 30px;
         border-radius: 50%;
         border: 1px solid #ddd;
-        background-color: #f8f9fa;
+        background: #f8f9fa;
         font-size: 16px;
         cursor: pointer;
         display: flex;
@@ -125,25 +130,15 @@
     }
 
         .quantity-btn:disabled {
-            opacity: 0.5;
+            opacity: .5;
             cursor: not-allowed;
         }
 
-    .quantity-input {
+    .quantity-display {
         width: 40px;
-        height: 30px;
         text-align: center;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        margin: 0 5px;
-        -moz-appearance: textfield;
+        display: inline-block;
     }
-
-        .quantity-input::-webkit-inner-spin-button,
-        .quantity-input::-webkit-outer-spin-button {
-            -webkit-appearance: none;
-            margin: 0;
-        }
 
     .item-total {
         font-weight: bold;
@@ -161,8 +156,8 @@
 
     .btn-checkout {
         padding: 8px 15px;
-        background-color: #0066cc;
-        color: white;
+        background: #0066cc;
+        color: #fff;
         border: none;
         border-radius: 5px;
         cursor: pointer;
@@ -170,12 +165,12 @@
     }
 
         .btn-checkout:hover {
-            background-color: #0055b3;
+            background: #0055b3;
         }
 
     .btn-remove {
         padding: 8px 15px;
-        background-color: #f0f0f0;
+        background: #f0f0f0;
         color: #333;
         border: none;
         border-radius: 5px;
@@ -183,11 +178,11 @@
     }
 
         .btn-remove:hover {
-            background-color: #e0e0e0;
+            background: #e0e0e0;
         }
 
     .cart-summary {
-        background-color: #f8f9fa;
+        background: #f8f9fa;
         border-radius: 10px;
         padding: 20px;
     }
@@ -213,8 +208,8 @@
         display: block;
         width: 100%;
         padding: 12px 0;
-        background-color: #0066cc;
-        color: white;
+        background: #0066cc;
+        color: #fff;
         text-align: center;
         border: none;
         border-radius: 5px;
@@ -224,58 +219,49 @@
     }
 
         .btn-checkout-all:hover {
-            background-color: #0055b3;
+            background: #0055b3;
         }
 
     .error-message {
         color: #dc3545;
-        font-size: 0.9em;
+        font-size: .9em;
         margin-top: 5px;
         display: none;
     }
+    @@media (max-width:768px) {
+        .cart-item
 
-    @@media (max-width: 768px) {
-        .cart-item {
-            flex-direction: column;
-            align-items: flex-start;
-        }
-
-        .item-image {
-            margin-right: 0;
-            margin-bottom: 10px;
-        }
-
-        .item-price, .item-quantity, .item-total {
-            margin: 10px 0;
-        }
-
-        .item-actions {
-            width: 100%;
-            justify-content: space-between;
-        }
+    {
+        flex-direction: column;
+        align-items: flex-start;
     }
-</style>
-@model PrimeMarket.Models.ViewModel.CartViewModel
-@{
-    ViewData["Title"] = "Shopping Cart";
-    Layout = "~/Views/Shared/_LayoutUser.cshtml";
-}
+
+    .item-image {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .item-price, .item-quantity, .item-total {
+        margin: 10px 0;
+    }
+
+    .item-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    }</style>
 
 <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
     <h1>Shopping Cart</h1>
 
     @if (TempData["SuccessMessage"] != null)
     {
-        <div class="alert alert-success">
-            @TempData["SuccessMessage"]
-        </div>
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
     }
-
     @if (TempData["ErrorMessage"] != null)
     {
-        <div class="alert alert-danger">
-            @TempData["ErrorMessage"]
-        </div>
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
     }
 
     <div class="cart-container">
@@ -285,7 +271,7 @@
                 <i class="fas fa-shopping-cart fa-4x"></i>
                 <h2>Your cart is empty</h2>
                 <p>Browse listings and add items to your cart.</p>
-                <a href="@Url.Action("User_MainPage", "User")" class="btn-browse">Browse Listings</a>
+                <a href="@Url.Action("User_MainPage","User")" class="btn-browse">Browse Listings</a>
             </div>
         }
         else
@@ -293,23 +279,19 @@
             <div class="cart-items">
                 @foreach (var item in Model.Items)
                 {
-                    var initialQty = 1;          // if you store qty in session, pull it here
+                    var initialQty = 1;
 
                     <div id="item-@item.BookmarkId"
                          class="cart-item"
-                         data-id="@item.BookmarkId"
                          data-price="@item.Price"
-                         data-max-stock="@(item.MaxStock ?? 0)">
+                    @(item.MaxStock.HasValue ? $"data-max-stock=\"{item.MaxStock.Value}\"" : "")>
 
-                        <!-- thumbnail -->
                         <div class="item-image">
-                            <img src="@(string.IsNullOrEmpty(item.ImageUrl) ? "/images/placeholder.png" : item.ImageUrl)"
-                                 alt="@item.Title"
-                                 width="100" height="100" />
+                            <img src="@(string.IsNullOrEmpty(item.ImageUrl)?"/images/placeholder.png":item.ImageUrl)"
+                                 alt="@item.Title" width="100" height="100" />
                         </div>
 
-                        <!-- title / seller -->
-                        <div class="item-details flex-grow-1">
+                        <div class="item-details">
                             <h3>@item.Title</h3>
                             <p class="seller">Seller: @item.SellerName</p>
                             @if (item.MaxStock.HasValue)
@@ -318,55 +300,30 @@
                             }
                         </div>
 
-                        <!-- unit price -->
                         <div class="item-price">@item.Price.ToString("C")</div>
 
-                        <!-- quantity controls -->
                         <div class="item-quantity">
-                            <button type="button"
-                                    class="quantity-btn decrease-btn"
-                                    data-id="@item.BookmarkId">
-                                ‑
-                            </button>
-
+                            <button type="button" class="quantity-btn decrease-btn" data-id="@item.BookmarkId">‑</button>
                             <span class="quantity-display">@initialQty</span>
-
-                            <button type="button"
-                                    class="quantity-btn increase-btn"
-                                    data-id="@item.BookmarkId">
-                                +
-                            </button>
+                            <button type="button" class="quantity-btn increase-btn" data-id="@item.BookmarkId">+</button>
                         </div>
 
-                        <!-- line total -->
                         <div class="item-total">
-                            <span class="unit">@item.Price.ToString("C")</span>
-                            × <span class="line-qty">@initialQty</span>
-                            = <span class="line-total">@(@item.Price * initialQty).ToString("C")</span>
+                            <span class="line-total">@(@item.Price * initialQty).ToString("C")</span>
                         </div>
 
-                        <!-- actions -->
                         <div class="item-actions">
                             <a class="btn-checkout"
                                href="@Url.Action("Checkout", new { listingId = item.ListingId, quantity = initialQty })">
                                 Buy Now
                             </a>
-                            <button type="button"
-                                    class="btn-remove"
-                                    data-id="@item.BookmarkId">
-                                Remove
-                            </button>
+                            <button type="button" class="btn-remove" data-id="@item.BookmarkId">Remove</button>
                         </div>
 
-                        <!-- hidden qty for CheckoutMultiple POST -->
-                        <input type="hidden"
-                               name="Quantities"
-                               value="@initialQty"
-                               data-id="@item.BookmarkId" />
+                        <input type="hidden" name="Quantities" value="@initialQty" />
                     </div>
                 }
             </div>
-
 
             <div class="cart-summary">
                 <div class="summary-details">
@@ -374,37 +331,31 @@
                         <div class="summary-label">Subtotal (<span id="item-count">@Model.Items.Count</span> items)</div>
                         <div class="summary-value" id="subtotal">@Model.TotalPrice.ToString("C")</div>
                     </div>
-
                     <div class="summary-row total">
                         <div class="summary-label">Total</div>
                         <div class="summary-value" id="cart-total">@Model.TotalPrice.ToString("C")</div>
                     </div>
                 </div>
-                <a href="@Url.Action("CheckoutMultiple")" class="btn-checkout-all">Checkout All Items</a>
+                <a href="@Url.Action("CheckoutMultiple","Payment")" class="btn-checkout-all">Checkout All Items</a>
             </div>
         }
     </div>
 </div>
 
-
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
 
-        const moneyFmt = new Intl.NumberFormat('tr-TR',
-                        { style: 'currency', currency: 'TRY' });
+        const moneyFmt = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' });
 
         function recalcLine(row) {
             const unit   = parseFloat(row.dataset.price);
             const qty    = parseInt(row.querySelector('.quantity-display').textContent);
             const lineEl = row.querySelector('.line-total');
-            const qtyEl  = row.querySelector('.line-qty');
             const hidden = row.querySelector('input[name="Quantities"]');
 
             const line = unit * qty;
             lineEl.textContent = moneyFmt.format(line);
-            qtyEl.textContent  = qty;
-            hidden.value       = qty;             // keep in sync for POST
+            hidden.value       = qty;
         }
 
         function recalcCart() {
@@ -412,26 +363,25 @@
             document.querySelectorAll('.cart-item').forEach(row => {
                 const unit = parseFloat(row.dataset.price);
                 const qty  = parseInt(row.querySelector('.quantity-display').textContent);
-                subtotal  += unit * qty;
-                count     += qty;
+                subtotal += unit * qty;
+                count    += qty;
             });
-
             document.getElementById('subtotal').textContent   = moneyFmt.format(subtotal);
             document.getElementById('cart-total').textContent = moneyFmt.format(subtotal);
             document.getElementById('item-count').textContent = count;
         }
 
         function clamp(row, qty) {
-            const max = parseInt(row.dataset.maxStock);
-            if (max && qty > max) return max;
-            if (qty < 1) return 1;
+    const max = Number(row.dataset.maxStock);          // NaN when attribute is absent
+    if (!Number.isNaN(max) && qty > max) return max;
+            if (qty < 1)          return 1;
             return qty;
         }
 
-        // btn handlers
+        /* quantity + / - */
         document.querySelectorAll('.quantity-btn').forEach(btn => {
             btn.addEventListener('click', () => {
-                const row  = document.getElementById('item-' + btn.dataset.id);
+                const row  = btn.closest('.cart-item');
                 const disp = row.querySelector('.quantity-display');
                 let   qty  = parseInt(disp.textContent);
 
@@ -444,18 +394,18 @@
             });
         });
 
-        // initialise
+        /* initial calc on load */
         document.querySelectorAll('.cart-item').forEach(recalcLine);
         recalcCart();
 
-        /* ---- REMOVE BUTTON (unchanged) ---- */
+        /* remove item */
         document.querySelectorAll('.btn-remove').forEach(btn => {
             btn.addEventListener('click', () => {
-                const id   = btn.dataset.id;
+                const id = btn.dataset.id;
                 fetch('/Payment/RemoveFromCart', {
-                    method: 'POST',
+                    method : 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `bookmarkId=${id}`
+                    body   : `bookmarkId=${id}`
                 })
                 .then(r => r.json())
                 .then(res => {
@@ -466,6 +416,30 @@
                     } else alert(res.message);
                 })
                 .catch(() => alert('Error removing item.'));
+            });
+        });
+
+        /* ---- CHECKOUT ALL: persist quantities then redirect ---- */
+        document.querySelector('.btn-checkout-all')?.addEventListener('click', function (e) {
+            e.preventDefault();
+            const cartItemsData = [];
+            document.querySelectorAll('.cart-item').forEach(item => {
+                const id  = item.getAttribute('id').replace('item-','');
+                const qty = parseInt(item.querySelector('.quantity-display').textContent);
+                cartItemsData.push({ BookmarkId: parseInt(id), Quantity: qty });
+            });
+            fetch('@Url.Action("UpdateCartQuantities", "Payment")', {
+                method : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body   : JSON.stringify(cartItemsData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    window.location = '@Url.Action("CheckoutMultiple", "Payment")';
+                } else {
+                    alert(data.message || "Could not update cart quantities.");
+                }
             });
         });
     });

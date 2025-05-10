@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -11,6 +11,7 @@ namespace PrimeMarket.Models.Enum
         Approved,
         Rejected,
         Sold,
-        Archived
+        Archived,
+        Active
     }
 }

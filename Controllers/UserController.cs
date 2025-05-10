@@ -865,7 +865,7 @@ namespace PrimeMarket.Controllers
         public async Task<IActionResult> User_MainPageAsync()
         {
             var approvedListings = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved)
+                .Where(l => l.Status == ListingStatus.Active && (!l.Stock.HasValue || l.Stock > 0))
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
@@ -884,7 +884,7 @@ namespace PrimeMarket.Controllers
             var bookmarks = await _context.Bookmarks
                 .Include(b => b.Listing)
                 .ThenInclude(l => l.Images)
-                .Where(b => b.UserId == userId && b.Listing.Status == Models.Enum.ListingStatus.Approved)
+                .Where(b => b.UserId == userId && b.Listing.Status == Models.Enum.ListingStatus.Active)
                 .ToListAsync();
 
             return View(bookmarks);

@@ -12,9 +12,8 @@
 </head>
 <body>
     <div style="margin-top: 80px;">
-        <nav style="box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;"
-             class="container">
-            <ul id="mainCategories" class="category-menu" style="list-style: none; display: flex; gap: 30px; padding: 10px 0;"></ul>
+        <nav style="box-shadow: rgba(0,0,0,.12) 0px 1px 3px, rgba(0,0,0,.24) 0px 1px 2px;" class="container">
+            <ul id="mainCategories" class="category-menu" style="list-style:none;display:flex;gap:30px;padding:10px 0;"></ul>
         </nav>
     </div>
 
@@ -24,12 +23,19 @@
             <div class="items-grid">
                 @foreach (var item in Model)
                 {
-                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })" class="item-card-link"
-                       data-category="@item.Category" data-subcategory="@item.SubCategory" data-detail-category="@item.DetailCategory">
+                    var stockAttr = item.Stock.HasValue
+                    ? $"data-max-stock=\"{item.Stock.Value}\"": string.Empty;
+                    <a href="@Url.Action("Details", "Listing", new { id = item.Id })"
+                       class="item-card-link"
+                    @Html.Raw(stockAttr)
+                       data-category="@item.Category"
+                       data-subcategory="@item.SubCategory"
+                       data-detail-category="@item.DetailCategory">
                         <div class="item-card">
                             @if (item.Images != null && item.Images.Any())
                             {
-                                var mainImage = item.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? item.Images.First().ImagePath;
+                                var mainImage = item.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                ?? item.Images.First().ImagePath;
                                 <div class="item-image">
                                     <img src="@mainImage" alt="@item.Title" />
                                 </div>
@@ -42,12 +48,16 @@
                             }
                             <div class="item-info">
                                 <h3>@item.Title</h3>
-                                <p class="item-description">@(item.Description.Length > 100 ? item.Description.Substring(0, 100) + "..." : item.Description)</p>
+                                <p class="item-description">
+                                    @(item.Description.Length > 100
+                                        ? item.Description.Substring(0, 100) + "..."
+                                        : item.Description)
+                                </p>
                                 <p class="item-price">@item.Price.ToString("C")</p>
                                 <p class="item-location">@item.Location</p>
-                                <span class="item-category" style="display: none;">@item.Category</span>
-                                <span class="item-subcategory" style="display: none;">@item.SubCategory</span>
-                                <span class="item-detail-category" style="display: none;">@item.DetailCategory</span>
+                                <span class="item-category" style="display:none;">@item.Category</span>
+                                <span class="item-subcategory" style="display:none;">@item.SubCategory</span>
+                                <span class="item-detail-category" style="display:none;">@item.DetailCategory</span>
                             </div>
                         </div>
                     </a>

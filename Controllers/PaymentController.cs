@@ -46,7 +46,7 @@ namespace PrimeMarket.Controllers
                     .Include(b => b.Listing)
                     .ThenInclude(l => l.Images)
                     .Include(b => b.Listing.Seller)
-                    .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Approved)
+                    .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Active)
                     .ToListAsync();
 
                 var model = new CartViewModel
@@ -63,7 +63,10 @@ namespace PrimeMarket.Controllers
                                   "/images/placeholder.png",
                         MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null // Set MaxStock based on listing condition
                     }).ToList(),
-                    TotalPrice = bookmarks.Sum(b => b.Listing.Price)
+                    TotalPrice = bookmarks.Sum(b => {
+                        int q = HttpContext.Session.GetInt32($"Quantity_{b.Id}") ?? 1;
+                        return b.Listing.Price * q;
+                    })
                 };
 
                 return View(model);
@@ -117,7 +120,7 @@ namespace PrimeMarket.Controllers
             {
                 // Check if the listing exists and is available
                 var listing = await _context.Listings
-                    .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Approved);
+                    .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Active);
 
                 if (listing == null)
                 {
@@ -212,7 +215,7 @@ namespace PrimeMarket.Controllers
             var listing = await _context.Listings
                 .Include(l => l.Seller)
                 .Include(l => l.Images)
-                .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Approved);
+                .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Active);
 
             if (listing == null)
             {
@@ -280,7 +283,7 @@ namespace PrimeMarket.Controllers
                 .Include(b => b.Listing)
                 .ThenInclude(l => l.Images)
                 .Include(b => b.Listing.Seller)
-                .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Approved)
+                .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Active)
                 .ToListAsync();
 
             if (bookmarks == null || bookmarks.Count == 0)
@@ -369,7 +372,7 @@ namespace PrimeMarket.Controllers
                 // Get the listing
                 var listing = await _context.Listings
                     .Include(l => l.Seller)
-                    .FirstOrDefaultAsync(l => l.Id == model.ListingId && l.Status == ListingStatus.Approved);
+                    .FirstOrDefaultAsync(l => l.Id == model.ListingId && l.Status == ListingStatus.Active);
 
                 if (listing == null)
                 {
@@ -495,7 +498,7 @@ namespace PrimeMarket.Controllers
                 var bookmarks = await _context.Bookmarks
                     .Include(b => b.Listing)
                     .ThenInclude(l => l.Seller)
-                    .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Approved)
+                    .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Active)
                     .ToListAsync();
 
                 if (bookmarks == null || bookmarks.Count == 0)
@@ -688,7 +691,7 @@ namespace PrimeMarket.Controllers
                 }
 
                 // Check if listing is still available
-                if (offer.Listing.Status != ListingStatus.Approved)
+                if (offer.Listing.Status != ListingStatus.Active)
                 {
                     TempData["ErrorMessage"] = "This listing is no longer available.";
                     return RedirectToAction("MyOffers", "User");
@@ -1025,8 +1028,13 @@ namespace PrimeMarket.Controllers
                     purchase.UpdatedAt = DateTime.UtcNow;
 
                     // Update the listing status to Sold
-                    purchase.Listing.Status = ListingStatus.Sold;
-                    purchase.Listing.UpdatedAt = DateTime.UtcNow;
+                    if (purchase.Listing.Condition == "First-Hand" &&
+                    purchase.Listing.Stock.HasValue &&
+                    purchase.Listing.Stock.Value <= 0)
+                        {
+                        purchase.Listing.Status = ListingStatus.Sold;
+                        purchase.Listing.UpdatedAt = DateTime.UtcNow;
+                        }
 
                     // Create notification for seller
                     var sellerNotification = new Notification
@@ -1120,7 +1128,7 @@ namespace PrimeMarket.Controllers
                 }
 
                 // Check if listing is still available
-                if (offer.Listing.Status != ListingStatus.Approved)
+                if (offer.Listing.Status != ListingStatus.Active)
                 {
                     TempData["ErrorMessage"] = "This listing is no longer available.";
                     return RedirectToAction("MyOffers", "User");
@@ -1215,69 +1223,39 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyOffers", "User");
             }
         }
+        // Controllers/PaymentController.cs
         [HttpPost]
-        [UserAuthenticationFilter]
-        public async Task<IActionResult> UpdateCartQuantities([FromBody] List<CartItemQuantityDto> cartItems)
+        public IActionResult UpdateCartQuantities([FromBody] List<CartItemQuantityDto> items)
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
+            foreach (var req in items)
             {
-                return Json(new { success = false, message = "Please log in to manage your cart." });
-            }
+                var bookmark = _context.Bookmarks
+                                       .Include(b => b.Listing)
+                                       .FirstOrDefault(b => b.Id == req.BookmarkId);
 
-            try
-            {
-                // Validate that all bookmarks belong to the user
-                foreach (var item in cartItems)
+                if (bookmark == null)
+                    return Json(new { success = false, message = "Item no longer exists." });
+
+                var listing = bookmark.Listing;
+
+                // ---- VALIDATE, don’t modify ----
+                if (listing.Stock.HasValue && req.Quantity > listing.Stock.Value)
                 {
-                    var bookmark = await _context.Bookmarks
-                        .Include(b => b.Listing)
-                        .FirstOrDefaultAsync(b => b.Id == item.BookmarkId && b.UserId == userId);
-
-                    if (bookmark == null)
+                    return Json(new
                     {
-                        return Json(new { success = false, message = "Item not found in your cart." });
-                    }
-
-                    // Validate quantity against stock for first-hand listings
-                    if (bookmark.Listing.Condition == "First-Hand" &&
-                        bookmark.Listing.Stock.HasValue &&
-                        item.Quantity > bookmark.Listing.Stock.Value)
-                    {
-                        return Json(new
-                        {
-                            success = false,
-                            message = $"Not enough stock available for {bookmark.Listing.Title}. Only {bookmark.Listing.Stock.Value} in stock.",
-                            itemId = item.BookmarkId,
-                            maxStock = bookmark.Listing.Stock.Value
-                        });
-                    }
-
-                    // Store the quantity in session for later use in checkout
-                    HttpContext.Session.SetInt32($"Quantity_{item.BookmarkId}", item.Quantity);
+                        success = false,
+                        message = $"Maximum stock is {listing.Stock.Value}.",
+                        itemId = req.BookmarkId,
+                        maxStock = listing.Stock.Value
+                    });
                 }
 
-                // Calculate the updated total
-                decimal total = 0;
-                foreach (var item in cartItems)
-                {
-                    var bookmark = await _context.Bookmarks
-                        .Include(b => b.Listing)
-                        .FirstOrDefaultAsync(b => b.Id == item.BookmarkId);
-
-                    if (bookmark != null)
-                    {
-                        total += bookmark.Listing.Price * item.Quantity;
-                    }
-                }
-
-                return Json(new { success = true, total = total });
+                // just remember the quantity in session for this user
+                HttpContext.Session.SetInt32($"Quantity_{req.BookmarkId}", req.Quantity);
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error updating cart quantities");
-                return Json(new { success = false, message = "An error occurred while updating your cart." });
-            }
+
+            return Json(new { success = true });
         }
+
     }
 }

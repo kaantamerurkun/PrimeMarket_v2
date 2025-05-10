@@ -1170,6 +1170,78 @@
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
       <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\24_ebe4e5c8-3633-4915-8943-b1f8bad42ecb.png'))</OriginalItemSpec>
     </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\25_83ec0ae4-c360-49ab-ab2d-466cf5097495.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/25_83ec0ae4-c360-49ab-ab2d-466cf5097495.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>ttxra71fla</Fingerprint>
+      <Integrity>/4XfwbalnDa05joOxNNSciyT9RwZjL3dr8rudmKXmRs=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\25_83ec0ae4-c360-49ab-ab2d-466cf5097495.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\26_3a01a6bf-ae6c-4ffd-8287-847a53525352.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/26_3a01a6bf-ae6c-4ffd-8287-847a53525352.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>39pb586ods</Fingerprint>
+      <Integrity>aQZlr1nM9HKgHG8EyT4os3KfW7hCiIEPo5Rgb2xAics=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\26_3a01a6bf-ae6c-4ffd-8287-847a53525352.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\27_fc5c69c6-2144-45ae-9890-b2ebb98c53e8.jpg'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/27_fc5c69c6-2144-45ae-9890-b2ebb98c53e8.jpg</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>ttxra71fla</Fingerprint>
+      <Integrity>/4XfwbalnDa05joOxNNSciyT9RwZjL3dr8rudmKXmRs=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\27_fc5c69c6-2144-45ae-9890-b2ebb98c53e8.jpg'))</OriginalItemSpec>
+    </StaticWebAsset>
+    <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\28_7be97138-677b-4b19-9d79-ccab46cec00f.png'))">
+      <SourceType>Package</SourceType>
+      <SourceId>PrimeMarket</SourceId>
+      <ContentRoot>$(MSBuildThisFileDirectory)..\staticwebassets\</ContentRoot>
+      <BasePath>_content/PrimeMarket</BasePath>
+      <RelativePath>images/listings/28_7be97138-677b-4b19-9d79-ccab46cec00f.png</RelativePath>
+      <AssetKind>All</AssetKind>
+      <AssetMode>All</AssetMode>
+      <AssetRole>Primary</AssetRole>
+      <RelatedAsset></RelatedAsset>
+      <AssetTraitName></AssetTraitName>
+      <AssetTraitValue></AssetTraitValue>
+      <Fingerprint>b3jbp1yc5k</Fingerprint>
+      <Integrity>mU18khwcAD68EKUxqD1jVrFNBnPNPVhOLiTGl4mjr6g=</Integrity>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      <OriginalItemSpec>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\28_7be97138-677b-4b19-9d79-ccab46cec00f.png'))</OriginalItemSpec>
+    </StaticWebAsset>
     <StaticWebAsset Include="$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png'))">
       <SourceType>Package</SourceType>
       <SourceId>PrimeMarket</SourceId>

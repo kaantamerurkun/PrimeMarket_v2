@@ -19,15 +19,17 @@ public class HomeController : Controller
         _logger = logger;
     }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
-        var approvedListings = await _context.Listings
-            .Where(l => l.Status == ListingStatus.Approved)
+        var listings = _context.Listings
+            .Where(l =>
+                l.Status == ListingStatus.Active &&                 // still for sale
+                (!l.Stock.HasValue || l.Stock > 0))                // second?hand OR stock?positive
             .OrderByDescending(l => l.CreatedAt)
-            .ToListAsync();
-
-        return View(approvedListings);
+            .ToList();
+        return View(listings);
     }
+
 
 
     public IActionResult Privacy()

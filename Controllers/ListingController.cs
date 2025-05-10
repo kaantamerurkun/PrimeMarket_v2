@@ -35,7 +35,7 @@ namespace PrimeMarket.Controllers
             var listing = await _context.Listings.FindAsync(id);
             if (listing == null) return NotFound();
 
-            listing.Status = ListingStatus.Approved;
+            listing.Status = ListingStatus.Active;
             await _context.SaveChangesAsync();
 
             return RedirectToAction("PendingListings", "Admin");
@@ -1088,7 +1088,7 @@ public async Task<IActionResult> DeleteListing(int id)
 
             // Start with all approved listings
             var query = _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved)
+                .Where(l => l.Status == ListingStatus.Active)
                 .Include(l => l.Images)
                 .Include(l => l.Seller)
                 .AsQueryable();
@@ -1160,7 +1160,7 @@ public async Task<IActionResult> DeleteListing(int id)
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
-            if (listing.Status != ListingStatus.Approved &&
+            if (listing.Status != ListingStatus.Active &&
                 userId != listing.SellerId &&
                 !isAdmin)
             {
@@ -1197,7 +1197,7 @@ public async Task<IActionResult> DeleteListing(int id)
 
             // Get related listings (same category)
             var relatedListings = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved &&
+                .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
                             l.Category == listing.Category)
                 .Include(l => l.Images)
@@ -1254,7 +1254,7 @@ public async Task<IActionResult> DeleteListing(int id)
 
                 // We'll still search for this number in titles and descriptions
                 var numberResults = await _context.Listings
-                    .Where(l => l.Status == ListingStatus.Approved &&
+                    .Where(l => l.Status == ListingStatus.Active &&
                           (l.Title.Contains(query) ||
                            l.Description.Contains(query)))
                     .Include(l => l.Images)
@@ -1272,7 +1272,7 @@ public async Task<IActionResult> DeleteListing(int id)
                 {
                     var listing = await _context.Listings
                         .Include(l => l.Images)
-                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Approved);
+                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Active);
 
                     if (listing != null)
                     {
@@ -1284,7 +1284,7 @@ public async Task<IActionResult> DeleteListing(int id)
 
             // For regular search, look for matches in title, category, subcategory, or detail category
             var results = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved &&
+                .Where(l => l.Status == ListingStatus.Active &&
                       (l.Title.Contains(query) ||
                        l.Category.Contains(query) ||
                        l.SubCategory.Contains(query) ||
@@ -1313,7 +1313,7 @@ public async Task<IActionResult> DeleteListing(int id)
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
-            if (listing.Status != ListingStatus.Approved &&
+            if (listing.Status != ListingStatus.Active &&
                 userId != listing.SellerId &&
                 !isAdmin)
             {
@@ -1350,7 +1350,7 @@ public async Task<IActionResult> DeleteListing(int id)
 
             // Get related listings (same category)
             var relatedListings = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Approved &&
+                .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
                             l.Category == listing.Category)
                 .Include(l => l.Images)
@@ -1403,7 +1403,7 @@ public async Task<IActionResult> DeleteListing(int id)
                 {
                     // Check if listing exists and is available
                     var listing = await _context.Listings
-                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == Models.Enum.ListingStatus.Approved);
+                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == Models.Enum.ListingStatus.Active);
 
                     if (listing == null)
                     {
@@ -1466,7 +1466,7 @@ public async Task<IActionResult> DeleteListing(int id)
                 return Json(new { success = false, message = "You can only make offers on second-hand listings." });
 
             // Verify listing is active and available
-            if (listing.Status != ListingStatus.Approved)
+            if (listing.Status != ListingStatus.Active)
                 return Json(new { success = false, message = "This listing is not available for offers." });
 
             if (listing.SellerId == userId.Value)

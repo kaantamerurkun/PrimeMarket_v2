@@ -319,7 +319,7 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                listing.Status = ListingStatus.Approved;
+                listing.Status = ListingStatus.Active;
                 listing.UpdatedAt = DateTime.UtcNow;
 
                 // Create an admin action record
