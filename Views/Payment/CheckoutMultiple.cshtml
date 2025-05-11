@@ -22,7 +22,7 @@
                         <p class="seller">Seller: @item.SellerName</p>
                         <div class="quantity-wrapper">
                             <label>Quantity: </label>
-                            <span class="quantity-display">@ViewData[$"Quantity_{item.BookmarkId}"] ?? 1</span>
+                            <span class="quantity-display">@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)</span>
                             <input type="hidden" name="quantities[@item.BookmarkId]"
                                    class="item-quantity"
                                    value="@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)" />
@@ -30,7 +30,7 @@
                         <p class="price">
                             <span class="unit-price">@item.Price.ToString("C")</span> ×
                             <span class="quantity-text">@(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)</span> =
-                            <span class="item-total">@((item.Price * (ViewData[$"Quantity_{item.BookmarkId}"] != null ? Convert.ToInt32(ViewData[$"Quantity_{item.BookmarkId}"]) : 1)).ToString("C"))</span>
+                            <span class="item-total">@((item.Price * Convert.ToInt32(ViewData[$"Quantity_{item.BookmarkId}"] ?? 1)).ToString("C"))</span>
                         </p>
                     </div>
                 </div>
@@ -44,6 +44,7 @@
 
         <div class="checkout-payment">
             <h2>Payment Details</h2>
+            <br />
 
             @if (TempData["ErrorMessage"] != null)
             {
@@ -101,6 +102,99 @@
 </div>
 
 <style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+
+    .checkout-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 30px;
+        margin-top: 30px;
+    }
+
+    .checkout-summary,
+    .checkout-payment {
+        flex: 1 1 100%;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        padding: 20px;
+    }
+
+    @@media (min-width: 768px) {
+        .checkout-summary {
+            flex: 0 0 40%;
+        }
+
+        .checkout-payment {
+            flex: 0 0 55%;
+        }
+    }
+
+    .item-summary {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 20px 0;
+        padding-bottom: 20px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .item-image {
+        flex: 0 0 80px;
+    }
+
+    .item-details {
+        flex: 1;
+    }
+
+    .order-total,
+    .payment-actions {
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    .payment-actions {
+        margin-top: 30px;
+    }
+
+    .btn-cancel,
+    .btn-pay {
+        width: 100%;
+        margin-bottom: 10px;
+        border-radius: 50px;
+    }
+
+    @@media (min-width: 500px) {
+        .btn-cancel, .btn-pay {
+            width: auto;
+            margin-bottom: 0;
+        }
+
+        .payment-actions {
+            flex-wrap: nowrap;
+        }
+    }
+
+    .form-row {
+        flex-wrap: wrap;
+    }
+
+    .form-group.half {
+        flex: 1 1 100%;
+    }
+
+    @@media (min-width: 600px) {
+        .form-group.half {
+            flex: 1 1 48%;
+        }
+    }
+
     .checkout-container {
         display: flex;
         gap: 30px;
@@ -236,7 +330,7 @@
         width: 100%;
         padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 50px;
         font-size: 16px;
     }
 
@@ -256,19 +350,24 @@
         background-color: #f0f0f0;
         color: #333;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         text-decoration: none;
         display: inline-block;
         text-align: center;
     }
 
+        .btn-cancel:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+
     .btn-pay {
         padding: 12px 24px;
         background-color: #0066cc;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
     }
@@ -315,177 +414,177 @@
     }
 </style>
 
-        <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Get all the elements we need
-            const quantityInputs = document.querySelectorAll('.quantity-input');
-            const decreaseButtons = document.querySelectorAll('.decrease-btn');
-            const increaseButtons = document.querySelectorAll('.increase-btn');
-            const checkoutTotal = document.getElementById('checkout-total');
-            const paymentAmount = document.getElementById('payment-amount');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get all the elements we need
+        const quantityInputs = document.querySelectorAll('.quantity-input');
+        const decreaseButtons = document.querySelectorAll('.decrease-btn');
+        const increaseButtons = document.querySelectorAll('.increase-btn');
+        const checkoutTotal = document.getElementById('checkout-total');
+        const paymentAmount = document.getElementById('payment-amount');
 
-            // Calculate initial total
-            updateTotalAmount();
+        // Calculate initial total
+        updateTotalAmount();
 
-            // Handle quantity changes
-            quantityInputs.forEach(input => {
-                input.addEventListener('change', function() {
-                    const itemId = this.getAttribute('data-id');
+        // Handle quantity changes
+        quantityInputs.forEach(input => {
+            input.addEventListener('change', function() {
+                const itemId = this.getAttribute('data-id');
 
-                    // Validate input value
-                    if (this.value < 1) this.value = 1;
-                    if (this.value > 99) this.value = 99;
+                // Validate input value
+                if (this.value < 1) this.value = 1;
+                if (this.value > 99) this.value = 99;
+
+                // Update hidden input
+                document.getElementById(`quantity-input-${itemId}`).value = this.value;
+
+                // Update quantity text
+                document.getElementById(`quantity-text-${itemId}`).textContent = this.value;
+
+                // Update item total
+                updateItemTotal(itemId);
+
+                // Update order total
+                updateTotalAmount();
+            });
+        });
+
+        // Handle decrease button clicks
+        decreaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
+                const currentValue = parseInt(input.value);
+
+                if (currentValue > 1) {
+                    input.value = currentValue - 1;
 
                     // Update hidden input
-                    document.getElementById(`quantity-input-${itemId}`).value = this.value;
+                    document.getElementById(`quantity-input-${itemId}`).value = input.value;
 
                     // Update quantity text
-                    document.getElementById(`quantity-text-${itemId}`).textContent = this.value;
+                    document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
 
                     // Update item total
                     updateItemTotal(itemId);
 
                     // Update order total
                     updateTotalAmount();
-                });
-            });
-
-            // Handle decrease button clicks
-            decreaseButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = this.getAttribute('data-id');
-                    const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-                    const currentValue = parseInt(input.value);
-
-                    if (currentValue > 1) {
-                        input.value = currentValue - 1;
-
-                        // Update hidden input
-                        document.getElementById(`quantity-input-${itemId}`).value = input.value;
-
-                        // Update quantity text
-                        document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
-
-                        // Update item total
-                        updateItemTotal(itemId);
-
-                        // Update order total
-                        updateTotalAmount();
-                    }
-                });
-            });
-
-            // Handle increase button clicks
-            increaseButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const itemId = this.getAttribute('data-id');
-                    const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
-                    const currentValue = parseInt(input.value);
-
-                    if (currentValue < 99) {
-                        input.value = currentValue + 1;
-
-                        // Update hidden input
-                        document.getElementById(`quantity-input-${itemId}`).value = input.value;
-
-                        // Update quantity text
-                        document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
-
-                        // Update item total
-                        updateItemTotal(itemId);
-
-                        // Update order total
-                        updateTotalAmount();
-                    }
-                });
-            });
-
-            // Function to update item total
-            function updateItemTotal(itemId) {
-                const itemSummary = document.querySelector(`.item-summary[data-bookmark-id="${itemId}"]`);
-                const price = parseFloat(itemSummary.getAttribute('data-price'));
-                const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${itemId}"]`).value);
-                const itemTotal = document.getElementById(`item-total-${itemId}`);
-
-                const total = price * quantity;
-                itemTotal.textContent = formatCurrency(total);
-            }
-
-            // Function to update total amount
-            function updateTotalAmount() {
-                let total = 0;
-                const itemSummaries = document.querySelectorAll('.item-summary');
-
-                itemSummaries.forEach(item => {
-                    const price = parseFloat(item.getAttribute('data-price'));
-                    const bookmarkId = item.getAttribute('data-bookmark-id');
-                    const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${bookmarkId}"]`).value);
-
-                    total += price * quantity;
-                });
-
-                checkoutTotal.textContent = formatCurrency(total);
-                paymentAmount.textContent = formatCurrency(total);
-            }
-
-            // Function to format currency
-            function formatCurrency(amount) {
-                return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
-            }
-
-            // Format card number with spaces
-            const cardInput = document.getElementById('cardNumber');
-            cardInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 0) {
-                    value = value.match(/.{1,4}/g).join(' ');
-                }
-                e.target.value = value;
-            });
-
-            // Format expiry date with slash
-            const expiryInput = document.getElementById('expiryDate');
-            expiryInput.addEventListener('input', function(e) {
-                let value = e.target.value.replace(/\D/g, '');
-                if (value.length > 0) {
-                    if (value.length > 2) {
-                        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                    }
-                }
-                e.target.value = value;
-            });
-
-            // Validate form on submit
-            const paymentForm = document.getElementById('paymentForm');
-            paymentForm.addEventListener('submit', function(e) {
-                const cardNumber = cardInput.value.replace(/\s/g, '');
-                const expiry = expiryInput.value;
-                const cvv = document.getElementById('cvv').value;
-
-                let isValid = true;
-
-                // Validate card number (basic check)
-                if (cardNumber.length < 13 || cardNumber.length > 19) {
-                    alert('Please enter a valid card number');
-                    isValid = false;
-                }
-
-                // Validate expiry date
-                const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
-                if (!expiryRegex.test(expiry)) {
-                    alert('Please enter a valid expiry date in MM/YY format');
-                    isValid = false;
-                }
-
-                // Validate CVV
-                if (cvv.length < 3 || cvv.length > 4) {
-                    alert('Please enter a valid CVV code');
-                    isValid = false;
-                }
-
-                if (!isValid) {
-                    e.preventDefault();
                 }
             });
         });
-        </script>
+
+        // Handle increase button clicks
+        increaseButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                const input = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
+                const currentValue = parseInt(input.value);
+
+                if (currentValue < 99) {
+                    input.value = currentValue + 1;
+
+                    // Update hidden input
+                    document.getElementById(`quantity-input-${itemId}`).value = input.value;
+
+                    // Update quantity text
+                    document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
+
+                    // Update item total
+                    updateItemTotal(itemId);
+
+                    // Update order total
+                    updateTotalAmount();
+                }
+            });
+        });
+
+        // Function to update item total
+        function updateItemTotal(itemId) {
+            const itemSummary = document.querySelector(`.item-summary[data-bookmark-id="${itemId}"]`);
+            const price = parseFloat(itemSummary.getAttribute('data-price'));
+            const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${itemId}"]`).value);
+            const itemTotal = document.getElementById(`item-total-${itemId}`);
+
+            const total = price * quantity;
+            itemTotal.textContent = formatCurrency(total);
+        }
+
+        // Function to update total amount
+        function updateTotalAmount() {
+            let total = 0;
+            const itemSummaries = document.querySelectorAll('.item-summary');
+
+            itemSummaries.forEach(item => {
+                const price = parseFloat(item.getAttribute('data-price'));
+                const bookmarkId = item.getAttribute('data-bookmark-id');
+                const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${bookmarkId}"]`).value);
+
+                total += price * quantity;
+            });
+
+            checkoutTotal.textContent = formatCurrency(total);
+            paymentAmount.textContent = formatCurrency(total);
+        }
+
+        // Function to format currency
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
+        }
+
+        // Format card number with spaces
+        const cardInput = document.getElementById('cardNumber');
+        cardInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                value = value.match(/.{1,4}/g).join(' ');
+            }
+            e.target.value = value;
+        });
+
+        // Format expiry date with slash
+        const expiryInput = document.getElementById('expiryDate');
+        expiryInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 0) {
+                if (value.length > 2) {
+                    value = value.substring(0, 2) + '/' + value.substring(2, 4);
+                }
+            }
+            e.target.value = value;
+        });
+
+        // Validate form on submit
+        const paymentForm = document.getElementById('paymentForm');
+        paymentForm.addEventListener('submit', function(e) {
+            const cardNumber = cardInput.value.replace(/\s/g, '');
+            const expiry = expiryInput.value;
+            const cvv = document.getElementById('cvv').value;
+
+            let isValid = true;
+
+            // Validate card number (basic check)
+            if (cardNumber.length < 13 || cardNumber.length > 19) {
+                alert('Please enter a valid card number');
+                isValid = false;
+            }
+
+            // Validate expiry date
+            const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
+            if (!expiryRegex.test(expiry)) {
+                alert('Please enter a valid expiry date in MM/YY format');
+                isValid = false;
+            }
+
+            // Validate CVV
+            if (cvv.length < 3 || cvv.length > 4) {
+                alert('Please enter a valid CVV code');
+                isValid = false;
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+    });
+</script>

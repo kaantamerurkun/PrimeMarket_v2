@@ -545,18 +545,18 @@ namespace PrimeMarket.Controllers
                         break;
 
                     // Special handling for tablets since they are split across different types
-                    case "Tablets":
-                        // Try each tablet type in order
-                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                        if (product == null)
-                        {
-                            product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                        }
-                        if (product == null)
-                        {
-                            product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                        }
-                        break;
+                    //case "Tablets":
+                    //    // Try each tablet type in order
+                    //    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    //    if (product == null)
+                    //    {
+                    //        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    //    }
+                    //    if (product == null)
+                    //    {
+                    //        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                    //    }
+                    //    break;
                 }
 
                 // If product is found, extract properties using reflection
