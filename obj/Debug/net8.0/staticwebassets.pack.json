@@ -329,6 +329,14 @@
       "PackagePath": "staticwebassets\\images\\listings\\36_aea2d6e2-0091-4716-89f6-7115f637358d.jpg"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\37_d0ab609e-7fba-4615-85ee-a4951add819f.png",
+      "PackagePath": "staticwebassets\\images\\listings\\37_d0ab609e-7fba-4615-85ee-a4951add819f.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\38_d4f0bc66-3103-4a97-a760-908bd4e5c45b.png",
+      "PackagePath": "staticwebassets\\images\\listings\\38_d4f0bc66-3103-4a97-a760-908bd4e5c45b.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\4_0105595f-daa3-4159-9b3e-48a87f506900.png",
       "PackagePath": "staticwebassets\\images\\listings\\4_0105595f-daa3-4159-9b3e-48a87f506900.png"
     },
@@ -437,6 +445,10 @@
       "PackagePath": "staticwebassets\\images\\logout-icon.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\order_history_icon.png",
+      "PackagePath": "staticwebassets\\images\\order_history_icon.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\placeholder.png",
       "PackagePath": "staticwebassets\\images\\placeholder.png"
     },
@@ -463,6 +475,14 @@
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png",
       "PackagePath": "staticwebassets\\images\\profiles\\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\21_0e389ee4-a7aa-445f-a770-f51e1594c107.JPG",
+      "PackagePath": "staticwebassets\\images\\profiles\\21_0e389ee4-a7aa-445f-a770-f51e1594c107.JPG"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\sales.png",
+      "PackagePath": "staticwebassets\\images\\sales.png"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\shopping_cart_icon.png",
@@ -521,6 +541,14 @@
       "PackagePath": "staticwebassets\\images\\verification\\back_20_94f35934-d393-45ff-bdc2-1d8bc081f18a.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\back_21_279ad40e-5694-4019-a3ae-09207faf75fd.jpg",
+      "PackagePath": "staticwebassets\\images\\verification\\back_21_279ad40e-5694-4019-a3ae-09207faf75fd.jpg"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\face_21_b4149901-409d-4c9b-b92d-707c1949421c.JPG",
+      "PackagePath": "staticwebassets\\images\\verification\\face_21_b4149901-409d-4c9b-b92d-707c1949421c.JPG"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png",
       "PackagePath": "staticwebassets\\images\\verification\\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png"
     },
@@ -567,6 +595,10 @@
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_20_a1386817-5b5d-449b-b156-57794622692c.png",
       "PackagePath": "staticwebassets\\images\\verification\\front_20_a1386817-5b5d-449b-b156-57794622692c.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verification\\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg",
+      "PackagePath": "staticwebassets\\images\\verification\\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verified.png",

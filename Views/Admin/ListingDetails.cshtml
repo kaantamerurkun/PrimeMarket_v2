@@ -3,6 +3,11 @@
     ViewData["Title"] = "Listing Details";
     Layout = null;
     var userName = Context.Session.GetString("AdminUsername") ?? "Admin";
+    var product = ViewBag.Product;
+    var sellerVerification = ViewBag.SellerVerification as PrimeMarket.Models.VerificationDocument;
+    var isSellerVerified = ViewBag.IsSellerVerified ?? false;
+    var isUpdatedListing = ViewBag.IsUpdatedListing ?? false;
+    var listingHistory = ViewBag.ListingHistory as List<PrimeMarket.Models.AdminAction>;
 }
 
 <!DOCTYPE html>
@@ -13,178 +18,298 @@
     <link rel="stylesheet" href="~/css/AdminDashboard.css" />
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <style>
-        .reasons-checklist {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 10px;
-            margin-bottom: 20px;
+        .logo img {
+            width: 120px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+        #userProfileModal {
+            z-index: 1010;
         }
 
-        .reason-item {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 8px;
+        .user-profile-content {
+            width: 90%;
+            max-width: 600px;
+            padding: 15px;
+            max-height: 85vh;
+            overflow-y: auto;
+            margin: 7% auto;
         }
 
-            .reason-item input[type="checkbox"] {
-                width: 18px;
-                height: 18px;
-            }
 
-            .reason-item label {
-                font-weight: normal;
-            }
-
-        .btn-confirm-reject {
-            padding: 8px 16px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
-        .btn-cancel {
-            padding: 8px 16px;
-            background-color: #f0f0f0;
-            color: #333;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            margin-right: 10px;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            padding: 8px 15px;
-            background-color: #f0f0f0;
-            color: #333;
-            border-radius: 5px;
-            text-decoration: none;
-            margin-bottom: 20px;
-        }
-
-        .listing-container {
+        .profile-header {
             display: flex;
             gap: 30px;
             margin-bottom: 30px;
+            align-items: flex-start;
         }
 
-        .image-gallery {
-            flex: 0 0 50%;
+        .profile-image-container {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            flex-shrink: 0;
         }
 
-        .main-image {
-            width: 100%;
-            height: 400px;
-            object-fit: cover;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-
-        .thumbnail-container {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding-bottom: 10px;
-        }
-
-            .thumbnail-container img {
-                width: 80px;
-                height: 80px;
+            .profile-image-container img {
+                width: 100%;
+                height: 100%;
+                border-radius: 10px;
                 object-fit: cover;
-                border-radius: 5px;
-                cursor: pointer;
-                transition: transform 0.3s ease;
             }
 
-                .thumbnail-container img:hover {
-                    transform: scale(1.05);
-                }
-
-        .listing-details {
+        .profile-details {
             flex: 1;
         }
 
-        .listing-title {
-            margin: 0 0 15px 0;
-            font-size: 24px;
-        }
-
-        .listing-price {
-            font-size: 24px;
-            font-weight: bold;
-            color: #0066cc;
-            margin-bottom: 20px;
-        }
-
-        .detail-section {
-            margin-bottom: 20px;
-        }
-
-            .detail-section h3 {
-                margin: 0 0 10px 0;
-                font-size: 18px;
-                border-bottom: 1px solid #ddd;
-                padding-bottom: 5px;
-            }
-
-        .detail-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-
-        .detail-label {
-            font-weight: bold;
-            color: #555;
-        }
-
-        .detail-value {
-            color: #333;
-        }
-
-        .description-section {
-            margin-top: 30px;
-        }
-
-            .description-section h3 {
-                margin: 0 0 15px 0;
-                font-size: 18px;
-            }
-
-        .description-content {
-            line-height: 1.6;
-            color: #333;
-            margin-bottom: 30px;
-        }
-
-        .seller-info {
+        .user-details-container {
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .empty-listings {
+            text-align: center;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .listings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .listing-card {
+            background-color: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+            .listing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
+
+        .listing-image {
+            position: relative;
+            height: 180px;
+        }
+
+            .listing-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .listing-status {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+            .listing-status.pending {
+                background-color: #ffc107;
+                color: #212529;
+            }
+
+            .listing-status.approved,
+            .listing-status.active {
+                background-color: #28a745;
+                color: white;
+            }
+
+            .listing-status.rejected {
+                background-color: #dc3545;
+                color: white;
+            }
+
+            .listing-status.sold {
+                background-color: #17a2b8;
+                color: white;
+            }
+
+        .listing-details h3 {
+            margin: 10px;
+            font-size: 16px;
+        }
+
+        .listing-price {
+            margin: 10px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .listing-date {
+            margin: 10px;
+            color: #666;
+            font-size: 12px;
+        }
+        .details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .back-button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #f0f0f0;
+            color: #333;
+            text-decoration: none;
+            margin-bottom: 20px;
+            border-radius: 50px;
+        }
+
+        .listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 30px;
         }
 
-            .seller-info h3 {
-                margin: 0 0 15px 0;
-                font-size: 18px;
+        .listing-status-badge {
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            color: white;
+        }
+
+        .listing-updated-badge {
+            background-color: #17a2b8;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .status-pending {
+            background-color: #ffc107;
+            color: #212529;
+        }
+
+        .status-approved {
+            background-color: #28a745;
+        }
+
+        .status-rejected {
+            background-color: #dc3545;
+        }
+
+        .listing-images {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .image-container {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+            .image-container img {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
             }
 
-        .seller-details {
+        .main-image-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #0066cc;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+        }
+
+        .info-section {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .info-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            color: #333;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+
+        .btn-approve {
+            background-color: #28a745;
+            color: white;
+            border-radius: 50px;
+        }
+
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50px;
+        }
+
+        .btn-edit {
+            background-color: #17a2b8;
+            color: white;
+            border-radius: 50px;
+        }
+
+        .seller-profile {
             display: flex;
             align-items: center;
             gap: 15px;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            margin-bottom: 15px;
         }
 
         .seller-image {
@@ -194,110 +319,133 @@
             object-fit: cover;
         }
 
-        .seller-name {
-            font-weight: bold;
-            margin-bottom: 5px;
+        .verification-badge {
+            width: 24px;
+            height: 24px;
+            margin-left: 5px;
         }
 
-        .seller-email, .seller-phone {
-            color: #666;
+        .seller-name {
+            color: #0066cc;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .rejection-reason {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .product-specs {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .spec-item {
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        .spec-label {
+            font-weight: bold;
+            color: #555;
             font-size: 14px;
         }
 
-        .admin-actions {
-            background-color: #f0f7ff;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
+        .spec-value {
+            color: #333;
+            margin-top: 5px;
         }
 
-            .admin-actions h3 {
-                margin: 0 0 15px 0;
-                font-size: 18px;
-                color: #0066cc;
-            }
-
-        .action-buttons {
-            display: flex;
-            gap: 15px;
+        .listing-history {
+            margin-top: 30px;
         }
 
-        .btn-approve {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
+        .history-item {
+            padding: 10px;
+            border-left: 3px solid #0066cc;
+            margin-bottom: 10px;
+            background-color: #f8f9fa;
         }
 
-        .btn-reject {
-            padding: 10px 20px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
+        .history-date {
+            font-size: 12px;
+            color: #666;
         }
 
-        .rejection-form {
-            margin-top: 20px;
+        /* Modal styles for rejection */
+        .modal {
             display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
         }
 
-            .rejection-form label {
-                display: block;
-                margin-bottom: 8px;
-                font-weight: bold;
-            }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 600px;
+            position: relative;
+        }
 
-            .rejection-form select {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 15px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-
-            .rejection-form textarea {
-                width: 100%;
-                padding: 10px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                resize: vertical;
-                min-height: 100px;
-                margin-bottom: 15px;
-            }
-
-        .btn-confirm-reject {
-            padding: 10px 20px;
-            background-color: #dc3545;
-            color: white;
-            border: none;
-            border-radius: 5px;
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            font-weight: bold;
             cursor: pointer;
         }
 
-        .alert {
-            padding: 12px 15px;
+        .reasons-checklist {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .reason-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background-color: #d4edda;
-            color: #155724;
-        }
-
-        .alert-danger {
-            background-color: #f8d7da;
-            color: #721c24;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    @using Microsoft.AspNetCore.Antiforgery
+    @inject IAntiforgery Anti
+
+    @{
+        var tokens = Anti.GetAndStoreTokens(Context);
+    }
+
+    <input type="hidden"
+           id="__RequestVerificationToken"
+           name="__RequestVerificationToken"
+           value="@tokens.RequestToken" />
+
     <header class="main-header">
         <div class="header-content">
             <a asp-action="AdminDashboard" asp-controller="Admin" class="logo">
@@ -306,15 +454,6 @@
             <div class="header-actions">
                 <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
                 <p>@userName</p>
-
-                <!-- Notification Bell -->
-                <div class="notification-wrapper">
-                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
-                    <div id="listingNotificationDropdown" class="notification-dropdown">
-                        <p class="notification-item">An item is waiting to be approved or rejected</p>
-                        <p class="notification-item">A user sent ID for verification.</p>
-                    </div>
-                </div>
             </div>
         </div>
     </header>
@@ -329,236 +468,470 @@
         </div>
 
         <div class="dashboard-content">
-            <div class="container">
-                <a href="@Url.Action("PendingListings", "Admin")" class="back-link">
-                    <i class="fas fa-arrow-left"></i> Back to Pending Listings
-                </a>
+            <div class="details-container">
+                <a href="@Url.Action("PendingListings", "Admin")" class="back-button">← Back to Pending Listings</a>
 
-                @if (TempData["SuccessMessage"] != null)
+                <div class="listing-header">
+                    <div>
+                        <h1>@Model.Title</h1>
+                        @if (isUpdatedListing)
+                        {
+                            <span class="listing-updated-badge">UPDATED LISTING</span>
+                        }
+                    </div>
+                    <span class="listing-status-badge status-@Model.Status.ToString().ToLower()">
+                        @Model.Status.ToString()
+                    </span>
+                </div>
+
+                @if (Model.Status == PrimeMarket.Models.Enum.ListingStatus.Rejected && !string.IsNullOrEmpty(Model.RejectionReason))
                 {
-                    <div class="alert alert-success">
-                        @TempData["SuccessMessage"]
+                    <div class="rejection-reason">
+                        <h4>Rejection Reason:</h4>
+                        <p>@Model.RejectionReason</p>
                     </div>
                 }
 
-                @if (TempData["ErrorMessage"] != null)
-                {
-                    <div class="alert alert-danger">
-                        @TempData["ErrorMessage"]
-                    </div>
-                }
-
-                <div class="listing-container">
-                    <div class="image-gallery">
+                <!-- Listing Images -->
+                <div class="info-section">
+                    <h3>Images</h3>
+                    <div class="listing-images">
                         @if (Model.Images != null && Model.Images.Any())
                         {
-                            var mainImage = Model.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? Model.Images.First().ImagePath;
-                            <img src="@mainImage" alt="@Model.Title" class="main-image" id="main-image">
-
-                            <div class="thumbnail-container">
-                                @foreach (var image in Model.Images)
-                                {
-                                    <img src="@image.ImagePath" alt="@Model.Title" class="thumbnail" onclick="changeMainImage('@image.ImagePath')">
-                                }
-                            </div>
+                            foreach (var image in Model.Images)
+                            {
+                                <div class="image-container">
+                                    <img src="@image.ImagePath" alt="@Model.Title" />
+                                    @if (image.IsMainImage)
+                                    {
+                                        <span class="main-image-badge">Main Image</span>
+                                    }
+                                </div>
+                            }
                         }
                         else
                         {
-                            <img src="/images/placeholder.png" alt="No Image Available" class="main-image">
+                            <p>No images available</p>
                         }
                     </div>
+                </div>
 
-                    <div class="listing-details">
-                        <h1 class="listing-title">@Model.Title</h1>
-                        <p class="listing-price">@Model.Price.ToString("C")</p>
-
-                        <div class="admin-actions">
-                            <h3>Admin Review</h3>
-                            <div class="action-buttons">
-                                <form asp-action="ApproveListing" asp-controller="Admin" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id">
-                                    <button type="submit" class="btn-approve">Approve Listing</button>
-                                </form>
-                                <button class="btn-reject" id="show-rejection-form">Reject Listing</button>
-                            </div>
-
-                            <div class="rejection-form" id="rejection-form">
-                                <form asp-action="RejectListing" asp-controller="Admin" method="post">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="id" value="@Model.Id">
-
-                                    <h3>Select Reason(s) for Rejection:</h3>
-                                    <div class="reasons-checklist">
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason1" name="reason" value="Images are blurry or unclear">
-                                            <label for="reason1">Images are blurry or unclear</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason2" name="reason" value="Listing description is incomplete or vague">
-                                            <label for="reason2">Listing description is incomplete or vague</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason3" name="reason" value="Price is not reasonable for this item">
-                                            <label for="reason3">Price is not reasonable for this item</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason4" name="reason" value="Item appears to be damaged or defective">
-                                            <label for="reason4">Item appears to be damaged or defective</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason5" name="reason" value="Item is prohibited or restricted">
-                                            <label for="reason5">Item is prohibited or restricted</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason6" name="reason" value="Information doesn't match the category">
-                                            <label for="reason6">Information doesn't match the category</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason7" name="reason" value="Not enough images provided">
-                                            <label for="reason7">Not enough images provided</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reason8" name="reason" value="Counterfeit or fake item">
-                                            <label for="reason8">Counterfeit or fake item</label>
-                                        </div>
-                                        <div class="reason-item">
-                                            <input type="checkbox" id="reasonOther" name="reason" value="Other">
-                                            <label for="reasonOther">Other</label>
-                                            <input type="text" id="otherReasonText" placeholder="Please specify..." style="display:none; margin-top:5px; width:100%; padding:5px; border-radius:5px;">
-                                        </div>
-                                    </div>
-                                    <div style="text-align: right; margin-top: 15px;">
-                                        <button type="button" class="btn-cancel" onclick="hideRejectForm()">Cancel</button>
-                                        <button type="button" class="btn-confirm-reject" onclick="confirmRejectListing()">Confirm Rejection</button>
-                                    </div>
-                                </form>
-                            </div>
+                <!-- Seller Information -->
+                <!-- Seller Information -->
+                <div class="info-section">
+                    <h3>Seller Information</h3>
+                    <div class="seller-profile">
+                        <img src="@(string.IsNullOrEmpty(Model.Seller?.ProfileImagePath) ? "/images/user-placeholder.png" : Model.Seller.ProfileImagePath)"
+                             alt="@Model.Seller?.FirstName"
+                             class="seller-image" />
+                        <div>
+                            <h4>
+                                <span class="seller-name" data-user-id="@Model.SellerId" style="cursor: pointer;" onclick="openUserProfileModal(@Model.SellerId, '@Model.Seller?.FirstName @Model.Seller?.LastName')">
+                                    @Model.Seller?.FirstName @Model.Seller?.LastName
+                                </span>
+                                @if (isSellerVerified)
+                                {
+                                    <img src="/images/verified.png" alt="Verified" class="verification-badge" />
+                                }
+                            </h4>
+                            <p>Email: @Model.Seller?.Email</p>
+                            <p>Joined: @Model.Seller?.CreatedAt?.ToString("MMM dd, yyyy")</p>
                         </div>
+                    </div>
 
-                        <div class="detail-section">
-                            <h3>Listing Details</h3>
-                            <div class="detail-item">
-                                <span class="detail-label">Condition</span>
-                                <span class="detail-value">@Model.Condition</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Category</span>
-                                <span class="detail-value">@Model.Category</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Subcategory</span>
-                                <span class="detail-value">@Model.SubCategory</span>
-                            </div>
-                            @if (!string.IsNullOrEmpty(Model.DetailCategory))
-                            {
-                                <div class="detail-item">
-                                    <span class="detail-label">Detail Category</span>
-                                    <span class="detail-value">@Model.DetailCategory</span>
-                                </div>
-                            }
-                            <div class="detail-item">
-                                <span class="detail-label">Location</span>
-                                <span class="detail-value">@Model.Location</span>
-                            </div>
-                            <div class="detail-item">
-                                <span class="detail-label">Listed Date</span>
-                                <span class="detail-value">@(((DateTime)Model.CreatedAt).ToString("MMMM dd, yyyy"))</span>
-                            </div>
+                    @if (sellerVerification != null && sellerVerification.Status == PrimeMarket.Models.Enum.VerificationStatus.Pending)
+                    {
+                        <div style="padding: 10px; background-color: #fff3cd; border-radius: 5px; margin-top: 10px;">
+                            <p>
+                                <strong>Note:</strong> This seller has pending ID verification.
+                                <a href="@Url.Action("VerificationDetails", "Admin", new { id = sellerVerification.Id })" style="color: #0066cc;">View verification</a>
+                            </p>
                         </div>
+                    }
+                </div>
 
-                        @if (ViewBag.Product != null)
+                <!-- Listing Details -->
+                <div class="info-section">
+                    <h3>Listing Details</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <div class="info-label">Price</div>
+                            <div class="info-value">@Model.Price.ToString("C")</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Condition</div>
+                            <div class="info-value">@Model.Condition</div>
+                        </div>
+                        @if (Model.Stock.HasValue && Model.Condition == "First-Hand")
                         {
-                            <div class="detail-section">
-                                <h3>Product Specifications</h3>
-                                @foreach (var prop in ViewBag.Product.GetType().GetProperties())
+                            <div class="info-item">
+                                <div class="info-label">Stock</div>
+                                <div class="info-value">@Model.Stock.Value units</div>
+                            </div>
+                        }
+                        <div class="info-item">
+                            <div class="info-label">Category</div>
+                            <div class="info-value">@Model.Category > @Model.SubCategory @(Model.DetailCategory != null ? "> " + Model.DetailCategory : "")</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Location</div>
+                            <div class="info-value">@Model.Location</div>
+                        </div>
+                        <div class="info-item">
+                            <div class="info-label">Created</div>
+                            <div class="info-value">@Model.CreatedAt?.ToString("MMM dd, yyyy HH:mm")</div>
+                        </div>
+                        @if (Model.UpdatedAt.HasValue)
+                        {
+                            <div class="info-item">
+                                <div class="info-label">Last Updated</div>
+                                <div class="info-value">@Model.UpdatedAt.Value.ToString("MMM dd, yyyy HH:mm")</div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Description -->
+                <div class="info-section">
+                    <h3>Description</h3>
+                    <p>@Model.Description</p>
+                </div>
+
+                <!-- Product Specifications -->
+                @if (product != null)
+                {
+                    <div class="info-section">
+                        <h3>Product Specifications</h3>
+                        <div class="product-specs">
+                            @{
+                                var properties = product.GetType().GetProperties();
+                                foreach (var prop in properties)
                                 {
                                     if (prop.Name != "Id" && prop.Name != "ListingId" && prop.Name != "Listing")
                                     {
-                                        var value = prop.GetValue(ViewBag.Product);
-                                        if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                                        var value = prop.GetValue(product);
+                                        if (value != null)
                                         {
-                                            <div class="detail-item">
-                                                <span class="detail-label">@prop.Name</span>
-                                                <span class="detail-value">@value</span>
+                                            <div class="spec-item">
+                                                <div class="spec-label">@prop.Name</div>
+                                                <div class="spec-value">@value.ToString()</div>
                                             </div>
                                         }
                                     }
                                 }
-                            </div>
-                        }
-
-                        <div class="seller-info">
-                            <h3>Seller Information</h3>
-                            <div class="seller-details">
-                                <img src="@(string.IsNullOrEmpty(Model.Seller?.ProfileImagePath) ? "/images/user-placeholder.png" : Model.Seller.ProfileImagePath)" alt="Seller" class="seller-image">
-                                <div>
-                                    <p class="seller-name">@Model.Seller?.FirstName @Model.Seller?.LastName</p>
-                                    <p class="seller-email">@Model.Seller?.Email</p>
-                                    @if (!string.IsNullOrEmpty(Model.Seller?.PhoneNumber))
-                                    {
-                                        <p class="seller-phone">@Model.Seller?.PhoneNumber</p>
-                                    }
-                                </div>
-                            </div>
+                            }
                         </div>
                     </div>
-                </div>
+                }
 
-                <div class="description-section">
-                    <h3>Description</h3>
-                    <div class="description-content">
-                        @Html.Raw(Model.Description.Replace("\n", "<br>"))
+                <!-- Action Buttons -->
+                @if (Model.Status == PrimeMarket.Models.Enum.ListingStatus.Pending)
+                {
+                    <div class="action-buttons">
+                        <form method="post" asp-action="ApproveListing" asp-controller="Admin" style="display: inline;">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@Model.Id" />
+                            <button type="submit" class="btn btn-approve">Approve Listing</button>
+                        </form>
+                        <button class="btn btn-reject" onclick="showRejectModal()">Reject Listing</button>
                     </div>
-                </div>
+                }
+
+                <!-- Listing History -->
+                @if (listingHistory != null && listingHistory.Any())
+                {
+                    <div class="listing-history">
+                        <h3>Listing History</h3>
+                        @foreach (var action in listingHistory)
+                        {
+                            <div class="history-item">
+                                <p><strong>@action.ActionType</strong> by @action.Admin?.Username</p>
+                                <p>@action.ActionDetails</p>
+                                <p class="history-date">@action.CreatedAt?.ToString("MMM dd, yyyy HH:mm")</p>
+                            </div>
+                        }
+                    </div>
+                }
             </div>
         </div>
     </div>
 
+    <!-- Rejection Modal -->
+    <div id="rejectModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeRejectModal()">&times;</span>
+            <h2>Reject Listing</h2>
+            <form id="rejectForm" method="post" asp-action="RejectListing" asp-controller="Admin">
+                @Html.AntiForgeryToken()
+                <input type="hidden" name="id" value="@Model.Id" />
+
+                <h3>Select Reason(s) for Rejection:</h3>
+                <div class="reasons-checklist">
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason1" name="reason" value="Images are blurry or unclear">
+                        <label for="reason1">Images are blurry or unclear</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason2" name="reason" value="Listing description is incomplete or vague">
+                        <label for="reason2">Listing description is incomplete or vague</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason3" name="reason" value="Price is not reasonable for this item">
+                        <label for="reason3">Price is not reasonable for this item</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason4" name="reason" value="Item appears to be damaged or defective">
+                        <label for="reason4">Item appears to be damaged or defective</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason5" name="reason" value="Item is prohibited or restricted">
+                        <label for="reason5">Item is prohibited or restricted</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason6" name="reason" value="Information doesn't match the category">
+                        <label for="reason6">Information doesn't match the category</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason7" name="reason" value="Not enough images provided">
+                        <label for="reason7">Not enough images provided</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason8" name="reason" value="Counterfeit or fake item">
+                        <label for="reason8">Counterfeit or fake item</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reasonOther" name="reason" value="Other">
+                        <label for="reasonOther">Other</label>
+                    </div>
+                </div>
+
+                <textarea id="otherReasonText" name="otherReason" placeholder="Please specify other reason..." style="display:none;"></textarea>
+
+                <div style="margin-top: 20px; text-align: right;">
+                    <button type="button" onclick="closeRejectModal()" style="padding: 10px 20px; margin-right: 10px;            background-color: gray;
+            border-radius: 50px;
+            color: white; cursor;cursor:pointer">
+                        Cancel
+                    </button>
+                    <button type="button" onclick="submitRejection()" class="btn btn-reject">Reject</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="userProfileModal" class="modal">
+        <div class="modal-content user-profile-content">
+            <span class="close" onclick="closeUserProfileModal()">&times;</span>
+            <div class="modal-header">
+                <h2 id="profileModalUserName">User Profile</h2>
+            </div>
+            <div class="profile-header">
+                <div class="profile-image-container">
+                    <img id="profileModalUserImage" src="/images/user-placeholder.png" alt="User Profile">
+                    <div id="profileModalVerificationBadge" class="verification-badge" style="display: none;">
+                        <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                    </div>
+                </div>
+
+                <div class="profile-details">
+                    <div class="user-details-container">
+                        <div class="detail-item">
+                            <span class="detail-label">Name:</span>
+                            <span id="profileModalUserFirstName" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Name:</span>
+                            <span id="profileModalUserLastName" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span id="profileModalUserEmail" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone Number:</span>
+                            <span id="profileModalUserPhone" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Registered:</span>
+                            <span id="profileModalUserCreated" class="detail-value"></span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Verification Status:</span>
+                            <span id="profileModalUserVerification" class="detail-value"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Listings Container (Fix for innerHTML error) -->
+            <div id="profileModalListingsContainer" class="listings-grid"></div>
+
+            <div class="modal-actions">
+                <button id="closeProfileBtn" class="btn-reject" style="background-color: #6c757d;">Close</button>
+            </div>
+
+        </div>
+    </div>
+
     <script>
-        function changeMainImage(imageSrc) {
-            document.getElementById('main-image').src = imageSrc;
+                        function fetchUserDetails(userId) {
+                    if (!userId) return;
+
+                    // Get the CSRF token
+                    const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
+
+                    fetch(`/Admin/GetUserDetails?userId=${userId}`, {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            'RequestVerificationToken': token
+                        }
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            console.error(`Server returned ${response.status}: ${response.statusText}`);
+                            throw new Error('Failed to fetch user details');
+                        }
+                        return response.json();
+                    })
+                    .then(user => {
+                        console.log('User details received:', user);
+
+                        // Update the UI with the user details
+                        document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
+                        document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
+                        document.getElementById('profileModalUserEmail').textContent = user.email || "";
+                        document.getElementById('profileModalUserPhone').textContent = user.phoneNumber || "Not provided";
+
+                        const createdDate = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : "Unknown";
+                        document.getElementById('profileModalUserCreated').textContent = createdDate;
+
+                        document.getElementById('profileModalUserVerification').textContent =
+                            user.isIdVerified ? "Verified" : "Pending";
+
+                        if (user.profileImagePath) {
+                            document.getElementById('profileModalUserImage').src = user.profileImagePath;
+                        }
+
+                        // Show verification badge if user is verified
+                        if (user.isIdVerified) {
+                            document.getElementById('profileModalVerificationBadge').style.display = 'block';
+                        } else {
+                            document.getElementById('profileModalVerificationBadge').style.display = 'none';
+                        }
+
+                        // Fetch user listings after user details are loaded
+                    })
+                    .catch(error => {
+                        console.error('Error fetching user details:', error);
+                        document.getElementById('profileModalUserFirstName').textContent = "Error loading data";
+                        document.getElementById('profileModalUserLastName').textContent = "";
+                        document.getElementById('profileModalUserEmail').textContent = "Please try again";
+                        document.getElementById('profileModalUserPhone').textContent = "";
+                        document.getElementById('profileModalUserCreated').textContent = "";
+                        document.getElementById('profileModalUserVerification').textContent = "Unknown";
+
+                        // We'll still try to fetch listings in case user details failed but listings might succeed
+                    });
+                }
+                // User Profile Modal Functions
+        function openUserProfileModal(userId, userName) {
+            if (!userId) return;
+
+            document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
+            document.getElementById('userProfileModal').style.display = 'block';
+
+            // Clear previous data
+            document.getElementById('profileModalUserFirstName').textContent = "";
+            document.getElementById('profileModalUserLastName').textContent = "";
+            document.getElementById('profileModalUserEmail').textContent = "";
+            document.getElementById('profileModalUserPhone').textContent = "Not provided";
+            document.getElementById('profileModalUserCreated').textContent = "";
+            document.getElementById('profileModalUserVerification').textContent = "Pending";
+            document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
+            document.getElementById('profileModalVerificationBadge').style.display = 'none';
+
+
+            // Fetch user details
+            fetchUserDetails(userId);
+
+            // Set up close button click handler
+            document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
         }
 
-        document.addEventListener('DOMContentLoaded', function() {
-            // Toggle notification dropdown
-            const notificationBell = document.getElementById('listingNotificationBell');
-            const notificationDropdown = document.getElementById('listingNotificationDropdown');
 
-            if (notificationBell && notificationDropdown) {
-                notificationBell.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    notificationDropdown.style.display = notificationDropdown.style.display === 'block' ? 'none' : 'block';
-                });
-
-                document.addEventListener('click', function(event) {
-                    if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
-                        notificationDropdown.style.display = 'none';
+                function closeUserProfileModal() {
+                    const modal = document.getElementById('userProfileModal');
+                    if (modal) {
+                        modal.style.display = 'none';
                     }
-                });
+                }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('rejectModal');
+            if (event.target === modal) {
+                closeRejectModal();
+            }
+        }
+        // Update the window.onclick event to handle both modals
+        window.onclick = function(event) {
+            const rejectModal = document.getElementById('rejectModal');
+            const userProfileModal = document.getElementById('userProfileModal');
+
+            if (event.target === rejectModal) {
+                closeRejectModal();
             }
 
-            // Show/hide rejection form
-            const showRejectionFormBtn = document.getElementById('show-rejection-form');
-            const rejectionForm = document.getElementById('rejection-form');
-
-            if (showRejectionFormBtn && rejectionForm) {
-                showRejectionFormBtn.addEventListener('click', function() {
-                    rejectionForm.style.display = rejectionForm.style.display === 'block' ? 'none' : 'block';
-                    this.textContent = rejectionForm.style.display === 'block' ? 'Cancel' : 'Reject Listing';
-                });
+            if (event.target === userProfileModal) {
+                closeUserProfileModal();
             }
-
-            // Handle "Other" reason checkbox
-            const reasonOther = document.getElementById('reasonOther');
-            const otherReasonText = document.getElementById('otherReasonText');
-
-            if (reasonOther && otherReasonText) {
-                reasonOther.addEventListener('change', function() {
-                    otherReasonText.style.display = this.checked ? 'block' : 'none';
-                });
-            }
+        }
+        // Show/hide other reason textarea
+        document.getElementById('reasonOther')?.addEventListener('change', function() {
+            document.getElementById('otherReasonText').style.display = this.checked ? 'block' : 'none';
         });
+
+        function showRejectModal() {
+            document.getElementById('rejectModal').style.display = 'block';
+        }
+
+        function closeRejectModal() {
+            document.getElementById('rejectModal').style.display = 'none';
+            // Reset form
+            document.querySelectorAll('input[name="reason"]').forEach(checkbox => checkbox.checked = false);
+            document.getElementById('otherReasonText').style.display = 'none';
+            document.getElementById('otherReasonText').value = '';
+        }
+
+        function submitRejection() {
+            const selectedReasons = [];
+            document.querySelectorAll('input[name="reason"]:checked').forEach(checkbox => {
+                if (checkbox.id === 'reasonOther') {
+                    const otherReason = document.getElementById('otherReasonText').value.trim();
+                    if (otherReason) {
+                        selectedReasons.push(otherReason);
+                    }
+                } else {
+                    selectedReasons.push(checkbox.value);
+                }
+            });
+
+            if (selectedReasons.length === 0) {
+                alert('Please select at least one rejection reason.');
+                return;
+            }
+
+            // Create a hidden input with the rejection reasons
+            const rejectionReasonInput = document.createElement('input');
+            rejectionReasonInput.type = 'hidden';
+            rejectionReasonInput.name = 'rejectionReason';
+            rejectionReasonInput.value = selectedReasons.join(', ');
+
+            document.getElementById('rejectForm').appendChild(rejectionReasonInput);
+            document.getElementById('rejectForm').submit();
+        }
     </script>
 </body>
 </html>

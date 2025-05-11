@@ -76,6 +76,8 @@ wwwroot\images\listings\33_413de832-1fda-4163-951d-c573a3764374.jpg
 wwwroot\images\listings\34_921cd9b5-019c-4cb4-913d-e5115afebc42.jpg
 wwwroot\images\listings\35_5892076b-50f3-43c4-81e1-f1b507c20c7a.png
 wwwroot\images\listings\36_aea2d6e2-0091-4716-89f6-7115f637358d.jpg
+wwwroot\images\listings\37_d0ab609e-7fba-4615-85ee-a4951add819f.png
+wwwroot\images\listings\38_d4f0bc66-3103-4a97-a760-908bd4e5c45b.png
 wwwroot\images\listings\4_0105595f-daa3-4159-9b3e-48a87f506900.png
 wwwroot\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png
 wwwroot\images\listings\5_eeec6a1d-f09c-401d-9f77-ca8e987ce59c.jpg
@@ -105,6 +107,7 @@ wwwroot\images\listings\9_960c9059-dc92-49fd-95f4-d5cd3fd79cef.png
 wwwroot\images\logout-icon.png
 wwwroot\images\MessagesIcon.png
 wwwroot\images\NotificationBell.png
+wwwroot\images\order_history_icon.png
 wwwroot\images\placeholder.png
 wwwroot\images\PrimeMarket_Logo.png
 wwwroot\images\PrimeMarket_Logo_V2.png
@@ -114,6 +117,8 @@ wwwroot\images\profiles\14_4f68e75c-d203-48fa-a388-f0c23b225048.JPG
 wwwroot\images\profiles\14_9906f896-6693-4ce1-9d37-645b2c386955.png
 wwwroot\images\profiles\14_abe225a1-e2ae-4c02-86d9-6573bfd23c63.jpg
 wwwroot\images\profiles\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png
+wwwroot\images\profiles\21_0e389ee4-a7aa-445f-a770-f51e1594c107.JPG
+wwwroot\images\sales.png
 wwwroot\images\shopping_cart_icon.png
 wwwroot\images\user-placeholder.png
 wwwroot\images\verification\back_14_06fc1ad1-884f-412d-a645-24be5439c933.png
@@ -128,6 +133,8 @@ wwwroot\images\verification\back_18_2f0e8358-b553-4b6e-9229-9d0765840a1d.png
 wwwroot\images\verification\back_18_edb24c98-2da8-43ad-b4a5-e018654dad20.png
 wwwroot\images\verification\back_19_aaa61477-def1-49b5-bd42-4429baca4647.png
 wwwroot\images\verification\back_20_94f35934-d393-45ff-bdc2-1d8bc081f18a.png
+wwwroot\images\verification\back_21_279ad40e-5694-4019-a3ae-09207faf75fd.jpg
+wwwroot\images\verification\face_21_b4149901-409d-4c9b-b92d-707c1949421c.JPG
 wwwroot\images\verification\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png
 wwwroot\images\verification\front_14_40492d63-2284-47ea-9d5c-8ba9f08679d6.png
 wwwroot\images\verification\front_14_44bad9b6-21cf-4501-a7d6-6b5ad9fcd472.png
@@ -140,6 +147,7 @@ wwwroot\images\verification\front_18_26e0676f-aa9c-4349-a442-9cdb90c061c9.png
 wwwroot\images\verification\front_18_a6ae440d-325a-42dd-a70e-53008338584d.png
 wwwroot\images\verification\front_19_587afc38-51c2-4537-9b79-1c217622e7d5.png
 wwwroot\images\verification\front_20_a1386817-5b5d-449b-b156-57794622692c.png
+wwwroot\images\verification\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg
 wwwroot\images\verified.png
 wwwroot\js\category-filtering.js
 wwwroot\js\site.js

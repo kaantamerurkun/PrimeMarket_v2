@@ -13,6 +13,12 @@
     <link rel="stylesheet" href="~/css/AdminDashboard.css" />
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <style>
+        .logo img {
+            width: 120px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
         .verification-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
@@ -70,6 +76,7 @@
             .id-image-container h4 {
                 margin: 0 0 5px 0;
                 font-size: 16px;
+                text-align: center;
             }
 
         .id-image {
@@ -163,13 +170,8 @@
         }
 
         .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 20px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 900px;
-            position: relative;
+            width: 95%;
+            max-width: 600px;
         }
 
         .close {
@@ -206,7 +208,7 @@
         .modal-image {
             width: 100%;
             height: auto;
-            max-height: 500px;
+            max-height: 400px;
             object-fit: contain;
             border-radius: 5px;
         }
@@ -458,6 +460,12 @@
             border-radius: 10px;
             margin-top: 20px;
         }
+        @@media (max-width: 768px) {
+            .verification-images, .modal-images
+
+        {
+            flex-direction: column;
+        }
     </style>
 </head>
 <body>
@@ -546,11 +554,18 @@
                             <div class="verification-images">
                                 <div class="id-image-container">
                                     <h4>ID Front</h4>
-                                    <img src="@verification.FrontImagePath" alt="ID Front" class="id-image front-image" onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath')">
+                                    <img src="@verification.FrontImagePath" alt="ID Front" class="id-image front-image"
+                                         onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath', '@verification.FaceImagePath')">
                                 </div>
                                 <div class="id-image-container">
                                     <h4>ID Back</h4>
-                                    <img src="@verification.BackImagePath" alt="ID Back" class="id-image back-image" onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath')">
+                                    <img src="@verification.BackImagePath" alt="ID Back" class="id-image back-image"
+                                         onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath', '@verification.FaceImagePath')">
+                                </div>
+                                <div class="id-image-container">
+                                    <h4>Face Photo</h4>
+                                    <img src="@verification.FaceImagePath" alt="Face Photo" class="id-image face-image"
+                                         onclick="openImageModal('@verification.Id', '@verification.User?.FirstName @verification.User?.LastName', '@verification.FrontImagePath', '@verification.BackImagePath', '@verification.FaceImagePath')">
                                 </div>
                             </div>
 
@@ -582,6 +597,10 @@
                 <div class="modal-image-container">
                     <h4>ID Back</h4>
                     <img id="modalImageBack" class="modal-image" src="" alt="ID Back">
+                </div>
+                <div class="modal-image-container">
+                    <h4>Face Photo</h4>
+                    <img id="modalImageFace" class="modal-image" src="" alt="Face Photo">
                 </div>
             </div>
             <div class="modal-actions">
@@ -626,8 +645,16 @@
                         <label for="reason8">Security features not visible</label>
                     </div>
                     <div class="reason-item">
-                        <input type="checkbox" id="reason9" name="reason" value="Photo on ID doesn't match user">
-                        <label for="reason9">Photo on ID doesn't match user</label>
+                        <input type="checkbox" id="reason9" name="reason" value="Photo on ID doesn't match face photo">
+                        <label for="reason9">Photo on ID doesn't match face photo</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason10" name="reason" value="Face photo is not clear">
+                        <label for="reason10">Face photo is not clear</label>
+                    </div>
+                    <div class="reason-item">
+                        <input type="checkbox" id="reason11" name="reason" value="Face photo appears to be altered">
+                        <label for="reason11">Face photo appears to be altered</label>
                     </div>
                     <div class="reason-item">
                         <input type="checkbox" id="reasonOther" name="reason" value="Other">
@@ -712,12 +739,13 @@
         let currentUserId = null;
 
         // Image modal functions
-        function openImageModal(id, userName, frontImage, backImage) {
+        function openImageModal(id, userName, frontImage, backImage, faceImage) {
             currentVerificationId = id;
 
             document.getElementById('modalUserName').textContent = userName + ' - ID Verification';
             document.getElementById('modalImageFront').src = frontImage;
             document.getElementById('modalImageBack').src = backImage;
+            document.getElementById('modalImageFace').src = faceImage;
             document.getElementById('idModal').style.display = 'block';
 
             document.getElementById('rejectReasons').style.display = 'none';
@@ -753,15 +781,16 @@
         }
 
         function openRejectModal(id) {
-            const card = document.querySelector(`.verification-card[data-id="${id}"]`);
-            if (!card) return;
+        const card = document.querySelector(`.verification-card[data-id="${id}"]`);
+        if (!card) return;
 
-            const userName = card.querySelector('.user-details h3').textContent;
-            const frontImage = card.querySelector('.front-image').src;
-            const backImage = card.querySelector('.back-image').src;
+        const userName = card.querySelector('.user-details h3').textContent;
+        const frontImage = card.querySelector('.front-image').src;
+        const backImage = card.querySelector('.back-image').src;
+        const faceImage = card.querySelector('.face-image').src;
 
-            openImageModal(id, userName, frontImage, backImage);
-            showRejectReasons();
+        openImageModal(id, userName, frontImage, backImage, faceImage);
+        showRejectReasons();
         }
 
         // User Profile Modal Functions
@@ -771,7 +800,7 @@
             document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
             document.getElementById('userProfileModal').style.display = 'block';
 
-            // Clear previous data
+            // Clear previous data and show loading state
             document.getElementById('profileModalUserFirstName').textContent = "";
             document.getElementById('profileModalUserLastName').textContent = "";
             document.getElementById('profileModalUserEmail').textContent = "";
@@ -794,10 +823,13 @@
             // Set up verification button click handler
             document.getElementById('viewVerificationBtn').onclick = function() {
                 const verificationId = document.querySelector(`.verification-card[data-user-id="${userId}"]`).getAttribute('data-id');
+                const verificationCard = document.querySelector(`.verification-card[data-id="${verificationId}"]`);
+
                 closeUserProfileModal();
                 openImageModal(verificationId, userName,
-                    document.querySelector(`.verification-card[data-id="${verificationId}"] .front-image`).src,
-                    document.querySelector(`.verification-card[data-id="${verificationId}"] .back-image`).src);
+                    verificationCard.querySelector('.front-image').src,
+                    verificationCard.querySelector('.back-image').src,
+                    verificationCard.querySelector('.face-image').src);
             };
 
             // Set up close button click handler

@@ -10,11 +10,33 @@
     <title>PrimeMarket - Main Page</title>
     <link rel="stylesheet" href="/css/UserMainPage.css" />
     <style>
+        .listing-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .listings h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 28px;
+        }
+
+        .items-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
         .item-card-link {
             text-decoration: none;
             color: inherit;
             display: block;
             transition: transform 0.2s ease;
+            width: calc(25% - 20px); /* 4 per row */
+            min-width: 250px;
+            max-width: 300px;
         }
 
             .item-card-link:hover {
@@ -100,12 +122,10 @@
     </style>
 </head>
 <body>
-    <div style="margin-top: 80px;">
-        <nav style="box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;"
-             class="container">
-            <ul id="mainCategories" class="category-menu" style="list-style: none; display: flex; gap: 30px; padding: 10px 0;"></ul>
-        </nav>
-    </div>
+    <nav style="margin-top: 65px; border-radius:15px; box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;" class="container">
+        <ul id="mainCategories" class="category-menu" style="list-style: none; display: flex; gap: 30px; padding: 10px 0; margin: 0;"></ul>
+    </nav>
+
 
     <main class="listing-content">
         <section class="listings">

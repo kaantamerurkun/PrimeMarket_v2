@@ -15,6 +15,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title</title>
     <link rel="stylesheet" href="/css/EditProfile.css" />
+    <style>
+        .logo img {
+            width: 120px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+    </style>
 </head>
 <body>
     <div class="min-h-screen">
@@ -127,10 +135,17 @@
                         <div class="input-group">
                             <label for="idFront">Upload Front of ID:</label>
                             <input type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" />
+                            <span class="help-text">Please upload a clear photo of the front of your ID</span>
                         </div>
                         <div class="input-group">
                             <label for="idBack">Upload Back of ID:</label>
                             <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" />
+                            <span class="help-text">Please upload a clear photo of the back of your ID</span>
+                        </div>
+                        <div class="input-group">
+                            <label for="facePhoto">Upload Your Face Photo:</label>
+                            <input type="file" id="facePhoto" name="facePhoto" accept=".jpg,.jpeg,.png" />
+                            <span class="help-text">Please upload a clear photo of your face for verification</span>
                         </div>
                         <div class="button-container">
                             <button type="button" id="sendVerificationBtn" class="btn-sendverification">Send Verification</button>
@@ -144,7 +159,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Add event listener to the send verification button
             const sendVerificationBtn = document.getElementById("sendVerificationBtn");
             if (sendVerificationBtn) {
                 sendVerificationBtn.addEventListener("click", sendVerification);
@@ -154,12 +168,13 @@
         function sendVerification() {
             const idFront = document.getElementById("idFront").files[0];
             const idBack = document.getElementById("idBack").files[0];
+            const facePhoto = document.getElementById("facePhoto").files[0];
             const messageDiv = document.getElementById("verification-message");
 
             messageDiv.style.display = "none";
 
-            if (!idFront || !idBack) {
-                messageDiv.textContent = "Please upload both front and back images of your ID.";
+            if (!idFront || !idBack || !facePhoto) {
+                messageDiv.textContent = "Please upload front ID, back ID, and your face photo.";
                 messageDiv.style.backgroundColor = "#f8d7da";
                 messageDiv.style.color = "#721c24";
                 messageDiv.style.display = "block";
@@ -169,6 +184,7 @@
             const formData = new FormData();
             formData.append("idFront", idFront);
             formData.append("idBack", idBack);
+            formData.append("facePhoto", facePhoto);
             formData.append("__RequestVerificationToken", document.querySelector('#verification-form input[name="__RequestVerificationToken"]').value);
 
             const sendVerificationBtn = document.getElementById("sendVerificationBtn");
@@ -192,6 +208,7 @@
                     messageDiv.style.color = "#155724";
                     document.getElementById("idFront").value = "";
                     document.getElementById("idBack").value = "";
+                    document.getElementById("facePhoto").value = "";
                 } else {
                     messageDiv.textContent = "Error: " + data.message;
                     messageDiv.style.backgroundColor = "#f8d7da";

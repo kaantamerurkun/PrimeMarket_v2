@@ -7,6 +7,7 @@
 
 body {
     background-color: #f0f8ff;
+    line-height: 1.6;
 }
 .main-header {
     background: #f0f8ff;
@@ -23,16 +24,14 @@ body {
     margin: 0 auto;
     padding: 15px 20px;
     display: flex;
-    flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    width: 100%;
 }
 
 .header-actions {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 20px;
 }
 
 /* ✅ Fix search box layout */

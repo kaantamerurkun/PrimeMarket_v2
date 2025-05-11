@@ -6,12 +6,28 @@
 }
 
 <style>
+    .container {
+        max-width: 1000px;
+        width: 100%;
+        padding: 20px;
+        margin: 120px auto 50px auto; /* Center horizontally + spacing */
+    }
+
+    .logo img {
+        width: 120px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
     .my-purchases-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        text-align: center;
         margin-bottom: 20px;
     }
+
+        .my-purchases-header h1 {
+            margin: 0 auto;
+        }
 
     .empty-purchases {
         text-align: center;
@@ -169,20 +185,18 @@
     }
 
     @@media (max-width: 768px) {
-        .purchase-item
+        .purchase-item {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
+        .purchase-image {
+            height: 180px;
+            flex: none;
+        }
     }
+</style>
 
-    .purchase-image {
-        height: 180px;
-        flex: none;
-    }
-
-    }</style>
-
-<div class="container" style="margin-top:120px;margin-bottom:50px;">
+<div class="container">
     <div class="my-purchases-header">
         <h1>My Purchases</h1>
     </div>

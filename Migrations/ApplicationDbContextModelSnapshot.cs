@@ -1404,6 +1404,10 @@ namespace PrimeMarket.Migrations
                     b.Property<DateTime?>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("FaceImagePath")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("FrontImagePath")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");

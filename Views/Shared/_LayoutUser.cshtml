@@ -33,8 +33,32 @@
     <link rel="stylesheet" href="/css/UserLayout.css" />
     <link rel="stylesheet" href="/css/notificationstyle.css" />
     <link rel="stylesheet" href="/css/messagenotifications.css" />
+
     <title>@ViewBag.Title</title>
     <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .content-wrap {
+            flex: 1;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            background-color: #333;
+            color: white;
+            margin-top: 40px;
+        }
         .verified-badge {
         display: inline-flex;
         align-items: center;
@@ -327,6 +351,7 @@
     </style>
 </head>
 <body>
+    <div class="page-container">
     <header class="main-header">
         <div class="header-content">
             <a asp-action="User_MainPage" asp-controller="User" class="logo">
@@ -411,11 +436,14 @@
                             <img src="/images/bookmark-button.png" alt="Bookmarks" />
                             My Bookmarks
                         </a>
-
-                        <a href="@Url.Action("Cart", "Payment")" class="dropdown-item">
-                            <img src="/images/shopping_cart_icon.png" alt="Shopping Cart" />
-                            Shopping Cart
-                        </a>
+                            <a href="@Url.Action("MyPurchase", "Payment")" class="dropdown-item">
+                                <img src="/images/order_history_icon.png" alt="Shopping Cart" />
+                                My Purchases History
+                            </a>
+                            <a href="@Url.Action("MySales", "Payment")" class="dropdown-item">
+                                <img src="/images/sales.png" alt="Shopping Cart" />
+                                My Sales History
+                            </a>
 
                         <div class="dropdown-divider"></div>
 
@@ -426,16 +454,19 @@
                             </button>
                         </form>
                     </div>
-                </div>
 
+                </div>
+                    <a href="@Url.Action("Cart", "Payment")">
+                        <img src="/images/shopping_cart_icon.png" style="width:20px;height:20px;" alt="Shopping Cart" />
+                    </a>
                 <a asp-action="CreateListing" asp-controller="User"><button class="btn-list">List an Item</button></a>
             </div>
         </div>
     </header>
 
-    <div>
+    <main class="content-wrap">
         @RenderBody()
-    </div>
+    </main>
 
     <script src="/js/category-filtering.js"></script>
     <script>
@@ -630,5 +661,16 @@
         });
     </script>
 
+        <footer>
+    <div class="footer-content">
+        <p style="text-align:center;">&copy; 2025 PrimeMarket. All rights reserved.</p>
+        <ul class="footer-links" style="color:white; list-style-type:none; display:flex; justify-content:center; gap:20px; padding:0; margin:10px 0;">
+            <li><a style="color:white; text-decoration:none;" href="/Privacy">Privacy Policy</a></li>
+            <li><a style="color:white; text-decoration:none;" href="/Terms">Terms of Service</a></li>
+            <li><a style="color:white; text-decoration:none;" href="/Contact">Contact Us</a></li>
+        </ul>
+    </div>
+</footer>
+    </div>
 </body>
 </html>

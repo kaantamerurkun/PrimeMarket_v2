@@ -296,7 +296,7 @@ namespace PrimeMarket.Controllers
         }
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SubmitIdVerification(IFormFile idFront, IFormFile idBack)
+        public async Task<IActionResult> SubmitIdVerification(IFormFile idFront, IFormFile idBack, IFormFile facePhoto)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -304,14 +304,14 @@ namespace PrimeMarket.Controllers
                 return Json(new { success = false, message = "You must be logged in to verify your ID" });
             }
 
-            if (idFront == null || idBack == null)
+            if (idFront == null || idBack == null || facePhoto == null)
             {
-                return Json(new { success = false, message = "Both front and back ID images are required" });
+                return Json(new { success = false, message = "Front ID, back ID, and face photo are all required" });
             }
 
             try
             {
-                // Save the ID images
+                // Save the ID images and face photo
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "verification");
                 if (!Directory.Exists(uploadsFolder))
                 {
@@ -321,9 +321,11 @@ namespace PrimeMarket.Controllers
                 // Generate unique filenames
                 string frontImageFileName = $"front_{userId}_{Guid.NewGuid()}{Path.GetExtension(idFront.FileName)}";
                 string backImageFileName = $"back_{userId}_{Guid.NewGuid()}{Path.GetExtension(idBack.FileName)}";
+                string faceImageFileName = $"face_{userId}_{Guid.NewGuid()}{Path.GetExtension(facePhoto.FileName)}";
 
                 string frontImagePath = Path.Combine(uploadsFolder, frontImageFileName);
                 string backImagePath = Path.Combine(uploadsFolder, backImageFileName);
+                string faceImagePath = Path.Combine(uploadsFolder, faceImageFileName);
 
                 // Save files to disk
                 using (var frontStream = new FileStream(frontImagePath, FileMode.Create))
@@ -336,6 +338,11 @@ namespace PrimeMarket.Controllers
                     await idBack.CopyToAsync(backStream);
                 }
 
+                using (var faceStream = new FileStream(faceImagePath, FileMode.Create))
+                {
+                    await facePhoto.CopyToAsync(faceStream);
+                }
+
                 // Check if user already has a verification document
                 var existingVerification = await _context.VerificationDocuments.FirstOrDefaultAsync(v => v.UserId == userId);
 
@@ -344,8 +351,8 @@ namespace PrimeMarket.Controllers
                     // Update existing document
                     existingVerification.FrontImagePath = $"/images/verification/{frontImageFileName}";
                     existingVerification.BackImagePath = $"/images/verification/{backImageFileName}";
+                    existingVerification.FaceImagePath = $"/images/verification/{faceImageFileName}";
                     existingVerification.Status = PrimeMarket.Models.Enum.VerificationStatus.Pending;
-                    // Set an empty string instead of null for RejectionReason
                     existingVerification.RejectionReason = string.Empty;
                     existingVerification.UpdatedAt = DateTime.Now;
                 }
@@ -357,8 +364,8 @@ namespace PrimeMarket.Controllers
                         UserId = userId.Value,
                         FrontImagePath = $"/images/verification/{frontImageFileName}",
                         BackImagePath = $"/images/verification/{backImageFileName}",
+                        FaceImagePath = $"/images/verification/{faceImageFileName}",
                         Status = PrimeMarket.Models.Enum.VerificationStatus.Pending,
-                        // Set an empty string instead of null for RejectionReason
                         RejectionReason = string.Empty,
                         CreatedAt = DateTime.Now
                     };
@@ -368,12 +375,10 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Remove the admin notification creation code entirely
-                // OR for a quick fix, replace it with:
-                // Create a notification for the user instead:
+                // Create a notification for the user
                 var userNotification = new Notification
                 {
-                    UserId = userId.Value, // This is definitely in the Users table
+                    UserId = userId.Value,
                     Message = "Your ID verification has been submitted and is pending review",
                     Type = PrimeMarket.Models.Enum.NotificationType.VerificationApproved,
                     RelatedEntityId = userId.Value,

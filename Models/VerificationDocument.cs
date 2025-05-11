@@ -17,6 +17,9 @@ namespace PrimeMarket.Models
         [Required]
         public string BackImagePath { get; set; }
 
+        [Required]
+        public string FaceImagePath { get; set; }  // New field for face photo
+
         public VerificationStatus Status { get; set; } = VerificationStatus.Pending;
 
         public string RejectionReason { get; set; }

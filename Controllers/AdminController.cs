@@ -267,22 +267,17 @@ namespace PrimeMarket.Controllers
             else if (listing.SubCategory == "Desktops")
                 product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Tablets")
-
-                // Replace the problematic code block in the ListingDetails method with the following:
-
-                if (listing.SubCategory == "Tablets")
+            {
+                product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                if (product == null)
                 {
-                    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    if (product == null)
-                    {
-                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    }
-                    if (product == null)
-                    {
-                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    }
+                    product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                 }
-
+                if (product == null)
+                {
+                    product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                }
+            }
             else if (listing.SubCategory == "Washers")
                 product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Dishwashers")
@@ -295,8 +290,31 @@ namespace PrimeMarket.Controllers
                 product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Televisions")
                 product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Phone Accessories")
+                product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Tablet Accessories")
+                product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Computer Accessories")
+                product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+
+            // Get seller verification status
+            var sellerVerification = await _context.VerificationDocuments
+                .FirstOrDefaultAsync(v => v.UserId == listing.SellerId);
 
             ViewBag.Product = product;
+            ViewBag.SellerVerification = sellerVerification;
+            ViewBag.IsSellerVerified = listing.Seller?.IsIdVerified ?? false;
+
+            // Check if this is an updated listing
+            ViewBag.IsUpdatedListing = listing.UpdatedAt.HasValue &&
+                                       listing.UpdatedAt.Value > listing.CreatedAt.Value.AddMinutes(5);
+
+            // Get any previous versions/history of the listing if needed
+            ViewBag.ListingHistory = await _context.AdminActions
+                .Where(a => a.EntityType == "Listing" && a.EntityId == id)
+                .OrderByDescending(a => a.CreatedAt)
+                .ToListAsync();
+
             return View(listing);
         }
 
@@ -460,6 +478,9 @@ namespace PrimeMarket.Controllers
             {
                 return NotFound();
             }
+
+            // Ensure face image property is available in the view
+            ViewBag.FaceImagePath = verification.FaceImagePath ?? "/images/user-placeholder.png";
 
             return View(verification);
         }
