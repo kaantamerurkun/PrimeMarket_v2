@@ -224,7 +224,7 @@
     }
 
     .edit-form-container {
-        background-color: #f8f9fa;
+        background-color: #ffffff;
         border-radius: 20px;
         padding: 30px;
     }
@@ -650,67 +650,88 @@
 
             const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
 
-            const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
+    const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
 
-            if (!fieldDefinitions || fieldDefinitions.length === 0) {
-                fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
-                return;
-            }
-
-            fieldsContainer.innerHTML = '';
-
-            fieldDefinitions.forEach(field => {
-                const fieldDiv = document.createElement('div');
-                fieldDiv.className = 'form-group';
-
-                const label = document.createElement('label');
-                label.setAttribute('for', field.name);
-                label.textContent = field.label;
-                fieldDiv.appendChild(label);
-
-                const existingValue = dynamicProperties[field.name];
-
-                if (field.type === 'select') {
-                    const select = document.createElement('select');
-                    select.id = field.name;
-                    select.name = `DynamicProperties[${field.name}]`;
-                    select.className = 'form-control';
-
-                    const emptyOption = document.createElement('option');
-                    emptyOption.value = '';
-                    emptyOption.textContent = `Select ${field.label}`;
-                    select.appendChild(emptyOption);
-
-                    field.options.forEach(option => {
-                        const optEl = document.createElement('option');
-                        optEl.value = option;
-                        optEl.textContent = option;
-
-                        if (existingValue && existingValue.toLowerCase() === option.toLowerCase()) {
-                            optEl.selected = true;
-                        }
-
-                        select.appendChild(optEl);
-                    });
-
-                    fieldDiv.appendChild(select);
-                } else {
-                    const input = document.createElement('input');
-                    input.type = field.type || 'text';
-                    input.id = field.name;
-                    input.name = `DynamicProperties[${field.name}]`;
-                    input.className = 'form-control';
-                    input.placeholder = field.placeholder || '';
-
-                    if (existingValue) {
-                        input.value = existingValue;
-                    }
-
-                    fieldDiv.appendChild(input);
+                if (!fieldDefinitions || fieldDefinitions.length === 0) {
+                    fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
+                    return;
                 }
 
-                fieldsContainer.appendChild(fieldDiv);
-            });
+                fieldsContainer.innerHTML = '';
+
+                fieldDefinitions.forEach(field => {
+                    const fieldDiv = document.createElement('div');
+                    fieldDiv.className = 'form-group';
+
+                    const label = document.createElement('label');
+                    label.setAttribute('for', field.name);
+                    label.textContent = field.label;
+                    fieldDiv.appendChild(label);
+
+                    // Try to find value by exact match or case-insensitive match
+                    let existingValue = dynamicProperties[field.name];
+
+                    // If no exact match, try case-insensitive search
+                    if (!existingValue) {
+                        const keys = Object.keys(dynamicProperties);
+                        const matchedKey = keys.find(key => key.toLowerCase() === field.name.toLowerCase());
+                        if (matchedKey) {
+                            existingValue = dynamicProperties[matchedKey];
+                        }
+                    }
+
+                    if (field.type === 'select') {
+                        const select = document.createElement('select');
+                        select.id = field.name;
+                        select.name = `DynamicProperties[${field.name}]`;
+                        select.className = 'form-control';
+
+                        const emptyOption = document.createElement('option');
+                        emptyOption.value = '';
+                        emptyOption.textContent = `Select ${field.label}`;
+                        select.appendChild(emptyOption);
+
+                        field.options.forEach(option => {
+                            const optEl = document.createElement('option');
+                            optEl.value = option;
+                            optEl.textContent = option;
+
+                            // Check for matching value
+                            if (existingValue) {
+                                if (option.toLowerCase() === existingValue.toLowerCase()) {
+                                    optEl.selected = true;
+                                } else if (existingValue === 'True' && option === 'Yes') {
+                                    optEl.selected = true;
+                                } else if (existingValue === 'False' && option === 'No') {
+                                    optEl.selected = true;
+                                }
+                            }
+
+                            select.appendChild(optEl);
+                        });
+
+                        fieldDiv.appendChild(select);
+                    } else {
+                        const input = document.createElement('input');
+                        input.type = field.type || 'text';
+                        input.id = field.name;
+                        input.name = `DynamicProperties[${field.name}]`;
+                        input.className = 'form-control';
+                        input.placeholder = field.placeholder || '';
+
+                        if (existingValue) {
+                            input.value = existingValue;
+                        }
+
+                        fieldDiv.appendChild(input);
+                    }
+
+                    fieldsContainer.appendChild(fieldDiv);
+                });
+
+                // Log for debugging
+                console.log('Dynamic Properties:', dynamicProperties);
+                console.log('Field Definitions:', fieldDefinitions);
         }
 
 

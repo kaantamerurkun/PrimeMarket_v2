@@ -476,10 +476,11 @@ namespace PrimeMarket.Controllers
             };
 
             // Fetch product-specific properties
+            // Fetch product-specific properties
             var dynamicProperties = new Dictionary<string, string>();
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
-                dynamic? product = null;
+                object product = null;
                 // Get the appropriate product type based on subcategory
                 switch (listing.SubCategory)
                 {
@@ -491,77 +492,81 @@ namespace PrimeMarket.Controllers
                         product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Phones":
+                    case "Other Phone":
                         product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Phone Accessories":
+                    case "Phone Accessory":
                         product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
 
                     // Tablets
                     case "IOS Tablets":
+                    case "IOS Tablet":
                         product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Android Tablets":
+                    case "Android Tablet":
                         product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Tablets":
+                    case "Other Tablet":
                         product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Tablet Accessories":
+                    case "Tablet Accessory":
                         product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
 
                     // Computers
                     case "Laptops":
+                    case "Laptop":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Desktops":
+                    case "Desktop":
                         product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Accessories":
+                    case "Computer Accessory":
                         product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
 
                     // White Goods
                     case "Fridges":
+                    case "Fridge":
                         product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Washers":
+                    case "Washer":
                         product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Dishwashers":
+                    case "Dishwasher":
                         product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Ovens":
+                    case "Oven":
                         product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
 
                     // Electronics
                     case "Vacuum Cleaner":
+                    case "Vacuum Cleaners":
                         product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Televisions":
+                    case "Television":
                         product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-
-                    // Special handling for tablets since they are split across different types
-                    //case "Tablets":
-                    //    // Try each tablet type in order
-                    //    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    //    if (product == null)
-                    //    {
-                    //        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    //    }
-                    //    if (product == null)
-                    //    {
-                    //        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                    //    }
-                    //    break;
                 }
 
                 // If product is found, extract properties using reflection
                 if (product != null)
                 {
+                    // Log for debugging
+                    _logger.LogInformation("Found product of type {ProductType} for listing {ListingId}", product.GetType().Name, id);
+
                     foreach (var prop in product.GetType().GetProperties())
                     {
                         // Skip navigation or system properties
@@ -571,9 +576,22 @@ namespace PrimeMarket.Controllers
                         var value = prop.GetValue(product);
                         if (value != null)
                         {
-                            dynamicProperties[prop.Name] = value.ToString();
+                            if (prop.PropertyType == typeof(bool))
+                            {
+                                dynamicProperties[prop.Name] = value.ToString();
+                            }
+                            else
+                            {
+                                dynamicProperties[prop.Name] = value.ToString();
+                            }
+
+                            _logger.LogInformation("Added property {PropertyName} with value {Value}", prop.Name, value);
                         }
                     }
+                }
+                else
+                {
+                    _logger.LogWarning("No product found for subcategory '{SubCategory}' and listing ID {ListingId}", listing.SubCategory, id);
                 }
             }
 
