@@ -5,6 +5,7 @@
     int? uid = Context.Session.GetInt32("UserId");
     IEnumerable<Notification> notifications = Enumerable.Empty<Notification>();
     int unreadCount = 0;
+    string userProfileImagePath = Context.Session.GetString("UserProfileImagePath") ?? "/images/placeholder.png";
 
     if (uid.HasValue)
     {
@@ -16,6 +17,12 @@
                           .Take(5)
                           .ToList();
         unreadCount = notifications.Count();
+        // Get user profile image
+        var user = db.Users.FirstOrDefault(u => u.Id == uid.Value);
+        if (user != null && !string.IsNullOrEmpty(user.ProfileImagePath))
+        {
+            userProfileImagePath = user.ProfileImagePath;
+        }
     }
 }
 
@@ -29,214 +36,294 @@
     <title>@ViewBag.Title</title>
     <style>
         .verified-badge {
-            display: inline-flex;
-            align-items: center;
-            margin-left: 5px;
+        display: inline-flex;
+        align-items: center;
+        margin-left: 5px;
         }
 
-            .verified-badge img {
-                width: 16px;
-                height: 16px;
-            }
+        .verified-badge img {
+        width: 16px;
+        height: 16px;
+        }
 
         .search-box {
-            position: relative;
-            width: 300px;
+        position: relative;
+        width: 300px;
         }
 
-            .search-box input {
-                width: 100%;
-                padding: 8px 40px 8px 16px;
-                border: 1px solid #ddd;
-                border-radius: 50px;
-                outline: none;
-                transition: border-color 0.3s ease;
-            }
+        .search-box input {
+        width: 100%;
+        padding: 8px 40px 8px 16px;
+        border: 1px solid #ddd;
+        border-radius: 50px;
+        outline: none;
+        transition: border-color 0.3s ease;
+        }
 
-                .search-box input:focus {
-                    border-color: #0066cc;
-                }
+        .search-box input:focus {
+        border-color: #0066cc;
+        }
 
         .search-button {
-            position: absolute;
-            right: 5px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 8px;
+        position: absolute;
+        right: 5px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
         }
 
-        /* Notification styles */
-        .notification-wrapper {
-            position: relative;
-            display: inline-block;
+        /* User dropdown styles */
+        .user-dropdown-wrapper {
+        position: relative;
+        display: inline-block;
         }
 
-        .notification-icon {
-            position: relative;
+        .user-dropdown-trigger {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        cursor: pointer;
+        padding: 5px 10px;
+        border-radius: 5px;
+        text-decoration: none;
+        color: inherit;
+        transition: background-color 0.2s ease;
+        }
+
+        .user-dropdown-trigger:hover {
+        background-color: #f0f0f0;
+        }
+
+        .dropdown-arrow {
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 5px solid #333;
+        margin-left: 5px;
+        transition: transform 0.3s ease;
+        }
+
+        .user-dropdown-wrapper.open .dropdown-arrow {
+        transform: rotate(180deg);
+        }
+
+        .user-dropdown-menu {
+        display: none;
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 10px;
+        width: 250px;
+        background-color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border-radius: 8px;
+        z-index: 1000;
+        padding: 10px;
+        }
+
+        .user-dropdown-wrapper.open .user-dropdown-menu {
+        display: block;
+        }
+
+        .dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 10px;
+        color: #333;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.2s ease;
+        cursor: pointer;
+        width: 100%;
+        background: none;
+        border: none;
+        font-size: 14px;
+        text-align: left;
+        }
+
+        .dropdown-item:hover {
+        background-color: #f0f0f0;
+        }
+
+        .dropdown-item img {
+        width: 20px;
+        height: 20px;
+        }
+
+        .dropdown-divider {
+        height: 1px;
+        background-color: #eee;
+        margin: 5px 0;
+        }
+
+        .dropdown-item.notification-item {
+        position: relative;
         }
 
         .notification-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #dc3545;
-            color: white;
-            font-size: 10px;
-            font-weight: bold;
-            width: 15px;
-            height: 15px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        background-color: #dc3545;
+        color: white;
+        font-size: 10px;
+        font-weight: bold;
+        min-width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 3px;
         }
 
-        .notification-dropdown {
-            display: none;
-            position: absolute;
-            right: 0;
-            top: 40px;
-            width: 350px;
-            background-color: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-            border-radius: 8px;
-            z-index: 1000;
-            padding: 10px;
-            max-height: 400px;
-            overflow-y: auto;
+        /* Notification submenu */
+        .notification-submenu {
+        display: none;
+        position: absolute;
+        left: 100%;
+        top: 0;
+        width: 350px;
+        background-color: white;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        border-radius: 8px;
+        z-index: 1001;
+        padding: 10px;
+        max-height: 400px;
+        overflow-y: auto;
         }
 
-        .notification-dropdown.show {
-            display: block;
+        .notification-item.active .notification-submenu {
+        display: block;
         }
 
         .notification-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
-            margin-bottom: 10px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+        margin-bottom: 10px;
         }
 
         .notification-header h3 {
-            margin: 0;
-            font-size: 16px;
+        margin: 0;
+        font-size: 16px;
         }
 
         .mark-all-read {
-            background: none;
-            border: none;
-            color: #0066cc;
-            cursor: pointer;
-            font-size: 14px;
-            padding: 0;
+        background: none;
+        border: none;
+        color: #0066cc;
+        cursor: pointer;
+        font-size: 14px;
+        padding: 0;
         }
 
-        .notification-item {
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            border-left: 3px solid transparent;
+        .notification-list-item {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        border-left: 3px solid transparent;
         }
 
-        .notification-item:hover {
-            background-color: #f8f9fa;
+        .notification-list-item:hover {
+        background-color: #f8f9fa;
         }
 
-        .notification-item.unread {
-            background-color: #f0f7ff;
-            border-left-color: #0066cc;
+        .notification-list-item.unread {
+        background-color: #f0f7ff;
+        border-left-color: #0066cc;
         }
 
         .notification-content {
-            margin-bottom: 5px;
+        margin-bottom: 5px;
         }
 
         .notification-time {
-            font-size: 12px;
-            color: #888;
+        font-size: 12px;
+        color: #888;
         }
 
         .notification-footer {
-            text-align: center;
-            padding-top: 10px;
-            border-top: 1px solid #eee;
+        text-align: center;
+        padding-top: 10px;
+        border-top: 1px solid #eee;
         }
 
         .view-all-link {
-            color: #0066cc;
-            text-decoration: none;
-            font-size: 14px;
+        color: #0066cc;
+        text-decoration: none;
+        font-size: 14px;
         }
 
         .view-all-link:hover {
-            text-decoration: underline;
+        text-decoration: underline;
         }
 
         /* Style for searchpagestyle.css */
-        /* This is for the standalone search page */
-
         .search-body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f9f9f9;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f9f9f9;
         }
 
         .search-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 70vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 70vh;
         }
 
         .search-bar {
-            display: flex;
-            width: 60%;
-            max-width: 800px;
-            margin: 0 auto;
-            transition: all 0.3s ease;
+        display: flex;
+        width: 60%;
+        max-width: 800px;
+        margin: 0 auto;
+        transition: all 0.3s ease;
         }
 
-            .search-bar.focused {
-                width: 70%;
-            }
+        .search-bar.focused {
+        width: 70%;
+        }
 
-            .search-bar input {
-                flex: 1;
-                padding: 15px 20px;
-                border: 1px solid #ddd;
-                border-radius: 50px 0 0 50px;
-                font-size: 18px;
-                outline: none;
-                transition: border-color 0.3s ease;
-            }
+        .search-bar input {
+        flex: 1;
+        padding: 15px 20px;
+        border: 1px solid #ddd;
+        border-radius: 50px 0 0 50px;
+        font-size: 18px;
+        outline: none;
+        transition: border-color 0.3s ease;
+        }
 
-                .search-bar input:focus {
-                    border-color: #0066cc;
-                }
+        .search-bar input:focus {
+        border-color: #0066cc;
+        }
 
-            .search-bar button {
-                padding: 15px 30px;
-                background-color: #0066cc;
-                color: white;
-                border: none;
-                border-radius: 0 50px 50px 0;
-                cursor: pointer;
-                font-weight: bold;
-                transition: background-color 0.3s ease;
-            }
+        .search-bar button {
+        padding: 15px 30px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 0 50px 50px 0;
+        cursor: pointer;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+        }
 
-                .search-bar button:hover {
-                    background-color: #0055b3;
-                }
+        .search-bar button:hover {
+        background-color: #0055b3;
+        }
     </style>
 </head>
 <body>
@@ -253,64 +340,94 @@
                     </form>
                 </div>
 
-                <a asp-action="MyProfilePage" asp-controller="User" style="display: flex; align-items: center; text-decoration: none;">
-                    <span style="display: flex; align-items: center; gap: 5px;">
-                        @userName
-                        @if (isVerified)
-                        {
-                            <span class="verified-badge" style="display: inline-flex; vertical-align: middle;">
-                                <img src="/images/verified.png" alt="Verified" title="Verified User" style="width: 16px; height: 16px;" />
-                            </span>
-                        }
-                    </span>
-                </a>
-                <form asp-action="Logout" asp-controller="User" method="post" style="display: inline;">
-                    <button type="submit" class="btn-logout">Logout</button>
-                </form>
-
-                <!-- Unified Notification System -->
-                <div class="notification-wrapper">
-                    <div class="notification-icon" id="notificationIcon">
-                        <img src="/images/NotificationBell.png" alt="Notifications" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" />
-                        @if (unreadCount > 0)
-                        {
-                            <span class="notification-badge">@(unreadCount > 9 ? "9+" : unreadCount.ToString())</span>
-                        }
+                <!-- User dropdown menu -->
+                <div class="user-dropdown-wrapper" id="userDropdown">
+                    <div class="user-dropdown-trigger">
+                        <span style="display: flex; align-items: center; gap: 5px;">
+                            @userName
+                            @if (isVerified)
+                            {
+                                <span class="verified-badge" style="display: inline-flex; vertical-align: middle;">
+                                    <img src="/images/verified.png" alt="Verified" title="Verified User" style="width: 16px; height: 16px;" />
+                                </span>
+                            }
+                        </span>
+                        <span class="dropdown-arrow"></span>
                     </div>
-                    <div class="notification-dropdown" id="notificationDropdown">
-                        <div class="notification-header">
-                            <h3>Notifications</h3>
-                            <button class="mark-all-read" id="markAllReadBtn">Mark all as read</button>
-                        </div>
-                        <div id="notificationsList">
-                            @if (!notifications.Any())
+
+                    <div class="user-dropdown-menu">
+                        <a href="@Url.Action("MyProfilePage", "User")" class="dropdown-item">
+                            <img src=@userProfileImagePath alt="Profile" />
+                            My Profile
+                        </a>
+
+                        <div class="dropdown-item notification-item" id="notificationDropdownItem">
+                            <img src="/images/NotificationBell.png" alt="Notifications" />
+                            Notifications
+                            @if (unreadCount > 0)
                             {
-                                <div class="no-notifications" style="text-align: center; padding: 20px;">
-                                    <p>No notifications to display</p>
+                                <span class="notification-badge">@(unreadCount > 9 ? "9+" : unreadCount.ToString())</span>
+                            }
+
+                            <!-- Notification submenu -->
+                            <div class="notification-submenu" id="notificationSubmenu">
+                                <div class="notification-header">
+                                    <h3>Notifications</h3>
+                                    <button class="mark-all-read" id="markAllReadBtn">Mark all as read</button>
                                 </div>
-                            }
-                            else
-                            {
-                                foreach (var notification in notifications)
-                                {
-                                    <div class="notification-item @(!notification.IsRead ? "unread" : "")"
-                                         data-id="@notification.Id"
-                                         data-type="@notification.Type"
-                                         data-entity-id="@notification.RelatedEntityId">
-                                        <div class="notification-content">@notification.Message</div>
-                                        <div class="notification-time">@(((DateTime)notification.CreatedAt).ToString("MMM dd, yyyy HH:mm"))</div>
-                                    </div>
-                                }
-                            }
+                                <div id="notificationsList">
+                                    @if (!notifications.Any())
+                                    {
+                                        <div class="no-notifications" style="text-align: center; padding: 20px;">
+                                            <p>No notifications to display</p>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        foreach (var notification in notifications)
+                                        {
+                                            <div class="notification-list-item @(!notification.IsRead ? "unread" : "")"
+                                                 data-id="@notification.Id"
+                                                 data-type="@notification.Type"
+                                                 data-entity-id="@notification.RelatedEntityId">
+                                                <div class="notification-content">@notification.Message</div>
+                                                <div class="notification-time">@(((DateTime)notification.CreatedAt).ToString("MMM dd, yyyy HH:mm"))</div>
+                                            </div>
+                                        }
+                                    }
+                                </div>
+                                <div class="notification-footer">
+                                    <a href="@Url.Action("Index", "Notifications")" class="view-all-link">View all notifications</a>
+                                </div>
+                            </div>
                         </div>
-                        <div class="notification-footer">
-                            <a href="@Url.Action("Index", "Notifications")" class="view-all-link">View all notifications</a>
-                        </div>
+
+                        <a href="@Url.Action("Conversations", "Message")" class="dropdown-item">
+                            <img src="/images/MessagesIcon.png" alt="Messages" />
+                            Messages
+                        </a>
+
+                        <a href="@Url.Action("MyBookmarks", "User")" class="dropdown-item">
+                            <img src="/images/bookmark-button.png" alt="Bookmarks" />
+                            My Bookmarks
+                        </a>
+
+                        <a href="@Url.Action("Cart", "Payment")" class="dropdown-item">
+                            <img src="/images/shopping_cart_icon.png" alt="Shopping Cart" />
+                            Shopping Cart
+                        </a>
+
+                        <div class="dropdown-divider"></div>
+
+                        <form asp-action="Logout" asp-controller="User" method="post" style="display: inline; width: 100%;">
+                            <button type="submit" class="dropdown-item" style="color: #dc3545;">
+                                <img src="/images/logout-icon.png" alt="Logout" style="width: 20px; height: 20px;" />
+                                Logout
+                            </button>
+                        </form>
                     </div>
                 </div>
-                <a asp-action="Conversations" asp-controller="Message"><img style="margin-top:10px ; height: 25px; width: 25px;" src="/images/MessagesIcon.png" alt="Messages" /></a>
-                <a asp-action="MyBookmarks" asp-controller="User"><img style="margin-top:10px ; height: 25px; width: 25px;" src="/images/bookmark-button.png" alt="Bookmarks" /></a>
-                <a asp-action="Cart" asp-controller="Payment"><img style="margin-top:10px ; height: 25px; width: 25px;" src="/images/shopping_cart_icon.png" alt="Shopping Cart" /></a>
+
                 <a asp-action="CreateListing" asp-controller="User"><button class="btn-list">List an Item</button></a>
             </div>
         </div>
@@ -323,23 +440,40 @@
     <script src="/js/category-filtering.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // Notification dropdown toggle
-            const notificationIcon = document.getElementById('notificationIcon');
-            const notificationDropdown = document.getElementById('notificationDropdown');
-            const markAllReadBtn = document.getElementById('markAllReadBtn');
-            const notificationItems = document.querySelectorAll('.notification-item');
+            // User dropdown functionality
+            const userDropdown = document.getElementById('userDropdown');
+            const userDropdownTrigger = userDropdown.querySelector('.user-dropdown-trigger');
 
-            // Toggle dropdown
-            notificationIcon.addEventListener('click', function(e) {
+            userDropdownTrigger.addEventListener('click', function(e) {
                 e.stopPropagation();
-                notificationDropdown.classList.toggle('show');
+                userDropdown.classList.toggle('open');
             });
 
-            // Close when clicking outside
+            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
-                if (!notificationDropdown.contains(e.target) && e.target !== notificationIcon) {
-                    notificationDropdown.classList.remove('show');
+                if (!userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('open');
                 }
+            });
+
+            // Notification submenu functionality
+            const notificationDropdownItem = document.getElementById('notificationDropdownItem');
+            const notificationSubmenu = document.getElementById('notificationSubmenu');
+            const markAllReadBtn = document.getElementById('markAllReadBtn');
+            const notificationItems = document.querySelectorAll('.notification-list-item');
+
+            // Show/hide notification submenu
+            notificationDropdownItem.addEventListener('mouseenter', function() {
+                this.classList.add('active');
+            });
+
+            notificationDropdownItem.addEventListener('mouseleave', function() {
+                this.classList.remove('active');
+            });
+
+            // Prevent notification submenu from closing dropdown
+            notificationSubmenu.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
 
             // Mark all as read
@@ -355,7 +489,7 @@
                     .then(data => {
                         if (data.success) {
                             // Update UI
-                            document.querySelectorAll('.notification-item.unread').forEach(item => {
+                            document.querySelectorAll('.notification-list-item.unread').forEach(item => {
                                 item.classList.remove('unread');
                             });
                             // Remove badge

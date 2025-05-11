@@ -417,8 +417,32 @@
       "PackagePath": "staticwebassets\\images\\listings\\9_960c9059-dc92-49fd-95f4-d5cd3fd79cef.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\logout-icon.png",
+      "PackagePath": "staticwebassets\\images\\logout-icon.png"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\placeholder.png",
       "PackagePath": "staticwebassets\\images\\placeholder.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\14_233c28bd-8e0a-4613-a4ab-5a41411edf63.jpg",
+      "PackagePath": "staticwebassets\\images\\profiles\\14_233c28bd-8e0a-4613-a4ab-5a41411edf63.jpg"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\14_2a868b16-7c5b-48cd-9d6e-f57f8d9bbaaa.jpg",
+      "PackagePath": "staticwebassets\\images\\profiles\\14_2a868b16-7c5b-48cd-9d6e-f57f8d9bbaaa.jpg"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\14_4f68e75c-d203-48fa-a388-f0c23b225048.JPG",
+      "PackagePath": "staticwebassets\\images\\profiles\\14_4f68e75c-d203-48fa-a388-f0c23b225048.JPG"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\14_9906f896-6693-4ce1-9d37-645b2c386955.png",
+      "PackagePath": "staticwebassets\\images\\profiles\\14_9906f896-6693-4ce1-9d37-645b2c386955.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\14_abe225a1-e2ae-4c02-86d9-6573bfd23c63.jpg",
+      "PackagePath": "staticwebassets\\images\\profiles\\14_abe225a1-e2ae-4c02-86d9-6573bfd23c63.jpg"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\profiles\\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png",

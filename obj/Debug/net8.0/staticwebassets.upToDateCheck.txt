@@ -98,11 +98,17 @@ wwwroot\images\listings\9_0ac853fd-df95-4e95-ab14-0f3cea90a37c.png
 wwwroot\images\listings\9_18d872be-0b78-4a27-90b2-185b6b822677.png
 wwwroot\images\listings\9_59938bc5-49d9-43c0-a0f4-9c0d37fddd83.png
 wwwroot\images\listings\9_960c9059-dc92-49fd-95f4-d5cd3fd79cef.png
+wwwroot\images\logout-icon.png
 wwwroot\images\MessagesIcon.png
 wwwroot\images\NotificationBell.png
 wwwroot\images\placeholder.png
 wwwroot\images\PrimeMarket_Logo.png
 wwwroot\images\PrimeMarket_Logo_V2.png
+wwwroot\images\profiles\14_233c28bd-8e0a-4613-a4ab-5a41411edf63.jpg
+wwwroot\images\profiles\14_2a868b16-7c5b-48cd-9d6e-f57f8d9bbaaa.jpg
+wwwroot\images\profiles\14_4f68e75c-d203-48fa-a388-f0c23b225048.JPG
+wwwroot\images\profiles\14_9906f896-6693-4ce1-9d37-645b2c386955.png
+wwwroot\images\profiles\14_abe225a1-e2ae-4c02-86d9-6573bfd23c63.jpg
 wwwroot\images\profiles\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png
 wwwroot\images\shopping_cart_icon.png
 wwwroot\images\user-placeholder.png

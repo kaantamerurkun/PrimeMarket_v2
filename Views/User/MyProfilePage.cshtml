@@ -13,6 +13,13 @@
     <link rel="stylesheet" href="/css/MyProfilePage.css" />
     <title>My Profile</title>
     <style>
+        /* Main container with proper header spacing */
+        .main-content {
+            margin-top: 80px; /* Adjust this value based on your header height */
+            padding-top: 20px;
+            min-height: calc(100vh - 80px);
+        }
+
         .verified-badge {
             display: inline-flex;
             align-items: center;
@@ -48,7 +55,7 @@
         /* User details styling */
         .user-details-container {
             background-color: #f0f8ff;
-            margin-top: 12%;
+            margin-top: 0; /* Changed from 12% to 0 */
             width: 50%;
             border-radius: 10px;
             padding: 20px;
@@ -327,203 +334,313 @@
             color: white;
             border-radius: 50px;
         }
+
+        .profile-image-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .profile-image-wrapper {
+            position: relative;
+            width: 100%;
+        }
+
+        .profile-image {
+            width: 350px;
+            height: 350px;
+            max-width: 100%;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .user-details-container {
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            margin-top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Responsive styles */
+        @@media (max-width: 1024px) {
+            .profile-section-wrapper {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .profile-image {
+                width: 300px;
+                height: 300px;
+            }
+
+            .user-details-container {
+                width: 100%;
+                max-width: 600px;
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .main-content {
+                margin-top: 60px; /* Adjust for smaller header on mobile */
+            }
+
+            .profile-section-wrapper {
+                padding: 10px;
+            }
+
+            .profile-image {
+                width: 250px;
+                height: 250px;
+            }
+
+            .detail-item {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .detail-value {
+                text-align: left !important;
+            }
+        }
+
+        @@media (max-width: 480px) {
+            .profile-image {
+                width: 200px;
+                height: 200px;
+            }
+
+            .user-details-container {
+                padding: 15px;
+            }
+        }
+
+        /* Success message styling */
+        .success-message {
+            position: relative;
+            z-index: 1000;
+            background-color: #d4edda;
+            color: #155724;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 
 <body>
-    <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
-        <div style="margin-right: 20px; margin-left: 300px; position: relative;" class="profile-image-container">
-            <img src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)" alt="Profile Pic" width="350px" height="350px" />
-            @if (isVerified)
-            {
-                <div class="verification-badge">
-                    <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
-                </div>
-            }
-        </div>
-
-        <div style="flex: 1; text-align: left">
-            <div class="user-details-container">
-                <div class="detail-item">
-                    <span class="detail-label">Name:</span>
-                    <span class="detail-value">@Model.User.FirstName</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Last Name:</span>
-                    <span class="detail-value">@Model.User.LastName</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Email:</span>
-                    <span class="detail-value">@Model.User.Email</span>
-                </div>
-                <div class="detail-item">
-                    <span class="detail-label">Phone Number:</span>
-                    <span class="detail-value">@(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</span>
-                </div>
-            </div>
-
-            @if (isVerified)
-            {
-                <div class="user-verified-status">
-                    <img src="/images/verified.png" alt="Verified" width="16" height="16" style="margin-right: 5px;">
-                    <span>Your account is verified</span>
-                </div>
-            }
-            else
-            {
-                <div class="user-verified-status" style="color: #dc3545;">
-                    <span>Your account is not verified. Please verify your ID in Edit Profile.</span>
-                </div>
-            }
-            <br />
-
-            @if (TempData["SuccessMessage"] != null)
-            {
-                <div style="background-color: #d4edda; color: #155724; padding: 10px; border-radius: 4px; margin-bottom: 15px;">
-                    @TempData["SuccessMessage"]
-                </div>
-            }
-        </div>
-    </div>
-    <!-- Add this code to MyProfilePage.cshtml after the user details container and before the buttons div -->
-    <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
-        @if (Model.TotalRatings >= 0)
-        {
-            <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px;">
-                <div class="rating-info" style="display: flex; align-items: center; justify-content: center;">
-                    <span style="font-weight: bold; margin-right: 10px;">Your Seller Rating:</span>
-                    <div class="stars" style="color: #ffa500; margin-right: 10px;">
-                        @for (int i = 1; i <= 5; i++)
+    <div class="main-content">
+        <div style="display: flex; align-items: flex-start; justify-content: center; width: 100%; margin: 0 auto; padding: 20px;">
+            <div class="profile-section-wrapper" style="display: flex; align-items: stretch; gap: 20px; max-width: 1200px; width: 100%;">
+                <div class="profile-image-container" style="flex: 0 0 auto;">
+                    <div class="profile-image-wrapper" style="height: 100%; display: flex; align-items: center;">
+                        <img class="profile-image" src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)" alt="Profile Pic" />
+                        @if (isVerified)
                         {
-                            if (i <= Model.AverageRating)
-                            {
-                                <span>★</span>
-                            }
-                            else if (i - 0.5 <= Model.AverageRating)
-                            {
-                                <span>☆</span>
-                            }
-                            else
-                            {
-                                <span style="color: #ddd;">★</span>
-                            }
+                            <div class="verification-badge">
+                                <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                            </div>
                         }
                     </div>
-                    <span>@Model.AverageRating.ToString("0.0")/5 (@Model.TotalRatings reviews)</span>
                 </div>
-            </div>
-        }
-        else
-        {
-            <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px; text-align: center;">
-                <span>You haven't received any seller ratings yet.</span>
-            </div>
-        }
-    </div>
 
+                <div style="flex: 1; text-align: left">
+                    <div class="user-details-container">
+                        <div class="detail-item">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">@Model.User.FirstName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Name:</span>
+                            <span class="detail-value">@Model.User.LastName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">@Model.User.Email</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone Number:</span>
+                            <span class="detail-value">@(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</span>
+                        </div>
+                    </div>
 
-    <br>
-    <br>
-    <br>
-
-    <div style="display: flex; justify-content: center;">
-        <a asp-controller="User" asp-action="EditProfile">
-            <button class="btn-editprofile">Edit Profile</button>
-        </a>
-        <a asp-controller="User" asp-action="MyBookmarks">
-            <button style="margin-left:100px" class="btn-mybookmark">My Bookmarks</button>
-        </a>
-        <a asp-controller="Report" asp-action="MyProfitLossReport">
-            <button style="margin-left:100px" class="btn-profitlossreport">Profit & Loss Report</button>
-        </a>
-    </div>
-
-    <br />
-
-    <!-- My Listings Section -->
-    <div class="my-listings-section container" style="max-width: 85%; margin: 0 auto; text-align: center;">
-        <div class="listings-header">
-            <h2 style="text-align: center; width: 100%;">My Listings</h2>
-            <a href="@Url.Action("CreateListing", "User")" class="btn-new-listing" style="border-radius: 50px;">
-                <i class="fas fa-plus"></i> Create New Listing
-            </a>
-        </div>
-
-        <div class="listings-filter" style="justify-content: center;">
-            <button class="filter-btn active" data-filter="all" style="border-radius: 50px;">All</button>
-            <button class="filter-btn" data-filter="pending" style="border-radius: 50px;">Pending</button>
-            <button class="filter-btn" data-filter="approved" style="border-radius: 50px;">Approved</button>
-            <button class="filter-btn" data-filter="rejected" style="border-radius: 50px;">Rejected</button>
-            <button class="filter-btn" data-filter="sold" style="border-radius: 50px;">Sold</button>
-        </div>
-
-        <div class="my-listings-container">
-            @if (Model.Listings == null || Model.Listings.Count == 0)
-            {
-                <div class="empty-listings">
-                    <i class="fas fa-list-alt"></i>
-                    <p>You don't have any listings yet</p>
-                    <a href="@Url.Action("CreateListing", "User")" class="btn-create-first" style="border-radius: 50px;">Create Your First Listing</a>
-                </div>
-            }
-            else
-            {
-                <div class="listings-grid" style="max-width: 95%; margin: 0 auto;">
-                    @foreach (var listing in Model.Listings)
+                    @if (isVerified)
                     {
-                        string statusClass = listing.Status.ToString().ToLower();
-                        string mainImage = listing.Images != null && listing.Images.Any()
-                        ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
-                        : "/images/placeholder.png";
+                        <div class="user-verified-status">
+                            <img src="/images/verified.png" alt="Verified" width="16" height="16" style="margin-right: 5px;">
+                            <span>Your account is verified</span>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="user-verified-status" style="color: #dc3545;">
+                            <span>Your account is not verified. Please verify your ID in Edit Profile.</span>
+                        </div>
+                    }
+                    <br />
 
-                        <div class="listing-card @statusClass" data-status="@listing.Status.ToString().ToLower()" data-id="@listing.Id">
-                            <div class="listing-image">
-                                <img src="@mainImage" alt="@listing.Title">
-                                <div class="listing-status @statusClass" style="border-radius: 50px;">@listing.Status.ToString()</div>
-                            </div>
-                            <div class="listing-details">
-                                <h3>@listing.Title</h3>
-                                <p class="listing-price">@listing.Price.ToString("C")</p>
-                                <p class="listing-date">Listed on @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
-
-                                @if (listing.Status == PrimeMarket.Models.Enum.ListingStatus.Rejected)
-                                {
-                                    <div class="rejection-reason" style="border-radius: 50px;">
-                                        <p><strong>Rejection Reason:</strong> @listing.RejectionReason</p>
-                                    </div>
-                                }
-                            </div>
-                            <div class="listing-actions">
-                                <a href="@Url.Action("MyListing", "User", new { id = listing.Id })" class="btn-view" style="border-radius: 50px;">View</a>
-
-                                @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
-                                {
-                                    <a href="@Url.Action("EditListing", "Listing", new { id = listing.Id })" class="btn-edit" style="border-radius: 50px;">Edit</a>
-                                    <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>
-                                }
-                            </div>
+                    @if (TempData["SuccessMessage"] != null)
+                    {
+                        <div class="success-message" id="successMessage">
+                            @TempData["SuccessMessage"]
                         </div>
                     }
                 </div>
+            </div>
+        </div>
+        <!-- Add this code to MyProfilePage.cshtml after the user details container and before the buttons div -->
+        <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
+            @if (Model.TotalRatings >= 0)
+            {
+                <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px;">
+                    <div class="rating-info" style="display: flex; align-items: center; justify-content: center;">
+                        <span style="font-weight: bold; margin-right: 10px;">Your Seller Rating:</span>
+                        <div class="stars" style="color: #ffa500; margin-right: 10px;">
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                if (i <= Model.AverageRating)
+                                {
+                                    <span>★</span>
+                                }
+                                else if (i - 0.5 <= Model.AverageRating)
+                                {
+                                    <span>☆</span>
+                                }
+                                else
+                                {
+                                    <span style="color: #ddd;">★</span>
+                                }
+                            }
+                        </div>
+                        <span>@Model.AverageRating.ToString("0.0")/5 (@Model.TotalRatings reviews)</span>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="user-rating-container" style="background-color: #f0f8ff; width: 50%; border-radius: 10px; padding: 15px; margin-top: 20px; text-align: center;">
+                    <span>You haven't received any seller ratings yet.</span>
+                </div>
             }
         </div>
-    </div>
 
-    <!-- Delete Confirmation Modal -->
-    <div id="deleteModal" class="modal">
-        <div class="modal-content" style="border-radius: 50px;">
-            <span class="close">&times;</span>
-            <h2>Confirm Deletion</h2>
-            <p>Are you sure you want to delete this listing?</p>
-            <p>This action cannot be undone.</p>
-            <div class="modal-actions">
-                <button id="cancelDelete" class="btn-cancel" style="border-radius: 50px;">Cancel</button>
-                <button id="confirmDelete" class="btn-confirm" style="border-radius: 50px;">Delete</button>
+
+        <br>
+        <br>
+        <br>
+
+        <div style="display: flex; justify-content: center;">
+            <a asp-controller="User" asp-action="EditProfile">
+                <button class="btn-editprofile">Edit Profile</button>
+            </a>
+            <a asp-controller="User" asp-action="MyBookmarks">
+                <button style="margin-left:100px" class="btn-mybookmark">My Bookmarks</button>
+            </a>
+            <a asp-controller="Report" asp-action="MyProfitLossReport">
+                <button style="margin-left:100px" class="btn-profitlossreport">Profit & Loss Report</button>
+            </a>
+        </div>
+
+        <br />
+
+        <!-- My Listings Section -->
+        <div class="my-listings-section container" style="max-width: 85%; margin: 0 auto; text-align: center;">
+            <div class="listings-header">
+                <h2 style="text-align: center; width: 100%;">My Listings</h2>
+                <a href="@Url.Action("CreateListing", "User")" class="btn-new-listing" style="border-radius: 50px;">
+                    <i class="fas fa-plus"></i> Create New Listing
+                </a>
+            </div>
+
+            <div class="listings-filter" style="justify-content: center;">
+                <button class="filter-btn active" data-filter="all" style="border-radius: 50px;">All</button>
+                <button class="filter-btn" data-filter="pending" style="border-radius: 50px;">Pending</button>
+                <button class="filter-btn" data-filter="approved" style="border-radius: 50px;">Approved</button>
+                <button class="filter-btn" data-filter="rejected" style="border-radius: 50px;">Rejected</button>
+                <button class="filter-btn" data-filter="sold" style="border-radius: 50px;">Sold</button>
+            </div>
+
+            <div class="my-listings-container">
+                @if (Model.Listings == null || Model.Listings.Count == 0)
+                {
+                    <div class="empty-listings">
+                        <i class="fas fa-list-alt"></i>
+                        <p>You don't have any listings yet</p>
+                        <a href="@Url.Action("CreateListing", "User")" class="btn-create-first" style="border-radius: 50px;">Create Your First Listing</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="listings-grid" style="max-width: 95%; margin: 0 auto;">
+                        @foreach (var listing in Model.Listings)
+                        {
+                            string statusClass = listing.Status.ToString().ToLower();
+                            string mainImage = listing.Images != null && listing.Images.Any()
+                            ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
+                            : "/images/placeholder.png";
+
+                            <div class="listing-card @statusClass" data-status="@listing.Status.ToString().ToLower()" data-id="@listing.Id">
+                                <div class="listing-image">
+                                    <img src="@mainImage" alt="@listing.Title">
+                                    <div class="listing-status @statusClass" style="border-radius: 50px;">@listing.Status.ToString()</div>
+                                </div>
+                                <div class="listing-details">
+                                    <h3>@listing.Title</h3>
+                                    <p class="listing-price">@listing.Price.ToString("C")</p>
+                                    <p class="listing-date">Listed on @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
+
+                                    @if (listing.Status == PrimeMarket.Models.Enum.ListingStatus.Rejected)
+                                    {
+                                        <div class="rejection-reason" style="border-radius: 50px;">
+                                            <p><strong>Rejection Reason:</strong> @listing.RejectionReason</p>
+                                        </div>
+                                    }
+                                </div>
+                                <div class="listing-actions">
+                                    <a href="@Url.Action("MyListing", "User", new { id = listing.Id })" class="btn-view" style="border-radius: 50px;">View</a>
+
+                                    @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
+                                    {
+                                        <a href="@Url.Action("EditListing", "Listing", new { id = listing.Id })" class="btn-edit" style="border-radius: 50px;">Edit</a>
+                                        <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Delete Confirmation Modal -->
+        <div id="deleteModal" class="modal">
+            <div class="modal-content" style="border-radius: 50px;">
+                <span class="close">&times;</span>
+                <h2>Confirm Deletion</h2>
+                <p>Are you sure you want to delete this listing?</p>
+                <p>This action cannot be undone.</p>
+                <div class="modal-actions">
+                    <button id="cancelDelete" class="btn-cancel" style="border-radius: 50px;">Cancel</button>
+                    <button id="confirmDelete" class="btn-confirm" style="border-radius: 50px;">Delete</button>
+                </div>
             </div>
         </div>
     </div>
 
     <script>
+                setTimeout(function () {
+            var msg = document.getElementById('successMessage');
+            if (msg) {
+                msg.style.display = 'none';
+            }
+        }, 3000); // 3 seconds
         document.addEventListener('DOMContentLoaded', function() {
             // Filter buttons functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
