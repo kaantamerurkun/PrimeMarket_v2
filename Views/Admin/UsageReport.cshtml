@@ -424,26 +424,27 @@
         function filterUsers() {
             const searchTerm = document.getElementById('userSearch').value.toLowerCase();
             const table = document.getElementById('userTable');
-            const rows = table.querySelectorAll('tbody tr');
+            const allRows = table.querySelectorAll('tbody tr');
 
-            let visibleRows = [];
+            // Hide all rows initially
+            allRows.forEach(row => row.style.display = 'none');
 
-            rows.forEach(row => {
+            // Collect rows that contain the search term in the Name or Email column
+            const visibleRows = [];
+            allRows.forEach(row => {
                 const name = row.cells[0].textContent.toLowerCase();
                 const email = row.cells[1].textContent.toLowerCase();
-
                 if (name.includes(searchTerm) || email.includes(searchTerm)) {
                     visibleRows.push(row);
                 }
             });
 
-            // Reset pagination
+            // Reset to first page and update pagination for the filtered results
             currentPage = 1;
-
-            // Update pagination and show first page
             updatePagination(visibleRows);
             showPage(currentPage, visibleRows);
         }
+
     </script>
 
     <!-- Add Font Awesome for icons -->
