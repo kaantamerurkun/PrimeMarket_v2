@@ -1900,13 +1900,13 @@
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\category-filtering.js'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"fingerprint","Value":"akwjxycfzt"},{"Name":"integrity","Value":"sha256-ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY="},{"Name":"label","Value":"_content/PrimeMarket/js/category-filtering.js"}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"20621"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY=\u0022"},{"Name":"Last-Modified","Value":"Thu, 01 May 2025 10:06:11 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"max-age=31536000, immutable"},{"Name":"Content-Length","Value":"20621"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY=\u0022"},{"Name":"Last-Modified","Value":"Mon, 12 May 2025 18:44:34 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/PrimeMarket/js/category-filtering.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\category-filtering.js'))</AssetFile>
       <Selectors><![CDATA[[]]]></Selectors>
       <EndpointProperties><![CDATA[[{"Name":"integrity","Value":"sha256-ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY="}]]]></EndpointProperties>
-      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"20621"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY=\u0022"},{"Name":"Last-Modified","Value":"Thu, 01 May 2025 10:06:11 GMT"}]]]></ResponseHeaders>
+      <ResponseHeaders><![CDATA[[{"Name":"Accept-Ranges","Value":"bytes"},{"Name":"Cache-Control","Value":"no-cache"},{"Name":"Content-Length","Value":"20621"},{"Name":"Content-Type","Value":"text/javascript"},{"Name":"ETag","Value":"\u0022ZsuYQ/ANX6bDbVGIS\u002BUwMZW9C01kzNPLZa3jCBJWNyY=\u0022"},{"Name":"Last-Modified","Value":"Mon, 12 May 2025 18:44:34 GMT"}]]]></ResponseHeaders>
     </StaticWebAssetEndpoint>
     <StaticWebAssetEndpoint Include="_content/PrimeMarket/js/site.js">
       <AssetFile>$([System.IO.Path]::GetFullPath('$(MSBuildThisFileDirectory)..\staticwebassets\js\site.js'))</AssetFile>

@@ -3,6 +3,7 @@ using PrimeMarket.Data;
 using PrimeMarket.Models;
 using Microsoft.Extensions.Logging;
 using System.Text.Json.Serialization;
+using Microsoft.Build.Tasks;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,37 +74,31 @@ app.UseAuthorization();
 // Enable session - make sure this comes before endpoints
 app.UseSession();
 
-// Initialize database if needed
+// Fix for CS0136: Renamed the inner 'scope' variable to 'innerScope' to avoid name conflict.
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
-    try
+    using (var innerScope = app.Services.CreateScope()) // Renamed 'scope' to 'innerScope'
     {
-        var context = services.GetRequiredService<ApplicationDbContext>();
-
-        // Ensure database is created (this will apply migrations if needed)
-        context.Database.EnsureCreated();
-
-        // Check if we need to seed an admin account
-        if (!context.Admins.Any())
+        var innerServices = innerScope.ServiceProvider;
+        try
         {
-            // Create default admin account
-            context.Admins.Add(new Admin
-            {
-                Username = "admin",
-                Password = "admin123", // In a real app, this would be hashed
-                CreatedAt = DateTime.UtcNow
-            });
-            context.SaveChanges();
+            var context = innerServices.GetRequiredService<ApplicationDbContext>();
 
-            var logger = services.GetRequiredService<ILogger<Program>>();
-            logger.LogInformation("Database seeded with default admin account");
+            // Ensure database is created (this will apply migrations if needed)
+            context.Database.EnsureCreated();
+
+            // Reset database tables Not: SAKIN BURAYI YORUMDAN ÇIKARTMA AMINA KORUM YOKSA!!!
+            //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'DELETE FROM ?'");
+            //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL'");
+            //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'IF OBJECTPROPERTY(OBJECT_ID(''?''), ''TableHasIdentity'') = 1 DBCC CHECKIDENT (''?'', RESEED, 0)'");
         }
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while initializing the database.");
+        catch (Exception ex)
+        {
+            var logger = innerServices.GetRequiredService<ILogger<Program>>();
+            logger.LogError(ex, "An error occurred while initializing the database.");
+        }
     }
 }
 

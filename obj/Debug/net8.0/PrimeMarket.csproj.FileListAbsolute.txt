@@ -84,7 +84,6 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Microsoft.IdentityModel.Protocols.OpenIdConnect.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Microsoft.IdentityModel.Tokens.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Microsoft.SqlServer.Server.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Microsoft.Win32.SystemEvents.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Mono.TextTemplating.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.ClientModel.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.CodeDom.dll
@@ -95,17 +94,14 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Composition.TypedParts.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Configuration.ConfigurationManager.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Diagnostics.DiagnosticSource.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Drawing.Common.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Formats.Asn1.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.IdentityModel.Tokens.Jwt.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.IO.Pipelines.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Memory.Data.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Runtime.Caching.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Security.Cryptography.ProtectedData.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Security.Permissions.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Text.Encodings.Web.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Text.Json.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Windows.Extensions.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\cs\Microsoft.CodeAnalysis.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\de\Microsoft.CodeAnalysis.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\es\Microsoft.CodeAnalysis.resources.dll
@@ -177,13 +173,8 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win-arm64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win\lib\net6.0\Microsoft.Win32.SystemEvents.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\unix\lib\net6.0\System.Drawing.Common.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Drawing.Common.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Runtime.Caching.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Security.Cryptography.ProtectedData.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
-C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\runtimes\win\lib\net6.0\System.Windows.Extensions.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\scopedcss\bundle\PrimeMarket.styles.css
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.development.json
@@ -383,3 +374,5 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\zh-Hant\FSharp.Core.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Newtonsoft.Json.dll
+C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Microsoft.NET.StringTools.dll
+C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\System.Resources.Extensions.dll

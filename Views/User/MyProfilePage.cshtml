@@ -468,7 +468,7 @@
             <div class="profile-section-wrapper" style="display: flex; align-items: stretch; gap: 20px; max-width: 1200px; width: 100%;">
                 <div class="profile-image-container" style="flex: 0 0 auto;">
                     <div class="profile-image-wrapper" style="height: 100%; display: flex; align-items: center;">
-                        <img class="profile-image" src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)" alt="Profile Pic" />
+                        <img class="profile-image" src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/placeholder.png" : Model.User.ProfileImagePath)" alt="Profile Pic" />
                         @if (isVerified)
                         {
                             <div class="verification-badge">
