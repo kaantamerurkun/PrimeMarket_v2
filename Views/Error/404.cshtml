@@ -1,0 +1,32 @@
+﻿@page "/404"
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>404 - Not Found</title>
+    <link rel="stylesheet" href="~/css/404.css" />
+</head>
+<body>
+    <div class="not-found-container">
+        <h1>🛒 404 - This product (page) is out of stock!</h1>
+        <p>Oops! The page you're looking for is not on our shelves. Maybe it never existed or has been discontinued.</p>
+        @{
+            var isUserLoggedIn = Context.Session.GetInt32("UserId") != null;
+            if (isUserLoggedIn)
+            {
+                <p>Let's go back <a asp-action="User_MainPage" asp-controller="User" class="btn btn-primary">home</a> and continue shopping!</p>
+            }
+            else
+            {
+                <p>Let's go back <a asp-action="Index" asp-controller="Home" class="btn btn-primary">home</a> and continue shopping!</p>
+            }
+        }
+        <p><button id="searchButton" class="btn btn-secondary">Search Anyway</button></p>
+        <p id="searchStatus"></p>
+    </div>
+    <script src="~/js/404.js"></script>
+</body>
+</html>

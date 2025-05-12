@@ -1,6 +1,6 @@
 {
   "Version": 1,
-  "Hash": "r0RSyLFUQh933p7xOa1Id1tbItla6nLGflGD8ElOfV4=",
+  "Hash": "GVxScoCNjpS0KNhY5wWUXifOYsfDwXgMIFcBaDjntLM=",
   "Source": "PrimeMarket",
   "BasePath": "_content/PrimeMarket",
   "Mode": "Default",
@@ -16,6 +16,27 @@
     }
   ],
   "Assets": [
+    {
+      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\css\\404.css",
+      "SourceId": "PrimeMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\",
+      "BasePath": "_content/PrimeMarket",
+      "RelativePath": "css/404#[.{fingerprint}]?.css",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "udaobb61t5",
+      "Integrity": "kuHZiPXKSp0+rT3PYIbEKvpRiUYSqZe9bIlDlX2He7s=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\css\\404.css"
+    },
     {
       "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\css\\AdminDashboard.css",
       "SourceId": "PrimeMarket",
@@ -3188,6 +3209,27 @@
       "OriginalItemSpec": "wwwroot\\images\\verified.png"
     },
     {
+      "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\404.js",
+      "SourceId": "PrimeMarket",
+      "SourceType": "Discovered",
+      "ContentRoot": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\",
+      "BasePath": "_content/PrimeMarket",
+      "RelativePath": "js/404#[.{fingerprint}]?.js",
+      "AssetKind": "All",
+      "AssetMode": "All",
+      "AssetRole": "Primary",
+      "AssetMergeBehavior": "",
+      "AssetMergeSource": "",
+      "RelatedAsset": "",
+      "AssetTraitName": "",
+      "AssetTraitValue": "",
+      "Fingerprint": "25d7a6dd7j",
+      "Integrity": "uo/aA7IUazeaI+DOrjeC0F4okyxR2PLJ0Dgc98uqPvE=",
+      "CopyToOutputDirectory": "Never",
+      "CopyToPublishDirectory": "PreserveNewest",
+      "OriginalItemSpec": "wwwroot\\js\\404.js"
+    },
+    {
       "Identity": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\category-filtering.js",
       "SourceId": "PrimeMarket",
       "SourceType": "Discovered",
@@ -4428,6 +4470,88 @@
     }
   ],
   "Endpoints": [
+    {
+      "Route": "css/404.css",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\css\\404.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1722"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"kuHZiPXKSp0+rT3PYIbEKvpRiUYSqZe9bIlDlX2He7s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 12 May 2025 11:10:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-kuHZiPXKSp0+rT3PYIbEKvpRiUYSqZe9bIlDlX2He7s="
+        }
+      ]
+    },
+    {
+      "Route": "css/404.udaobb61t5.css",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\css\\404.css",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "1722"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/css"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"kuHZiPXKSp0+rT3PYIbEKvpRiUYSqZe9bIlDlX2He7s=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 12 May 2025 11:10:57 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "udaobb61t5"
+        },
+        {
+          "Name": "label",
+          "Value": "css/404.css"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-kuHZiPXKSp0+rT3PYIbEKvpRiUYSqZe9bIlDlX2He7s="
+        }
+      ]
+    },
     {
       "Route": "css/AdminDashboard.css",
       "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\css\\AdminDashboard.css",
@@ -16807,6 +16931,88 @@
         {
           "Name": "integrity",
           "Value": "sha256-7m8RWafJFdfF0qYQ0Q2pq4U/t+/ySiYe9TnmLi1EK9U="
+        }
+      ]
+    },
+    {
+      "Route": "js/404.25d7a6dd7j.js",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\404.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "910"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uo/aA7IUazeaI+DOrjeC0F4okyxR2PLJ0Dgc98uqPvE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 12 May 2025 11:10:00 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "max-age=31536000, immutable"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "fingerprint",
+          "Value": "25d7a6dd7j"
+        },
+        {
+          "Name": "label",
+          "Value": "js/404.js"
+        },
+        {
+          "Name": "integrity",
+          "Value": "sha256-uo/aA7IUazeaI+DOrjeC0F4okyxR2PLJ0Dgc98uqPvE="
+        }
+      ]
+    },
+    {
+      "Route": "js/404.js",
+      "AssetFile": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\404.js",
+      "Selectors": [],
+      "ResponseHeaders": [
+        {
+          "Name": "Accept-Ranges",
+          "Value": "bytes"
+        },
+        {
+          "Name": "Content-Length",
+          "Value": "910"
+        },
+        {
+          "Name": "Content-Type",
+          "Value": "text/javascript"
+        },
+        {
+          "Name": "ETag",
+          "Value": "\"uo/aA7IUazeaI+DOrjeC0F4okyxR2PLJ0Dgc98uqPvE=\""
+        },
+        {
+          "Name": "Last-Modified",
+          "Value": "Mon, 12 May 2025 11:10:00 GMT"
+        },
+        {
+          "Name": "Cache-Control",
+          "Value": "no-cache"
+        }
+      ],
+      "EndpointProperties": [
+        {
+          "Name": "integrity",
+          "Value": "sha256-uo/aA7IUazeaI+DOrjeC0F4okyxR2PLJ0Dgc98uqPvE="
         }
       ]
     },

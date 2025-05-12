@@ -45,6 +45,8 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+app.UseStatusCodePagesWithReExecute("/404");
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

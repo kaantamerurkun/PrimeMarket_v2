@@ -1,3 +1,4 @@
+wwwroot\css\404.css
 wwwroot\css\AdminDashboard.css
 wwwroot\css\AdminLogin.css
 wwwroot\css\AllMessages.css
@@ -149,6 +150,7 @@ wwwroot\images\verification\front_19_587afc38-51c2-4537-9b79-1c217622e7d5.png
 wwwroot\images\verification\front_20_a1386817-5b5d-449b-b156-57794622692c.png
 wwwroot\images\verification\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg
 wwwroot\images\verified.png
+wwwroot\js\404.js
 wwwroot\js\category-filtering.js
 wwwroot\js\site.js
 wwwroot\lib\bootstrap\dist\css\bootstrap.css
