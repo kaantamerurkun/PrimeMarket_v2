@@ -98,9 +98,25 @@
             </div>
         </main>
     </center>
-
+    <div id="successModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+        <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width:500px; border-radius:8px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+            <div style="margin-bottom:15px; color:#4CAF50;">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                    <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                </svg>
+            </div>
+            <h2 style="margin-bottom:15px; color:#333;">Listing Created Successfully!</h2>
+            <p style="margin-bottom:20px; color:#555; font-size:16px;">Your listing has been submitted and is now pending admin approval.</p>
+            <div class="progress-bar" style="height:5px; width:100%; background-color:#f1f1f1; border-radius:3px; margin-bottom:15px;">
+                <div class="progress" style="height:100%; width:0; background-color:#4CAF50; border-radius:3px; transition:width 3s linear;"></div>
+            </div>
+            <p id="redirectMessage" style="font-size:14px; color:#777;">Redirecting to your profile in 3 seconds...</p>
+        </div>
+    </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            // Category selection data and handlers
             const allCategories = {
                 "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
                 "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
@@ -438,44 +454,43 @@
                 }
             });
 
-        continueBtn.addEventListener("click", () => {
-            if (
-                !selectedCondition ||
-                !selectedCategory ||
-                (subcategories.style.visibility === "visible" && !selectedSubcategory) ||
-                (details.style.visibility === "visible" && details.childElementCount > 0 && !selectedDetail)
-            ) {
-                alert("Please make sure to select all category levels before continuing.");
-                return;
-            }
+            continueBtn.addEventListener("click", () => {
+                if (
+                    !selectedCondition ||
+                    !selectedCategory ||
+                    (subcategories.style.visibility === "visible" && !selectedSubcategory) ||
+                    (details.style.visibility === "visible" && details.childElementCount > 0 && !selectedDetail)
+                ) {
+                    alert("Please make sure to select all category levels before continuing.");
+                    return;
+                }
 
-            document.querySelector(".selection-grid").style.display = "none";
-            document.getElementById("categoryHeaderWrapper").style.display = "none";
-            continueBtn.style.display = "none";
-            formContainer.style.display = "block";
-            document.getElementById("backToCategory").style.display = "block";
+                document.querySelector(".selection-grid").style.display = "none";
+                document.getElementById("categoryHeaderWrapper").style.display = "none";
+                continueBtn.style.display = "none";
+                formContainer.style.display = "block";
+                document.getElementById("backToCategory").style.display = "block";
 
-            document.getElementById("hiddenCondition").value = selectedCondition;
-            document.getElementById("hiddenCategory").value = selectedCategory;
-            document.getElementById("hiddenSubcategory").value = selectedSubcategory;
-            document.getElementById("hiddenDetail").value = selectedDetail || "";
+                document.getElementById("hiddenCondition").value = selectedCondition;
+                document.getElementById("hiddenCategory").value = selectedCategory;
+                document.getElementById("hiddenSubcategory").value = selectedSubcategory;
+                document.getElementById("hiddenDetail").value = selectedDetail || "";
 
-            // Add stock field if First-Hand condition is selected
-            if (selectedCondition === "First-Hand" && !document.getElementById("stock")) {
-                const stockField = document.createElement("div");
-                stockField.innerHTML = `
-                    <label for="stock">Stock Quantity:</label>
-                    <input style="border-radius:50px" type="number" id="stock" name="Stock" placeholder="Enter available quantity" min="1" required />
-                `;
+                // Add stock field if First-Hand condition is selected
+                if (selectedCondition === "First-Hand" && !document.getElementById("stock")) {
+                    const stockField = document.createElement("div");
+                    stockField.innerHTML = `
+                        <label for="stock">Stock Quantity:</label>
+                        <input style="border-radius:50px" type="number" id="stock" name="Stock" placeholder="Enter available quantity" min="1" required />
+                    `;
 
-                const form = document.querySelector("#detailsForm form");
-                const insertBeforeEl = form.querySelector("label"); // Insert before first label
-                form.insertBefore(stockField, insertBeforeEl);
-            }
+                    const form = document.querySelector("#detailsForm form");
+                    const insertBeforeEl = form.querySelector("label"); // Insert before first label
+                    form.insertBefore(stockField, insertBeforeEl);
+                }
 
-            generateDynamicFields();
-        });
-
+                generateDynamicFields();
+            });
 
             document.querySelector(".btn-back").addEventListener("click", () => {
                 document.querySelector(".selection-grid").style.display = "grid";
@@ -503,7 +518,7 @@
                 }
             });
 
-            // Form submission
+            // Form submission with modal
             listingForm.addEventListener('submit', function(e) {
                 // Basic validation before submit
                 const title = document.getElementById('title').value;
@@ -518,11 +533,117 @@
                     return false;
                 }
 
+                // Prevent default form submission
+                e.preventDefault();
+
                 // Set button to loading state
                 const submitButton = this.querySelector('button[type="submit"]');
                 submitButton.disabled = true;
                 submitButton.textContent = 'Creating listing...';
+
+                // Create FormData object to send all form data including files
+                const formData = new FormData(this);
+
+                // Submit form via AJAX
+                fetch(this.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    // Check if response is redirect (success) or HTML content (validation errors)
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('text/html')) {
+                        return response.text().then(html => {
+                            if (html.includes('ErrorMessage')) {
+                                // Show validation errors
+                                document.open();
+                                document.write(html);
+                                document.close();
+                                return { success: false };
+                            } else {
+                                return { success: true };
+                            }
+                        });
+                    } else {
+                        // Successful redirect
+                        return { success: true };
+                    }
+                })
+                .then(result => {
+                    if (result.success) {
+                        // Show success modal
+                        showSuccessModal();
+                    } else {
+                        // Reset submit button if there was an error
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'List the Item';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error submitting form:', error);
+                    // Fall back to traditional form submission in case of AJAX error
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'List the Item';
+                    alert('There was an error submitting your form. Please try again.');
+                });
             });
+
+            // Function to show success modal
+            function showSuccessModal() {
+                // Create modal if it doesn't exist
+                if (!document.getElementById('successModal')) {
+                    const modalHtml = `
+                        <div id="successModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
+                            <div class="modal-content" style="background-color:#fefefe; margin:15% auto; padding:20px; border:1px solid #888; width:80%; max-width:500px; border-radius:8px; text-align:center; box-shadow:0 4px 8px rgba(0,0,0,0.2);">
+                                <div style="margin-bottom:15px; color:#4CAF50;">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                                    </svg>
+                                </div>
+                                <h2 style="margin-bottom:15px; color:#333;">Listing Created Successfully! Listing has been sent to admins for approval</h2>
+                                <p style="margin-bottom:20px; color:#555; font-size:16px;">Your listing has been submitted and is now pending admin approval.</p>
+                                <div class="progress-bar" style="height:5px; width:100%; background-color:#f1f1f1; border-radius:3px; margin-bottom:15px;">
+                                    <div class="progress" style="height:100%; width:0; background-color:#4CAF50; border-radius:3px; transition:width 3s linear;"></div>
+                                </div>
+                                <p id="redirectMessage" style="font-size:14px; color:#777;">Redirecting to your profile in 3 seconds...</p>
+                            </div>
+                        </div>
+                    `;
+
+                    const modalContainer = document.createElement('div');
+                    modalContainer.innerHTML = modalHtml;
+                    document.body.appendChild(modalContainer.firstElementChild);
+                }
+
+                const modal = document.getElementById('successModal');
+                const progressBar = modal.querySelector('.progress');
+
+                // Show the modal
+                modal.style.display = 'block';
+
+                // Animate the progress bar
+                setTimeout(() => {
+                    progressBar.style.width = '100%';
+                }, 100);
+
+                // Set the countdown and redirect
+                let secondsLeft = 3;
+                const redirectMessage = document.getElementById('redirectMessage');
+
+                const countdown = setInterval(() => {
+                    secondsLeft--;
+                    if (secondsLeft <= 0) {
+                        clearInterval(countdown);
+                        window.location.href = '/User/MyProfilePage';
+                    } else {
+                        redirectMessage.textContent = `Redirecting to your profile in ${secondsLeft} seconds...`;
+                    }
+                }, 1000);
+            }
         });
     </script>
 </body>

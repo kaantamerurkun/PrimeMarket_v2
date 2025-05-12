@@ -13,7 +13,6 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Globalization;
-using System.Reflection;
 
 
 namespace PrimeMarket.Controllers
@@ -191,7 +190,7 @@ namespace PrimeMarket.Controllers
                 ViewBag.SelectedDetailCategory = model.DetailCategory;
 
                 // Return to the create view with the model to retain form data
-                return View("~/Views/User/CreateListing.cshtml", model);
+                return View("~/Views/User/MyProfilePage.cshtml", model);
             }
 
             try
@@ -417,7 +416,7 @@ namespace PrimeMarket.Controllers
             {
                 _logger.LogError(ex, "Error creating listing: {ErrorMessage}", ex.Message);
                 ModelState.AddModelError("", $"Error creating listing: {ex.Message}");
-                return View("~/Views/User/CreateListing.cshtml", model);
+                return View("~/Views/User/MyProfilePage.cshtml", model);
             }
         }
 

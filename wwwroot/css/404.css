@@ -2,6 +2,7 @@
     margin: 0;
     padding: 0;
     background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
 }
 
 .not-found-container {
@@ -12,7 +13,7 @@
     border-radius: 8px;
     padding: 40px;
     text-align: center;
-    font-family: "Segoe UI", Tahoma, sans-serif;
+    font-family: Arial, sans-serif;
     color: #333;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
@@ -33,7 +34,7 @@
     margin: 5px;
     font-size: 1em;
     text-decoration: none;
-    border-radius: 5px;
+    border-radius: 50px;
     cursor: pointer;
 }
 

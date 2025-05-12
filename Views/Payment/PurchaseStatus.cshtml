@@ -1,4 +1,10 @@
 ﻿<style>
+    .container {
+        max-width: 1000px;
+        margin: 120px auto 50px auto;
+        padding: 0 15px;
+    }
+
     .logo img {
         width: 120px;
         height: 50px;
@@ -188,7 +194,7 @@
         background-color: #0066cc;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         transition: background-color 0.3s ease;
     }
@@ -365,17 +371,17 @@
 
                     <form method="post" action="@Url.Action("ConfirmShipping", "Payment")">
                         @Html.AntiForgeryToken()
-                        <input type="hidden" name="purchaseId" value="@Model.PurchaseId" />
+                        <input style="border-radius:50px" type="hidden" name="purchaseId" value="@Model.PurchaseId" />
 
                         <div class="form-group">
                             <label for="trackingNumber">Tracking Number (optional)</label>
-                            <input type="text" id="trackingNumber" name="trackingNumber" class="form-control"
+                            <input style="border-radius:50px" type="text" id="trackingNumber" name="trackingNumber" class="form-control"
                                    placeholder="Enter tracking number" />
                         </div>
 
                         <div class="form-group">
                             <label for="shippingProvider">Shipping Provider (optional)</label>
-                            <input type="text" id="shippingProvider" name="shippingProvider" class="form-control"
+                            <input style="border-radius:50px" type="text" id="shippingProvider" name="shippingProvider" class="form-control"
                                    placeholder="Enter shipping provider" />
                         </div>
 

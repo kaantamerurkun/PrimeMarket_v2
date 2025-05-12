@@ -13,7 +13,9 @@ namespace PrimeMarket.Controllers
         [Route("404")]
         public IActionResult NotFoundPage()
         {
-            return View("404"); // Views/Error/404.cshtml dosyasını döner
+            bool isUserLoggedIn = HttpContext.Session.GetInt32("UserId") != null;
+            ViewBag.IsUserLoggedIn = isUserLoggedIn;
+            return View("404");
         }
     }
 }

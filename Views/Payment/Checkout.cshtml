@@ -67,7 +67,7 @@
                 </div>
 
                 <div class="payment-actions">
-                    <a href="@Url.Action("User_Listing_Details", "User", new { id = Model.ListingId })" class="btn-cancel">Cancel</a>
+                    <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" class="btn-cancel">Cancel</a>
                     <button type="submit" class="btn-pay">Pay Now @Model.ListingPrice.ToString("C")</button>
                 </div>
             </form>
@@ -76,6 +76,11 @@
 </div>
 
 <style>
+    .container {
+        margin: 120px auto 50px auto; /* top, horizontal center, bottom */
+        max-width: 1000px;
+    }
+
     .logo img {
         width: 120px;
         height: 50px;
@@ -166,7 +171,7 @@
         width: 100%;
         padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 50px;
         font-size: 16px;
     }
 
@@ -186,7 +191,7 @@
         background-color: #f0f0f0;
         color: #333;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         text-decoration: none;
         display: inline-block;
@@ -198,7 +203,7 @@
         background-color: #0066cc;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
     }
@@ -206,6 +211,10 @@
         .btn-pay:hover {
             background-color: #0055b3;
         }
+        .btn-cancel:hover {
+        background-color: #dc5455;
+        color: white;
+    }
 
     .alert-danger {
         background-color: #f8d7da;

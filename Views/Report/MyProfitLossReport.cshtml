@@ -1,4 +1,5 @@
 ﻿@model PrimeMarket.Models.ViewModel.ProfitLossReportViewModel
+@using Newtonsoft.Json
 @{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
     ViewData["Title"] = "Profit & Loss Report";
@@ -46,7 +47,7 @@
 
     <div class="chart-container">
         <h2>Revenue Over Time</h2>
-        <canvas id="revenueChart"></canvas>
+        <canvas id="revenueChart" width="1000" height="400"></canvas>
     </div>
 
     @if (Model.TopCategories != null && Model.TopCategories.Any())
@@ -118,6 +119,7 @@
         object-fit: cover;
         border-radius: 8px;
     }
+
     .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -158,10 +160,10 @@
         transition: all 0.2s ease-in-out;
     }
 
-    .btn-refresh:hover {
-        background-color: #0066cc;
-        color: #fff;
-    }
+        .btn-refresh:hover {
+            background-color: #0066cc;
+            color: #fff;
+        }
 
     .period-label {
         margin-bottom: 20px;
@@ -223,21 +225,21 @@
         margin-bottom: 30px;
     }
 
-    .chart-container h2 {
-        margin-top: 0;
-        margin-bottom: 20px;
-        text-align: center;
-        font-size: 20px;
-    }
+        .chart-container h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 20px;
+        }
 
     .top-categories {
         margin-bottom: 30px;
     }
 
-    .top-categories h2 {
-        margin-bottom: 20px;
-        font-size: 20px;
-    }
+        .top-categories h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
 
     .categories-grid {
         display: grid;
@@ -252,11 +254,11 @@
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
     }
 
-    .category-card h3 {
-        margin-top: 0;
-        margin-bottom: 10px;
-        font-size: 16px;
-    }
+        .category-card h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
 
     .category-count {
         color: #666;
@@ -293,10 +295,10 @@
         margin-bottom: 30px;
     }
 
-    .recent-sales h2 {
-        margin-bottom: 20px;
-        font-size: 20px;
-    }
+        .recent-sales h2 {
+            margin-bottom: 20px;
+            font-size: 20px;
+        }
 
     .table-responsive {
         overflow-x: auto;
@@ -307,30 +309,30 @@
         border-collapse: collapse;
     }
 
-    .sales-table th, .sales-table td {
-        padding: 12px 15px;
-        text-align: left;
-        border-bottom: 1px solid #f0f0f0;
-    }
+        .sales-table th, .sales-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #f0f0f0;
+        }
 
-    .sales-table th {
-        background-color: #f8f9fa;
-        font-weight: bold;
-        color: #333;
-    }
+        .sales-table th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+            color: #333;
+        }
 
-    .sales-table tbody tr:hover {
-        background-color: #f8f9fa;
-    }
+        .sales-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
 
     .listing-info a {
         color: #0066cc;
         text-decoration: none;
     }
 
-    .listing-info a:hover {
-        text-decoration: underline;
-    }
+        .listing-info a:hover {
+            text-decoration: underline;
+        }
 
     .amount {
         font-weight: bold;
@@ -372,9 +374,9 @@
             width: 100%;
         }
 
-        .time-filter select {
-            width: 100%;
-        }
+            .time-filter select {
+                width: 100%;
+            }
 
         .btn-refresh {
             width: 100%;
@@ -387,66 +389,110 @@
             gap: 5px;
         }
     }
+    .chart-container canvas {
+        width: 100%;
+        display: block;
+    }
 </style>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     function changeTimeRange(range) {
         window.location.href = '@Url.Action("MyProfitLossReport", "Report")?timeRange=' + range;
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        // Prepare chart data
-        const labels = @Html.Raw(Json.Serialize(Model.ChartData.Select(d => d.Label)));
-        const data = @Html.Raw(Json.Serialize(Model.ChartData.Select(d => d.Value)));
+        const rawChartData = JSON.parse('@Html.Raw(JsonConvert.SerializeObject(Model.ChartData ?? new List<PrimeMarket.Models.ViewModel.ChartDataPoint>()).Replace("'", "\\'"))');
 
-        // Create chart
-        const ctx = document.getElementById('revenueChart').getContext('2d');
-        const revenueChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [{
-                    label: 'Revenue',
-                    data: data,
-                    backgroundColor: 'rgba(0, 102, 204, 0.2)',
-                    borderColor: 'rgba(0, 102, 204, 1)',
-                    borderWidth: 2,
-                    tension: 0.1,
-                    fill: true,
-                    pointBackgroundColor: 'rgba(0, 102, 204, 1)',
-                    pointRadius: 4
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return '₺' + value.toLocaleString();
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                return 'Revenue: ₺' + context.parsed.y.toLocaleString();
-                            }
-                        }
-                    },
-                    legend: {
-                        display: false
-                    }
-                }
-            }
-        });
+        if (!Array.isArray(rawChartData)) {
+            console.error("Chart data is not an array:", rawChartData);
+            return;
+        }
 
-        // Set chart height
-        ctx.canvas.parentNode.style.height = '400px';
+            const labels = rawChartData.map(d => {
+        const date = new Date(d.Label);
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${year}-${month}`;
+    });
+
+        const values = rawChartData.map(d => d.Value);
+
+        if (!labels.length || !values.length) {
+            const canvas = document.getElementById('revenueChart');
+            const ctx = canvas.getContext('2d');
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#888";
+            ctx.fillText("No chart data available", 20, 50);
+            return;
+        }
+
+        const canvas = document.getElementById('revenueChart');
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width = canvas.offsetWidth;
+        const height = canvas.height = 400;
+
+        const margin = { top: 40, right: 30, bottom: 50, left: 80 };
+        const chartWidth = width - margin.left - margin.right;
+        const chartHeight = height - margin.top - margin.bottom;
+
+        const maxValue = Math.max(...values);
+        const stepX = chartWidth / (values.length - 1);
+        const stepY = chartHeight / maxValue;
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Axes
+        ctx.beginPath();
+        ctx.moveTo(margin.left, margin.top);
+        ctx.lineTo(margin.left, height - margin.bottom);
+        ctx.lineTo(width - margin.right, height - margin.bottom);
+        ctx.strokeStyle = "#888";
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Y axis labels
+        ctx.fillStyle = "#444";
+        ctx.textAlign = "right";
+        ctx.font = "12px sans-serif";
+        const numTicks = 5;
+        for (let i = 0; i <= numTicks; i++) {
+            const yVal = maxValue * (i / numTicks);
+            const y = height - margin.bottom - yVal * stepY;
+            ctx.beginPath();
+            ctx.moveTo(margin.left - 5, y);
+            ctx.lineTo(margin.left, y);
+            ctx.stroke();
+            ctx.fillText("₺" + yVal.toFixed(0), margin.left - 10, y + 4);
+        }
+
+        // X axis labels
+        ctx.textAlign = "center";
+        for (let i = 0; i < labels.length; i++) {
+            const x = margin.left + i * stepX;
+            const y = height - margin.bottom + 15;
+            ctx.fillText(labels[i], x, y + 10);
+        }
+
+        // Line
+        ctx.beginPath();
+        for (let i = 0; i < values.length; i++) {
+            const x = margin.left + i * stepX;
+            const y = height - margin.bottom - values[i] * stepY;
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        }
+        ctx.strokeStyle = "#0066cc";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Points
+        ctx.fillStyle = "#0066cc";
+        for (let i = 0; i < values.length; i++) {
+            const x = margin.left + i * stepX;
+            const y = height - margin.bottom - values[i] * stepY;
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, 2 * Math.PI);
+            ctx.fill();
+        }
     });
 </script>

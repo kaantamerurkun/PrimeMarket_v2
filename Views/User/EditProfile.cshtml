@@ -56,17 +56,17 @@
                         <div class="name-fields">
                             <div class="input-group">
                                 <label asp-for="FirstName">First Name</label>
-                                <input asp-for="FirstName" type="text">
+                                <input asp-for="FirstName" type="text" style="border-radius:50px">
                                 <span asp-validation-for="FirstName" class="text-danger"></span>
                             </div>
                             <div class="input-group">
                                 <label asp-for="LastName">Last Name</label>
-                                <input asp-for="LastName" type="text">
+                                <input asp-for="LastName" type="text" style="border-radius:50px">
                                 <span asp-validation-for="LastName" class="text-danger"></span>
                             </div>
                             <div class="input-group">
                                 <label asp-for="PhoneNumber">Phone Number</label>
-                                <input asp-for="PhoneNumber" type="tel">
+                                <input asp-for="PhoneNumber" type="tel" style="border-radius:50px">
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
                             </div>
                         </div>
@@ -82,11 +82,11 @@
                     <h2>Email Address</h2>
                     <div class="input-group">
                         <label>Current Email</label>
-                        <input type="email" value="@Model.Email" disabled />
+                        <input style="border-radius:50px" type="email" value="@Model.Email" disabled />
                     </div>
                     <div class="input-group">
                         <label asp-for="Email">New Email</label>
-                        <input asp-for="Email" type="email" placeholder="Enter new email address" />
+                        <input style="border-radius:50px" asp-for="Email" type="email" placeholder="Enter new email address" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                         <p class="note">Note: Changing your email will require verification of the new address.</p>
                     </div>
@@ -101,17 +101,17 @@
                     <h2>Change Password</h2>
                     <div class="input-group">
                         <label asp-for="CurrentPassword">Current Password</label>
-                        <input asp-for="CurrentPassword" type="password" />
+                        <input style="border-radius:50px" asp-for="CurrentPassword" type="password" />
                         <span asp-validation-for="CurrentPassword" class="text-danger"></span>
                     </div>
                     <div class="input-group">
                         <label asp-for="NewPassword">New Password</label>
-                        <input asp-for="NewPassword" type="password" />
+                        <input style="border-radius:50px" asp-for="NewPassword" type="password" />
                         <span asp-validation-for="NewPassword" class="text-danger"></span>
                     </div>
                     <div class="input-group">
                         <label asp-for="ConfirmNewPassword">Confirm New Password</label>
-                        <input asp-for="ConfirmNewPassword" type="password" />
+                        <input style="border-radius:50px" asp-for="ConfirmNewPassword" type="password" />
                         <span asp-validation-for="ConfirmNewPassword" class="text-danger"></span>
                     </div>
                     <div class="button-container">
@@ -134,17 +134,17 @@
                     {
                         <div class="input-group">
                             <label for="idFront">Upload Front of ID:</label>
-                            <input type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" />
+                            <input style="border-radius:50px" type="file" id="idFront" name="idFront" accept=".jpg,.jpeg,.png" />
                             <span class="help-text">Please upload a clear photo of the front of your ID</span>
                         </div>
                         <div class="input-group">
                             <label for="idBack">Upload Back of ID:</label>
-                            <input type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" />
+                            <input style="border-radius:50px" type="file" id="idBack" name="idBack" accept=".jpg,.jpeg,.png" />
                             <span class="help-text">Please upload a clear photo of the back of your ID</span>
                         </div>
                         <div class="input-group">
                             <label for="facePhoto">Upload Your Face Photo:</label>
-                            <input type="file" id="facePhoto" name="facePhoto" accept=".jpg,.jpeg,.png" />
+                            <input style="border-radius:50px" type="file" id="facePhoto" name="facePhoto" accept=".jpg,.jpeg,.png" />
                             <span class="help-text">Please upload a clear photo of your face for verification</span>
                         </div>
                         <div class="button-container">

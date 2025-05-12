@@ -14,7 +14,7 @@
         <h1>🛒 404 - This product (page) is out of stock!</h1>
         <p>Oops! The page you're looking for is not on our shelves. Maybe it never existed or has been discontinued.</p>
         @{
-            var isUserLoggedIn = Context.Session.GetInt32("UserId") != null;
+            var isUserLoggedIn = ViewBag.IsUserLoggedIn;
             if (isUserLoggedIn)
             {
                 <p>Let's go back <a asp-action="User_MainPage" asp-controller="User" class="btn btn-primary">home</a> and continue shopping!</p>

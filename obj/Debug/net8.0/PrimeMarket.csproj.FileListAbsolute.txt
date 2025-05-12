@@ -382,3 +382,4 @@ C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\zh-Hans\FSharp.Core.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\zh-Hant\FSharp.Core.resources.dll
 C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
+C:\Users\urkun\source\repos\PrimeMarket_13.04.2025\PrimeMarket\bin\Debug\net8.0\Newtonsoft.Json.dll
