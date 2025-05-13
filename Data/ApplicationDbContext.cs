@@ -3,6 +3,7 @@ using PrimeMarket.Models;
 using PrimeMarket.Models.Products;
 using System.Collections.Generic;
 using System.Reflection.Emit;
+using Monitor = PrimeMarket.Models.Products.Monitor;
 
 namespace PrimeMarket.Data
 {
@@ -47,6 +48,27 @@ namespace PrimeMarket.Data
         public DbSet<PhoneAccessory> PhoneAccessories { get; set; }
         public DbSet<TabletAccessory> TabletAccessories { get; set; }
         public DbSet<ComputerAccessory> ComputerAccessories { get; set; }
+        public DbSet<ComputerComponent> ComputerComponents { get; set; }
+        public DbSet<Monitor> Monitors { get; set; }
+        public DbSet<Stove> Stoves { get; set; }
+        public DbSet<SparePart> SpareParts { get; set; }
+
+        public DbSet<MicrowaveOven> MicrowaveOvens { get; set; }
+        public DbSet<BeveragePreparation> BeveragePreparations { get; set; }
+        public DbSet<FoodPreparation> FoodPreparations { get; set; }
+        public DbSet<Iron> Irons { get; set; }
+        public DbSet<SewingMachine> SewingMachines { get; set; }
+        public DbSet<Keyboard> Keyboards { get; set; }
+        public DbSet<Speaker> Speakers { get; set; }
+        public DbSet<HeadphoneEarphone> HeadphonesEarphones { get; set; }
+        public DbSet<HeatingCooling> HeatingCoolings { get; set; }
+        public DbSet<Camera> Cameras { get; set; }
+        public DbSet<BaseComputer> Computers { get; set; }
+
+        public DbSet<Webcam> Webcams { get; set; }
+        public DbSet<Microphone> Microphones { get; set; }
+        public DbSet<Mouse> Mouses { get; set; }
+        public DbSet<ComputerBag> ComputerBags { get; set; }
         public DbSet<EmailVerification> EmailVerifications { get; set; }
         public DbSet<ProductReview> ProductReviews { get; set; }
 
@@ -294,6 +316,119 @@ namespace PrimeMarket.Data
                 .HasOne(l => l.ComputerAccessory)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<ComputerAccessory>(p => p.ListingId);
+
+            // Computer Components
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.ComputerComponent)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<ComputerComponent>(p => p.ListingId);
+
+            // Monitor
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Monitor)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Monitor>(p => p.ListingId);
+
+            // Stove
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Stove)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Stove>(p => p.ListingId);
+
+            // Microwave Oven
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.MicrowaveOven)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<MicrowaveOven>(p => p.ListingId);
+
+            // Beverage Preparation
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.BeveragePreparation)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<BeveragePreparation>(p => p.ListingId);
+
+            // Food Preparation
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.FoodPreparation)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<FoodPreparation>(p => p.ListingId);
+
+            // Iron
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Iron)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Iron>(p => p.ListingId);
+
+            // Sewing Machine
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.SewingMachine)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<SewingMachine>(p => p.ListingId);
+
+            // Keyboard
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Keyboard)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Keyboard>(p => p.ListingId);
+
+            // Speaker
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Speaker)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Speaker>(p => p.ListingId);
+
+            // Headphone/Earphone
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.HeadphoneEarphone)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<HeadphoneEarphone>(p => p.ListingId);
+
+            // Webcam
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Webcam)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Webcam>(p => p.ListingId);
+
+            // Microphone
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Microphone)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Microphone>(p => p.ListingId);
+
+            // Mouse
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Mouse)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Mouse>(p => p.ListingId);
+
+            // Computer Bag
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.ComputerBag)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<ComputerBag>(p => p.ListingId);
+            // SparePart
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.SparePart)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<SparePart>(p => p.ListingId);
+
+            // HeatingCooling
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.HeatingCooling)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<HeatingCooling>(p => p.ListingId);
+
+            // Camera
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Camera)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Camera>(p => p.ListingId);
+
+            // BaseComputer
+            modelBuilder.Entity<Listing>()
+                .HasOne(l => l.Computer)
+                .WithOne(p => p.Listing)
+                .HasForeignKey<Computer>(p => p.ListingId);
 
             modelBuilder.Entity<ProductReview>()
                 .HasIndex(pr => new { pr.UserId, pr.ListingId })

@@ -3,6 +3,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Collections.Generic;
 using PrimeMarket.Models.Products;
+using Monitor = PrimeMarket.Models.Products.Monitor;
 
 namespace PrimeMarket.Models.Factory
 {
@@ -22,11 +23,26 @@ namespace PrimeMarket.Models.Factory
                     "Laptops" => new Laptop(),
                     "Desktops" => new Desktop(),
                     "Computer Accessories" => new ComputerAccessory(),
+                    "Computer Components" => new ComputerComponent(),
+                    "Monitors" => new Monitor(),
                     "Fridges" => new Fridge(),
                     "Washers" => new Washer(),
                     "Dishwashers" => new Dishwasher(),
                     "Ovens" => new Oven(),
-                    "Vacuum Cleaner" => new VacuumCleaner(),
+                    "Stoves" => new Stove(),
+                    "Microwave Ovens" => new MicrowaveOven(),
+                    "Vacuum Cleaners" => new VacuumCleaner(),
+                    "Beverage Preparations" => new BeveragePreparation(),
+                    "Food Preparations" => new FoodPreparation(),
+                    "Irons" => new Iron(),
+                    "Sewing Machines" => new SewingMachine(),
+                    "Keyboards" => new Keyboard(),
+                    "Speakers" => new Speaker(),
+                    "HeadPhones&EarPhones" => new HeadphoneEarphone(),
+                    "Webcams" => new Webcam(),
+                    "Microphones" => new Microphone(),
+                    "Mouses" => new Mouse(),
+                    "Computer Bags" => new ComputerBag(),
                     "Televisions" => new Television(),
                     _ => throw new ArgumentException($"Unsupported subcategory in Electronics: {normalizedSubcategory}")
                 };

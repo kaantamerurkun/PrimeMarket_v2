@@ -514,6 +514,102 @@ namespace PrimeMarket.Migrations
                     b.ToTable("AndroidTablets");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.BeveragePreparation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("BeveragePreparations");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Camera", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Cameras");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Computer", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Gpu")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("GpuMemory")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Hdmi")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("MemorySpeed")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OperatingSystem")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Processor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Ram")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RamType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Storage")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Warranty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Computer");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.ComputerAccessory", b =>
                 {
                     b.Property<int>("Id")
@@ -543,6 +639,52 @@ namespace PrimeMarket.Migrations
                         .IsUnique();
 
                     b.ToTable("ComputerAccessories");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.ComputerBag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("ComputerBags");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.ComputerComponent", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompatibleModels")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Warranty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("ComputerComponents");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.Desktop", b =>
@@ -650,6 +792,25 @@ namespace PrimeMarket.Migrations
                     b.ToTable("Dishwashers");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.FoodPreparation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("FoodPreparations");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.Fridge", b =>
                 {
                     b.Property<int>("Id")
@@ -690,6 +851,44 @@ namespace PrimeMarket.Migrations
                         .IsUnique();
 
                     b.ToTable("Fridges");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.HeadphoneEarphone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("HeadphonesEarphones");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.HeatingCooling", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("HeatingCoolings");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.IOSPhone", b =>
@@ -785,6 +984,44 @@ namespace PrimeMarket.Migrations
                     b.ToTable("IOSTablets");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.Iron", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Irons");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Keyboard", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Keyboards");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.Laptop", b =>
                 {
                     b.Property<int>("Id")
@@ -849,6 +1086,90 @@ namespace PrimeMarket.Migrations
                         .IsUnique();
 
                     b.ToTable("Laptops");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Microphone", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Microphones");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.MicrowaveOven", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("MicrowaveOvens");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Monitor", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompatibleModels")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Warranty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Monitors");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Mouse", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Mouses");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.OtherPhone", b =>
@@ -1013,6 +1334,90 @@ namespace PrimeMarket.Migrations
                     b.ToTable("PhoneAccessories");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.SewingMachine", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("SewingMachines");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.SparePart", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompatibleModels")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Warranty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("SpareParts");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Speaker", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Speakers");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Stove", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Stoves");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.TabletAccessory", b =>
                 {
                     b.Property<int>("Id")
@@ -1161,6 +1566,25 @@ namespace PrimeMarket.Migrations
                         .IsUnique();
 
                     b.ToTable("Washers");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Webcam", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Webcams");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Purchase", b =>
@@ -1596,11 +2020,66 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.BeveragePreparation", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("BeveragePreparation")
+                        .HasForeignKey("PrimeMarket.Models.Products.BeveragePreparation", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Camera", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Camera")
+                        .HasForeignKey("PrimeMarket.Models.Products.Camera", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Computer", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Computer")
+                        .HasForeignKey("PrimeMarket.Models.Products.Computer", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.ComputerAccessory", b =>
                 {
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
                         .WithOne("ComputerAccessory")
                         .HasForeignKey("PrimeMarket.Models.Products.ComputerAccessory", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.ComputerBag", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("ComputerBag")
+                        .HasForeignKey("PrimeMarket.Models.Products.ComputerBag", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.ComputerComponent", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("ComputerComponent")
+                        .HasForeignKey("PrimeMarket.Models.Products.ComputerComponent", "ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1629,11 +2108,44 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.FoodPreparation", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("FoodPreparation")
+                        .HasForeignKey("PrimeMarket.Models.Products.FoodPreparation", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.Fridge", b =>
                 {
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
                         .WithOne("Fridge")
                         .HasForeignKey("PrimeMarket.Models.Products.Fridge", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.HeadphoneEarphone", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("HeadphoneEarphone")
+                        .HasForeignKey("PrimeMarket.Models.Products.HeadphoneEarphone", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.HeatingCooling", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("HeatingCooling")
+                        .HasForeignKey("PrimeMarket.Models.Products.HeatingCooling", "ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1662,11 +2174,77 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.Iron", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Iron")
+                        .HasForeignKey("PrimeMarket.Models.Products.Iron", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Keyboard", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Keyboard")
+                        .HasForeignKey("PrimeMarket.Models.Products.Keyboard", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.Laptop", b =>
                 {
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
                         .WithOne("Laptop")
                         .HasForeignKey("PrimeMarket.Models.Products.Laptop", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Microphone", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Microphone")
+                        .HasForeignKey("PrimeMarket.Models.Products.Microphone", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.MicrowaveOven", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("MicrowaveOven")
+                        .HasForeignKey("PrimeMarket.Models.Products.MicrowaveOven", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Monitor", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Monitor")
+                        .HasForeignKey("PrimeMarket.Models.Products.Monitor", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Mouse", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Mouse")
+                        .HasForeignKey("PrimeMarket.Models.Products.Mouse", "ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1717,6 +2295,50 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.SewingMachine", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("SewingMachine")
+                        .HasForeignKey("PrimeMarket.Models.Products.SewingMachine", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.SparePart", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("SparePart")
+                        .HasForeignKey("PrimeMarket.Models.Products.SparePart", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Speaker", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Speaker")
+                        .HasForeignKey("PrimeMarket.Models.Products.Speaker", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Stove", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Stove")
+                        .HasForeignKey("PrimeMarket.Models.Products.Stove", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.TabletAccessory", b =>
                 {
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
@@ -1755,6 +2377,17 @@ namespace PrimeMarket.Migrations
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
                         .WithOne("Washer")
                         .HasForeignKey("PrimeMarket.Models.Products.Washer", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Webcam", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Webcam")
+                        .HasForeignKey("PrimeMarket.Models.Products.Webcam", "ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -1867,9 +2500,24 @@ namespace PrimeMarket.Migrations
                     b.Navigation("AndroidTablet")
                         .IsRequired();
 
+                    b.Navigation("BeveragePreparation")
+                        .IsRequired();
+
                     b.Navigation("Bookmarks");
 
+                    b.Navigation("Camera")
+                        .IsRequired();
+
+                    b.Navigation("Computer")
+                        .IsRequired();
+
                     b.Navigation("ComputerAccessory")
+                        .IsRequired();
+
+                    b.Navigation("ComputerBag")
+                        .IsRequired();
+
+                    b.Navigation("ComputerComponent")
                         .IsRequired();
 
                     b.Navigation("Desktop")
@@ -1878,7 +2526,16 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Dishwasher")
                         .IsRequired();
 
+                    b.Navigation("FoodPreparation")
+                        .IsRequired();
+
                     b.Navigation("Fridge")
+                        .IsRequired();
+
+                    b.Navigation("HeadphoneEarphone")
+                        .IsRequired();
+
+                    b.Navigation("HeatingCooling")
                         .IsRequired();
 
                     b.Navigation("IOSPhone")
@@ -1889,10 +2546,28 @@ namespace PrimeMarket.Migrations
 
                     b.Navigation("Images");
 
+                    b.Navigation("Iron")
+                        .IsRequired();
+
+                    b.Navigation("Keyboard")
+                        .IsRequired();
+
                     b.Navigation("Laptop")
                         .IsRequired();
 
                     b.Navigation("Messages");
+
+                    b.Navigation("Microphone")
+                        .IsRequired();
+
+                    b.Navigation("MicrowaveOven")
+                        .IsRequired();
+
+                    b.Navigation("Monitor")
+                        .IsRequired();
+
+                    b.Navigation("Mouse")
+                        .IsRequired();
 
                     b.Navigation("Offers");
 
@@ -1912,6 +2587,18 @@ namespace PrimeMarket.Migrations
 
                     b.Navigation("Reviews");
 
+                    b.Navigation("SewingMachine")
+                        .IsRequired();
+
+                    b.Navigation("SparePart")
+                        .IsRequired();
+
+                    b.Navigation("Speaker")
+                        .IsRequired();
+
+                    b.Navigation("Stove")
+                        .IsRequired();
+
                     b.Navigation("TabletAccessory")
                         .IsRequired();
 
@@ -1922,6 +2609,9 @@ namespace PrimeMarket.Migrations
                         .IsRequired();
 
                     b.Navigation("Washer")
+                        .IsRequired();
+
+                    b.Navigation("Webcam")
                         .IsRequired();
                 });
 

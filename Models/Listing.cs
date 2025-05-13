@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using PrimeMarket.Models.Enum;
 using PrimeMarket.Models.Products;
+using Monitor = PrimeMarket.Models.Products.Monitor;
 
 namespace PrimeMarket.Models
 {
@@ -69,6 +70,10 @@ namespace PrimeMarket.Models
         // Computers
         public virtual Laptop Laptop { get; set; }
         public virtual Desktop Desktop { get; set; }
+        public virtual ComputerComponent ComputerComponent { get; set; }
+        public virtual Monitor Monitor { get; set; }
+        public virtual Keyboard Keyboard { get; set; }
+
 
         // White Goods
         public virtual Washer Washer { get; set; }
@@ -76,8 +81,16 @@ namespace PrimeMarket.Models
         public virtual Fridge Fridge { get; set; }
         public virtual Oven Oven { get; set; }
 
+
         // Electrical Domestic Appliances
         public virtual VacuumCleaner VacuumCleaner { get; set; }
+        public virtual MicrowaveOven MicrowaveOven { get; set; }
+        public virtual Stove Stove { get; set; }
+        public virtual BeveragePreparation BeveragePreparation { get; set; }
+        public virtual FoodPreparation FoodPreparation { get; set; }
+        public virtual Iron Iron { get; set; }
+        public virtual SewingMachine SewingMachine { get; set; }
+
 
         // Televisions
         public virtual Television Television { get; set; }
@@ -86,5 +99,15 @@ namespace PrimeMarket.Models
         public virtual PhoneAccessory PhoneAccessory { get; set; }
         public virtual TabletAccessory TabletAccessory { get; set; }
         public virtual ComputerAccessory ComputerAccessory { get; set; }
+        public virtual HeadphoneEarphone HeadphoneEarphone { get; set; }
+        public virtual Speaker Speaker { get; set; }
+        public virtual Webcam Webcam { get; set; }
+        public virtual Microphone Microphone { get; set; }
+        public virtual Mouse Mouse { get; set; }
+        public virtual ComputerBag ComputerBag { get; set; }
+        public virtual SparePart SparePart { get; set; }
+        public virtual HeatingCooling HeatingCooling { get; set; }
+        public virtual Camera Camera { get; set; }
+        public virtual Computer Computer { get; set; }
     }
 }

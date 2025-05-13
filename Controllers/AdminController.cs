@@ -262,22 +262,30 @@ namespace PrimeMarket.Controllers
                 product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Android Phone")
                 product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Other Phones")
+                product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Spare Parts")
+                product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Phone Accessories")
+                product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "IOS Tablets")
+                product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Android Tablets")
+                product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Other Tablets")
+                product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Tablet Accessories")
+                product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Laptops")
                 product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Desktops")
                 product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
-            else if (listing.SubCategory == "Tablets")
-            {
-                product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                if (product == null)
-                {
-                    product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                }
-                if (product == null)
-                {
-                    product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
-                }
-            }
+            else if (listing.SubCategory == "Computer Accessories")
+                product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Computer Components")
+                product = await _context.ComputerComponents.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Monitors")
+                product = await _context.Monitors.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Washers")
                 product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Dishwashers")
@@ -286,16 +294,42 @@ namespace PrimeMarket.Controllers
                 product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Ovens")
                 product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Stoves")
+                product = await _context.Stoves.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Microwave Ovens")
+                product = await _context.MicrowaveOvens.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Vacuum Cleaner")
                 product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Beverage Preparation")
+                product = await _context.BeveragePreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Food Preparation")
+                product = await _context.FoodPreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Iron")
+                product = await _context.Irons.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Sewing Machine")
+                product = await _context.SewingMachines.FirstOrDefaultAsync(p => p.ListingId == id);
             else if (listing.SubCategory == "Televisions")
                 product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
-            else if (listing.SubCategory == "Phone Accessories")
-                product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
-            else if (listing.SubCategory == "Tablet Accessories")
-                product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
-            else if (listing.SubCategory == "Computer Accessories")
-                product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Heating & Cooling")
+                product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Cameras")
+                product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Keyboards")
+                product = await _context.Keyboards.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Speakers")
+                product = await _context.Speakers.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Headphones & Earphones")
+                product = await _context.HeadphonesEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Webcams")
+                product = await _context.Webcams.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Microphones")
+                product = await _context.Microphones.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Mouse")
+                product = await _context.Mouses.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Computer Bags")
+                product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
+            else if (listing.SubCategory == "Computers")
+                product = await _context.Computers.FirstOrDefaultAsync(p => p.ListingId == id);
 
             // Get seller verification status
             var sellerVerification = await _context.VerificationDocuments
