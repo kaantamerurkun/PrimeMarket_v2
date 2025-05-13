@@ -1,559 +1,995 @@
 ﻿@model PrimeMarket.Models.ViewModel.ListingDetailsViewModel
-
 @{
+
+    var isVerified = Context.Session.GetString("IsUserVerified") == "true";
+
     ViewData["Title"] = Model.Listing.Title;
     Layout = "~/Views/Shared/_LayoutGuest.cshtml";
 }
-
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <nav class="breadcrumb">
-        <a href="@Url.Action("Guest_Listing_Details", "Listing")">Home</a> &gt;
-        <a href="#">@Model.Listing.Category</a> &gt;
-        <a href="#">@Model.Listing.SubCategory</a>
-        @if (!string.IsNullOrEmpty(Model.Listing.DetailCategory))
-        {
-            <span> &gt; <a href="#">@Model.Listing.DetailCategory</a></span>
+<html lang="en">
+<body>
+    <style>
+        .logo img {
+            width: 120px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
         }
-    </nav>
 
-    <div class="listing-header">
-        <h1>@Model.Listing.Title</h1>
-        <div class="price">@Model.Listing.Price.ToString("C")</div>
-    </div>
+        .verified-badge {
+            display: inline-flex;
+            align-items: center;
+            margin-left: 8px;
+        }
 
-    <div class="main-content">
-        <div class="image-gallery">
-            @if (Model.Listing.Images != null && Model.Listing.Images.Any())
-            {
-                var mainImage = Model.Listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? Model.Listing.Images.First().ImagePath;
-                <img src="@mainImage" alt="@Model.Listing.Title" class="main-image" id="main-image">
+            .verified-badge img {
+                width: 16px;
+                height: 16px;
+            }
 
-                <div class="thumbnail-container">
-                    @foreach (var image in Model.Listing.Images)
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .breadcrumb {
+            display: flex;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+            .breadcrumb a {
+                color: #0066cc;
+                text-decoration: none;
+                margin: 0 5px;
+            }
+
+                .breadcrumb a:first-child {
+                    margin-left: 0;
+                }
+
+                .breadcrumb a:hover {
+                    text-decoration: underline;
+                }
+
+        .listing-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+            .listing-header h1 {
+                margin: 0;
+                font-size: 24px;
+                flex: 1;
+            }
+
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #0066cc;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .image-gallery {
+            flex: 0 0 60%;
+        }
+
+        .main-image {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+        }
+
+        .thumbnail-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .thumbnail {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+            .thumbnail:hover {
+                transform: scale(1.05);
+            }
+
+        .property-details {
+            flex: 0 0 35%;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .value {
+            color: #333;
+        }
+
+        .btn-bookmark, .btn-buynow, .btn-cart, .btn-makeoffer, .btn-outofstock {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+            .btn-bookmark:hover {
+                background: #f0f0f0;
+            }
+
+            .btn-buynow:hover {
+                background: #2CB736;
+                color: white;
+            }
+
+            .btn-cart:hover {
+                background: #0066cc;
+                color: white;
+            }
+
+            .btn-makeoffer:hover {
+                background: #FEBA00;
+                color: white;
+            }
+
+        .btn-outofstock {
+            background: #f8f9fa;
+            color: #6c757d;
+            cursor: not-allowed;
+        }
+
+        .product-specifications {
+            margin-bottom: 30px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+        }
+
+            .product-specifications h3 {
+                margin-top: 0;
+                margin-bottom: 15px;
+                border-bottom: 1px solid #ddd;
+                padding-bottom: 10px;
+            }
+
+        .description-section {
+            margin-bottom: 30px;
+        }
+
+            .description-section h3 {
+                margin-bottom: 15px;
+            }
+
+        .description-content {
+            line-height: 1.6;
+        }
+
+        .seller-info {
+            margin-bottom: 30px;
+        }
+
+        .seller-card {
+            display: flex;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+        }
+
+        .seller-photo {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-right: 20px;
+            object-fit: cover;
+        }
+
+        .seller-details h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            display: inline-flex;
+            align-items: center;
+        }
+
+            .seller-details h3 a {
+                text-decoration: none;
+                color: inherit;
+            }
+
+                .seller-details h3 a:hover {
+                    text-decoration: underline;
+                }
+
+        .phone {
+            margin-bottom: 15px;
+            color: #666;
+        }
+
+        .btn-sendmessage, .btn-makeoffer, .btn-accept, .btn-reject {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .btn-sendmessage {
+            background-color: #0066cc;
+            color: white;
+        }
+
+        .btn-makeoffer {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-accept {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-reject {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .btn-sendmessage:hover {
+            background-color: #0055b3;
+        }
+
+        .btn-makeoffer:hover {
+            background-color: #e0e0e0;
+        }
+
+        .btn-accept:hover {
+            background-color: #218838;
+        }
+
+        .btn-reject:hover {
+            background-color: #c82333;
+        }
+
+        .owner-badge {
+            display: inline-block;
+            padding: 5px 10px;
+            background-color: #f0f0f0;
+            color: #666;
+            border-radius: 15px;
+            font-size: 14px;
+        }
+
+        .active-offers-container {
+            margin-top: 15px;
+            border-top: 1px solid #ddd;
+            padding-top: 15px;
+        }
+
+            .active-offers-container h4 {
+                margin-top: 0;
+                margin-bottom: 10px;
+            }
+
+        .offer-item {
+            background-color: white;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .offer-details p {
+            margin: 5px 0;
+        }
+
+        .offer-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .related-listings {
+            margin-top: 40px;
+        }
+
+            .related-listings h3 {
+                margin-bottom: 20px;
+            }
+
+        .related-listings-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .related-listing-item {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+            .related-listing-item:hover {
+                transform: translateY(-5px);
+            }
+
+        .related-image {
+            height: 150px;
+            overflow: hidden;
+        }
+
+            .related-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .related-info {
+            padding: 10px;
+        }
+
+            .related-info h4 {
+                margin: 0 0 5px 0;
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+        .related-price {
+            color: #0066cc;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 10px;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Responsive design */
+        @@media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+
+            .image-gallery {
+                flex: 0 0 100%;
+            }
+
+            .property-details {
+                flex: 0 0 100%;
+            }
+
+            .related-listings-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .reviews-section {
+            margin-top: 40px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+
+            .reviews-section h3 {
+                margin-bottom: 20px;
+                font-size: 24px;
+            }
+
+        .reviews-summary {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .average-rating {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .rating-number {
+            font-size: 36px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .stars {
+            display: inline-flex;
+        }
+
+        .star {
+            font-size: 24px;
+            margin: 0 2px;
+        }
+
+            .star.filled {
+                color: #ffa500;
+            }
+
+            .star.empty {
+                color: #ddd;
+            }
+
+        .review-count {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .add-review-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+            .add-review-section h4 {
+                margin-top: 0;
+                margin-bottom: 15px;
+            }
+
+        .rating-input {
+            margin-bottom: 15px;
+        }
+
+        .star-rating-input {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+        }
+
+            .star-rating-input input {
+                display: none;
+            }
+
+            .star-rating-input label {
+                cursor: pointer;
+                font-size: 30px;
+                color: #ddd;
+                margin: 0 5px;
+            }
+
+                .star-rating-input input:checked ~ label,
+                .star-rating-input label:hover,
+                .star-rating-input label:hover ~ label {
+                    color: #ffa500;
+                }
+
+        .comment-input {
+            margin-bottom: 15px;
+        }
+
+            .comment-input label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            .comment-input textarea {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                resize: vertical;
+            }
+
+        .btn-submit-review {
+            background-color: #0066cc;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+            .btn-submit-review:hover {
+                background-color: #0055b3;
+            }
+
+        .review-notice {
+            text-align: center;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        .reviews-list {
+            margin-top: 20px;
+        }
+
+        .review-item {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #eee;
+        }
+
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .reviewer-name {
+            font-weight: bold;
+        }
+
+        .verified-purchase {
+            color: #28a745;
+            font-size: 14px;
+        }
+
+        .review-date {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .review-rating {
+            margin-bottom: 10px;
+        }
+
+        .review-comment {
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .no-reviews {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+    </style>
+    <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+
+        <div class="listing-header">
+            <h1>@Model.Listing.Title</h1>
+            <div class="price">@Model.Listing.Price.ToString("C")</div>
+        </div>
+
+        <div class="main-content">
+            <div class="image-gallery">
+                @if (Model.Listing.Images != null && Model.Listing.Images.Any())
+                {
+                    var mainImage = Model.Listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? Model.Listing.Images.First().ImagePath;
+                    <img src="@mainImage" alt="@Model.Listing.Title" class="main-image" id="main-image">
+
+                    <div class="thumbnail-container">
+                        @foreach (var image in Model.Listing.Images)
+                        {
+                            <img src="@image.ImagePath" alt="@Model.Listing.Title" class="thumbnail" onclick="changeMainImage('@image.ImagePath')">
+                        }
+                    </div>
+                }
+                else
+                {
+                    <img src="/images/placeholder.png" alt="No Image Available" class="main-image">
+                }
+            </div>
+
+            <div class="property-details">
+                <div class="detail-item">
+                    <span class="label">Listing No:</span>
+                    <span class="value">#@Model.Listing.Id</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Condition:</span>
+                    <span class="value">@Model.Listing.Condition</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Category:</span>
+                    <span class="value">@Model.Listing.Category</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Subcategory:</span>
+                    <span class="value">@Model.Listing.SubCategory</span>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.Listing.DetailCategory))
+                {
+                    <div class="detail-item">
+                        <span class="label">Detail Category:</span>
+                        <span class="value">@Model.Listing.DetailCategory</span>
+                    </div>
+                }
+                <div class="detail-item">
+                    <span class="label">Location:</span>
+                    <span class="value">@Model.Listing.Location</span>
+                </div>
+                <div class="detail-item">
+                    <span class="label">Listed Date:</span>
+                    <span class="value">@(((DateTime)Model.Listing.CreatedAt).ToString("MMMM dd, yyyy"))</span>
+                </div>
+
+                @if (Model.Listing.Condition == "First-Hand" && Model.Listing.Stock.HasValue)
+                {
+                    <div class="detail-item">
+                        <span class="label">Available Stock:</span>
+                        <span class="value">@Model.Listing.Stock</span>
+                    </div>
+                }
+
+                <!-- Action Buttons -->
+                <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 15px" class="action-buttons">
+                    <button style="display: flex;flex: 0 0 30%;font-size:0.8em" class="btn-bookmark"
+                            onclick="toggleBookmark(@Model.Listing.Id)"
+                            id="bookmark-btn">
+                        @(Model.IsBookmarked ? "Remove from Bookmark" : "Add to Bookmark")
+                    </button>
+
+                    @if (!Model.IsOwner)
                     {
-                        <img src="@image.ImagePath" alt="@Model.Listing.Title" class="thumbnail" onclick="changeMainImage('@image.ImagePath')">
+                        @if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock.HasValue && Model.Listing.Stock > 0))
+                        {
+                            <!-- First-Hand with stock: show Buy Now and Add to Cart buttons -->
+                            <a style="text-decoration:none" href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
+                                <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
+                            </a>
+                            <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-cart"
+                                    onclick="addToCart(@Model.Listing.Id)">
+                                Add to Cart
+                            </button>
+                        }
+                        else if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock == null || Model.Listing.Stock <= 0))
+                        {
+                            <!-- First-Hand out of stock: show disabled button -->
+                            <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-outofstock" disabled>Out of Stock</button>
+                        }
+                        else if (Model.Listing.Condition == "Second-Hand")
+                        {
+                            <!-- Second-Hand: show Make an Offer button -->
+                            <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
+                        }
                     }
                 </div>
-            }
-            else
-            {
-                <img src="/images/placeholder.png" alt="No Image Available" class="main-image">
-            }
-        </div>
-
-        <div class="property-details">
-            <div class="detail-item">
-                <span class="label">Listing No:</span>
-                <span class="value">#@Model.Listing.Id</span>
-            </div>
-            @if (Model.Listing.Condition.Equals("First-Hand"))
-            {
-                <div class="detail-item">
-                    <span class="label">Stock Count:</span>
-                    <span class="value">@Model.Listing.Stock</span>
-                </div>
-            }
-            <div class="detail-item">
-                <span class="label">Condition:</span>
-                <span class="value">@Model.Listing.Condition</span>
-            </div>
-            <div class="detail-item">
-                <span class="label">Category:</span>
-                <span class="value">@Model.Listing.Category</span>
-            </div>
-            <div class="detail-item">
-                <span class="label">Subcategory:</span>
-                <span class="value">@Model.Listing.SubCategory</span>
-            </div>
-            @if (!string.IsNullOrEmpty(Model.Listing.DetailCategory))
-            {
-                <div class="detail-item">
-                    <span class="label">Detail Category:</span>
-                    <span class="value">@Model.Listing.DetailCategory</span>
-                </div>
-            }
-            <div class="detail-item">
-                <span class="label">Location:</span>
-                <span class="value">@Model.Listing.Location</span>
-            </div>
-            <div class="detail-item">
-                <span class="label">Listed Date:</span>
-                <span class="value">@(((DateTime)Model.Listing.CreatedAt).ToString("MMMM dd, yyyy"))</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 15px" class="action-buttons">
-                <a asp-action="Login" asp-controller="User">
-                <button style="display: flex;flex: 0 0 30%;font-size:0.8em" class="btn-bookmark"
-                        onclick="toggleBookmark(@Model.Listing.Id)"
-                        id="bookmark-btn">
-                    @(Model.IsBookmarked ? "Remove from Bookmark" : "Add to Bookmark")
-                </button>
-                </a>
-                <a asp-action="Login" asp-controller="Login">
-                <a href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
-                    <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
-                </a>
-                </a>
             </div>
         </div>
-    </div>
 
-    <!-- Product Specifications -->
-    @if (Model.Product != null)
-    {
-        <div class="product-specifications">
-            <h3>Product Specifications</h3>
-            @foreach (var prop in Model.Product.GetType().GetProperties())
-            {
-                if (prop.Name != "Id" && prop.Name != "ListingId" && prop.Name != "Listing")
+        <!-- Product Specifications -->
+        @if (Model.Product != null)
+        {
+            <div class="product-specifications">
+                <h3>Product Specifications</h3>
+                @foreach (var prop in Model.Product.GetType().GetProperties())
                 {
-                    var value = prop.GetValue(Model.Product);
-                    if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                    if (prop.Name != "Id" && prop.Name != "ListingId" && prop.Name != "Listing")
                     {
-                        <div class="detail-item">
-                            <span class="label">@prop.Name:</span>
-                            <span class="value">@value</span>
-                        </div>
+                        var value = prop.GetValue(Model.Product);
+                        if (value != null && !string.IsNullOrEmpty(value.ToString()))
+                        {
+                            <div class="detail-item">
+                                <span class="label">@prop.Name:</span>
+                                <span class="value">@value</span>
+                            </div>
+                        }
                     }
                 }
-            }
-        </div>
-    }
+            </div>
+        }
 
-    <!-- Description -->
-    <div class="description-section">
-        <h3>Description</h3>
-        <div class="description-content">
-            @Html.Raw(Model.Listing.Description.Replace("\n", "<br>"))
+        <!-- Description -->
+        <div class="description-section">
+            <h3>Description</h3>
+            <div class="description-content">
+                @Html.Raw(Model.Listing.Description.Replace("\n", "<br>"))
+            </div>
         </div>
+
+        <!-- Seller Info -->
+        <div class="seller-info">
+            <div class="seller-card">
+                <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.Listing.Seller.ProfileImagePath)"
+                     alt="Seller Photo" class="seller-photo">
+                <div class="seller-details">
+                    <h3 style="display: inline-flex; align-items: center; margin-bottom: 10px;">
+                        @if (Model.IsOwner)
+                        {
+                            <a href="@Url.Action("MyProfilePage", "User", new { id = Model.Listing.SellerId })" style="text-decoration: none; color: inherit;">
+                                @Model.Listing.Seller?.FirstName @Model.Listing.Seller?.LastName
+                            </a>
+                        }
+                        else
+                        {
+                            <a href="@Url.Action("OtherUserProfile", "User", new { id = Model.Listing.SellerId })" style="text-decoration: none; color: inherit;">
+                                @Model.Listing.Seller?.FirstName @Model.Listing.Seller?.LastName
+                            </a>
+                        }
+                        @if (isVerified)
+                        {
+                            <span class="verified-badge" style="margin-left: 8px;">
+                                <img src="/images/verified.png" alt="Verified" title="Verified User" />
+                            </span>
+                        }
+                    </h3>
+                    <p class="phone">@(string.IsNullOrEmpty(Model.Listing.Seller?.PhoneNumber) ? "No phone number" : Model.Listing.Seller.PhoneNumber)</p>
+
+                    <!-- Message/Offer Buttons -->
+                    @if (!Model.IsOwner)
+                    {
+                        <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
+                            <button class="btn-sendmessage">Send Message</button>
+                        </a>
+                    }
+                    else
+                    {
+                        <p class="owner-badge">You are the seller of this listing</p>
+
+                        <!-- If second-hand and has active offers, show them -->
+                        @if (Model.Listing.Condition == "Second-Hand" && Model.ActiveOffers != null && Model.ActiveOffers.Any())
+                        {
+                            <div class="active-offers-container">
+                                <h4>Active Offers</h4>
+                                @foreach (var offer in Model.ActiveOffers)
+                                {
+                                    <div class="offer-item">
+                                        <div class="offer-details">
+                                            <p>From: @offer.Buyer.FirstName @offer.Buyer.LastName</p>
+                                            <p>Amount: @offer.OfferAmount.ToString("C")</p>
+                                            <p>Message: @(string.IsNullOrEmpty(offer.Message) ? "No message" : offer.Message)</p>
+                                        </div>
+                                        <div class="offer-actions">
+                                            <button class="btn-accept" onclick="respondToOffer(@offer.Id, true)">Accept</button>
+                                            <button class="btn-reject" onclick="respondToOffer(@offer.Id, false)">Reject</button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Listings -->
+        @if (Model.RelatedListings != null && Model.RelatedListings.Any())
+        {
+            <div class="related-listings">
+                <h3>Similar Listings</h3>
+                <div class="related-listings-grid">
+                    @foreach (var related in Model.RelatedListings)
+                    {
+                        <a href="@Url.Action("Details", "Listing", new { id = related.Id })" class="related-listing-item">
+                            <div class="related-image">
+                                @{
+                                    var relatedImage = related.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                    ?? related.Images?.FirstOrDefault()?.ImagePath
+                                    ?? "/images/placeholder.png";
+                                }
+                                <img src="@relatedImage" alt="@related.Title">
+                            </div>
+                            <div class="related-info">
+                                <h4>@related.Title</h4>
+                                <p class="related-price">@related.Price.ToString("C")</p>
+                            </div>
+                        </a>
+                    }
+                </div>
+            </div>
+        }
     </div>
 
-    <!-- Seller Info -->
-    <div class="seller-info">
-        <div class="seller-card">
-            <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.Listing.Seller.ProfileImagePath)"
-                 alt="Seller Photo" class="seller-photo">
-            <div class="seller-details">
-                <h3>@Model.Listing.Seller?.FirstName @Model.Listing.Seller?.LastName</h3>
-                <p class="phone">@(string.IsNullOrEmpty(Model.Listing.Seller?.PhoneNumber) ? "No phone number" : Model.Listing.Seller.PhoneNumber)</p>
+    <!-- Offer Modal -->
+    <div id="offerModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeOfferModal()">&times;</span>
+            <h2>Make an Offer</h2>
 
-                <!-- Message/Offer Buttons -->
-                @if (!Model.IsOwner)
+            <form id="offerForm">
+                <input type="hidden" id="listingId" value="@Model.Listing.Id" />
+
+                <label for="offerAmount">Your Offer (@Model.Listing.Price.ToString("C") is the asking price):</label>
+                <input type="number"
+                       id="offerAmount"
+                       name="offerAmount"
+                       required
+                       min="1"
+                       step="0.01"
+                       max="@Model.Listing.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                       value="@Math.Round(Model.Listing.Price * 0.9m, 2).ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                       style="border-radius:50px; padding:10px" />
+
+                <br /><br />
+
+                <label for="offerMessage">Message (optional):</label><br />
+                <textarea id="offerMessage" name="offerMessage" rows="4" cols="40"
+                          placeholder="Explain why you're making this offer..."></textarea>
+
+                <br /><br />
+
+                <button type="submit" class="btn-sendmessage">Send Offer</button>
+            </form>
+        </div>
+    </div>
+    @if (Model.Listing.Condition == "First-Hand")
+    {
+        <div class="reviews-section">
+            <h3>Customer Reviews</h3>
+
+            <div class="reviews-summary">
+                <div class="average-rating">
+                    <span class="rating-number">@Model.AverageRating</span>
+                    <div class="stars">
+                        @for (int i = 1; i <= 5; i++)
+                        {
+                            <span class="star @(i <= Model.AverageRating ? "filled" : "empty")">★</span>
+                        }
+                    </div>
+                    <span class="review-count">@Model.TotalReviews @(Model.TotalReviews == 1 ? "review" : "reviews")</span>
+                </div>
+            </div>
+
+            @if (Model.CanReview)
+            {
+                <div class="add-review-section">
+                    <h4>Write a Review</h4>
+                    <form id="reviewForm">
+                        <input type="hidden" id="listingId" value="@Model.Listing.Id" />
+
+                        <div class="rating-input">
+                            <label>Your Rating:</label>
+                            <div class="star-rating-input">
+                                @for (int i = 5; i >= 1; i--)
+                                {
+                                    <input type="radio" id="star@(i)" name="rating" value="@i" />
+                                    <label for="star@(i)" title="@i stars">★</label>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="comment-input">
+                            <label for="comment">Your Review:</label>
+                            <textarea id="comment" name="comment" rows="4" required placeholder="Share your experience with this product..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit-review">Submit Review</button>
+                    </form>
+                </div>
+            }
+            else if (Model.HasReviewed)
+            {
+                <p class="review-notice">You have already reviewed this product.</p>
+            }
+            else if (!Model.IsOwner)
+            {
+                <p class="review-notice">Only customers who have purchased and received this product can write a review.</p>
+            }
+
+            <div class="reviews-list">
+                @if (Model.Reviews != null && Model.Reviews.Any())
                 {
-                    <a asp-action="Login" asp-controller="User">
-                    <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
-                        <button class="btn-sendmessage">Send Message</button>
-                    </a>
-                    </a>
-                    @if (Model.Listing.Condition.Equals("Second-Hand"))
+                    foreach (var review in Model.Reviews.OrderByDescending(r => r.CreatedAt))
                     {
-                        <a asp-action="Login" asp-controller="User">
-                            <button class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
-                        </a>
+                        <div class="review-item">
+                            <div class="review-header">
+                                <div class="reviewer-info">
+                                    <span class="reviewer-name">@review.User.FirstName @review.User.LastName</span>
+                                    @if (review.IsVerifiedPurchase)
+                                    {
+                                        <span class="verified-purchase">✓ Verified Purchase</span>
+                                    }
+                                </div>
+                                <div class="review-date">@(((DateTime)review.CreatedAt).ToString("MMM dd, yyyy"))</div>
+                            </div>
+                            <div class="review-rating">
+                                @for (int i = 1; i <= 5; i++)
+                                {
+                                    <span class="star @(i <= review.Rating ? "filled" : "empty")">★</span>
+                                }
+                            </div>
+                            <p class="review-comment">@review.Comment</p>
+                        </div>
                     }
                 }
                 else
                 {
-                    <p class="owner-badge">You are the seller of this listing</p>
-                }
-            </div>
-        </div>
-    </div>
-
-    <!-- Related Listings -->
-    @if (Model.RelatedListings != null && Model.RelatedListings.Any())
-    {
-        <div class="related-listings">
-            <h3>Similar Listings</h3>
-            <div class="related-listings-grid">
-                @foreach (var related in Model.RelatedListings)
-                {
-                    <a href="@Url.Action("Details", "Listing", new { id = related.Id })" class="related-listing-item">
-                        <div class="related-image">
-                            @{
-                                var relatedImage = related.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
-                                ?? related.Images?.FirstOrDefault()?.ImagePath
-                                ?? "/images/placeholder.png";
-                            }
-                            <img src="@relatedImage" alt="@related.Title">
-                        </div>
-                        <div class="related-info">
-                            <h4>@related.Title</h4>
-                            <p class="related-price">@related.Price.ToString("C")</p>
-                        </div>
-                    </a>
+                    <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
                 }
             </div>
         </div>
     }
-</div>
-
-<!-- Offer Modal -->
-<div id="offerModal" class="modal">
-    <div class="modal-content">
-        <span class="close-btn" onclick="closeOfferModal()">&times;</span>
-        <h2>Make an Offer</h2>
-        <form id="offerForm">
-            <input type="hidden" id="listingId" value="@Model.Listing.Id">
-            <label for="offerAmount">Your Offer (@Model.Listing.Price.ToString("C") is the asking price):</label>
-            <input style="border-radius:50px; padding:10px" type="number" id="offerAmount" name="offerAmount"
-                   required min="1" max="@Model.Listing.Price" step="0.01" value="@Math.Round(Model.Listing.Price * 0.9m, 2)">
-            <br><br>
-            <label for="offerMessage">Message (optional):</label><br>
-            <textarea id="offerMessage" name="offerMessage" rows="4" cols="40"
-                      placeholder="Explain why you're making this offer..."></textarea>
-            <br><br>
-            <button type="submit" class="btn-sendmessage">Send Offer</button>
-        </form>
-    </div>
-</div>
-
-<style>
-    .logo img {
-        width: 120px;
-        height: 50px;
-        object-fit: cover;
-        border-radius: 8px;
-    }
-    .container {
-        max-width: 1200px;
-        margin: 0 auto;
-        padding: 0 20px;
-    }
-
-    .breadcrumb {
-        display: flex;
-        margin-bottom: 20px;
-        font-size: 14px;
-        color: #666;
-    }
-
-        .breadcrumb a {
-            color: #0066cc;
-            text-decoration: none;
-            margin: 0 5px;
-        }
-
-            .breadcrumb a:first-child {
-                margin-left: 0;
-            }
-
-            .breadcrumb a:hover {
-                text-decoration: underline;
-            }
-
-    .listing-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-    }
-
-        .listing-header h1 {
-            margin: 0;
-            font-size: 24px;
-            flex: 1;
-        }
-
-    .price {
-        font-size: 24px;
-        font-weight: bold;
-        color: #0066cc;
-    }
-
-    .main-content {
-        display: flex;
-        gap: 30px;
-        margin-bottom: 30px;
-    }
-
-    .image-gallery {
-        flex: 0 0 60%;
-    }
-
-    .main-image {
-        width: 100%;
-        height: 400px;
-        object-fit: cover;
-        border-radius: 10px;
-        margin-bottom: 10px;
-    }
-
-    .thumbnail-container {
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        padding-bottom: 10px;
-    }
-
-    .thumbnail {
-        width: 80px;
-        height: 80px;
-        object-fit: cover;
-        border-radius: 5px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
-    }
-
-        .thumbnail:hover {
-            transform: scale(1.05);
-        }
-
-    .property-details {
-        flex: 0 0 35%;
-    }
-
-    .detail-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 10px 0;
-        border-bottom: 1px solid #f0f0f0;
-    }
-
-    .label {
-        font-weight: bold;
-        color: #555;
-    }
-
-    .value {
-        color: #333;
-    }
-
-    .btn-bookmark, .btn-buynow {
-        padding: 10px 15px;
-        border: 1px solid #ddd;
-        border-radius: 20px;
-        background: white;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-        .btn-bookmark:hover {
-            background: #f0f0f0;
-        }
-
-        .btn-buynow:hover {
-            background: #2CB736;
-            color: white;
-        }
-
-    .product-specifications {
-        margin-bottom: 30px;
-        padding: 20px;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-    }
-
-        .product-specifications h3 {
-            margin-top: 0;
-            margin-bottom: 15px;
-            border-bottom: 1px solid #ddd;
-            padding-bottom: 10px;
-        }
-
-    .description-section {
-        margin-bottom: 30px;
-    }
-
-        .description-section h3 {
-            margin-bottom: 15px;
-        }
-
-    .description-content {
-        line-height: 1.6;
-    }
-
-    .seller-info {
-        margin-bottom: 30px;
-    }
-
-    .seller-card {
-        display: flex;
-        background-color: #f8f9fa;
-        border-radius: 10px;
-        padding: 20px;
-    }
-
-    .seller-photo {
-        width: 80px;
-        height: 80px;
-        border-radius: 50%;
-        margin-right: 20px;
-        object-fit: cover;
-    }
-
-    .seller-details h3 {
-        margin-top: 0;
-        margin-bottom: 10px;
-    }
-
-    .phone {
-        margin-bottom: 15px;
-        color: #666;
-    }
-
-    .btn-sendmessage, .btn-makeoffer {
-        padding: 8px 15px;
-        border: none;
-        border-radius: 20px;
-        cursor: pointer;
-        margin-right: 10px;
-        font-size: 14px;
-    }
-
-    .btn-sendmessage {
-        background-color: #0066cc;
-        color: white;
-    }
-
-    .btn-makeoffer {
-        background-color: #f0f0f0;
-        color: #333;
-    }
-
-    .btn-sendmessage:hover {
-        background-color: #0055b3;
-    }
-
-    .btn-makeoffer:hover {
-        background-color: #e0e0e0;
-    }
-
-    .owner-badge {
-        display: inline-block;
-        padding: 5px 10px;
-        background-color: #f0f0f0;
-        color: #666;
-        border-radius: 15px;
-        font-size: 14px;
-    }
-
-    .related-listings {
-        margin-top: 40px;
-    }
-
-        .related-listings h3 {
-            margin-bottom: 20px;
-        }
-
-    .related-listings-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-    }
-
-    .related-listing-item {
-        text-decoration: none;
-        color: inherit;
-        display: block;
-        transition: transform 0.2s ease;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        overflow: hidden;
-    }
-
-        .related-listing-item:hover {
-            transform: translateY(-5px);
-        }
-
-    .related-image {
-        height: 150px;
-        overflow: hidden;
-    }
-
-        .related-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-    .related-info {
-        padding: 10px;
-    }
-
-        .related-info h4 {
-            margin: 0 0 5px 0;
-            font-size: 16px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-    .related-price {
-        color: #0066cc;
-        font-weight: bold;
-        margin: 0;
-    }
-
-    /* Modal Styles */
-    .modal {
-        display: none;
-        position: fixed;
-        z-index: 1000;
-        left: 0;
-        top: 0;
-        width: 100%;
-        height: 100%;
-        background-color: rgba(0,0,0,0.5);
-    }
-
-    .modal-content {
-        background-color: white;
-        margin: 10% auto;
-        padding: 20px;
-        width: 80%;
-        max-width: 500px;
-        border-radius: 10px;
-        position: relative;
-    }
-
-    .close-btn {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 24px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-
-    /* Responsive design */
-    @@media (max-width: 768px) {
-        .main-content {
-            flex-direction: column;
-        }
-
-        .image-gallery {
-            flex: 0 0 100%;
-        }
-
-        .property-details {
-            flex: 0 0 100%;
-        }
-
-        .related-listings-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }</style>
-
+</body>
+</html>
 <script>
-        // Change main image when thumbnail is clicked
+    // Detect guest mode from server-side session
+    const isGuest = @(Context.Session.GetInt32("UserId") == null ? "true" : "false");
+
+    // Change main image when thumbnail is clicked
     function changeMainImage(imageSrc) {
         document.getElementById('main-image').src = imageSrc;
     }
 
-    // Open offer modal - ADD THIS FUNCTION
+    // Show login-required notification
+    function showLoginMessage() {
+        showNotification("You must be logged in to perform this action.", true);
+    }
+
+    // Open offer modal (only if logged in)
     function openOfferModal() {
+        if (isGuest) {
+            showLoginMessage();
+            return;
+        }
         document.getElementById('offerModal').style.display = 'block';
     }
 
-    // Close offer modal - KEEP THIS FUNCTION
+    // Close offer modal
     function closeOfferModal() {
         document.getElementById('offerModal').style.display = 'none';
     }
 
     // Toggle bookmark
     function toggleBookmark(listingId) {
+        if (isGuest) {
+            showLoginMessage();
+            return;
+        }
+
         fetch('/Listing/ToggleBookmark', {
             method: 'POST',
             headers: {
@@ -565,11 +1001,8 @@
         .then(data => {
             if (data.success) {
                 const bookmarkBtn = document.getElementById('bookmark-btn');
-                if (data.isBookmarked) {
-                    bookmarkBtn.textContent = "Remove from Bookmark";
-                } else {
-                    bookmarkBtn.textContent = "Add to Bookmark";
-                }
+                bookmarkBtn.textContent = data.isBookmarked ? "Remove from Bookmark" : "Add to Bookmark";
+                showNotification(data.message);
             } else {
                 alert(data.message);
             }
@@ -579,9 +1012,42 @@
         });
     }
 
+    // Add to cart functionality
+    function addToCart(listingId) {
+        if (isGuest) {
+            showLoginMessage();
+            return;
+        }
+
+        fetch('/Payment/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `listingId=${listingId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding to cart:', error);
+            alert('An error occurred while adding the item to your cart.');
+        });
+    }
+
     // Handle offer submission
-    document.getElementById('offerForm').addEventListener('submit', function(e) {
+    document.getElementById('offerForm')?.addEventListener('submit', function(e) {
         e.preventDefault();
+
+        if (isGuest) {
+            showLoginMessage();
+            return;
+        }
 
         const listingId = document.getElementById('listingId').value;
         const offerAmount = document.getElementById('offerAmount').value;
@@ -595,13 +1061,14 @@
             body: JSON.stringify({
                 listingId: listingId,
                 offerAmount: offerAmount,
+                offerAmountRaw: offerAmount,
                 message: message
             })
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
+                showNotification(data.message);
                 closeOfferModal();
             } else {
                 alert(data.message);
@@ -613,93 +1080,61 @@
         });
     });
 
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('offerModal');
-        if (event.target === modal) {
-            closeOfferModal();
+    // Accept or reject offers
+    function respondToOffer(offerId, accept) {
+        if (isGuest) {
+            showLoginMessage();
+            return;
         }
-    }
 
-    // Optional: Pre-populate offer amount with a percentage of the listing price
-    document.addEventListener('DOMContentLoaded', function() {
-        const offerAmountInput = document.getElementById('offerAmount');
-        if (offerAmountInput) {
-            offerAmountInput.addEventListener('input', function() {
-                // Ensure the offer doesn't exceed the listing price
-                const maxPrice = @Model.Listing.Price;
-                if (parseFloat(this.value) > maxPrice) {
-                    this.value = maxPrice;
-                }
-            });
-        }
-    });
-    // Change main image when thumbnail is clicked
-    function changeMainImage(imageSrc) {
-        document.getElementById('main-image').src = imageSrc;
-    }
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-
-    // Toggle bookmark
-    function toggleBookmark(listingId) {
-        fetch('/Listing/ToggleBookmark', {
+        fetch('/Listing/RespondToOffer', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
             },
-            body: `listingId=${listingId}`
+            body: `offerId=${offerId}&accept=${accept}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                const bookmarkBtn = document.getElementById('bookmark-btn');
-                if (data.isBookmarked) {
-                    bookmarkBtn.textContent = "Remove from Bookmark";
-                } else {
-                    bookmarkBtn.textContent = "Add to Bookmark";
-                }
+                showNotification(data.message);
+                setTimeout(() => location.reload(), 1500);
             } else {
                 alert(data.message);
             }
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error responding to offer:', error);
+            alert('An error occurred while processing your response. Please try again.');
         });
     }
 
-    // Handle offer submission
-    document.getElementById('offerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
+    // Generic notification handler
+    function showNotification(message, isError = false) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '5px';
+        notification.style.zIndex = '9999';
+        notification.style.transition = 'opacity 0.5s ease-in-out';
 
-        const listingId = document.getElementById('listingId').value;
-        const offerAmount = document.getElementById('offerAmount').value;
-        const message = document.getElementById('offerMessage').value;
+        document.body.appendChild(notification);
 
-        fetch('/Listing/MakeOffer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                listingId: listingId,
-                offerAmount: offerAmount,
-                message: message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                alert(data.message);
-                closeOfferModal();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while submitting your offer. Please try again.');
-        });
-    });
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
 
     // Close modal when clicking outside
     window.onclick = function(event) {
@@ -709,17 +1144,57 @@
         }
     }
 
-    // Optional: Pre-populate offer amount with a percentage of the listing price
+    // Offer price limit enforcement
     document.addEventListener('DOMContentLoaded', function() {
         const offerAmountInput = document.getElementById('offerAmount');
         if (offerAmountInput) {
-            offerAmountInput.addEventListener('input', function() {
-                // Ensure the offer doesn't exceed the listing price
-                const maxPrice = @Model.Listing.Price;
+            offerAmountInput.addEventListener('input', function () {
+                const maxPrice = parseFloat('@Model.Listing.Price');
                 if (parseFloat(this.value) > maxPrice) {
                     this.value = maxPrice;
                 }
             });
         }
+    });
+
+    // Review form submission
+    document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (isGuest) {
+            showLoginMessage();
+            return;
+        }
+
+        const listingId = document.getElementById('listingId').value;
+        const rating = document.querySelector('input[name="rating"]:checked')?.value;
+        const comment = document.getElementById('comment').value;
+
+        if (!rating) {
+            alert('Please select a rating');
+            return;
+        }
+
+        fetch('/ProductReview/AddReview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+            },
+            body: `listingId=${listingId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload();
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while submitting your review.');
+        });
     });
 </script>

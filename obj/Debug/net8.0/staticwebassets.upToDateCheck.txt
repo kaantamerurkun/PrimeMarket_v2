@@ -85,6 +85,12 @@ wwwroot\images\listings\40_5c82be10-efca-4e85-8b24-60b3e54d065a.png
 wwwroot\images\listings\41_00f25a31-4e56-4a2b-aee7-9f70626c12c2.png
 wwwroot\images\listings\42_d3d70dda-f9cc-493f-81e9-8cba2aadab07.png
 wwwroot\images\listings\43_d39da1b9-cef4-4337-b6ae-1d3feca1dfdf.png
+wwwroot\images\listings\44_136f1149-3fed-4e5c-9913-903a2d45058f.png
+wwwroot\images\listings\44_15b6e7e9-76ca-41cf-8802-10f2ba9f3eed.png
+wwwroot\images\listings\44_c6e5dc2c-7798-48e1-8bff-54582b485f5e.png
+wwwroot\images\listings\44_e8cab622-4cfc-47bc-bac4-0be76686ace7.png
+wwwroot\images\listings\44_fc98ee90-b0ef-4ae1-a24d-3b2ab9c4bdde.png
+wwwroot\images\listings\45_bf3165fe-a67b-4cc7-a486-02af84cbe038.png
 wwwroot\images\listings\5_131dd15b-04b3-48e7-b670-c498a05ca223.png
 wwwroot\images\listings\5_eeec6a1d-f09c-401d-9f77-ca8e987ce59c.jpg
 wwwroot\images\listings\6_1a09695a-11a5-4c2d-82b4-54f4804a50f3.png
@@ -124,6 +130,7 @@ wwwroot\images\profiles\14_9906f896-6693-4ce1-9d37-645b2c386955.png
 wwwroot\images\profiles\14_abe225a1-e2ae-4c02-86d9-6573bfd23c63.jpg
 wwwroot\images\profiles\15_4f163a1a-b8d4-48be-baff-200cc319aa72.png
 wwwroot\images\profiles\21_0e389ee4-a7aa-445f-a770-f51e1594c107.JPG
+wwwroot\images\profiles\22_c09655d6-7fc1-4b54-b313-35059b0f6821.jpg
 wwwroot\images\sales.png
 wwwroot\images\shopping_cart_icon.png
 wwwroot\images\user-placeholder.png
@@ -140,7 +147,9 @@ wwwroot\images\verification\back_18_edb24c98-2da8-43ad-b4a5-e018654dad20.png
 wwwroot\images\verification\back_19_aaa61477-def1-49b5-bd42-4429baca4647.png
 wwwroot\images\verification\back_20_94f35934-d393-45ff-bdc2-1d8bc081f18a.png
 wwwroot\images\verification\back_21_279ad40e-5694-4019-a3ae-09207faf75fd.jpg
+wwwroot\images\verification\back_22_dd047376-235e-4918-a2b6-6761779e73a8.jpeg
 wwwroot\images\verification\face_21_b4149901-409d-4c9b-b92d-707c1949421c.JPG
+wwwroot\images\verification\face_22_27290466-b486-4512-9f5e-8a0f37769ca8.jpg
 wwwroot\images\verification\front_14_2582e2c0-53c6-4053-8c5e-5665b022ca4c.png
 wwwroot\images\verification\front_14_40492d63-2284-47ea-9d5c-8ba9f08679d6.png
 wwwroot\images\verification\front_14_44bad9b6-21cf-4501-a7d6-6b5ad9fcd472.png
@@ -154,6 +163,7 @@ wwwroot\images\verification\front_18_a6ae440d-325a-42dd-a70e-53008338584d.png
 wwwroot\images\verification\front_19_587afc38-51c2-4537-9b79-1c217622e7d5.png
 wwwroot\images\verification\front_20_a1386817-5b5d-449b-b156-57794622692c.png
 wwwroot\images\verification\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg
+wwwroot\images\verification\front_22_1af44678-d485-440b-a9f6-1426740ae863.jpeg
 wwwroot\images\verified.png
 wwwroot\js\404.js
 wwwroot\js\category-filtering.js
