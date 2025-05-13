@@ -17,68 +17,70 @@ namespace PrimeMarket.Models.Factory
             // Handle subcategories for Electronics category
             if (category == "Electronics")
             {
-                // Check for known subcategories in Electronics
-                return normalizedSubcategory switch
+                // Standardize the subcategory names to match DB models
+                switch (normalizedSubcategory)
                 {
-                    "Laptops" => new Laptop(),
-                    "Desktops" => new Desktop(),
-                    "Computer Accessories" => new ComputerAccessory(),
-                    "Computer Components" => new ComputerComponent(),
-                    "Monitors" => new Monitor(),
-                    "Fridges" => new Fridge(),
-                    "Washers" => new Washer(),
-                    "Dishwashers" => new Dishwasher(),
-                    "Ovens" => new Oven(),
-                    "Stoves" => new Stove(),
-                    "Microwave Ovens" => new MicrowaveOven(),
-                    "Vacuum Cleaners" => new VacuumCleaner(),
-                    "Beverage Preparations" => new BeveragePreparation(),
-                    "Food Preparations" => new FoodPreparation(),
-                    "Irons" => new Iron(),
-                    "Sewing Machines" => new SewingMachine(),
-                    "Keyboards" => new Keyboard(),
-                    "Speakers" => new Speaker(),
-                    "HeadPhones&EarPhones" => new HeadphoneEarphone(),
-                    "Webcams" => new Webcam(),
-                    "Microphones" => new Microphone(),
-                    "Mouses" => new Mouse(),
-                    "Computer Bags" => new ComputerBag(),
-                    "Televisions" => new Television(),
-                    _ => throw new ArgumentException($"Unsupported subcategory in Electronics: {normalizedSubcategory}")
-                };
+                    case "white goods/ovens":
+                    case "Oven":
+                    case "Ovens":
+                        return new Oven();
+                    case "Desktops":
+                    case "desktop":
+                    case "computer/desktop":
+                        return new Desktop();
+                    case "tablet/ios":
+                    case "IOS Tablets":
+                        return new IOSTablet();
+                    case "tablet/Android":
+                    case "Android Tablets":
+                        return new AndroidTablet();
+                    case "tablet/OtherTablets":
+                    case "Other Tablets":
+                        return new OtherTablet();
+                    // Check for other Electronics subcategories
+                    case "Laptops": return new Laptop();
+                    case "Computer Accessories": return new ComputerAccessory();
+                    case "Computer Components": return new ComputerComponent();
+                    case "Monitors": return new Monitor();
+                    case "Fridges": return new Fridge();
+                    case "Washers": return new Washer();
+                    case "Dishwashers": return new Dishwasher();
+                    case "Stoves": return new Stove();
+                    case "Microwave Ovens": return new MicrowaveOven();
+                    case "Vacuum Cleaners": return new VacuumCleaner();
+                    case "Beverage Preparations": return new BeveragePreparation();
+                    case "Food Preparations": return new FoodPreparation();
+                    case "Irons": return new Iron();
+                    case "Sewing Machines": return new SewingMachine();
+                    case "Keyboards": return new Keyboard();
+                    case "Speakers": return new Speaker();
+                    case "HeadPhones&EarPhones": return new HeadphoneEarphone();
+                    case "Webcams": return new Webcam();
+                    case "Microphones": return new Microphone();
+                    case "Mouses": return new Mouse();
+                    case "Computer Bags": return new ComputerBag();
+                    case "Televisions": return new Television();
+                    default:
+                        throw new ArgumentException($"Unsupported subcategory in Electronics: {normalizedSubcategory}");
+                }
             }
 
             // Main switch for standard category/subcategory combinations
-            return (category, normalizedSubcategory) switch
+            switch (normalizedSubcategory)
             {
-                ("Phone", "IOS Phone") => new IOSPhone(),
-                ("Phone", "Android Phone") => new AndroidPhone(),
-                ("Phone", "Other Phones") => new OtherPhone(),
-                ("Phone", "Phone Accessories") => new PhoneAccessory(),
-
-                ("Tablets", "IOS Tablets") => new IOSTablet(),
-                ("Tablets", "Android Tablets") => new AndroidTablet(),
-                ("Tablets", "Other Tablets") => new OtherTablet(),
-                ("Tablets", "Tablet Accessories") => new TabletAccessory(),
-
+                case "IOS Phone": return new IOSPhone();
+                case "Android Phone": return new AndroidPhone();
+                case "Other Phones": return new OtherPhone();
+                case "Phone Accessories": return new PhoneAccessory();
+                case "IOS Tablets": return new IOSTablet();
+                case "Android Tablets": return new AndroidTablet();
+                case "Other Tablets": return new OtherTablet();
+                case "Tablet Accessories": return new TabletAccessory();
                 // Special case for just "Tablets" (might come from selection)
-                ("Tablets", "Tablets") => new OtherTablet(),
-
-                // Handle potential mismatches in categorization
-                var (cat, sub) when cat == "Phone" && sub.Contains("Phone") => new OtherPhone(),
-                var (cat, sub) when cat == "Tablets" && sub.Contains("Tablet") => new OtherTablet(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Laptop") => new Laptop(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Desktop") => new Desktop(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Fridge") => new Fridge(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Wash") => new Washer(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Dishwasher") => new Dishwasher(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Oven") => new Oven(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Vacuum") => new VacuumCleaner(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("Television") => new Television(),
-                var (cat, sub) when cat == "Electronics" && sub.Contains("TV") => new Television(),
-
-                _ => throw new ArgumentException($"Unsupported product type: {category} - {normalizedSubcategory}")
-            };
+                case "Tablets": return new OtherTablet();
+                default:
+                    throw new ArgumentException($"Unsupported product type: {category} - {normalizedSubcategory}");
+            }
         }
     }
 }

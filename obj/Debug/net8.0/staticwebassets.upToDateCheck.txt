@@ -54,6 +54,9 @@ wwwroot\images\listings\18_280534e2-a364-4dd7-bd47-234ac8714b46.jpg
 wwwroot\images\listings\18_dcaa13c6-8d65-4c91-9f5d-b35a4d56c5f7.png
 wwwroot\images\listings\19_02bc8673-7bf3-4136-a15d-cb95cee2a4a3.png
 wwwroot\images\listings\19_10cd19c3-1c8c-4185-9694-0d7d1031ffe8.png
+wwwroot\images\listings\2_194c98c1-1039-4f87-a56d-c47347938aa3.webp
+wwwroot\images\listings\2_23a3c632-1552-4d16-a65f-d738d1c05fa2.webp
+wwwroot\images\listings\2_d0f536d8-9138-477e-a068-06b80db047c4.webp
 wwwroot\images\listings\20_30df8657-7527-4698-8282-13372eb74d28.png
 wwwroot\images\listings\20_ba15c5e7-04c8-477e-bcbb-a71d6d5aa89a.png
 wwwroot\images\listings\21_d9f118ec-ab14-445c-bed7-4abab36e356e.png
