@@ -1,9 +1,12 @@
-﻿@{
+﻿```cshtml
+@{
     var isUserLoggedIn = Context.Session.GetInt32("UserId") != null;
-    if(isUserLoggedIn)
+    if (isUserLoggedIn)
     {
         Layout = "~/Views/Shared/_LayoutUser.cshtml";
-    } else {
+    }
+    else
+    {
         Layout = "~/Views/Shared/_LayoutGuest.cshtml";
     }
 }
@@ -22,6 +25,31 @@
             height: 50px;
             object-fit: cover;
             border-radius: 8px;
+        }
+
+        /* Star Rating Styles */
+        .item-rating {
+            margin-bottom: 8px;
+        }
+
+        .stars {
+            display: flex;
+            align-items: center;
+        }
+
+        .star {
+            color: #ddd;
+            font-size: 14px;
+        }
+
+            .star.full, .star.half {
+                color: #ffb74d;
+            }
+
+        .rating-text {
+            margin-left: 5px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
@@ -71,6 +99,41 @@
                             <div class="result-details">
                                 <h3>@listing.Title</h3>
                                 <p class="result-price">@listing.Price.ToString("C")</p>
+
+                                <!-- Star Rating Display -->
+                                <div class="item-rating">
+                                    @{
+                                        // Use TryGetValue pattern to avoid null reference exceptions
+                                        double? avgRating = null;
+                                        if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(listing.Id))
+                                        {
+                                            avgRating = ViewBag.ListingRatings[listing.Id];
+                                        }
+
+                                        double rating = avgRating ?? 0;
+                                        int fullStars = (int)Math.Floor(rating);
+                                        bool hasHalfStar = rating - fullStars >= 0.5;
+                                    }
+                                    <div class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= fullStars)
+                                            {
+                                                <span class="star full">★</span>
+                                            }
+                                            else if (i == fullStars + 1 && hasHalfStar)
+                                            {
+                                                <span class="star half">★</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="star empty">☆</span>
+                                            }
+                                        }
+                                        <span class="rating-text">@rating.ToString("0.0")</span>
+                                    </div>
+                                </div>
+
                                 <p class="result-location">@listing.Location</p>
                                 <span class="result-condition">@listing.Condition</span>
                             </div>
@@ -270,6 +333,8 @@
                 grid-template-columns: 1fr;
             }
 
-            }</style>
+            }
+        </style>
+    </div>
 </body>
 </html>

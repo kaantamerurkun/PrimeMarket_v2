@@ -37,7 +37,7 @@
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                     <div class="profile-info">
                         <div class="profile-image-container">
-                            <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.ProfileImagePath)"
+                            <img src="@(string.IsNullOrEmpty(Model.ProfileImagePath) ? "/images/placeholder.png" : Model.ProfileImagePath)"
                                  alt="Profile" class="profile-image" id="profile-image">
                             <label for="profile-image-upload" class="camera-button">
                                 @if (isVerified)
@@ -76,7 +76,7 @@
                     </div>
                 </form>
 
-                <!-- EMAIL FORM -->
+                <!-- Email form section enhancements for EditProfile.cshtml -->
                 <form asp-action="UpdateEmail" asp-controller="User" method="post">
                     @Html.AntiForgeryToken()
                     <h2>Email Address</h2>
@@ -88,12 +88,16 @@
                         <label asp-for="Email">New Email</label>
                         <input style="border-radius:50px" asp-for="Email" type="email" placeholder="Enter new email address" />
                         <span asp-validation-for="Email" class="text-danger"></span>
-                        <p class="note">Note: Changing your email will require verification of the new address.</p>
+                        <p class="note">
+                            <strong>Important:</strong> Changing your email requires verification of the new address.
+                            We'll send a verification code to your new email address.
+                        </p>
                     </div>
                     <div class="button-container">
                         <button type="submit" class="btn-savechangesandgoprofile">Update Email</button>
                     </div>
                 </form>
+
 
                 <!-- PASSWORD FORM -->
                 <form asp-action="UpdatePassword" asp-controller="User" method="post">

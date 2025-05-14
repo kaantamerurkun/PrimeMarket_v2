@@ -224,7 +224,7 @@
         // Add hover effect for main items
         if (level === 'main') {
             li.addEventListener('mouseover', () => {
-                li.style.color = '#0066cc';
+/*                li.style.color = '#0066cc';*/
             });
             li.addEventListener('mouseout', () => {
                 li.style.color = '';
@@ -287,34 +287,34 @@
         let noResultsFound = true;
 
         // Update the current filter display
-        if (activeFilter.category) {
-            activeFilterText = activeFilter.category;
-            if (activeFilter.subcategory) {
-                activeFilterText += ' > ' + activeFilter.subcategory;
-                if (activeFilter.detailCategory) {
-                    activeFilterText += ' > ' + activeFilter.detailCategory;
-                }
-            }
-        }
+        //if (activeFilter.category) {
+        //    activeFilterText = activeFilter.category;
+        //    if (activeFilter.subcategory) {
+        //        activeFilterText += ' > ' + activeFilter.subcategory;
+        //        if (activeFilter.detailCategory) {
+        //            activeFilterText += ' > ' + activeFilter.detailCategory;
+        //        }
+        //    }
+        //}
 
         // Update filter indicator if it exists
-        const filterIndicator = document.getElementById('current-filter');
-        if (filterIndicator) {
-            filterIndicator.textContent = activeFilterText;
-        } else {
-            // Create filter indicator if it doesn't exist
-            const listingsHeader = document.querySelector('.listings h2');
-            if (listingsHeader) {
-                const indicator = document.createElement('span');
-                indicator.id = 'current-filter';
-                indicator.textContent = activeFilterText;
-                indicator.style.fontSize = '16px';
-                indicator.style.fontWeight = 'normal';
-                indicator.style.color = '#555';
-                indicator.style.marginLeft = '15px';
-                listingsHeader.appendChild(indicator);
-            }
-        }
+        //const filterIndicator = document.getElementById('current-filter');
+        //if (filterIndicator) {
+        //    filterIndicator.textContent = activeFilterText;
+        //} else {
+        //    // Create filter indicator if it doesn't exist
+        //    const listingsHeader = document.querySelector('.listings h2');
+        //    if (listingsHeader) {
+        //        const indicator = document.createElement('span');
+        //        indicator.id = 'current-filter';
+        //        indicator.textContent = activeFilterText;
+        //        indicator.style.fontSize = '16px';
+        //        indicator.style.fontWeight = 'normal';
+        //        indicator.style.color = '#555';
+        //        indicator.style.marginLeft = '15px';
+        //        listingsHeader.appendChild(indicator);
+        //    }
+        //}
 
         // Apply the filter
         allItems.forEach(item => {

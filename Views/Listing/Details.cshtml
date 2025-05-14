@@ -178,7 +178,13 @@
         }
 
         .description-section {
-        margin-bottom: 30px;
+            margin-bottom: 30px;
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            flex-shrink: 1;
+            min-width: 0; 
         }
 
         .description-section h3 {
@@ -608,7 +614,15 @@
     <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
 
         <div class="listing-header">
-            <h1>@Model.Listing.Title</h1>
+            <h1 style="margin-bottom: 30px;
+            max-width: 100%;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            white-space: normal;
+            flex-shrink: 1;
+            min-width: 0; ">
+                @Model.Listing.Title
+            </h1>
             <div class="price">@Model.Listing.Price.ToString("C")</div>
         </div>
 

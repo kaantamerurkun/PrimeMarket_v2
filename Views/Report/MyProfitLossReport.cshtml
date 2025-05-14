@@ -113,6 +113,14 @@
 </div>
 
 <style>
+    .listing-info a {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        max-width: 100%;
+    }
     .logo img {
         width: 120px;
         height: 50px;
@@ -408,13 +416,7 @@
             return;
         }
 
-            const labels = rawChartData.map(d => {
-        const date = new Date(d.Label);
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${year}-${month}`;
-    });
-
+        const labels = rawChartData.map(d => d.Label);
         const values = rawChartData.map(d => d.Value);
 
         if (!labels.length || !values.length) {
@@ -431,7 +433,7 @@
         const width = canvas.width = canvas.offsetWidth;
         const height = canvas.height = 400;
 
-        const margin = { top: 40, right: 30, bottom: 50, left: 80 };
+        const margin = { top: 40, right: 30, bottom: 50, left: 60 };
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 

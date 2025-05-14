@@ -1470,15 +1470,18 @@ public async Task<IActionResult> DeleteListing(int id)
             return View(viewModel);
         }
         // Add this method to your ListingController.cs file
-        [HttpGet]
-        public async Task<IActionResult> Search(string query)
+// ListingController.cs - Updated Search Method
+[HttpGet]
+public async Task<IActionResult> Search(string query)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (string.IsNullOrEmpty(query))
             {
-                if (userId == null) { 
-                    return RedirectToAction("Index", "Home"); 
-                }else
+                if (userId == null)
+                {
+                    return RedirectToAction("Index", "Home");
+                }
+                else
                 {
                     return RedirectToAction("User_MainPage", "User");
                 }
@@ -1501,6 +1504,9 @@ public async Task<IActionResult> DeleteListing(int id)
                     .OrderByDescending(l => l.CreatedAt)
                     .ToListAsync();
 
+                // Calculate average ratings for all listings
+                ViewBag.ListingRatings = GetListingRatings(numberResults.Select(l => l.Id).ToList());
+
                 return View("~/Views/Home/Search_Page.cshtml", numberResults);
             }
 
@@ -1517,7 +1523,12 @@ public async Task<IActionResult> DeleteListing(int id)
                     if (listing != null)
                     {
                         // Return a list with just one item
-                        return View("~/Views/Home/Search_Page.cshtml", new List<Listing> { listing });
+                        var singleListing = new List<Listing> { listing };
+
+                        // Calculate ratings for this single listing
+                        ViewBag.ListingRatings = GetListingRatings(new List<int> { listing.Id });
+
+                        return View("~/Views/Home/Search_Page.cshtml", singleListing);
                     }
                 }
             }
@@ -1534,7 +1545,26 @@ public async Task<IActionResult> DeleteListing(int id)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
+            // Calculate average ratings for all listings
+            ViewBag.ListingRatings = GetListingRatings(results.Select(l => l.Id).ToList());
+
             return View("~/Views/Home/Search_Page.cshtml", results);
+        }
+
+        // Helper method to get average ratings for a list of listing IDs
+        private Dictionary<int, double> GetListingRatings(List<int> listingIds)
+        {
+            var ratings = _context.ProductReviews
+                .Where(r => listingIds.Contains(r.ListingId))
+                .GroupBy(r => r.ListingId)
+                .Select(g => new
+                {
+                    ListingId = g.Key,
+                    AverageRating = Math.Round(g.Average(r => r.Rating), 1)
+                })
+                .ToDictionary(x => x.ListingId, x => x.AverageRating);
+
+            return ratings;
         }
         [HttpGet]
         public async Task<IActionResult> Guest_Listing_Details(int id)

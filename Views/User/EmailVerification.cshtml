@@ -2,6 +2,8 @@
     ViewBag.Title = "Email Verification";
     var email = ViewBag.Email as string;
     var isEmailUpdate = TempData["IsEmailUpdate"] as bool? ?? false;
+    // Check if verification code was already sent during signup
+    var verificationAlreadySent = TempData["VerificationSent"] as bool? ?? false;
 }
 
 <!DOCTYPE html>
@@ -49,6 +51,7 @@
                     <br /><br />
                     <input type="hidden" id="email" value="@email" />
                     <input type="hidden" id="isEmailUpdate" value="@isEmailUpdate.ToString().ToLower()" />
+                    <input type="hidden" id="verificationAlreadySent" value="@verificationAlreadySent.ToString().ToLower()" />
                     <div>
                         <button class="send-btn" type="submit">Verify</button>
                     </div>
@@ -59,26 +62,30 @@
     </div>
 
     <script>
-        // Auto-send verification code when page loads
+        // Auto-send verification code only when a new verification is needed (not during signup)
         window.addEventListener("DOMContentLoaded", function () {
             const email = document.getElementById("email").value;
+            const verificationAlreadySent = document.getElementById("verificationAlreadySent").value === "true";
 
-            fetch('/User/SendVerificationCode', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                body: new URLSearchParams({ email })
-            })
-            .then(res => {
-                if (!res.ok) throw new Error("Failed to send code.");
-                return res.json();
-            })
-            .then(() => {
-                console.log("Verification code sent to:", email);
-            })
-            .catch(err => {
-                console.error(err);
-                showMessage("Failed to send verification code. Please refresh the page and try again.", true);
-            });
+            // Only send a new verification code if one wasn't already sent during signup
+            if (!verificationAlreadySent) {
+                fetch('/User/SendVerificationCode', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: new URLSearchParams({ email })
+                })
+                .then(res => {
+                    if (!res.ok) throw new Error("Failed to send code.");
+                    return res.json();
+                })
+                .then(() => {
+                    console.log("Verification code sent to:", email);
+                })
+                .catch(err => {
+                    console.error(err);
+                    showMessage("Failed to send verification code. Please refresh the page and try again.", true);
+                });
+            }
         });
 
         // Helper function to show success/error messages

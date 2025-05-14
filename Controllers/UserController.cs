@@ -59,9 +59,10 @@ namespace PrimeMarket.Controllers
             return RedirectToAction("EditProfile");
         }
 
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
+// Enhanced UpdateEmail Method
+[HttpPost]
+[ValidateAntiForgeryToken]
+public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null) return RedirectToAction("Login");
@@ -88,18 +89,113 @@ namespace PrimeMarket.Controllers
                 TempData["NewEmail"] = model.Email;
                 TempData["IsEmailUpdate"] = true;
 
-                // Send verification code to the new email
-                SendVerificationCodeInternal(model.Email);
+                // Send verification code to the new email using the enhanced method
+                SendVerificationCodeForEmailUpdate(model.Email);
+
+                // Redirect to the dedicated email update verification page
+                return RedirectToAction("EmailUpdateVerification", new { email = model.Email });
             }
             catch (Exception ex)
             {
                 TempData["ErrorMessage"] = "Failed to send verification email: " + ex.Message;
                 return RedirectToAction("EditProfile");
             }
-
-            // Redirect to the email verification page
-            return RedirectToAction("EmailVerification", new { email = model.Email });
         }
+
+        // New EmailUpdateVerification action
+        [HttpGet]
+        public IActionResult EmailUpdateVerification(string email)
+        {
+            ViewBag.Email = email;
+            return View();
+        }
+
+        // Enhanced method specifically for email updates
+        private void SendVerificationCodeForEmailUpdate(string email)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.Email == email);
+
+            // Remove any existing verification code for this email
+            var existingCode = _context.EmailVerifications.FirstOrDefault(v => v.Email == email);
+            if (existingCode != null)
+                _context.EmailVerifications.Remove(existingCode);
+
+            // Generate a new code
+            var code = new Random().Next(100000, 999999).ToString();
+
+            // Save the code
+            _context.EmailVerifications.Add(new EmailVerification
+            {
+                Email = email,
+                Code = code,
+                Expiration = DateTime.UtcNow.AddMinutes(10)
+            });
+
+            _context.SaveChanges();
+
+            try
+            {
+                using (var smtpClient = new SmtpClient(_emailSettings.Host))
+                {
+                    smtpClient.Port = _emailSettings.Port;
+                    smtpClient.Credentials = new NetworkCredential(_emailSettings.SenderEmail, _emailSettings.SenderPassword);
+                    smtpClient.EnableSsl = _emailSettings.EnableSsl;
+
+                    var mailMessage = new MailMessage
+                    {
+                        From = new MailAddress(_emailSettings.SenderEmail, _emailSettings.SenderName),
+                        Subject = "PrimeMarket Email Address Update Verification",
+                        IsBodyHtml = true,
+                        Body = $@"
+                <html>
+                <head>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                        .container {{ width: 100%; max-width: 600px; margin: 0 auto; padding: 20px; }}
+                        .header {{ background-color: #0066cc; color: white; padding: 15px; text-align: center; }}
+                        .content {{ padding: 20px; background-color: #f8f9fa; border-radius: 0 0 5px 5px; }}
+                        .code {{ font-size: 28px; font-weight: bold; text-align: center; 
+                                 margin: 30px 0; color: #0066cc; letter-spacing: 5px; padding: 15px;
+                                 background-color: #e9f0f8; border-radius: 10px; }}
+                        .footer {{ font-size: 12px; text-align: center; margin-top: 30px; color: #666; }}
+                        .note {{ font-size: 14px; color: #555; font-style: italic; margin-top: 20px; }}
+                        .button {{ display: inline-block; background-color: #0066cc; color: white; 
+                                  padding: 10px 20px; text-decoration: none; border-radius: 5px; 
+                                  margin-top: 20px; text-align: center; }}
+                    </style>
+                </head>
+                <body>
+                    <div class='container'>
+                        <div class='header'>
+                            <h1>Email Update Verification</h1>
+                        </div>
+                        <div class='content'>
+                            <p>Hello,</p>
+                            <p>You have requested to update your email address on your PrimeMarket account. To complete this change, please use the verification code below:</p>
+                            <div class='code'>{code}</div>
+                            <p>This code will expire in 10 minutes for security reasons.</p>
+                            <p class='note'>If you did not request to change your email address, please ignore this message or contact customer support immediately.</p>
+                            <p>Thank you,<br>The PrimeMarket Team</p>
+                        </div>
+                        <div class='footer'>
+                            <p>This is an automated message, please do not reply to this email.</p>
+                            <p>PrimeMarket &copy; 2024. All rights reserved.</p>
+                        </div>
+                    </div>
+                </body>
+                </html>"
+                    };
+
+                    mailMessage.To.Add(email);
+                    smtpClient.Send(mailMessage);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Email sending error: {ex.Message}. Please check your email configuration.", ex);
+            }
+        }
+
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -455,6 +551,10 @@ namespace PrimeMarket.Controllers
             try
             {
                 SendVerificationCodeInternal(model.Email);
+
+                // Add a flag to indicate we've already sent a verification code
+                TempData["VerificationSent"] = true;
+
                 return RedirectToAction("EmailVerification", "User", new { email = model.Email });
             }
             catch (Exception ex)
@@ -880,17 +980,36 @@ namespace PrimeMarket.Controllers
             ViewBag.ListingId = id;
             return View();
         }
-
-        [UserAuthenticationFilter]
-        public async Task<IActionResult> User_MainPageAsync()
+// UserController.cs - Updated User_MainPageAsync Method
+[UserAuthenticationFilter]
+public async Task<IActionResult> User_MainPageAsync()
         {
             var approvedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active && (!l.Stock.HasValue || l.Stock > 0))
-                .Include(l => l.Images)          //  <<– THIS LINE is the key
+                .Include(l => l.Images)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
+            // Calculate average ratings for all listings
+            ViewBag.ListingRatings = GetListingRatings(approvedListings.Select(l => l.Id).ToList());
+
             return View(approvedListings);
+        }
+
+        // Helper method to get average ratings for a list of listing IDs
+        private Dictionary<int, double> GetListingRatings(List<int> listingIds)
+        {
+            var ratings = _context.ProductReviews
+                .Where(r => listingIds.Contains(r.ListingId))
+                .GroupBy(r => r.ListingId)
+                .Select(g => new
+                {
+                    ListingId = g.Key,
+                    AverageRating = Math.Round(g.Average(r => r.Rating), 1)
+                })
+                .ToDictionary(x => x.ListingId, x => x.AverageRating);
+
+            return ratings;
         }
 
         [UserAuthenticationFilter]

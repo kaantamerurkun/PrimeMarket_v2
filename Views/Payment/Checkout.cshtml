@@ -16,7 +16,9 @@
                     <img src="@Model.ListingImage" alt="@Model.ListingTitle" width="120" height="120">
                 </div>
                 <div class="item-details">
-                    <h3>@Model.ListingTitle</h3>
+                    <h3>
+                        @Model.ListingTitle
+                    </h3>
                     <p class="seller">Seller: @Model.SellerName</p>
                     <p class="price">@Model.ListingPrice.ToString("C")</p>
                 </div>
@@ -76,6 +78,14 @@
 </div>
 
 <style>
+    .item-details h3 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        word-break: break-word;
+        overflow-wrap: break-word;
+        white-space: normal;
+        max-width: 100%;
+    }
     .container {
         margin: 120px auto 50px auto; /* top, horizontal center, bottom */
         max-width: 1000px;

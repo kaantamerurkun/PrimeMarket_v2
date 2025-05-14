@@ -10,12 +10,73 @@
     <title>PrimeMarket - Main Page</title>
     <link rel="stylesheet" href="/css/UserMainPage.css" />
     <style>
+        /* Add these styles to both CSS sections in User_MainPage.cshtml and Index.cshtml */
+
+        .item-card-link {
+            text-decoration: none;
+            color: inherit;
+            display: block;
+            transition: transform 0.2s ease;
+            width: calc(25% - 20px); /* 4 per row */
+            min-width: 250px;
+            max-width: 300px;
+            height: 350px; /* Fixed height for all cards */
+        }
+
+            .item-card-link:hover {
+                transform: translateY(-5px);
+            }
+
+        .item-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .item-image {
+            height: 200px;
+            overflow: hidden;
+            flex-shrink: 0; /* Prevent image from shrinking */
+        }
+
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+        .item-info {
+            padding: 15px;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent content from overflowing */
+        }
+
+            .item-info h3 {
+                margin-top: 0;
+                margin-bottom: 10px;
+                font-size: 18px;
+                white-space: nowrap; /* Keep the text on a single line */
+                overflow: hidden; /* Hide overflow text */
+                text-overflow: ellipsis; /* Add ellipsis (...) at the end */
+                max-width: 100%; /* Ensure it takes full width of container */
+                line-height: 1.5; /* Proper line height for descenders */
+                padding-bottom: 5px; /* Extra padding to prevent cutting off descenders */
+                height: 27px; /* Fixed height to accommodate the line height */
+            }
         .logo img {
             width: 120px;
             height: 50px;
             object-fit: cover;
             border-radius: 8px;
         }
+
         .listing-content {
             max-width: 1400px;
             margin: 0 auto;
@@ -69,16 +130,6 @@
                 object-fit: cover;
             }
 
-        .item-info {
-            padding: 15px;
-        }
-
-            .item-info h3 {
-                margin-top: 0;
-                margin-bottom: 10px;
-                font-size: 18px;
-            }
-
         .item-description {
             color: #666;
             font-size: 14px;
@@ -89,7 +140,7 @@
         .item-price {
             font-weight: bold;
             color: #0066cc;
-            font-size: 18px;
+            font-size: 16px;
             margin-bottom: 5px;
         }
 
@@ -124,6 +175,31 @@
             border-radius: 5px;
             cursor: pointer;
             margin-top: 10px;
+        }
+
+        /* Star Rating Styles */
+        .item-rating {
+            margin-bottom: 8px;
+        }
+
+        .stars {
+            display: flex;
+            align-items: center;
+        }
+
+        .star {
+            color: #ddd;
+            font-size: 14px;
+        }
+
+            .star.full, .star.half {
+                color: #ffb74d;
+            }
+
+        .rating-text {
+            margin-left: 5px;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
@@ -168,12 +244,39 @@
 
                             <div class="item-info">
                                 <h3>@item.Title</h3>
-                                <p class="item-description">
-                                    @(item.Description.Length > 100
-                                        ? item.Description.Substring(0, 100) + "..."
-                                        : item.Description)
-                                </p>
                                 <p class="item-price">@item.Price.ToString("C")</p>
+                                <div class="item-rating">
+                                    @{
+                                        // Use TryGetValue pattern to avoid null reference exceptions
+                                        double? avgRating = null;
+                                        if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(item.Id))
+                                        {
+                                            avgRating = ViewBag.ListingRatings[item.Id];
+                                        }
+
+                                        double rating = avgRating ?? 0;
+                                        int fullStars = (int)Math.Floor(rating);
+                                        bool hasHalfStar = rating - fullStars >= 0.5;
+                                    }
+                                    <div class="stars">
+                                        @for (int i = 1; i <= 5; i++)
+                                        {
+                                            if (i <= fullStars)
+                                            {
+                                                <span class="star full">★</span>
+                                            }
+                                            else if (i == fullStars + 1 && hasHalfStar)
+                                            {
+                                                <span class="star half">★</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="star empty">☆</span>
+                                            }
+                                        }
+                                        <span class="rating-text">@rating.ToString("0.0")</span>
+                                    </div>
+                                </div>
                                 <p class="item-location">@item.Location</p>
 
                                 <span class="item-category" style="display:none;">@item.Category</span>

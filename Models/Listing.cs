@@ -14,7 +14,7 @@ namespace PrimeMarket.Models
         [Required]
         public int SellerId { get; set; }
 
-        [Required, MaxLength(200)]
+        [Required]
         public string Title { get; set; }
 
         [Required]

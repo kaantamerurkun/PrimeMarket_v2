@@ -169,8 +169,16 @@
       "PackagePath": "staticwebassets\\images\\listings\\10_e1da4fb4-a189-4c35-88d3-70a2f8c399fd.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\11_10c3bfca-f66c-4def-824b-706302a30ed6.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\11_10c3bfca-f66c-4def-824b-706302a30ed6.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\11_2e5047c5-2446-4a8a-9998-57e23cfe615f.png",
       "PackagePath": "staticwebassets\\images\\listings\\11_2e5047c5-2446-4a8a-9998-57e23cfe615f.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\11_9af6ba37-7c25-4bda-bb5c-7cf46edfc868.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\11_9af6ba37-7c25-4bda-bb5c-7cf46edfc868.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\11_d32f82a9-7e51-478a-9746-4e077cff02be.png",
@@ -185,12 +193,28 @@
       "PackagePath": "staticwebassets\\images\\listings\\12_6ebeb147-322b-4ed0-b54f-531f65e8e8b4.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_1a4aa6a4-007b-4ca5-8bba-a4fdfd08cef4.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\13_1a4aa6a4-007b-4ca5-8bba-a4fdfd08cef4.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png",
       "PackagePath": "staticwebassets\\images\\listings\\13_424b49f5-32a9-48aa-8531-8b794c21cd86.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_8f2d96c7-e240-4ebe-87d1-5cc0cce51bb5.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\13_8f2d96c7-e240-4ebe-87d1-5cc0cce51bb5.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_d9f6110d-26b0-4668-a409-3c9c66bf9742.png",
       "PackagePath": "staticwebassets\\images\\listings\\13_d9f6110d-26b0-4668-a409-3c9c66bf9742.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\13_fc2d3e81-a5e4-4a8e-98e1-e848abcf4bcf.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\13_fc2d3e81-a5e4-4a8e-98e1-e848abcf4bcf.webp"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\14_148a46ac-e776-4a3a-aded-d5235d4efed3.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\14_148a46ac-e776-4a3a-aded-d5235d4efed3.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\14_259e20bd-ed4c-4851-84ae-e8809bafb15f.png",
@@ -201,12 +225,24 @@
       "PackagePath": "staticwebassets\\images\\listings\\14_56042f45-9c5e-4c71-add3-80dd520245d2.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\14_c07bfdac-2748-46ce-a56d-3f17620b9d13.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\14_c07bfdac-2748-46ce-a56d-3f17620b9d13.webp"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\15_53dc0787-b565-4cd2-89a6-e2f611d89282.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\15_53dc0787-b565-4cd2-89a6-e2f611d89282.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\15_a995203b-e0f2-41aa-b470-069c22d941d1.png",
       "PackagePath": "staticwebassets\\images\\listings\\15_a995203b-e0f2-41aa-b470-069c22d941d1.png"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\15_be9ec451-522c-4bce-9afe-190557c95779.png",
       "PackagePath": "staticwebassets\\images\\listings\\15_be9ec451-522c-4bce-9afe-190557c95779.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\15_e8797d1a-a015-47ee-b5c6-57bff6e9d5ff.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\15_e8797d1a-a015-47ee-b5c6-57bff6e9d5ff.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\16_56a10dfa-1499-413e-a146-d5cd752be8ad.jpg",

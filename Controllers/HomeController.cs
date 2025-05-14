@@ -23,12 +23,32 @@ public class HomeController : Controller
     {
         var listings = _context.Listings
             .Where(l =>
-                l.Status == ListingStatus.Active &&                 // still for sale
-                (!l.Stock.HasValue || l.Stock > 0))                // second?hand OR stock?positive
-                   .Include(l => l.Images)          //  <<– THIS LINE is the key
+                l.Status == ListingStatus.Active &&                // still for sale
+                (!l.Stock.HasValue || l.Stock > 0))                // second-hand OR stock-positive
+                   .Include(l => l.Images)
             .OrderByDescending(l => l.CreatedAt)
             .ToList();
+
+        // Calculate average ratings for all listings
+        ViewBag.ListingRatings = GetListingRatings(listings.Select(l => l.Id).ToList());
+
         return View(listings);
+    }
+
+    // Helper method to get average ratings for a list of listing IDs
+    private Dictionary<int, double> GetListingRatings(List<int> listingIds)
+    {
+        var ratings = _context.ProductReviews
+            .Where(r => listingIds.Contains(r.ListingId))
+            .GroupBy(r => r.ListingId)
+            .Select(g => new
+            {
+                ListingId = g.Key,
+                AverageRating = Math.Round(g.Average(r => r.Rating), 1)
+            })
+            .ToDictionary(x => x.ListingId, x => x.AverageRating);
+
+        return ratings;
     }
 
 

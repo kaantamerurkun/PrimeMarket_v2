@@ -1,0 +1,238 @@
+﻿@{
+    ViewBag.Title = "Update Email Verification";
+    var email = ViewBag.Email as string;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewBag.Title</title>
+    <link rel="stylesheet" href="/css/EmailVerification.css" />
+    <style>
+        .logo img {
+            width: 120px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+        }
+
+        .container {
+            max-width: 500px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h2 {
+            color: #0066cc;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .verification-code {
+            margin: 30px 0;
+        }
+
+        .code-input {
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            width: 250px;
+            outline: none;
+            font-size: 16px;
+            text-align: center;
+            letter-spacing: 2px;
+            transition: border-color 0.3s ease;
+        }
+
+        .code-input:focus {
+            border-color: #0066cc;
+        }
+
+        .verify-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .verify-btn:hover {
+            background-color: #0055aa;
+        }
+
+        .verify-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+
+        .resend-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #0066cc;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .resend-link:hover {
+            text-decoration: underline;
+        }
+
+        .result-message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img style="height: 100px" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" />
+
+        <h2>Verify Your New Email Address</h2>
+        <p>To complete your email update, please enter the verification code we've sent to <strong>@email</strong></p>
+
+        <div class="verification-code">
+            <input type="text"
+                   id="verificationCode"
+                   class="code-input"
+                   maxlength="6"
+                   placeholder="Enter 6-digit code"
+                   required />
+        </div>
+
+        <input type="hidden" id="email" value="@email" />
+
+        <button id="verifyButton" class="verify-btn">Verify Email</button>
+
+        <div>
+            <a id="resendCode" class="resend-link">Didn't receive a code? Send again</a>
+        </div>
+
+        <div id="resultMessage" class="result-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Auto-send verification code when page loads
+            sendVerificationCode();
+
+            // Handle verification button click
+            document.getElementById('verifyButton').addEventListener('click', verifyCode);
+
+            // Handle resend link click
+            document.getElementById('resendCode').addEventListener('click', function(e) {
+                e.preventDefault();
+                sendVerificationCode();
+            });
+        });
+
+        function sendVerificationCode() {
+            const email = document.getElementById("email").value;
+            const resendLink = document.getElementById("resendCode");
+
+            // Temporarily disable resend link
+            resendLink.style.opacity = "0.5";
+            resendLink.style.pointerEvents = "none";
+            resendLink.textContent = "Sending code...";
+
+            fetch('/User/SendVerificationCode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email })
+            })
+            .then(res => {
+                if (!res.ok) throw new Error("Failed to send code.");
+                return res.json();
+            })
+            .then(() => {
+                showMessage("Verification code sent! Please check your email.", false);
+
+                // Re-enable resend link after 30 seconds
+                setTimeout(() => {
+                    resendLink.style.opacity = "1";
+                    resendLink.style.pointerEvents = "auto";
+                    resendLink.textContent = "Didn't receive a code? Send again";
+                }, 30000);
+            })
+            .catch(err => {
+                console.error(err);
+                showMessage("Failed to send verification code. Please try again.", true);
+
+                // Re-enable resend link immediately on error
+                resendLink.style.opacity = "1";
+                resendLink.style.pointerEvents = "auto";
+                resendLink.textContent = "Didn't receive a code? Send again";
+            });
+        }
+
+        function verifyCode() {
+            const email = document.getElementById("email").value;
+            const code = document.getElementById("verificationCode").value;
+            const verifyButton = document.getElementById("verifyButton");
+
+            if (!code || code.length !== 6) {
+                showMessage("Please enter a valid 6-digit verification code.", true);
+                return;
+            }
+
+            // Disable button during verification
+            verifyButton.disabled = true;
+            verifyButton.textContent = "Verifying...";
+
+            fetch('/User/VerifyEmailCode', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: new URLSearchParams({ email, code })
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error("Verification failed");
+                }
+                return res.json();
+            })
+            .then(data => {
+                showMessage("Email verified successfully! Redirecting to your profile...", false);
+                setTimeout(() => window.location.href = data.redirectUrl, 2000);
+            })
+            .catch(() => {
+                showMessage("Invalid or expired verification code. Please try again.", true);
+                verifyButton.disabled = false;
+                verifyButton.textContent = "Verify Email";
+            });
+        }
+
+        function showMessage(message, isError) {
+            const messageElement = document.getElementById("resultMessage");
+            messageElement.textContent = message;
+            messageElement.className = "result-message " + (isError ? "error" : "success");
+            messageElement.style.display = "block";
+        }
+    </script>
+</body>
+</html>
