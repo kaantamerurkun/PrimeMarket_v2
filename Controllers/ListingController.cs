@@ -1542,6 +1542,8 @@ public async Task<IActionResult> DeleteListing(int id)
             var listing = await _context.Listings
                 .Include(l => l.Images)
                 .Include(l => l.Seller)
+                .Include(l => l.Reviews)
+                .ThenInclude(r => r.User)
                 .FirstOrDefaultAsync(l => l.Id == id);
 
             if (listing == null)
@@ -1560,9 +1562,106 @@ public async Task<IActionResult> DeleteListing(int id)
                 return NotFound();
             }
 
-            // Get product-specific details
+            // Get product-specific details (existing code)
             dynamic product = null;
-
+            if (!string.IsNullOrEmpty(listing.DetailCategory))
+            {
+                switch (listing.DetailCategory)
+                {
+                    case "Laptops":
+                    case "Laptop":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Desktop":
+                    case "Desktops":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Accessory":
+                    case "Computer Accesories":
+                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Component":
+                    case "Computer Components":
+                        product = await _context.ComputerComponents.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Monitor":
+                    case "Monitors":
+                        product = await _context.Monitors.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Fridge":
+                    case "Fridges":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Washer":
+                    case "Washers":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Stove":
+                    case "Stoves":
+                        product = await _context.Stoves.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Microwave Oven":
+                    case "Microwave Ovens":
+                        product = await _context.MicrowaveOvens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Dishwasher":
+                    case "Diswashers":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Oven":
+                    case "Ovens":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Vacuum Cleaner":
+                    case "Vacuum Cleaners":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Beverage Preparation":
+                    case "Beverage Preparations":
+                        product = await _context.BeveragePreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Food Preparation":
+                    case "Food Preparations":
+                        product = await _context.FoodPreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Iron":
+                    case "Irons":
+                        product = await _context.Irons.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Sewing Machine":
+                    case "Sewing Machines":
+                        product = await _context.SewingMachines.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Keyboard":
+                    case "Keyboards":
+                        product = await _context.Keyboards.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Speaker":
+                    case "Speakers":
+                        product = await _context.Speakers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Headphone & Earphone":
+                    case "Headphone & Earphones":
+                        product = await _context.HeadphonesEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Webcam":
+                    case "Webcams":
+                        product = await _context.Webcams.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Microphone":
+                    case "Microphones":
+                        product = await _context.Microphones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Mouse":
+                    case "Mouses":
+                        product = await _context.Mouses.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Bag":
+                    case "Computer Bags":
+                        product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                }
+            }
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
@@ -1573,10 +1672,36 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Android Phone":
                         product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-                    case "Laptops":
-                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Other Phone":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-
+                    case "Spare Part":
+                        product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessory":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Tablet":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablet":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablet":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessory":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Television":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Heating & Cooling":
+                        product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Camera":
+                        product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                 }
             }
 
@@ -1588,7 +1713,7 @@ public async Task<IActionResult> DeleteListing(int id)
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings (same category)
+            // Get related listings (existing code)
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -1598,6 +1723,47 @@ public async Task<IActionResult> DeleteListing(int id)
                 .Take(4)
                 .ToListAsync();
 
+            // Get active offers if this is a second-hand listing (existing code)
+            List<Offer> activeOffers = new List<Offer>();
+            if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
+            {
+                activeOffers = await _context.Offers
+                    .Include(o => o.Buyer)
+                    .Where(o => o.ListingId == id && o.Status == OfferStatus.Pending)
+                    .OrderByDescending(o => o.CreatedAt)
+                    .ToListAsync();
+            }
+
+            // Check if user can review this product
+            bool canReview = false;
+            bool hasReviewed = false;
+
+            if (userId.HasValue && listing.Condition == "First-Hand")
+            {
+                // Check if user has purchased and received this product
+                var hasPurchased = await _context.Purchases
+                    .Include(p => p.Confirmation)
+                    .AnyAsync(p => p.BuyerId == userId.Value &&
+                                  p.ListingId == id &&
+                                  p.PaymentStatus == PaymentStatus.Completed &&
+                                  p.Confirmation != null &&
+                                  p.Confirmation.BuyerReceivedProduct);
+
+                if (hasPurchased)
+                {
+                    // Check if user has already reviewed
+                    hasReviewed = await _context.ProductReviews
+                        .AnyAsync(r => r.UserId == userId.Value && r.ListingId == id);
+
+                    canReview = !hasReviewed;
+                }
+            }
+
+            // Calculate average rating and total reviews
+            var reviews = listing.Reviews?.ToList() ?? new List<ProductReview>();
+            double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
+            int totalReviews = reviews.Count;
+
             // Create view model
             var viewModel = new ListingDetailsViewModel
             {
@@ -1605,7 +1771,13 @@ public async Task<IActionResult> DeleteListing(int id)
                 Product = product,
                 IsBookmarked = isBookmarked,
                 RelatedListings = relatedListings,
-                IsOwner = userId.HasValue && userId.Value == listing.SellerId
+                IsOwner = userId.HasValue && userId.Value == listing.SellerId,
+                ActiveOffers = activeOffers,
+                Reviews = reviews,
+                AverageRating = Math.Round(averageRating, 1),
+                TotalReviews = totalReviews,
+                CanReview = canReview,
+                HasReviewed = hasReviewed
             };
 
             return View(viewModel);
