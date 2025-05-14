@@ -228,7 +228,7 @@ namespace PrimeMarket.Controllers
                 {
                     try
                     {
-                        var product = ProductFactory.CreateProduct(model.Category, model.SubCategory);
+                        var product = ProductFactory.CreateProduct(model.Category, model.SubCategory, model.DetailCategory);
                         if (product != null)
                         {
                             product.ListingId = listing.Id;
@@ -603,9 +603,6 @@ namespace PrimeMarket.Controllers
                         break;
 
                     // General fallback (if any final top‑level category exists)
-                    case "Computers":
-                        product = await _context.Computers.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
 
                     // Default – not recognised
                     default:
@@ -1254,6 +1251,104 @@ public async Task<IActionResult> DeleteListing(int id)
 
             // Get product-specific details (existing code)
             dynamic product = null;
+            if (!string.IsNullOrEmpty(listing.DetailCategory))
+            {
+                switch (listing.DetailCategory)
+                {
+                    case "Laptops":
+                    case "Laptop":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Desktop":
+                    case "Desktops":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Accessory":
+                    case "Computer Accesories":
+                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Component":
+                    case "Computer Components":
+                        product = await _context.ComputerComponents.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Monitor":
+                    case "Monitors":
+                        product = await _context.Monitors.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Fridge":
+                    case "Fridges":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Washer":
+                    case "Washers":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Stove":
+                    case "Stoves":
+                        product = await _context.Stoves.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Microwave Oven":
+                    case "Microwave Ovens":
+                        product = await _context.MicrowaveOvens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Dishwasher":
+                    case "Diswashers":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Oven":
+                    case "Ovens":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Vacuum Cleaner":
+                    case "Vacuum Cleaners":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Beverage Preparation":
+                    case "Beverage Preparations":
+                        product = await _context.BeveragePreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Food Preparation":
+                    case "Food Preparations":
+                        product = await _context.FoodPreparations.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Iron":
+                    case "Irons":
+                        product = await _context.Irons.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Sewing Machine":
+                    case "Sewing Machines":
+                        product = await _context.SewingMachines.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Keyboard":
+                    case "Keyboards":
+                        product = await _context.Keyboards.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Speaker":
+                    case "Speakers":
+                        product = await _context.Speakers.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Headphone & Earphone":
+                    case "Headphone & Earphones":
+                        product = await _context.HeadphonesEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Webcam":
+                    case "Webcams":
+                        product = await _context.Webcams.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Microphone":
+                    case "Microphones":
+                        product = await _context.Microphones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Mouse":
+                    case "Mouses":
+                        product = await _context.Mouses.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Computer Bag":
+                    case "Computer Bags":
+                        product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                }
+            }
             if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
@@ -1285,54 +1380,6 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Tablet Accessory":
                         product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
-                    case "Laptops":
-                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Desktop":
-                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Computer Accessory":
-                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Computer Component":
-                        product = await _context.ComputerComponents.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Monitor":
-                        product = await _context.Monitors.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Fridge":
-                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Stove":
-                        product = await _context.Stoves.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Microwave Oven":
-                        product = await _context.MicrowaveOvens.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Dishwasher":
-                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Oven":
-                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Vacuum Cleaner":
-                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Beverage Preparation":
-                        product = await _context.BeveragePreparations.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Food Preparation":
-                        product = await _context.FoodPreparations.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Iron":
-                        product = await _context.Irons.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Sewing Machine":
-                        product = await _context.SewingMachines.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Washer":
-                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
                     case "Television":
                         product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
@@ -1341,30 +1388,6 @@ public async Task<IActionResult> DeleteListing(int id)
                         break;
                     case "Camera":
                         product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Computer":
-                        product = await _context.Computers.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Keyboard":
-                        product = await _context.Keyboards.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Speaker":
-                        product = await _context.Speakers.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Headphone & Earphone":
-                        product = await _context.HeadphonesEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Webcam":
-                        product = await _context.Webcams.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Microphone":
-                        product = await _context.Microphones.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Mouse":
-                        product = await _context.Mouses.FirstOrDefaultAsync(p => p.ListingId == id);
-                        break;
-                    case "Computer Bag":
-                        product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                 }
             }

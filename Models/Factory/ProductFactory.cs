@@ -9,78 +9,168 @@ namespace PrimeMarket.Models.Factory
 {
     public static class ProductFactory
     {
-        public static BaseProduct CreateProduct(string category, string subcategory)
+        public static BaseProduct CreateProduct(string category, string subcategory, string detailcategory)
         {
             // Normalize subcategory to match with switch cases
-            string normalizedSubcategory = subcategory?.Trim();
+            string? normalizedSubcategory = subcategory?.Trim();
+            string? normalizedDetailcategory = detailcategory?.Trim();
+            if (category == "Phone")
+            {
+                normalizedDetailcategory = null;
+                switch (normalizedSubcategory)
+                {
+                    case "IOS Phone":
+                    case "IOS Phones":
+                        return new IOSPhone();
+                    case "Android Phone":
+                    case "Android Phones":
+                        return new AndroidPhone();
+                    case "Other Phones":
+                    case "Other Phone":
+                        return new OtherPhone();
+                    case "Phone Accessories":
+                    case "Phone Accessory":
+                        return new PhoneAccessory();
+                    case "Spare Parts":
+                    case "Spare Part":
+                        return new SparePart();
+                }
+            }
+            if (category == "Tablet")
+            {
+                normalizedDetailcategory = null;
+                switch (normalizedSubcategory)
+                {
+                    case "IOS Tablet":
+                    case "IOS Tablets":
+                        return new IOSTablet();
+                    case "Android Tablet":
+                    case "Android Tablets":
+                        return new AndroidTablet();
+                    case "Other Tablets":
+                    case "Other Tablet":
+                        return new OtherTablet();
+                    case "Tablet Accessories":
+                    case "Tablet Accessory":
+                        return new TabletAccessory();
+                }
+            }
 
             // Handle subcategories for Electronics category
             if (category == "Electronics")
             {
-                // Standardize the subcategory names to match DB models
-                switch (normalizedSubcategory)
+                if (normalizedSubcategory == "Computer")
                 {
-                    case "white goods/ovens":
-                    case "Oven":
-                    case "Ovens":
-                        return new Oven();
-                    case "Desktops":
-                    case "desktop":
-                    case "computer/desktop":
-                        return new Desktop();
-                    case "tablet/ios":
-                    case "IOS Tablets":
-                        return new IOSTablet();
-                    case "tablet/Android":
-                    case "Android Tablets":
-                        return new AndroidTablet();
-                    case "tablet/OtherTablets":
-                    case "Other Tablets":
-                        return new OtherTablet();
-                    // Check for other Electronics subcategories
-                    case "Laptops": return new Laptop();
-                    case "Computer Accessories": return new ComputerAccessory();
-                    case "Computer Components": return new ComputerComponent();
-                    case "Monitors": return new Monitor();
-                    case "Fridges": return new Fridge();
-                    case "Washers": return new Washer();
-                    case "Dishwashers": return new Dishwasher();
-                    case "Stoves": return new Stove();
-                    case "Microwave Ovens": return new MicrowaveOven();
-                    case "Vacuum Cleaners": return new VacuumCleaner();
-                    case "Beverage Preparations": return new BeveragePreparation();
-                    case "Food Preparations": return new FoodPreparation();
-                    case "Irons": return new Iron();
-                    case "Sewing Machines": return new SewingMachine();
-                    case "Keyboards": return new Keyboard();
-                    case "Speakers": return new Speaker();
-                    case "HeadPhones&EarPhones": return new HeadphoneEarphone();
-                    case "Webcams": return new Webcam();
-                    case "Microphones": return new Microphone();
-                    case "Mouses": return new Mouse();
-                    case "Computer Bags": return new ComputerBag();
-                    case "Televisions": return new Television();
-                    default:
-                        throw new ArgumentException($"Unsupported subcategory in Electronics: {normalizedSubcategory}");
+                    switch (normalizedDetailcategory)
+                    {
+                        case "Laptop":
+                        case "Laptops":
+                            return new Laptop();
+                        case "Desktops":
+                        case "Desktop":
+                            return new Desktop();
+                        case "Computer Accessory":
+                        case "Computer Accessories":
+                            return new ComputerAccessory();
+                        case "Computer Components":
+                        case "Computer Component":
+                            return new ComputerComponent();
+                        case "Monitors":
+                        case "Monitor":
+                            return new Monitor();
+                    }
+                }
+                if (normalizedSubcategory == "White Goods")
+                {
+                    switch (normalizedDetailcategory)
+                    {
+                        case "Fridge":
+                        case "Fridges":
+                            return new Fridge();
+                        case "Washers":
+                        case "Washer":
+                            return new Washer();
+                        case "Dishwashers":
+                        case "Dishwasher":
+                            return new Dishwasher();
+                        case "Stoves":
+                        case "Stove":
+                            return new Stove();
+                        case "Ovens":
+                        case "Oven":
+                            return new Oven();
+                        case "Microwave Ovens":
+                        case "Microwave Oven":
+                            return new MicrowaveOven();
+                    }
+                }
+                if (normalizedSubcategory == "Electrical Domestic Appliances")
+                {
+                    switch (normalizedDetailcategory)
+                    {
+                        case "Vacuum Cleaner":
+                        case "Vacuum Cleaners":
+                            return new VacuumCleaner();
+                        case "Beverage Preparation":
+                        case "Beverage Preparations":
+                            return new BeveragePreparation();
+                        case "Food Preparation":
+                        case "Food Preparations":
+                            return new FoodPreparation();
+                        case "Iron":
+                        case "Irons":
+                            return new Iron();
+                        case "Sewing Machine":
+                        case "Sewing Machines":
+                            return new SewingMachine();
+                    }
+                }
+                if (normalizedSubcategory == "Televisions")
+                {
+                    normalizedDetailcategory = null;
+                    return new Television();
+                }
+                if (normalizedSubcategory == "Heating & Cooling")
+                {
+                    normalizedDetailcategory = null;
+                    return new HeatingCooling();
+                }
+                if (normalizedSubcategory == "Cameras")
+                {
+                    normalizedDetailcategory = null;
+                    return new Camera();
+                }
+                if (normalizedSubcategory == "Computer Accessories")
+                {
+                    switch (normalizedDetailcategory)
+                    {
+                        case "Keyboard":
+                        case "Keyboards":
+                            return new Keyboard();
+                        case "Speaker":
+                        case "Speakers":
+                            return new Speaker();
+                        case "Headphones & Earphones":
+                        case "Headphones & Earphone":
+                            return new HeadphoneEarphone();
+                        case "Webcam":
+                        case "Webcams":
+                            return new Webcam();
+                        case "Microphone":
+                        case "Microphones":
+                            return new Microphone();
+                        case "Mouse":
+                        case "Mouses":
+                            return new Mouse();
+                        case "Computer Bag":
+                        case "Computer Bags":
+                            return new ComputerBag();
+                    }
                 }
             }
 
-            // Main switch for standard category/subcategory combinations
-            switch (normalizedSubcategory)
-            {
-                case "IOS Phone": return new IOSPhone();
-                case "Android Phone": return new AndroidPhone();
-                case "Other Phones": return new OtherPhone();
-                case "Phone Accessories": return new PhoneAccessory();
-                case "IOS Tablets": return new IOSTablet();
-                case "Android Tablets": return new AndroidTablet();
-                case "Other Tablets": return new OtherTablet();
-                case "Tablet Accessories": return new TabletAccessory();
-                // Special case for just "Tablets" (might come from selection)
-                case "Tablets": return new OtherTablet();
-                default:
-                    throw new ArgumentException($"Unsupported product type: {category} - {normalizedSubcategory}");
-            }
+            // Default case to handle unmatched inputs
+            throw new ArgumentException("Invalid category, subcategory, or detailcategory provided.");
         }
     }
 }

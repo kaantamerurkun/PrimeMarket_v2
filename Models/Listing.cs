@@ -108,6 +108,5 @@ namespace PrimeMarket.Models
         public virtual SparePart SparePart { get; set; }
         public virtual HeatingCooling HeatingCooling { get; set; }
         public virtual Camera Camera { get; set; }
-        public virtual Computer Computer { get; set; }
     }
 }

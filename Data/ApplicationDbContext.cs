@@ -63,7 +63,6 @@ namespace PrimeMarket.Data
         public DbSet<HeadphoneEarphone> HeadphonesEarphones { get; set; }
         public DbSet<HeatingCooling> HeatingCoolings { get; set; }
         public DbSet<Camera> Cameras { get; set; }
-        public DbSet<BaseComputer> Computers { get; set; }
 
         public DbSet<Webcam> Webcams { get; set; }
         public DbSet<Microphone> Microphones { get; set; }
@@ -424,11 +423,6 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Camera>(p => p.ListingId);
 
-            // BaseComputer
-            modelBuilder.Entity<Listing>()
-                .HasOne(l => l.Computer)
-                .WithOne(p => p.Listing)
-                .HasForeignKey<Computer>(p => p.ListingId);
 
             modelBuilder.Entity<ProductReview>()
                 .HasIndex(pr => new { pr.UserId, pr.ListingId })
