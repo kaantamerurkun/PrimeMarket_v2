@@ -23,6 +23,8 @@ namespace PrimeMarket.Controllers
             _logger = logger;
         }
 
+        // Modify the MyProfitLossReport method in ReportController.cs
+        // Modify the MyProfitLossReport method in ReportController.cs
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> MyProfitLossReport(string timeRange = "all")
@@ -75,10 +77,10 @@ namespace PrimeMarket.Controllers
                     ? sales
                     : sales.Where(s => s.CreatedAt >= startDate).ToList();
 
-                // Calculate sales statistics
+                // Calculate sales statistics - UPDATED to use Quantity field
                 var totalRevenue = filteredSales.Sum(s => s.Amount);
-                var totalItems = filteredSales.Count;
-                var averagePrice = totalItems > 0 ? totalRevenue / totalItems : 0;
+                var totalItems = filteredSales.Sum(s => s.Quantity); // Sum quantities instead of counting sales
+                var averagePrice = totalItems > 0 ? totalRevenue / totalItems : 0; // Calculate average per item, not per order
 
                 // Get the top selling categories
                 var topCategories = filteredSales
@@ -86,9 +88,9 @@ namespace PrimeMarket.Controllers
                     .Select(g => new CategoryStatViewModel
                     {
                         Category = g.Key,
-                        Count = g.Count(),
+                        Count = g.Sum(s => s.Quantity), // Sum quantities per category
                         Revenue = g.Sum(s => s.Amount),
-                        Percentage = g.Count() * 100.0 / (totalItems == 0 ? 1 : totalItems)
+                        Percentage = g.Sum(s => s.Quantity) * 100.0 / (totalItems == 0 ? 1 : totalItems) // Calculate percentage based on quantities
                     })
                     .OrderByDescending(c => c.Count)
                     .Take(5)
@@ -137,7 +139,17 @@ namespace PrimeMarket.Controllers
                 // Generate the data points for the chart
                 var chartData = new List<ChartDataPoint>();
 
-                if (timeRange == "week" || timeRange == "month")
+                // Ensure we have at least one data point even if there are no sales
+                if (!filteredSales.Any())
+                {
+                    // Add a single data point with zero value for current date
+                    chartData.Add(new ChartDataPoint
+                    {
+                        Label = DateTime.UtcNow.ToString(timeFormat),
+                        Value = 0
+                    });
+                }
+                else if (timeRange == "week" || timeRange == "month")
                 {
                     // Daily data points
                     for (int i = 0; i < dataPoints; i++)
@@ -174,12 +186,39 @@ namespace PrimeMarket.Controllers
                 }
                 else
                 {
-                    // Monthly data points
+                    // For year and all time, use monthly data points
+
+                    // If we have very few months of data but "all time" is selected,
+                    // make sure we at least have 2 data points
+                    if (timeRange == "all" && filteredSales.Count > 0)
+                    {
+                        // Calculate the actual date range in months
+                        var minDate = filteredSales.Min(s => s.CreatedAt ?? DateTime.UtcNow);
+                        var maxDate = filteredSales.Max(s => s.CreatedAt ?? DateTime.UtcNow);
+                        var monthsSpan = ((maxDate.Year - minDate.Year) * 12) + maxDate.Month - minDate.Month;
+
+                        // If we have less than 2 months of data, adjust to show at least 2 data points
+                        if (monthsSpan < 2)
+                        {
+                            // Start date should be 1 month before the earliest sale
+                            chartStartDate = minDate.AddMonths(-1);
+                            // Make sure we show at least 2 months
+                            dataPoints = Math.Max(2, monthsSpan + 1);
+                        }
+                    }
+
+                    // Monthly data points for year and all time
                     for (int i = 0; i < dataPoints; i++)
                     {
                         var monthStart = timeRange == "year"
                             ? chartStartDate.AddMonths(i)
                             : DateTime.UtcNow.AddMonths(-dataPoints + i + 1);
+
+                        // For "all time" with very few data points, use the adjusted range
+                        if (timeRange == "all" && dataPoints <= 2)
+                        {
+                            monthStart = chartStartDate.AddMonths(i);
+                        }
 
                         var monthEnd = monthStart.AddMonths(1).AddDays(-1);
                         var monthRevenue = filteredSales
@@ -194,14 +233,24 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
+                // If we still somehow ended up with no data points, add a zero point for the current month
+                if (!chartData.Any())
+                {
+                    chartData.Add(new ChartDataPoint
+                    {
+                        Label = DateTime.UtcNow.ToString(timeFormat),
+                        Value = 0
+                    });
+                }
+
                 // Create the view model
                 var viewModel = new ProfitLossReportViewModel
                 {
                     TimeRange = timeRange,
                     PeriodLabel = periodLabel,
-                    TotalSales = totalItems,
+                    TotalSales = totalItems, // This now represents total quantity of items
                     TotalRevenue = totalRevenue,
-                    AveragePrice = averagePrice,
+                    AveragePrice = averagePrice, // This now represents the average price per item
                     TopCategories = topCategories,
                     RecentSales = filteredSales.Take(10).ToList(),
                     ChartData = chartData

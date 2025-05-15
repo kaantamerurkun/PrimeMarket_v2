@@ -355,6 +355,7 @@ namespace PrimeMarket.Controllers
                         product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Phone":
+                    case "Other Phones":
                         product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Spare Part":
@@ -370,6 +371,7 @@ namespace PrimeMarket.Controllers
                         product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Tablet":
+                    case "Other Tablets":
                         product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Tablet Accessory":

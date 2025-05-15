@@ -759,7 +759,7 @@
         <!-- Seller Info -->
         <div class="seller-info">
             <div class="seller-card">
-                <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.Listing.Seller.ProfileImagePath)"
+                <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/placeholder.png" : Model.Listing.Seller.ProfileImagePath)"
                      alt="Seller Photo" class="seller-photo">
                 <div class="seller-details">
                     <h3 style="display: inline-flex; align-items: center; margin-bottom: 10px;">
@@ -775,7 +775,7 @@
                                 @Model.Listing.Seller?.FirstName @Model.Listing.Seller?.LastName
                             </a>
                         }
-                        @if (isVerified)
+                        @if (Model.Listing.Seller.IsIdVerified)
                         {
                             <span class="verified-badge" style="margin-left: 8px;">
                                 <img src="/images/verified.png" alt="Verified" title="Verified User" />

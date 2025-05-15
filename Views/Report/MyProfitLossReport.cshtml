@@ -82,6 +82,7 @@
                             <th>Listing</th>
                             <th>Date</th>
                             <th>Buyer</th>
+                            <th>Quantity</th>
                             <th>Amount</th>
                         </tr>
                     </thead>
@@ -96,6 +97,7 @@
                                 </td>
                                 <td>@(sale.CreatedAt?.ToString("MMM dd, yyyy") ?? "N/A")</td>
                                 <td>@sale.Buyer.FirstName @sale.Buyer.LastName</td>
+                                <td>@sale.Quantity</td>
                                 <td class="amount">@sale.Amount.ToString("C")</td>
                             </tr>
                         }
@@ -121,6 +123,7 @@
         white-space: normal;
         max-width: 100%;
     }
+
     .logo img {
         width: 120px;
         height: 50px;
@@ -356,47 +359,51 @@
     }
 
     @@media (max-width: 768px) {
-        .summary-cards {
-            flex-direction: column;
-            gap: 10px;
-        }
+        .summary-cards
 
-        .categories-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .report-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 15px;
-        }
-
-        .report-actions {
-            width: 100%;
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
-
-        .time-filter {
-            width: 100%;
-        }
-
-            .time-filter select {
-                width: 100%;
-            }
-
-        .btn-refresh {
-            width: 100%;
-            justify-content: center;
-        }
-
-        .period-label {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-        }
+    {
+        flex-direction: column;
+        gap: 10px;
     }
+
+    .categories-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .report-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .report-actions {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+
+    .time-filter {
+        width: 100%;
+    }
+
+        .time-filter select {
+            width: 100%;
+        }
+
+    .btn-refresh {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .period-label {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    }
+
     .chart-container canvas {
         width: 100%;
         display: block;
@@ -428,6 +435,13 @@
             return;
         }
 
+        // Handle edge cases - ensure we have at least 2 data points for line chart
+        if (labels.length === 1) {
+            // If only one data point, duplicate it to create a flat line
+            labels.push(labels[0] + " (copy)");
+            values.push(values[0]);
+        }
+
         const canvas = document.getElementById('revenueChart');
         const ctx = canvas.getContext('2d');
         const width = canvas.width = canvas.offsetWidth;
@@ -437,8 +451,9 @@
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
-        const maxValue = Math.max(...values);
-        const stepX = chartWidth / (values.length - 1);
+        // Handle case where all values are zero
+        const maxValue = Math.max(...values) || 1; // Use 1 as default if all are zero
+        const stepX = chartWidth / Math.max(1, (values.length - 1)); // Avoid division by zero
         const stepY = chartHeight / maxValue;
 
         ctx.clearRect(0, 0, width, height);
@@ -467,34 +482,54 @@
             ctx.fillText("₺" + yVal.toFixed(0), margin.left - 10, y + 4);
         }
 
-        // X axis labels
+        // X axis labels - limit labels if there are too many
         ctx.textAlign = "center";
-        for (let i = 0; i < labels.length; i++) {
+        const maxVisibleLabels = 12;
+        const labelStep = labels.length > maxVisibleLabels ? Math.ceil(labels.length / maxVisibleLabels) : 1;
+
+        for (let i = 0; i < labels.length; i += labelStep) {
             const x = margin.left + i * stepX;
             const y = height - margin.bottom + 15;
-            ctx.fillText(labels[i], x, y + 10);
+            // Rotate labels if they might overlap
+            if (labels.length > 6) {
+                ctx.save();
+                ctx.translate(x, y + 10);
+                ctx.rotate(Math.PI / 6); // 30 degrees
+                ctx.fillText(labels[i], 0, 0);
+                ctx.restore();
+            } else {
+                ctx.fillText(labels[i], x, y + 10);
+            }
         }
 
         // Line
-        ctx.beginPath();
-        for (let i = 0; i < values.length; i++) {
-            const x = margin.left + i * stepX;
-            const y = height - margin.bottom - values[i] * stepY;
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
-        }
-        ctx.strokeStyle = "#0066cc";
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        // Points
-        ctx.fillStyle = "#0066cc";
-        for (let i = 0; i < values.length; i++) {
-            const x = margin.left + i * stepX;
-            const y = height - margin.bottom - values[i] * stepY;
+        if (values.length > 0) {
             ctx.beginPath();
-            ctx.arc(x, y, 4, 0, 2 * Math.PI);
-            ctx.fill();
+            for (let i = 0; i < values.length; i++) {
+                const x = margin.left + i * stepX;
+                const y = height - margin.bottom - (values[i] * stepY || 0); // Protect against NaN
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.strokeStyle = "#0066cc";
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Points
+            ctx.fillStyle = "#0066cc";
+            for (let i = 0; i < values.length; i++) {
+                const x = margin.left + i * stepX;
+                const y = height - margin.bottom - (values[i] * stepY || 0); // Protect against NaN
+                ctx.beginPath();
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+        } else {
+            // No data message
+            ctx.font = "16px Arial";
+            ctx.fillStyle = "#888";
+            ctx.textAlign = "center";
+            ctx.fillText("No revenue data available for this period", width / 2, height / 2);
         }
     });
 </script>

@@ -620,12 +620,13 @@
                             : "/images/placeholder.png";
 
                             <div class="listing-card" data-status="@listing.Status.ToString().ToLower()" data-id="@listing.Id">
+                                <a style ="text-decoration:none" href="@Url.Action("MyListing", "User", new { id = listing.Id })">
                                 <div class="listing-image">
                                     <img src="@mainImage" alt="@listing.Title">
                                     <div class="listing-status @statusClass" style="border-radius: 50px;">@listing.Status.ToString()</div>
                                 </div>
                                 <div class="listing-details">
-                                    <h3>@listing.Title</h3>
+                                    <h3 style="color:black">@listing.Title</h3>
                                     <p class="listing-price">@listing.Price.ToString("C")</p>
                                     <p class="listing-date">Listed on @(((DateTime)listing.CreatedAt).ToString("MMM dd, yyyy"))</p>
 
@@ -637,7 +638,6 @@
                                     }
                                 </div>
                                 <div class="listing-actions">
-                                    <a href="@Url.Action("MyListing", "User", new { id = listing.Id })" class="btn-view" style="border-radius: 50px;">View</a>
 
                                     @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
                                     {
@@ -645,6 +645,7 @@
                                         <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>
                                     }
                                 </div>
+                                </a>
                             </div>
                         }
                     </div>

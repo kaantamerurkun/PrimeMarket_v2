@@ -5,17 +5,18 @@
 }
 
 <div class="container" style="margin-top: 120px; margin-bottom: 50px; max-width: 85%; margin-left: auto; margin-right: auto;">
+    <a href="@Url.Action("Conversations")" class="back-link" style="border-radius: 50px;">
+        <i class="fas fa-arrow-left"></i> Back to Messages
+    </a>
     <div class="conversation-header" style="border-radius: 50px; background-color: #f8f9fa; padding: 15px; margin-bottom: 20px;">
-        <a href="@Url.Action("Conversations")" class="back-link" style="border-radius: 50px;">
-            <i class="fas fa-arrow-left"></i> Back to Messages
-        </a>
+
         <div class="listing-info">
             <div class="listing-image">
                 <img src="@(string.IsNullOrEmpty(Model.ListingImage) ? "/images/placeholder.png" : Model.ListingImage)"
                      alt="Listing Image" width="80" height="80" style="border-radius: 20px;">
             </div>
             <div class="listing-details">
-                <h3>@Model.ListingTitle</h3>
+                <h3 class="truncate-title" title="@Model.ListingTitle">@Model.ListingTitle</h3>
                 <p class="listing-price">@Model.ListingPrice.ToString("C")</p>
                 <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" target="_blank" style="border-radius: 50px; display: inline-block; padding: 5px 15px; background-color: #f0f0f0; text-decoration: none; color: #333;">View Listing</a>
             </div>
@@ -40,7 +41,7 @@
                                (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : Model.OtherUserProfileImage))"
                              alt="@(message.SentByMe ? "You" : Model.OtherUserName)"
                              style="width: 40px; height: 40px; border-radius: 50%;">
-                       
+
                         <div class="message-content" style="border-radius: 25px; max-width: 80%;">
                             @Html.Raw(message.Content)
                             <div class="message-time">@message.Timestamp.ToString("MMM dd, yyyy HH:mm")</div>
@@ -125,6 +126,7 @@
         object-fit: cover;
         border-radius: 8px;
     }
+
     .conversation-header {
         display: flex;
         justify-content: space-between;
@@ -160,6 +162,14 @@
     .listing-details h3 {
         margin: 0 0 5px 0;
         font-size: 18px;
+    }
+
+    /* Added truncate-title class for ellipsis */
+    .truncate-title {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 650px;
     }
 
     .listing-price {
@@ -282,103 +292,102 @@
 </style>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-    // Check for purchase confirmation in messages
-    function checkForPurchaseConfirmation() {
-        const messages = document.querySelectorAll('.message-content');
-        const currentUserId = parseInt(document.getElementById('currentUserId').value);
-        const otherUserId = parseInt(document.getElementById('receiverId').value);
-        const listingId = parseInt(document.getElementById('listingId').value);
+        document.addEventListener('DOMContentLoaded', function() {
+        // Check for purchase confirmation in messages
+        function checkForPurchaseConfirmation() {
+            const messages = document.querySelectorAll('.message-content');
+            const currentUserId = parseInt(document.getElementById('currentUserId').value);
+            const otherUserId = parseInt(document.getElementById('receiverId').value);
+            const listingId = parseInt(document.getElementById('listingId').value);
 
-        // Look for accepted offer message from seller
-        let hasAcceptedOffer = false;
-        let hasShippingConfirmation = false;
-        let offerId = null;
+            // Look for accepted offer message from seller
+            let hasAcceptedOffer = false;
+            let hasShippingConfirmation = false;
+            let offerId = null;
 
-        messages.forEach(message => {
-            const content = message.innerHTML;
+            messages.forEach(message => {
+                const content = message.innerHTML;
 
-            // Check for accepted offer message (contains offer amount and purchase link)
-            if (content.includes('accepted your offer') && content.includes('purchase</a>')) {
-                hasAcceptedOffer = true;
-                // Extract offer ID from the link
-                const match = content.match(/offerId=(\d+)/);
-                if (match && match[1]) {
-                    offerId = match[1];
+                // Check for accepted offer message (contains offer amount and purchase link)
+                if (content.includes('accepted your offer') && content.includes('purchase</a>')) {
+                    hasAcceptedOffer = true;
+                    // Extract offer ID from the link
+                    const match = content.match(/offerId=(\d+)/);
+                    if (match && match[1]) {
+                        offerId = match[1];
+                    }
                 }
-            }
 
-            // Check for shipping confirmation
-            if (content.includes('shipped your item') && (content.includes('Tracking Number') || content.includes('Shipping Provider'))) {
-                hasShippingConfirmation = true;
-            }
+                // Check for shipping confirmation
+                if (content.includes('shipped your item') && (content.includes('Tracking Number') || content.includes('Shipping Provider'))) {
+                    hasShippingConfirmation = true;
+                }
 
-            // Check for receipt confirmation
-            if (content.includes('received the item') && content.includes('Payment has been released')) {
-                // Transaction is complete, no need to show confirmations
-                hasAcceptedOffer = false;
-            }
-        });
+                // Check for receipt confirmation
+                if (content.includes('received the item') && content.includes('Payment has been released')) {
+                    // Transaction is complete, no need to show confirmations
+                    hasAcceptedOffer = false;
+                }
+            });
 
-        // Show appropriate confirmation sections
-        const confirmationSection = document.getElementById('purchaseConfirmation');
-        const sellerConfirmation = document.getElementById('sellerShippingConfirmation');
-        const buyerConfirmation = document.getElementById('buyerReceiptConfirmation');
+            // Show appropriate confirmation sections
+            const confirmationSection = document.getElementById('purchaseConfirmation');
+            const sellerConfirmation = document.getElementById('sellerShippingConfirmation');
+            const buyerConfirmation = document.getElementById('buyerReceiptConfirmation');
 
-        if (hasAcceptedOffer && offerId) {
-            // First determine if this is a second-hand listing with an accepted offer
-            fetch(`/Listing/CheckSecondHandOffer?offerId=${offerId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.isSecondHand) {
-                        confirmationSection.style.display = 'block';
+            if (hasAcceptedOffer && offerId) {
+                // First determine if this is a second-hand listing with an accepted offer
+                fetch(`/Listing/CheckSecondHandOffer?offerId=${offerId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.isSecondHand) {
+                            confirmationSection.style.display = 'block';
 
-                        if (data.purchaseId) {
-                            // Set purchase ID in the hidden fields
-                            document.getElementById('shippingPurchaseId').value = data.purchaseId;
-                            document.getElementById('receiptPurchaseId').value = data.purchaseId;
+                            if (data.purchaseId) {
+                                // Set purchase ID in the hidden fields
+                                document.getElementById('shippingPurchaseId').value = data.purchaseId;
+                                document.getElementById('receiptPurchaseId').value = data.purchaseId;
 
-                            // Determine if current user is seller or buyer
-                            const isSeller = data.sellerId === currentUserId;
-                            const isBuyer = data.buyerId === currentUserId;
+                                // Determine if current user is seller or buyer
+                                const isSeller = data.sellerId === currentUserId;
+                                const isBuyer = data.buyerId === currentUserId;
 
-                            // If current user is seller and hasn't shipped yet
-                            if (isSeller && !hasShippingConfirmation && !data.shippingConfirmed) {
-                                sellerConfirmation.style.display = 'block';
-                            }
+                                // If current user is seller and hasn't shipped yet
+                                if (isSeller && !hasShippingConfirmation && !data.shippingConfirmed) {
+                                    sellerConfirmation.style.display = 'block';
+                                }
 
-                            // If current user is buyer, seller has shipped, but buyer hasn't confirmed receipt
-                            if (isBuyer && hasShippingConfirmation && data.shippingConfirmed && !data.receiptConfirmed) {
-                                buyerConfirmation.style.display = 'block';
+                                // If current user is buyer, seller has shipped, but buyer hasn't confirmed receipt
+                                if (isBuyer && hasShippingConfirmation && data.shippingConfirmed && !data.receiptConfirmed) {
+                                    buyerConfirmation.style.display = 'block';
+                                }
                             }
                         }
-                    }
-                })
-                .catch(error => {
-                    console.error('Error checking second-hand offer:', error);
-                });
+                    })
+                    .catch(error => {
+                        console.error('Error checking second-hand offer:', error);
+                    });
+            }
         }
-    }
 
-    // Enable/disable buttons based on checkbox state
-    const shippingConfirm = document.getElementById('shippingConfirm');
-    if (shippingConfirm) {
-        shippingConfirm.addEventListener('change', function() {
-            document.getElementById('confirmShippingBtn').disabled = !this.checked;
-        });
-    }
+        // Enable/disable buttons based on checkbox state
+        const shippingConfirm = document.getElementById('shippingConfirm');
+        if (shippingConfirm) {
+            shippingConfirm.addEventListener('change', function() {
+                document.getElementById('confirmShippingBtn').disabled = !this.checked;
+            });
+        }
 
-    const receiptConfirm = document.getElementById('receiptConfirm');
-    if (receiptConfirm) {
-        receiptConfirm.addEventListener('change', function() {
-            document.getElementById('confirmReceiptBtn').disabled = !this.checked;
-        });
-    }
+        const receiptConfirm = document.getElementById('receiptConfirm');
+        if (receiptConfirm) {
+            receiptConfirm.addEventListener('change', function() {
+                document.getElementById('confirmReceiptBtn').disabled = !this.checked;
+            });
+        }
 
-    // Call the function after messages are loaded
-    document.addEventListener('DOMContentLoaded', function() {
+        // Call the function after messages are loaded
         checkForPurchaseConfirmation();
-    });
+
         // Scroll to bottom of chat
         const chatMessages = document.getElementById('chatMessages');
         chatMessages.scrollTop = chatMessages.scrollHeight;

@@ -5,81 +5,81 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 <div class="center-wrapper">
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <div class="notifications-header">
-        <h1>All Notifications</h1>
-        <div class="notifications-actions">
-            <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button>
-            <button id="clearAllBtn" class="btn-clear-all">Clear All</button>
+    <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
+        <div class="notifications-header">
+            <h1>All Notifications</h1>
+            <div class="notifications-actions">
+                <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button>
+                <button id="clearAllBtn" class="btn-clear-all">Clear All</button>
+            </div>
+        </div>
+
+        <div class="notifications-container">
+            @if (Model == null || Model.Count == 0)
+            {
+                <div class="empty-notifications">
+                    <i class="fas fa-bell-slash"></i>
+                    <p>You don't have any notifications</p>
+                </div>
+            }
+            else
+            {
+                <div class="notifications-list">
+                    @foreach (var notification in Model)
+                    {
+                        <div class="notification-item @(notification.IsRead ? "read" : "unread")" id="notification-@notification.Id">
+                            <div class="notification-icon">
+                                @switch (notification.Type)
+                                {
+                                    case PrimeMarket.Models.Enum.NotificationType.ListingApproved:
+                                        <i class="fas fa-check-circle" style="color: #28a745;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.ListingRejected:
+                                        <i class="fas fa-times-circle" style="color: #dc3545;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.NewMessage:
+                                        <i class="fas fa-envelope" style="color: #0066cc;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.NewOffer:
+                                        <i class="fas fa-tag" style="color: #fd7e14;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.OfferAccepted:
+                                        <i class="fas fa-handshake" style="color: #28a745;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.OfferRejected:
+                                        <i class="fas fa-ban" style="color: #dc3545;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.VerificationApproved:
+                                        <i class="fas fa-id-card" style="color: #28a745;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.VerificationRejected:
+                                        <i class="fas fa-id-card" style="color: #dc3545;"></i>
+                                        break;
+                                    case PrimeMarket.Models.Enum.NotificationType.PurchaseCompleted:
+                                        <i class="fas fa-shopping-cart" style="color: #28a745;"></i>
+                                        break;
+                                    default:
+                                        <i class="fas fa-bell" style="color: #0066cc;"></i>
+                                        break;
+                                }
+                            </div>
+                            <div class="notification-content">
+                                <p>@notification.Message</p>
+                                <span class="notification-time">@(((DateTime)notification.CreatedAt).ToString("MMM dd, yyyy HH:mm"))</span>
+                            </div>
+                            <div class="notification-actions">
+                                @if (!notification.IsRead)
+                                {
+                                    <button class="btn-mark-read" data-id="@notification.Id">Mark as Read</button>
+                                }
+                                <button class="btn-delete" data-id="@notification.Id">Delete</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
         </div>
     </div>
-
-    <div class="notifications-container">
-        @if (Model == null || Model.Count == 0)
-        {
-            <div class="empty-notifications">
-                <i class="fas fa-bell-slash"></i>
-                <p>You don't have any notifications</p>
-            </div>
-        }
-        else
-        {
-            <div class="notifications-list">
-                @foreach (var notification in Model)
-                {
-                    <div class="notification-item @(notification.IsRead ? "read" : "unread")" id="notification-@notification.Id">
-                        <div class="notification-icon">
-                            @switch (notification.Type)
-                            {
-                                case PrimeMarket.Models.Enum.NotificationType.ListingApproved:
-                                    <i class="fas fa-check-circle" style="color: #28a745;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.ListingRejected:
-                                    <i class="fas fa-times-circle" style="color: #dc3545;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.NewMessage:
-                                    <i class="fas fa-envelope" style="color: #0066cc;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.NewOffer:
-                                    <i class="fas fa-tag" style="color: #fd7e14;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.OfferAccepted:
-                                    <i class="fas fa-handshake" style="color: #28a745;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.OfferRejected:
-                                    <i class="fas fa-ban" style="color: #dc3545;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.VerificationApproved:
-                                    <i class="fas fa-id-card" style="color: #28a745;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.VerificationRejected:
-                                    <i class="fas fa-id-card" style="color: #dc3545;"></i>
-                                    break;
-                                case PrimeMarket.Models.Enum.NotificationType.PurchaseCompleted:
-                                    <i class="fas fa-shopping-cart" style="color: #28a745;"></i>
-                                    break;
-                                default:
-                                    <i class="fas fa-bell" style="color: #0066cc;"></i>
-                                    break;
-                            }
-                        </div>
-                        <div class="notification-content">
-                            <p>@notification.Message</p>
-                            <span class="notification-time">@(((DateTime)notification.CreatedAt).ToString("MMM dd, yyyy HH:mm"))</span>
-                        </div>
-                        <div class="notification-actions">
-                            @if (!notification.IsRead)
-                            {
-                                <button class="btn-mark-read" data-id="@notification.Id">Mark as Read</button>
-                            }
-                            <button class="btn-delete" data-id="@notification.Id">Delete</button>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-    </div>
-</div>
 </div>
 
 <style>
@@ -88,6 +88,14 @@
         justify-content: center;
         align-items: center;
         flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .container {
+        width: 100%;
+        max-width: 960px;
+        margin: 120px auto 50px;
     }
 
     .logo img {
@@ -96,6 +104,7 @@
         object-fit: cover;
         border-radius: 8px;
     }
+
     .notifications-header {
         display: flex;
         justify-content: space-between;
@@ -108,14 +117,23 @@
         gap: 10px;
     }
 
+    /* Make all buttons have 50px border radius */
+    button,
+    .btn-mark-all,
+    .btn-clear-all,
+    .btn-mark-read,
+    .btn-delete {
+        border-radius: 50px !important;
+        border: none;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
     .btn-mark-all,
     .btn-clear-all {
         padding: 8px 15px;
         background-color: #f0f0f0;
         color: #333;
-        border-radius: 50px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
     }
 
         .btn-mark-all:hover,
@@ -128,6 +146,7 @@
         padding: 50px;
         background-color: #f8f9fa;
         border-radius: 10px;
+        margin: 0 auto;
     }
 
         .empty-notifications i {
@@ -145,16 +164,19 @@
         display: flex;
         flex-direction: column;
         gap: 15px;
+        width: 100%;
     }
 
     .notification-item {
         display: flex;
         align-items: flex-start;
-        padding: 15px;
+        padding: 15px 25px;
         background-color: white;
         border-radius: 50px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         transition: background-color 0.3s ease;
+        width: 100%;
+        overflow: hidden;
     }
 
         .notification-item.unread {
@@ -168,16 +190,25 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px;
+        min-width: 40px;
         height: 40px;
+        flex-shrink: 0;
     }
 
     .notification-content {
         flex: 1;
+        min-width: 0; /* Important for text wrapping */
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        word-break: break-word;
     }
 
         .notification-content p {
             margin: 0 0 5px 0;
+            white-space: normal;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+            hyphens: auto;
         }
 
     .notification-time {
@@ -190,6 +221,7 @@
         flex-direction: column;
         gap: 5px;
         margin-left: 15px;
+        flex-shrink: 0;
     }
 
     .btn-mark-read,
@@ -197,11 +229,10 @@
         padding: 5px 10px;
         background-color: #f0f0f0;
         color: #333;
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
         font-size: 14px;
         white-space: nowrap;
+        min-width: 80px;
+        text-align: center;
     }
 
         .btn-mark-read:hover,
@@ -212,6 +243,27 @@
     .btn-delete {
         color: #dc3545;
     }
+
+    /* Custom notification styling */
+    .custom-notification {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 50px;
+        z-index: 9999;
+        opacity: 1;
+        transition: opacity 0.5s ease;
+    }
+
+        .custom-notification.success {
+            background-color: #28a745;
+        }
+
+        .custom-notification.error {
+            background-color: #dc3545;
+        }
 
     @@media (max-width: 768px) {
         .notifications-header
@@ -224,27 +276,33 @@
 
     .notification-item {
         flex-direction: column;
+        padding: 15px 20px;
     }
 
     .notification-icon {
         margin-bottom: 10px;
     }
 
+    .notification-content {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
     .notification-actions {
         margin-left: 0;
-        margin-top: 10px;
         flex-direction: row;
         width: 100%;
+        justify-content: space-between;
     }
 
     .btn-mark-read,
     .btn-delete {
         flex: 1;
         text-align: center;
+        max-width: 48%;
     }
 
-    }
-</style>
+    }</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -374,62 +432,55 @@
             });
         }
 
-    function markAllAsRead() {
-        const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+        function markAllAsRead() {
+            const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-        fetch('/Notifications/MarkAllAsRead', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': csrfToken
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-                unreadNotifications.forEach(item => {
-                    item.classList.remove('unread');
-                    item.classList.add('read');
+            fetch('/Notifications/MarkAllAsRead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': csrfToken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                    unreadNotifications.forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
 
-                    const markReadBtn = item.querySelector('.btn-mark-read');
-                    if (markReadBtn) {
-                        markReadBtn.remove();
-                    }
-                });
+                        const markReadBtn = item.querySelector('.btn-mark-read');
+                        if (markReadBtn) {
+                            markReadBtn.remove();
+                        }
+                    });
 
-                // Optional: Provide user feedback
-                showNotification('All notifications marked as read');
-            } else {
-                showNotification(data.message || 'Error marking notifications as read', true);
-            }
-        })
-        .catch(error => {
-            console.error('Error marking all notifications as read:', error);
-            showNotification('An error occurred', true);
-        });
-    }
+                    // Optional: Provide user feedback
+                    showNotification('All notifications marked as read');
+                } else {
+                    showNotification(data.message || 'Error marking notifications as read', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error marking all notifications as read:', error);
+                showNotification('An error occurred', true);
+            });
+        }
 
-    // Optional helper function for user feedback
-    function showNotification(message, isError = false) {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
-        notification.style.color = 'white';
-        notification.style.padding = '10px 20px';
-        notification.style.borderRadius = '5px';
-        notification.style.zIndex = '9999';
+        // Improved notification function
+        function showNotification(message, isError = false) {
+            const notification = document.createElement('div');
+            notification.textContent = message;
+            notification.className = `custom-notification ${isError ? 'error' : 'success'}`;
 
-        document.body.appendChild(notification);
+            document.body.appendChild(notification);
 
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => document.body.removeChild(notification), 500);
-        }, 3000);
-    }
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => document.body.removeChild(notification), 500);
+            }, 3000);
+        }
 
         function clearAll() {
             if (!confirm('Are you sure you want to delete all notifications?')) {

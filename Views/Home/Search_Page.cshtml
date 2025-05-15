@@ -1,5 +1,4 @@
-﻿```cshtml
-@{
+﻿@{
     var isUserLoggedIn = Context.Session.GetInt32("UserId") != null;
     if (isUserLoggedIn)
     {
@@ -12,329 +11,354 @@
 }
 @model List<PrimeMarket.Models.Listing>
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Search Results</title>
-    <link rel="stylesheet" href="/css/searchpagestyle.css" />
-    <style>
-        .logo img {
-            width: 120px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
+<div class="results-container" style="margin-top: 100px; padding: 0 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
+    @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+    {
+        <h2 class="results-title">Search Results for "@ViewBag.SearchTerm"</h2>
+    }
+    else
+    {
+        <h2 class="results-title">Search Results</h2>
+    }
 
-        /* Star Rating Styles */
-        .item-rating {
-            margin-bottom: 8px;
-        }
-
-        .stars {
-            display: flex;
-            align-items: center;
-        }
-
-        .star {
-            color: #ddd;
-            font-size: 14px;
-        }
-
-            .star.full, .star.half {
-                color: #ffb74d;
-            }
-
-        .rating-text {
-            margin-left: 5px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
-</head>
-
-<body class="search-body">
-    <div class="results-container" style="margin-top: 120px; padding: 0 20px; max-width: 1200px; margin-left: auto; margin-right: auto;">
-        @if (!string.IsNullOrEmpty(ViewBag.SearchTerm))
+    <!-- Display search results -->
+    <div class="search-results">
+        @if (ViewBag.ShowIdFormatMessage == true)
         {
-            <h2 class="results-title">Search Results for "@ViewBag.SearchTerm"</h2>
+            <div class="id-format-message">
+                <p><strong>Note:</strong> When searching for a listing by ID, please use the format <strong>#ID</strong> (e.g., #123)</p>
+            </div>
+        }
+
+        @if (Model == null || Model.Count == 0)
+        {
+            <div class="no-results">
+                <h3>No results found</h3>
+                <p>Try different keywords or browse categories</p>
+            </div>
         }
         else
         {
-            <h2 class="results-title">Search Results</h2>
-        }
+            <p class="results-count">Found @Model.Count results @(!string.IsNullOrEmpty(ViewBag.SearchTerm) ? $"for \"{ViewBag.SearchTerm}\"" : "")</p>
+            <div class="results-grid">
+                @foreach (var listing in Model)
+                {
+                    var mainImage = listing.Images != null && listing.Images.Any()
+                    ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
+                    : "/images/placeholder.png";
 
-        <!-- ID Search Modal -->
-        <!-- Display search results -->
-        <div class="search-results">
-            @if (ViewBag.ShowIdFormatMessage == true)
-            {
-                <div class="id-format-message">
-                    <p><strong>Note:</strong> When searching for a listing by ID, please use the format <strong>#ID</strong> (e.g., #123)</p>
-                </div>
-            }
+                    <a href="@(isUserLoggedIn ? Url.Action("Details", "Listing", new { id = listing.Id }) : Url.Action("Guest_Listing_Details", "Listing", new { id = listing.Id }))" class="result-card">
+                        <div class="result-image">
+                            <img src="@mainImage" alt="@listing.Title" />
+                        </div>
+                        <div class="result-details">
+                            <h3>@listing.Title</h3>
+                            <p class="result-price">@listing.Price.ToString("C")</p>
 
-            @if (Model == null || Model.Count == 0)
-            {
-                <div class="no-results">
-                    <h3>No results found</h3>
-                    <p>Try different keywords or browse categories</p>
-                </div>
-            }
-            else
-            {
-                <p class="results-count">Found @Model.Count results @(!string.IsNullOrEmpty(ViewBag.SearchTerm) ? $"for \"{ViewBag.SearchTerm}\"" : "")</p>
-                <div class="results-grid">
-                    @foreach (var listing in Model)
-                    {
-                        var mainImage = listing.Images != null && listing.Images.Any()
-                        ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
-                        : "/images/placeholder.png";
-
-                        <a href="@(isUserLoggedIn ? Url.Action("Details", "Listing", new { id = listing.Id }) : Url.Action("Guest_Listing_Details", "Listing", new { id = listing.Id }))" class="result-card">
-                            <div class="result-image">
-                                <img src="@mainImage" alt="@listing.Title" />
-                            </div>
-                            <div class="result-details">
-                                <h3>@listing.Title</h3>
-                                <p class="result-price">@listing.Price.ToString("C")</p>
-
-                                <!-- Star Rating Display -->
-                                <div class="item-rating">
-                                    @{
-                                        // Use TryGetValue pattern to avoid null reference exceptions
-                                        double? avgRating = null;
-                                        if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(listing.Id))
-                                        {
-                                            avgRating = ViewBag.ListingRatings[listing.Id];
-                                        }
-
-                                        double rating = avgRating ?? 0;
-                                        int fullStars = (int)Math.Floor(rating);
-                                        bool hasHalfStar = rating - fullStars >= 0.5;
+                            <!-- Star Rating Display -->
+                            <div class="item-rating">
+                                @{
+                                    // Use TryGetValue pattern to avoid null reference exceptions
+                                    double? avgRating = null;
+                                    if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(listing.Id))
+                                    {
+                                        avgRating = ViewBag.ListingRatings[listing.Id];
                                     }
-                                    <div class="stars">
-                                        @for (int i = 1; i <= 5; i++)
+
+                                    double rating = avgRating ?? 0;
+                                    int fullStars = (int)Math.Floor(rating);
+                                    bool hasHalfStar = rating - fullStars >= 0.5;
+                                }
+                                <div class="stars">
+                                    @for (int i = 1; i <= 5; i++)
+                                    {
+                                        if (i <= fullStars)
                                         {
-                                            if (i <= fullStars)
-                                            {
-                                                <span class="star full">★</span>
-                                            }
-                                            else if (i == fullStars + 1 && hasHalfStar)
-                                            {
-                                                <span class="star half">★</span>
-                                            }
-                                            else
-                                            {
-                                                <span class="star empty">☆</span>
-                                            }
+                                            <span class="star full">★</span>
                                         }
-                                        <span class="rating-text">@rating.ToString("0.0")</span>
-                                    </div>
+                                        else if (i == fullStars + 1 && hasHalfStar)
+                                        {
+                                            <span class="star half">★</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="star empty">☆</span>
+                                        }
+                                    }
+                                    <span class="rating-text">@rating.ToString("0.0")</span>
                                 </div>
-
-                                <p class="result-location">@listing.Location</p>
-                                <span class="result-condition">@listing.Condition</span>
                             </div>
-                        </a>
-                    }
-                </div>
-            }
-        </div>
 
-        <!-- ID Search Modal -->
-        <div id="idSearchModal" class="modal">
-            <div class="modal-content">
-                <h2 class="modal-title">ID Search Format</h2>
-                <p>When searching for a listing by ID, please add a # symbol before the number.</p>
-                <p>Example: <strong>#123</strong></p>
-                <div class="modal-buttons">
-                    <button class="modal-button modal-button-primary" id="closeModal">Got it</button>
-                </div>
+                            <p class="result-location">@listing.Location</p>
+                        </div>
+                    </a>
+                }
+            </div>
+        }
+    </div>
+
+    <!-- ID Search Modal -->
+    <div id="idSearchModal" class="modal">
+        <div class="modal-content">
+            <h2 class="modal-title">ID Search Format</h2>
+            <p>When searching for a listing by ID, please add a # symbol before the number.</p>
+            <p>Example: <strong>#123</strong></p>
+            <div class="modal-buttons">
+                <button class="modal-button modal-button-primary" id="closeModal">Got it</button>
             </div>
         </div>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const idSearchModal = document.getElementById('idSearchModal');
-                const closeModalBtn = document.getElementById('closeModal');
-
-                // Close modal button
-                if (closeModalBtn) {
-                    closeModalBtn.addEventListener('click', function() {
-                        idSearchModal.style.display = 'none';
-                    });
-                }
-
-                // Also close modal if clicked outside
-                window.addEventListener('click', function(e) {
-                    if (e.target === idSearchModal) {
-                        idSearchModal.style.display = 'none';
-                    }
-                });
-            });
-        </script>
-
-        <style>
-            /* Results container styles */
-            .results-container {
-                padding-bottom: 50px;
-            }
-
-            .results-title {
-                margin-bottom: 20px;
-                color: #333;
-                text-align: center;
-            }
-
-            .results-count {
-                margin-bottom: 20px;
-                color: #666;
-            }
-
-            .no-results {
-                text-align: center;
-                padding: 50px;
-                background-color: #f8f9fa;
-                border-radius: 10px;
-                margin-top: 20px;
-            }
-
-            .results-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-                gap: 20px;
-            }
-
-            .result-card {
-                background-color: white;
-                border-radius: 10px;
-                overflow: hidden;
-                box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                transition: transform 0.3s ease, box-shadow 0.3s ease;
-                text-decoration: none;
-                color: inherit;
-                display: block;
-            }
-
-                .result-card:hover {
-                    transform: translateY(-5px);
-                    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-                }
-
-            .result-image {
-                height: 200px;
-                overflow: hidden;
-            }
-
-                .result-image img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                }
-
-            .result-details {
-                padding: 15px;
-            }
-
-                .result-details h3 {
-                    margin: 0 0 10px 0;
-                    font-size: 16px;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-
-            .result-price {
-                font-weight: bold;
-                color: #0066cc;
-                font-size: 18px;
-                margin-bottom: 5px;
-            }
-
-            .result-location {
-                color: #666;
-                font-size: 14px;
-                margin-bottom: 5px;
-            }
-
-            .result-condition {
-                display: inline-block;
-                padding: 3px 8px;
-                background-color: #f0f0f0;
-                border-radius: 4px;
-                font-size: 12px;
-                color: #555;
-            }
-
-            /* Modal styles */
-            .modal {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background-color: rgba(0,0,0,0.5);
-                z-index: 1000;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .modal-content {
-                background-color: white;
-                padding: 30px;
-                border-radius: 10px;
-                max-width: 400px;
-                width: 100%;
-                text-align: center;
-            }
-
-            .modal-title {
-                margin-top: 0;
-                color: #0066cc;
-            }
-
-            .modal-buttons {
-                margin-top: 20px;
-                display: flex;
-                justify-content: center;
-                gap: 10px;
-            }
-
-            .modal-button {
-                padding: 8px 16px;
-                border-radius: 5px;
-                cursor: pointer;
-                border: none;
-                font-weight: bold;
-            }
-
-            .modal-button-primary {
-                background-color: #0066cc;
-                color: white;
-            }
-
-            /* Responsive adjustments */
-            @@media (max-width: 768px) {
-                .results-grid
-
-            {
-                grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            }
-
-            }
-
-            @@media (max-width: 480px) {
-                .results-grid
-
-            {
-                grid-template-columns: 1fr;
-            }
-
-            }
-        </style>
     </div>
-</body>
-</html>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const idSearchModal = document.getElementById('idSearchModal');
+        const closeModalBtn = document.getElementById('closeModal');
+
+        // Close modal button
+        if (closeModalBtn) {
+            closeModalBtn.addEventListener('click', function() {
+                idSearchModal.style.display = 'none';
+            });
+        }
+
+        // Also close modal if clicked outside
+        window.addEventListener('click', function(e) {
+            if (e.target === idSearchModal) {
+                idSearchModal.style.display = 'none';
+            }
+        });
+    });
+</script>
+
+<style>
+    /* Logo styles */
+    .logo img {
+        width: 120px;
+        height: 50px;
+        object-fit: cover;
+        border-radius: 8px;
+    }
+
+    /* Star Rating Styles */
+    .item-rating {
+        margin-bottom: 8px;
+    }
+
+    .stars {
+        display: flex;
+        align-items: center;
+    }
+
+    .star {
+        color: #ddd;
+        font-size: 14px;
+    }
+
+        .star.full, .star.half {
+            color: #ffb74d;
+        }
+
+    .rating-text {
+        margin-left: 5px;
+        font-size: 14px;
+        color: #666;
+    }
+
+    /* Results container styles */
+    .results-container {
+        padding-bottom: 50px;
+    }
+
+    .results-title {
+        margin-bottom: 20px;
+        color: #333;
+        text-align: center;
+    }
+
+    .results-count {
+        margin-bottom: 20px;
+        color: #666;
+    }
+
+    .no-results {
+        text-align: center;
+        padding: 50px;
+        background-color: #f8f9fa;
+        border-radius: 10px;
+        margin-top: 20px;
+    }
+
+    .results-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+    }
+
+    .result-card {
+        background-color: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+        .result-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .result-image {
+        height: 200px;
+        overflow: hidden;
+    }
+
+        .result-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .result-details {
+        padding: 15px;
+    }
+
+        .result-details h3 {
+            margin: 0 0 10px 0;
+            font-size: 16px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+    .result-price {
+        font-weight: bold;
+        color: #0066cc;
+        font-size: 18px;
+        margin-bottom: 5px;
+    }
+
+    .result-location {
+        color: #666;
+        font-size: 14px;
+        margin-bottom: 5px;
+    }
+
+    .result-condition {
+        display: inline-block;
+        padding: 3px 8px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        font-size: 12px;
+        color: #555;
+    }
+
+    /* Modal styles */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0,0,0,0.5);
+        z-index: 1000;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .modal-content {
+        background-color: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 400px;
+        width: 100%;
+        text-align: center;
+    }
+
+    .modal-title {
+        margin-top: 0;
+        color: #0066cc;
+    }
+
+    .modal-buttons {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .modal-button {
+        padding: 8px 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        border: none;
+        font-weight: bold;
+    }
+
+    .modal-button-primary {
+        background-color: #0066cc;
+        color: white;
+    }
+
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .results-grid
+
+    {
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    }
+
+    @@media (max-width: 480px) {
+        .results-grid
+
+    {
+        grid-template-columns: 1fr;
+    }
+
+    }
+
+    /* Ensure the search form in the header maintains consistent positioning */
+    .search-box {
+        position: relative;
+        width: 300px;
+    }
+
+        .search-box input {
+            width: 100%;
+            padding: 8px 40px 8px 16px;
+            border: 1px solid #ddd;
+            border-radius: 50px;
+            outline: none;
+            transition: border-color 0.3s ease;
+        }
+
+    /* Override search page specific styles that may be causing conflicts */
+    .search-body {
+        font-family: inherit;
+        margin: 0;
+        padding: 0;
+        background-color: inherit;
+    }
+
+    .search-container {
+        display: block;
+        height: auto;
+    }
+
+    /* Fix for the header search bar */
+    #header-search-form {
+        width: 100%;
+        position: relative;
+    }
+
+    #header-search-input {
+        width: 100%;
+        box-sizing: border-box;
+    }
+</style>

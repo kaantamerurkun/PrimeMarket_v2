@@ -4,8 +4,8 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 
-<div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <h1>Complete Your Purchase</h1>
+<div class="container" style="margin-top: 120px; margin-bottom: 50px; max-width: 1000px; margin-left: auto; margin-right: auto;">
+    <h1 style="text-align: center;">Complete Your Purchase</h1>
 
     <div class="purchase-container">
         <div class="purchase-summary">
@@ -75,6 +75,16 @@
 </div>
 
 <style>
+    .container {
+        max-width: 1000px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    h1 {
+        text-align: center;
+    }
+
     .item-details h3 {
         margin: 0 0 10px 0;
         font-size: 16px;
@@ -83,29 +93,32 @@
         white-space: normal;
         max-width: 100%;
     }
+
     .logo img {
         width: 120px;
         height: 50px;
         object-fit: cover;
-        border-radius: 8px;
+        border-radius: 50px;
     }
+
     .purchase-container {
         display: flex;
         gap: 30px;
         margin-top: 30px;
+        justify-content: center;
     }
 
     .purchase-summary {
         flex: 0 0 35%;
         background-color: #f8f9fa;
-        border-radius: 10px;
+        border-radius: 50px;
         padding: 20px;
     }
 
     .purchase-payment {
         flex: 0 0 60%;
         background-color: #f8f9fa;
-        border-radius: 10px;
+        border-radius: 50px;
         padding: 20px;
     }
 
@@ -121,7 +134,7 @@
     }
 
         .item-image img {
-            border-radius: 8px;
+            border-radius: 50px;
             object-fit: cover;
         }
 
@@ -173,7 +186,7 @@
         width: 100%;
         padding: 12px 15px;
         border: 1px solid #ddd;
-        border-radius: 5px;
+        border-radius: 50px;
         font-size: 16px;
     }
 
@@ -193,7 +206,7 @@
         background-color: #f0f0f0;
         color: #333;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         text-decoration: none;
         display: inline-block;
@@ -205,7 +218,7 @@
         background-color: #0066cc;
         color: white;
         border: none;
-        border-radius: 5px;
+        border-radius: 50px;
         cursor: pointer;
         font-weight: bold;
     }
@@ -218,22 +231,19 @@
         background-color: #f8d7da;
         color: #721c24;
         padding: 10px 15px;
-        border-radius: 5px;
+        border-radius: 50px;
         margin-bottom: 20px;
     }
 
     @@media (max-width: 768px) {
-        .purchase-container
+        .purchase-container {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
-    }
-
-    .purchase-summary,
-    .purchase-payment {
-        flex: 0 0 100%;
-    }
-
+        .purchase-summary,
+        .purchase-payment {
+            flex: 0 0 100%;
+        }
     }
 </style>
 

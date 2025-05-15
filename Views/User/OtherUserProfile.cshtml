@@ -12,24 +12,39 @@
     <link rel="stylesheet" href="/css/OtherUserProfile.css" />
     <title>@Model.User.FirstName @Model.User.LastName's Profile</title>
     <style>
+        /* Main container with proper header spacing */
+        .main-content {
+            margin-top: 80px; /* Adjust this value based on your header height */
+            padding-top: 20px;
+            min-height: calc(100vh - 80px);
+        }
+
         .logo img {
             width: 120px;
             height: 50px;
             object-fit: cover;
             border-radius: 8px;
         }
-        .profile-image {
+
+        .profile-image-container {
             position: relative;
-            width: 350px;
-            height: 350px;
-            border-radius: 10px;
-            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .profile-image img {
+        .profile-image-wrapper {
+            position: relative;
             width: 100%;
-            height: 100%;
+        }
+
+        .profile-image {
+            width: 350px;
+            height: 350px;
+            max-width: 100%;
             object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
         }
 
         .verification-badge {
@@ -42,11 +57,50 @@
             box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
         }
 
+        /* User details styling */
+        .user-details-container {
+            background-color: #f0f8ff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            margin-top: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .detail-item {
+            display: flex;
+            text-align: left;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .detail-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .detail-value {
+            color: #333;
+            text-align: right;
+        }
+
+        /* Seller rating styling */
         .seller-rating {
             margin-top: 20px;
+            margin-bottom: 30px;
             padding: 15px;
-            background-color: #f8f9fa;
+            background-color: #f0f8ff;
             border-radius: 10px;
+            width: 100%;
+        }
+
+        .rating-label {
+            font-weight: bold;
+            margin-right: 10px;
         }
 
         .star-rating {
@@ -61,10 +115,10 @@
             transition: color 0.2s;
         }
 
-        .star.selected,
-        .star.hover {
-            color: #ffa500;
-        }
+            .star.selected,
+            .star.hover {
+                color: #ffa500;
+            }
 
         .overall-rating {
             margin-top: 10px;
@@ -72,6 +126,18 @@
             color: #666;
         }
 
+        .rating-disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .rating-message {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* Listings grid styling */
         .listings-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
@@ -87,30 +153,39 @@
             transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .listing-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-        }
+            .listing-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            }
 
         .listing-image {
             height: 180px;
             overflow: hidden;
         }
 
-        .listing-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
+            .listing-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
         .listing-details {
             padding: 15px;
         }
 
+            .listing-details h3 {
+                margin: 0 0 10px 0;
+                font-size: 16px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
         .listing-price {
             font-weight: bold;
             color: #0066cc;
             font-size: 18px;
+            margin-bottom: 5px;
         }
 
         .empty-listings {
@@ -121,120 +196,184 @@
             margin-top: 20px;
         }
 
-        .rating-disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
+        /* Responsive styles */
+        @@media (max-width: 1024px) {
+            .profile-section-wrapper
+
+        {
+            flex-direction: column;
+            align-items: center;
         }
 
-        .rating-message {
-            margin-top: 10px;
-            font-size: 14px;
-            color: #666;
+        .profile-image {
+            width: 300px;
+            height: 300px;
         }
-    </style>
+
+        .user-details-container {
+            width: 100%;
+            max-width: 600px;
+        }
+
+        }
+
+        @@media (max-width: 768px) {
+            .main-content
+
+        {
+            margin-top: 60px; /* Adjust for smaller header on mobile */
+        }
+
+        .profile-section-wrapper {
+            padding: 10px;
+        }
+
+        .profile-image {
+            width: 250px;
+            height: 250px;
+        }
+
+        .detail-item {
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .detail-value {
+            text-align: left !important;
+        }
+
+        }
+
+        @@media (max-width: 480px) {
+            .profile-image
+
+        {
+            width: 200px;
+            height: 200px;
+        }
+
+        .user-details-container {
+            padding: 15px;
+        }
+
+        }</style>
 </head>
 
 <body>
-    <br />
-    <br />
-    <br />
-    <br />
-    <div style="display: flex; align-items: flex-start; width: 100%; margin: 0 auto;">
-        <div style="margin-right: 20px; margin-left: 300px">
-            <div class="profile-image">
-                <img src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/PrimeMarket_Logo_V2.png" : Model.User.ProfileImagePath)"
-                     alt="Profile Picture" />
-                @if (Model.User.IsIdVerified)
-                {
-                    <div class="verification-badge">
-                        <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
-                    </div>
-                }
-            </div>
-        </div>
-
-        <div style="flex: 1; text-align: left">
-            <br>
-            <p><strong>Name:</strong> @Model.User.FirstName</p>
-            <p><strong>Last Name:</strong> @Model.User.LastName</p>
-            <br />
-            <p><strong>Email:</strong> @Model.User.Email</p>
-            <br />
-            <p><strong>Phone Number:</strong> @(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</p>
-            <br />
-            <div class="seller-rating">
-                <span class="rating-label">Rating:</span>
-                <div class="star-rating" id="userRating" data-user-id="@Model.User.Id">
-                    <span class="star" data-value="1">&#9733;</span>
-                    <span class="star" data-value="2">&#9733;</span>
-                    <span class="star" data-value="3">&#9733;</span>
-                    <span class="star" data-value="4">&#9733;</span>
-                    <span class="star" data-value="5">&#9733;</span>
-                </div>
-                <div class="overall-rating" id="overallRatingDisplay">
-                    Overall Rating: <span id="avgRating">@Model.AverageRating</span>/5 (<span id="ratingCount">@Model.TotalRatings</span> ratings)
-                </div>
-                @if (Model.CanRateUser)
-                {
-                    <div class="rating-message" id="ratingMessage">
-                        @if (Model.UserRating > 0)
+    <div class="main-content">
+        <!-- User profile section -->
+        <div style="display: flex; align-items: flex-start; justify-content: center; width: 100%; margin: 0 auto; padding: 20px;">
+            <div class="profile-section-wrapper" style="display: flex; align-items: stretch; gap: 20px; max-width: 1200px; width: 100%; margin-bottom: 40px;">
+                <div class="profile-image-container" style="flex: 0 0 auto;">
+                    <div class="profile-image-wrapper" style="height: 100%; display: flex; align-items: center;">
+                        <img class="profile-image" src="@(string.IsNullOrEmpty(Model.User.ProfileImagePath) ? "/images/placeholder.png" : Model.User.ProfileImagePath)" alt="Profile Picture" />
+                        @if (Model.User.IsIdVerified)
                         {
-                            <text>You've rated this seller @Model.UserRating stars. Click to update your rating.</text>
+                            <div class="verification-badge">
+                                <img src="/images/verified.png" alt="Verified" width="30" height="30" title="Verified User">
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <div style="flex: 1; text-align: left">
+                    <div class="user-details-container">
+                        <div class="detail-item">
+                            <span class="detail-label">Name:</span>
+                            <span class="detail-value">@Model.User.FirstName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Last Name:</span>
+                            <span class="detail-value">@Model.User.LastName</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Email:</span>
+                            <span class="detail-value">@Model.User.Email</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Phone Number:</span>
+                            <span class="detail-value">@(string.IsNullOrEmpty(Model.User.PhoneNumber) ? "Not provided" : Model.User.PhoneNumber)</span>
+                        </div>
+                    </div>
+
+                    <div class="seller-rating" style="margin-bottom: 20px;">
+                        <span class="rating-label">Rating:</span>
+                        <div class="star-rating" id="userRating" data-user-id="@Model.User.Id">
+                            <span class="star" data-value="1">&#9733;</span>
+                            <span class="star" data-value="2">&#9733;</span>
+                            <span class="star" data-value="3">&#9733;</span>
+                            <span class="star" data-value="4">&#9733;</span>
+                            <span class="star" data-value="5">&#9733;</span>
+                        </div>
+                        <div class="overall-rating" id="overallRatingDisplay">
+                            Overall Rating: <span id="avgRating">@Model.AverageRating</span>/5 (<span id="ratingCount">@Model.TotalRatings</span> ratings)
+                        </div>
+                        @if (Model.CanRateUser)
+                        {
+                            <div class="rating-message" id="ratingMessage">
+                                @if (Model.UserRating > 0)
+                                {
+                                    <text>You've rated this seller @Model.UserRating stars. Click to update your rating.</text>
+                                }
+                                else
+                                {
+                                    <text>Click the stars to rate this seller.</text>
+                                }
+                            </div>
                         }
                         else
                         {
-                            <text>Click the stars to rate this seller.</text>
+                            <div class="rating-message">
+                                You can only rate sellers from whom you have completed a purchase.
+                            </div>
                         }
                     </div>
-                }
-                else
-                {
-                    <div class="rating-message">
-                        You can only rate sellers from whom you have completed a purchase.
-                    </div>
-                }
+                </div>
             </div>
         </div>
     </div>
-    <br>
-    <br>
-    <br>
-    <br />
-    <h2 style="text-align: center">@Model.User.FirstName's Listings</h2>
-    <div class="container" style="max-width: 1200px; margin: 0 auto;">
-        @if (Model.Listings == null || Model.Listings.Count == 0)
-        {
-            <div class="empty-listings">
-                <p>This user doesn't have any active listings yet.</p>
-            </div>
-        }
-        else
-        {
-            <div class="listings-grid">
-                @foreach (var listing in Model.Listings)
-                {
-                    <a href="@Url.Action("Details", "Listing", new { id = listing.Id })" style="text-decoration: none; color: inherit;">
-                        <div class="listing-card">
-                            <div class="listing-image">
-                                @{
-                                    var mainImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
-                                    ?? listing.Images?.FirstOrDefault()?.ImagePath
-                                    ?? "/images/placeholder.png";
-                                }
-                                <img src="@mainImage" alt="@listing.Title" />
+
+    <div style="clear: both;"></div>
+
+    <!-- Listings Section with more spacing -->
+    <div class="listings-section" style="margin-top: 40px; padding-top: 20px;">
+        <div class="container" style="max-width: 85%; margin: 0 auto; text-align: center; clear: both;">
+            <h2 style="text-align: center; margin-bottom: 20px;">@Model.User.FirstName's Listings</h2>
+
+            @if (Model.Listings == null || Model.Listings.Count == 0)
+            {
+                <div class="empty-listings">
+                    <p>This user doesn't have any active listings yet.</p>
+                </div>
+            }
+            else
+            {
+                <div class="listings-grid">
+                    @foreach (var listing in Model.Listings)
+                    {
+                        <a href="@Url.Action("Details", "Listing", new { id = listing.Id })" style="text-decoration: none; color: inherit;">
+                            <div class="listing-card">
+                                <div class="listing-image">
+                                    @{
+                                        var mainImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                        ?? listing.Images?.FirstOrDefault()?.ImagePath
+                                        ?? "/images/placeholder.png";
+                                    }
+                                    <img src="@mainImage" alt="@listing.Title" />
+                                </div>
+                                <div class="listing-details">
+                                    <h3>@listing.Title</h3>
+                                    <p class="listing-price">@listing.Price.ToString("C")</p>
+                                    <p>@listing.Location</p>
+                                </div>
                             </div>
-                            <div class="listing-details">
-                                <h3>@listing.Title</h3>
-                                <p class="listing-price">@listing.Price.ToString("C")</p>
-                                <p>@listing.Location</p>
-                            </div>
-                        </div>
-                    </a>
-                }
-            </div>
-        }
+                        </a>
+                    }
+                </div>
+            }
+        </div>
     </div>
-    <br />
+
     <script>
         const stars = document.querySelectorAll("#userRating .star");
         const avgRatingEl = document.getElementById("avgRating");
