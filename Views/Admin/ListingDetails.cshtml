@@ -585,7 +585,13 @@
                         }
                         <div class="info-item">
                             <div class="info-label">Category</div>
-                            <div class="info-value">@Model.Category > @Model.SubCategory @(Model.DetailCategory != null ? "> " + Model.DetailCategory : "")</div>
+                            <div class="info-value">
+                                @Model.Category
+                                @(string.IsNullOrEmpty(Model.SubCategory) ? "" :
+                                    " > " + Model.SubCategory +
+                                    (string.IsNullOrEmpty(Model.DetailCategory) ? "" : " > " + Model.DetailCategory))
+                            </div>
+
                         </div>
                         <div class="info-item">
                             <div class="info-label">Location</div>

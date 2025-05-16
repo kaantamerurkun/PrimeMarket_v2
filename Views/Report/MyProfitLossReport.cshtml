@@ -12,14 +12,14 @@
             <div class="time-filter">
                 <label for="timeRange">Time Range:</label>
                 <select id="timeRange" onchange="changeTimeRange(this.value)">
-                    <option value="all" selected="@(Model.TimeRange == "all")">All Time</option>
-                    <option value="week" selected="@(Model.TimeRange == "week")">Last 7 Days</option>
-                    <option value="month" selected="@(Model.TimeRange == "month")">Last 30 Days</option>
-                    <option value="quarter" selected="@(Model.TimeRange == "quarter")">Last 3 Months</option>
-                    <option value="year" selected="@(Model.TimeRange == "year")">Last 12 Months</option>
+                    <option value="all">All Time</option>
+                    <option value="week">Last 7 Days</option>
+                    <option value="month">Last 30 Days</option>
+                    <option value="quarter">Last 3 Months</option>
+                    <option value="year">Last 12 Months</option>
                 </select>
             </div>
-            <button id="refreshButton" class="btn-refresh" onclick="window.location.reload()">
+            <button id="refreshButton" class="btn-refresh" onclick="refreshData()">
                 <i class="fas fa-sync-alt"></i> Refresh Data
             </button>
         </div>
@@ -358,107 +358,201 @@
         color: #666;
     }
 
+    /* Ensure chart is responsive */
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+        .chart-container canvas {
+            width: 100% !important;
+            height: auto !important;
+            display: block;
+        }
+
     @@media (max-width: 768px) {
-        .summary-cards
+        .summary-cards {
+            flex-direction: column;
+            gap: 10px;
+        }
 
-    {
-        flex-direction: column;
-        gap: 10px;
-    }
+        .categories-grid {
+            grid-template-columns: 1fr;
+        }
 
-    .categories-grid {
-        grid-template-columns: 1fr;
-    }
+        .report-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
 
-    .report-header {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 15px;
-    }
+        .report-actions {
+            width: 100%;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-    .report-actions {
-        width: 100%;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
-    }
-
-    .time-filter {
-        width: 100%;
-    }
-
-        .time-filter select {
+        .time-filter {
             width: 100%;
         }
 
-    .btn-refresh {
-        width: 100%;
-        justify-content: center;
-    }
+            .time-filter select {
+                width: 100%;
+            }
 
-    .period-label {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 5px;
-    }
+        .btn-refresh {
+            width: 100%;
+            justify-content: center;
+        }
 
-    }
-
-    .chart-container canvas {
-        width: 100%;
-        display: block;
+        .period-label {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
     }
 </style>
 
 <script>
+    // This function updates the time range and loads fresh data
     function changeTimeRange(range) {
+        // Show loading indicator or disable the select while loading
+        document.getElementById('timeRange').disabled = true;
+        document.getElementById('refreshButton').disabled = true;
+
+        // Add a small visual cue to show loading
+        document.getElementById('lastUpdatedTime').textContent = "Loading...";
+
+        // Make the HTTP request to get fresh data
         window.location.href = '@Url.Action("MyProfitLossReport", "Report")?timeRange=' + range;
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    // This function refreshes the current time range
+    function refreshData() {
+        const currentTimeRange = document.getElementById('timeRange').value;
+        document.getElementById('refreshButton').disabled = true;
+        document.getElementById('lastUpdatedTime').textContent = "Loading...";
+
+        // Make the HTTP request with cache-busting parameter
+        window.location.href = '@Url.Action("MyProfitLossReport", "Report")?timeRange=' + currentTimeRange + '&t=' + new Date().getTime();
+    }
+
+    // Function to handle window resize events
+    function handleResize() {
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
+
+        // Clear previous chart
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Redraw chart with new dimensions
+        drawChart();
+    }
+
+    // Function to draw the chart
+    function drawChart() {
+        const canvas = document.getElementById('revenueChart');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+
+        // Get the container width for responsive sizing
+        const containerWidth = canvas.parentElement.clientWidth;
+        // Set canvas dimensions based on container size
+        canvas.width = containerWidth - 40; // Subtract padding
+        // Maintain a reasonable aspect ratio
+        canvas.height = Math.min(400, Math.max(250, containerWidth * 0.4));
+
+        const width = canvas.width; // Define width here to use throughout the function
+        const height = canvas.height; // Define height here to use throughout the function
+
         const rawChartData = JSON.parse('@Html.Raw(JsonConvert.SerializeObject(Model.ChartData ?? new List<PrimeMarket.Models.ViewModel.ChartDataPoint>()).Replace("'", "\\'"))');
 
-        if (!Array.isArray(rawChartData)) {
-            console.error("Chart data is not an array:", rawChartData);
+        if (!Array.isArray(rawChartData) || rawChartData.length === 0) {
+            // No data case
+            ctx.font = "16px Calibri";
+            ctx.fillStyle = "#888";
+            ctx.textAlign = "center";
+            ctx.fillText("No revenue data available for this period", width / 2, height / 2);
             return;
         }
 
         const labels = rawChartData.map(d => d.Label);
         const values = rawChartData.map(d => d.Value);
 
-        if (!labels.length || !values.length) {
-            const canvas = document.getElementById('revenueChart');
-            const ctx = canvas.getContext('2d');
-            ctx.font = "16px Arial";
-            ctx.fillStyle = "#888";
-            ctx.fillText("No chart data available", 20, 50);
-            return;
-        }
+        // Dynamic margin calculation based on data and canvas size
+        const margin = calculateMargins(canvas, labels, values);
 
-        // Handle edge cases - ensure we have at least 2 data points for line chart
-        if (labels.length === 1) {
-            // If only one data point, duplicate it to create a flat line
-            labels.push(labels[0] + " (copy)");
-            values.push(values[0]);
-        }
-
-        const canvas = document.getElementById('revenueChart');
-        const ctx = canvas.getContext('2d');
-        const width = canvas.width = canvas.offsetWidth;
-        const height = canvas.height = 400;
-
-        const margin = { top: 40, right: 30, bottom: 50, left: 60 };
         const chartWidth = width - margin.left - margin.right;
         const chartHeight = height - margin.top - margin.bottom;
 
-        // Handle case where all values are zero
-        const maxValue = Math.max(...values) || 1; // Use 1 as default if all are zero
-        const stepX = chartWidth / Math.max(1, (values.length - 1)); // Avoid division by zero
+        // Calculate step sizes based on data density
+        const stepX = calculateStepX(chartWidth, labels.length);
+
+        // Find max value with padding for better visualization
+        const maxValue = calculateMaxValue(values);
         const stepY = chartHeight / maxValue;
 
+        // Clear canvas
         ctx.clearRect(0, 0, width, height);
 
-        // Axes
+        // Draw axes
+        drawAxes(ctx, margin, height, width);
+
+        // Draw Y axis labels and grid lines
+        drawYAxisLabels(ctx, margin, height, maxValue);
+
+        // Draw X axis labels
+        drawXAxisLabels(ctx, margin, height, labels, stepX);
+
+        // Draw data line and points
+        drawDataLine(ctx, margin, height, values, labels, stepX, stepY);
+    }
+
+    // Calculate dynamic margins based on data and canvas size
+    function calculateMargins(canvas, labels, values) {
+        // Base margins
+        const margin = { top: 30, right: 30, bottom: 50, left: 60 };
+
+        // Adjust left margin based on maximum value (for y-axis labels)
+        const maxValue = Math.max(...values, 1);
+        const maxValueDigits = Math.floor(Math.log10(maxValue)) + 1;
+        margin.left = Math.max(60, 40 + (maxValueDigits * 8)); // More digits = more space
+
+        // Adjust bottom margin based on label length
+        const maxLabelLength = Math.max(...labels.map(l => l.length));
+        const isRotated = labels.length > 6 || maxLabelLength > 8;
+        margin.bottom = isRotated ? 70 : 50; // More space for rotated labels
+
+        return margin;
+    }
+
+    // Calculate step size for X axis based on canvas width and number of points
+    function calculateStepX(chartWidth, numPoints) {
+        // If only one point, place it in the middle
+        if (numPoints <= 1) return chartWidth;
+
+        return chartWidth / (numPoints - 1);
+    }
+
+    // Calculate maximum value for Y axis with some padding for better visualization
+    function calculateMaxValue(values) {
+        // Find the maximum value
+        const rawMax = Math.max(...values, 1); // Default to 1 if all values are 0 or array is empty
+
+        // Add 10% padding to the top for better visualization
+        const withPadding = rawMax * 1.1;
+
+        // Round to a nice number for better tick marks
+        const magnitude = Math.pow(10, Math.floor(Math.log10(withPadding)));
+        return Math.ceil(withPadding / magnitude) * magnitude;
+    }
+
+    // Draw X and Y axes
+    function drawAxes(ctx, margin, height, width) {
         ctx.beginPath();
         ctx.moveTo(margin.left, margin.top);
         ctx.lineTo(margin.left, height - margin.bottom);
@@ -466,32 +560,80 @@
         ctx.strokeStyle = "#888";
         ctx.lineWidth = 1;
         ctx.stroke();
+    }
 
-        // Y axis labels
+    // Draw Y axis labels and grid lines
+    function drawYAxisLabels(ctx, margin, height, maxValue) {
+        const width = ctx.canvas.width; // Get width from canvas context
+
         ctx.fillStyle = "#444";
         ctx.textAlign = "right";
         ctx.font = "12px sans-serif";
-        const numTicks = 5;
+
+        // Determine optimal number of ticks based on chart height
+        const chartHeight = height - margin.top - margin.bottom;
+        const pixelsPerTick = 40; // Aim for approximately this many pixels between ticks
+        const numTicks = Math.max(2, Math.min(10, Math.floor(chartHeight / pixelsPerTick)));
+
+        // Draw y-axis ticks and grid lines
         for (let i = 0; i <= numTicks; i++) {
             const yVal = maxValue * (i / numTicks);
-            const y = height - margin.bottom - yVal * stepY;
+            const y = height - margin.bottom - (yVal / maxValue) * (height - margin.top - margin.bottom);
+
+            // Draw tick mark
             ctx.beginPath();
             ctx.moveTo(margin.left - 5, y);
             ctx.lineTo(margin.left, y);
             ctx.stroke();
-            ctx.fillText("₺" + yVal.toFixed(0), margin.left - 10, y + 4);
-        }
 
-        // X axis labels - limit labels if there are too many
+            // Draw grid line
+            ctx.beginPath();
+            ctx.moveTo(margin.left, y);
+            ctx.lineTo(width - margin.right, y);
+            ctx.strokeStyle = "#f0f0f0";
+            ctx.stroke();
+            ctx.strokeStyle = "#888"; // Reset for ticks
+
+            // Draw label
+            // Format currency with appropriate number of decimal places
+            const formatted = new Intl.NumberFormat('tr-TR', {
+                style: 'currency',
+                currency: 'TRY',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: yVal < 10 ? 2 : yVal < 100 ? 1 : 0
+            }).format(yVal);
+
+            ctx.fillText(formatted, margin.left - 10, y + 4);
+        }
+    }
+
+    // Draw X axis labels
+    function drawXAxisLabels(ctx, margin, height, labels, stepX) {
+        const width = ctx.canvas.width; // Get width from canvas context
+
         ctx.textAlign = "center";
-        const maxVisibleLabels = 12;
+        ctx.fillStyle = "#444";
+
+        // Determine optimal label frequency
+        const maxVisibleLabels = Math.min(labels.length, Math.floor((width - margin.left - margin.right) / 80));
         const labelStep = labels.length > maxVisibleLabels ? Math.ceil(labels.length / maxVisibleLabels) : 1;
+
+        // Check if we need to rotate labels (if they're long or there are many)
+        const needsRotation = labels.length > 6 || labels.some(label => label.length > 8);
 
         for (let i = 0; i < labels.length; i += labelStep) {
             const x = margin.left + i * stepX;
             const y = height - margin.bottom + 15;
-            // Rotate labels if they might overlap
-            if (labels.length > 6) {
+
+            // Draw tick mark
+            ctx.beginPath();
+            ctx.moveTo(x, height - margin.bottom);
+            ctx.lineTo(x, height - margin.bottom + 5);
+            ctx.strokeStyle = "#888";
+            ctx.stroke();
+
+            // Draw label
+            if (needsRotation) {
                 ctx.save();
                 ctx.translate(x, y + 10);
                 ctx.rotate(Math.PI / 6); // 30 degrees
@@ -501,35 +643,78 @@
                 ctx.fillText(labels[i], x, y + 10);
             }
         }
+    }
 
-        // Line
-        if (values.length > 0) {
-            ctx.beginPath();
-            for (let i = 0; i < values.length; i++) {
-                const x = margin.left + i * stepX;
-                const y = height - margin.bottom - (values[i] * stepY || 0); // Protect against NaN
-                if (i === 0) ctx.moveTo(x, y);
-                else ctx.lineTo(x, y);
-            }
-            ctx.strokeStyle = "#0066cc";
-            ctx.lineWidth = 2;
-            ctx.stroke();
+    // Draw the data line and points
+    function drawDataLine(ctx, margin, height, values, labels, stepX, stepY) {
+        const width = ctx.canvas.width; // Get width from canvas context
 
-            // Points
-            ctx.fillStyle = "#0066cc";
-            for (let i = 0; i < values.length; i++) {
-                const x = margin.left + i * stepX;
-                const y = height - margin.bottom - (values[i] * stepY || 0); // Protect against NaN
-                ctx.beginPath();
-                ctx.arc(x, y, 4, 0, 2 * Math.PI);
-                ctx.fill();
-            }
-        } else {
-            // No data message
-            ctx.font = "16px Arial";
-            ctx.fillStyle = "#888";
-            ctx.textAlign = "center";
-            ctx.fillText("No revenue data available for this period", width / 2, height / 2);
+        if (values.length <= 0) return;
+
+        // Draw line connecting data points
+        ctx.beginPath();
+
+        for (let i = 0; i < values.length; i++) {
+            const x = margin.left + i * stepX;
+            const y = height - margin.bottom - (values[i] * stepY || 0); // Protect against NaN
+
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
         }
+
+        ctx.strokeStyle = "#0066cc";
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Add gradient fill under the line
+        ctx.lineTo(margin.left + (values.length - 1) * stepX, height - margin.bottom);
+        ctx.lineTo(margin.left, height - margin.bottom);
+        ctx.closePath();
+
+        // Create gradient
+        const gradient = ctx.createLinearGradient(0, margin.top, 0, height - margin.bottom);
+        gradient.addColorStop(0, "rgba(0, 102, 204, 0.2)");
+        gradient.addColorStop(1, "rgba(0, 102, 204, 0.05)");
+        ctx.fillStyle = gradient;
+        ctx.fill();
+
+        // Draw data points
+        ctx.fillStyle = "#0066cc";
+
+        for (let i = 0; i < values.length; i++) {
+            const x = margin.left + i * stepX;
+            const y = height - margin.bottom - (values[i] * stepY || 0);
+
+            // Draw point
+            ctx.beginPath();
+            ctx.arc(x, y, 4, 0, 2 * Math.PI);
+            ctx.fill();
+
+            // Optional: Add stroke to data points for better visibility
+            ctx.strokeStyle = "#fff";
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        // Set the correct selected option based on the current model
+        const timeRangeSelect = document.getElementById('timeRange');
+        const currentTimeRange = '@Model.TimeRange';
+        if (timeRangeSelect && currentTimeRange) {
+            // Set the selected option
+            for (let i = 0; i < timeRangeSelect.options.length; i++) {
+                if (timeRangeSelect.options[i].value === currentTimeRange) {
+                    timeRangeSelect.options[i].selected = true;
+                    break;
+                }
+            }
+        }
+
+        // Initial draw
+        drawChart();
+
+        // Add resize listener to redraw chart when window size changes
+        window.addEventListener('resize', handleResize);
     });
 </script>

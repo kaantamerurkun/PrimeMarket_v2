@@ -129,6 +129,7 @@
                     "Cameras": [],
                     "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
                 }
+                ,"Others": []
             };
 
             // Definition of fields for each category/subcategory
@@ -306,20 +307,29 @@
                 });
             }
 
-            function loadSubcategories() {
-                subcategories.innerHTML = "";
-                details.innerHTML = "";
-                continueBtn.style.display = "none";
-                const sub = allCategories[selectedCategory];
-                if (Array.isArray(sub)) {
+        function loadSubcategories() {
+            subcategories.innerHTML = "";
+            details.innerHTML = "";
+            continueBtn.style.display = "none";
+            const sub = allCategories[selectedCategory];
+
+            if (Array.isArray(sub)) {
+                if (sub.length > 0) {
                     sub.forEach(item => subcategories.appendChild(createItem(item)));
                     subcategories.style.visibility = "visible";
                     details.style.visibility = "hidden";
                 } else {
-                    Object.keys(sub).forEach(key => subcategories.appendChild(createItem(key)));
-                    subcategories.style.visibility = "visible";
+                    // If subcategories array is empty (like for "Others")
+                    subcategories.style.visibility = "hidden";
+                    details.style.visibility = "hidden";
+                    selectedSubcategory = "Others"; // Auto-set subcategory to "Others" for empty arrays
+                    continueBtn.style.display = "inline-block"; // Show the continue button
                 }
+            } else {
+                Object.keys(sub).forEach(key => subcategories.appendChild(createItem(key)));
+                subcategories.style.visibility = "visible";
             }
+        }
 
             function loadDetails() {
                 details.innerHTML = "";

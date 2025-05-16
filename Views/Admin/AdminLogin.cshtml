@@ -8,85 +8,36 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewBag.Title</title>
-    <link rel="stylesheet" href="~/css/AdminLogin.css" />
-    <style>
-        .logo img {
-            width: 120px;
-            height: 50px;
-            object-fit: cover;
-            border-radius: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="/css/Login.css" />
 </head>
 
 <body>
     <div class="container">
-        <br />
-        <br />
-        <br />
-        <center>
-            <div style="padding-top: 20px">
-                <a>
-                    <img style="height: 200px"
-                         src="/images/PrimeMarket_Logo_V2.png"
-                         alt="PrimeMarket Logo" />
-                </a>
-                <h2>Admin Login</h2>
-                <form id="loginForm" asp-controller="Admin" asp-action="AdminLogin" method="post">
-                    @Html.AntiForgeryToken()
-                    <label for="username">Username</label>
-                    <input style="
-                        padding: 8px 16px;
-                        border: 1px solid #ddd;
-                        border-radius: 20px;
-                        width: 250px;
-                        outline: none;
-                        transition: border-color 0.3s ease;"
-                           type="text"
-                           id="username"
-                           name="Username"
-                           required
-                           placeholder="Enter your username" />
-                    <br />
-                    <br />
+        <img class="logo-img" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" />
+        <h2>Admin Login</h2>
 
-                    <label for="password">Password</label>
-                    <input style="
-                        padding: 8px 16px;
-                        border: 1px solid #ddd;
-                        border-radius: 20px;
-                        width: 250px;
-                        outline: none;
-                        transition: border-color 0.3s ease;"
-                           type="password"
-                           id="password"
-                           name="Password"
-                           required
-                           placeholder="Enter your password" />
-                    <br />
-                    <br />
+        <form id="loginForm" method="post" asp-controller="Admin" asp-action="AdminLogin">
+            @Html.AntiForgeryToken()
 
-                    @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
-                    {
-                        <div style="color: red; margin-bottom: 10px;">
-                            @ViewBag.ErrorMessage
-                        </div>
-                    }
+            @if (!string.IsNullOrEmpty(ViewBag.ErrorMessage))
+            {
+                <div class="error-message">
+                    @ViewBag.ErrorMessage
+                </div>
+            }
 
-                    <div>
-                        <button style="
-                            cursor: pointer;
-                            padding: 8px 16px;
-                            border: 1px solid #ddd;
-                            border-radius: 20px;"
-                                type="submit">
-                            Login
-                        </button>
-                    </div>
-                    <br />
-                </form>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input class="login-input" type="text" id="username" name="Username" required placeholder="Enter your username" />
             </div>
-        </center>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input class="login-input" type="password" id="password" name="Password" required placeholder="Enter your password" />
+            </div>
+
+            <button class="login-button" type="submit">Login</button>
+        </form>
     </div>
 </body>
 </html>

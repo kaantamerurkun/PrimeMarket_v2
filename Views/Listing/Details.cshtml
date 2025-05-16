@@ -659,10 +659,13 @@
                     <span class="label">Category:</span>
                     <span class="value">@Model.Listing.Category</span>
                 </div>
-                <div class="detail-item">
-                    <span class="label">Subcategory:</span>
-                    <span class="value">@Model.Listing.SubCategory</span>
-                </div>
+                @if (!string.IsNullOrEmpty(Model.Listing.SubCategory))
+                {
+                    <div class="detail-item">
+                        <span class="label">Subcategory:</span>
+                        <span class="value">@Model.Listing.SubCategory</span>
+                    </div>
+                }
                 @if (!string.IsNullOrEmpty(Model.Listing.DetailCategory))
                 {
                     <div class="detail-item">

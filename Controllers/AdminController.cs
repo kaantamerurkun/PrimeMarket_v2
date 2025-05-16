@@ -714,7 +714,14 @@ namespace PrimeMarket.Controllers
             var totalListings = await _context.Listings.CountAsync();
             var pendingListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Pending);
             var approvedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Approved);
-            var soldListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Sold);
+
+            // Count listings with Sold status
+            var soldListingsCount = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Sold);
+
+            // Calculate total items sold by taking into account purchase quantities
+            var totalItemsSold = await _context.Purchases
+                .Where(p => p.PaymentStatus == PaymentStatus.Completed || p.PaymentStatus == PaymentStatus.Authorized)
+                .SumAsync(p => p.Quantity);
 
             // Get category breakdown
             var categoryStats = await _context.Listings
@@ -735,7 +742,7 @@ namespace PrimeMarket.Controllers
                 TotalListings = totalListings,
                 PendingListings = pendingListings,
                 ApprovedListings = approvedListings,
-                SoldListings = soldListings,
+                SoldListings = totalItemsSold, // Updated to use the total quantity sold
                 CategoryStats = categoryStats
             };
 

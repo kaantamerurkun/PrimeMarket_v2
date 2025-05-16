@@ -10,7 +10,8 @@
             "Heating & Cooling": [],
             "Cameras": [],
             "Computer Accessories": ["Keyboards", "Speakers", "Headphones & Earphones", "Webcams", "Microphones", "Mouse", "Computer Bags"]
-        }
+        }, "Others": []
+
     };
 
     // Store references to open menus for better control
@@ -286,35 +287,6 @@
         let activeFilterText = 'All Categories';
         let noResultsFound = true;
 
-        // Update the current filter display
-        //if (activeFilter.category) {
-        //    activeFilterText = activeFilter.category;
-        //    if (activeFilter.subcategory) {
-        //        activeFilterText += ' > ' + activeFilter.subcategory;
-        //        if (activeFilter.detailCategory) {
-        //            activeFilterText += ' > ' + activeFilter.detailCategory;
-        //        }
-        //    }
-        //}
-
-        // Update filter indicator if it exists
-        //const filterIndicator = document.getElementById('current-filter');
-        //if (filterIndicator) {
-        //    filterIndicator.textContent = activeFilterText;
-        //} else {
-        //    // Create filter indicator if it doesn't exist
-        //    const listingsHeader = document.querySelector('.listings h2');
-        //    if (listingsHeader) {
-        //        const indicator = document.createElement('span');
-        //        indicator.id = 'current-filter';
-        //        indicator.textContent = activeFilterText;
-        //        indicator.style.fontSize = '16px';
-        //        indicator.style.fontWeight = 'normal';
-        //        indicator.style.color = '#555';
-        //        indicator.style.marginLeft = '15px';
-        //        listingsHeader.appendChild(indicator);
-        //    }
-        //}
 
         // Apply the filter
         allItems.forEach(item => {
@@ -382,8 +354,7 @@
                             padding: 8px 16px;
                             background-color: #0066cc;
                             color: white;
-                            border: none;
-                            border-radius: 5px;
+                            border-radius: 50px;
                             cursor: pointer;
                             margin-top: 10px;">
                             Show All Categories

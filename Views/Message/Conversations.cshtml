@@ -24,7 +24,7 @@
                         <a href="@Url.Action("Conversation", new { userId = conversation.OtherUserId, listingId = conversation.ListingId })">
                             <div class="conversation-content">
                                 <div class="user-avatar">
-                                    <img src="@(string.IsNullOrEmpty(conversation.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : conversation.OtherUserProfileImage)"
+                                    <img src="@(string.IsNullOrEmpty(conversation.OtherUserProfileImage) ? "/images/placeholder.png" : conversation.OtherUserProfileImage)"
                                          alt="User Avatar" width="50" height="50" style="border-radius: 50%;" />
                                 </div>
                                 <div class="conversation-details">

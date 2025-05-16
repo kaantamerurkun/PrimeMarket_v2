@@ -93,19 +93,25 @@ namespace PrimeMarket.Controllers
 
         [HttpPost]
         [UserAuthenticationFilter]
+        
         public async Task<IActionResult> MarkAllAsRead()
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            if (userId == null)
-            {
-                return Json(new { success = false, message = "Not logged in" });
-            }
-
             try
             {
+                var userId = HttpContext.Session.GetInt32("UserId");
+                if (userId == null)
+                {
+                    return Json(new { success = false, message = "Not logged in" });
+                }
+
                 var unreadNotifications = await _context.Notifications
                     .Where(n => n.UserId == userId && !n.IsRead)
                     .ToListAsync();
+
+                if (unreadNotifications.Count == 0)
+                {
+                    return Json(new { success = true, message = "No unread notifications found" });
+                }
 
                 foreach (var notification in unreadNotifications)
                 {
@@ -115,11 +121,21 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                return Json(new { success = true });
+                return Json(new { success = true, message = "All notifications marked as read", count = unreadNotifications.Count });
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error marking notifications as read: {ex.Message}" });
+                // Log the exception details
+                Console.WriteLine($"Exception in MarkAllAsRead: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+
+                // Return a more detailed error
+                return Json(new
+                {
+                    success = false,
+                    message = $"Error marking notifications as read: {ex.Message}",
+                    details = ex.StackTrace
+                });
             }
         }
 

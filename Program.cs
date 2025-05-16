@@ -88,7 +88,7 @@ using (var scope = app.Services.CreateScope())
             // Ensure database is created (this will apply migrations if needed)
             context.Database.EnsureCreated();
 
-            // Reset database tables Not: SAKIN BURAYI YORUMDAN ÇIKARTMA AMINA KORUM YOKSA!!!
+            // Reset database tables Not: SAKIN BURAYI YORUMDAN ÇIKARTMA!
             //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'ALTER TABLE ? NOCHECK CONSTRAINT ALL'");
             //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'DELETE FROM ?'");
             //context.Database.ExecuteSqlRaw("EXEC sp_MSForEachTable 'ALTER TABLE ? WITH CHECK CHECK CONSTRAINT ALL'");

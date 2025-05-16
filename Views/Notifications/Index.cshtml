@@ -4,13 +4,19 @@
     ViewData["Title"] = "All Notifications";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
+
+<!-- Add this hidden form for CSRF token -->
+<form id="antiForgeryForm" style="display: none;">
+    @Html.AntiForgeryToken()
+</form>
+
 <div class="center-wrapper">
     <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
         <div class="notifications-header">
             <h1>All Notifications</h1>
             <div class="notifications-actions">
-                <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button>
-                <button id="clearAllBtn" class="btn-clear-all">Clear All</button>
+                <button id="markAllReadBtn" type="button" class="btn-mark-all">Mark All as Read</button>
+                <button id="clearAllBtn" type="button" class="btn-clear-all">Clear All</button>
             </div>
         </div>
 
@@ -305,6 +311,8 @@
     }</style>
 
 <script>
+    // Complete replacement for the notifications JavaScript
+
     document.addEventListener('DOMContentLoaded', function() {
         // Mark single notification as read
         const markReadButtons = document.querySelectorAll('.btn-mark-read');
@@ -327,13 +335,19 @@
         // Mark all as read
         const markAllReadBtn = document.getElementById('markAllReadBtn');
         if (markAllReadBtn) {
-            markAllReadBtn.addEventListener('click', markAllAsRead);
+            markAllReadBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                markAllAsRead();
+            });
         }
 
         // Clear all notifications
         const clearAllBtn = document.getElementById('clearAllBtn');
         if (clearAllBtn) {
-            clearAllBtn.addEventListener('click', clearAll);
+            clearAllBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                clearAll();
+            });
         }
 
         // Handle notification clicks to navigate
@@ -363,7 +377,12 @@
                 },
                 body: `notificationId=${notificationId}`
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server response was not OK');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const notificationItem = document.getElementById(`notification-${notificationId}`);
@@ -376,10 +395,14 @@
                             markReadBtn.remove();
                         }
                     }
+                    showNotification('Notification marked as read');
+                } else {
+                    showNotification(data.message || 'Error marking notification as read', true);
                 }
             })
             .catch(error => {
                 console.error('Error marking notification as read:', error);
+                showNotification('Error marking notification as read', true);
             });
         }
 
@@ -395,7 +418,12 @@
                 },
                 body: `notificationId=${notificationId}`
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server response was not OK');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     const notificationItem = document.getElementById(`notification-${notificationId}`);
@@ -424,22 +452,90 @@
                                 }
                             }, 300);
                         }, 300);
+
+                        showNotification('Notification deleted');
                     }
+                } else {
+                    showNotification(data.message || 'Error deleting notification', true);
                 }
             })
             .catch(error => {
                 console.error('Error deleting notification:', error);
+                showNotification('Error deleting notification', true);
             });
         }
 
         function markAllAsRead() {
-            const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            // Get the CSRF token from the hidden form
+            let token = '';
+            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (tokenElement) {
+                token = tokenElement.value;
+            }
 
+            // Create form data object with token
+            const formData = new FormData();
+            if (token) {
+                formData.append('__RequestVerificationToken', token);
+            }
+
+            // Debug info
+            console.log('Attempting to mark all as read');
+            console.log('Token present:', !!token);
+
+            // Make the API call
             fetch('/Notifications/MarkAllAsRead', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'RequestVerificationToken': csrfToken
+                    // Set CSRF token in header if available
+                    ...(token && { 'RequestVerificationToken': token })
+                },
+                body: formData
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error('Server returned: ' + response.status);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    // Update UI
+                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                    unreadNotifications.forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
+
+                        const markReadBtn = item.querySelector('.btn-mark-read');
+                        if (markReadBtn) {
+                            markReadBtn.remove();
+                        }
+                    });
+
+                    showNotification('All notifications marked as read');
+                } else {
+                    showNotification(data.message || 'Error marking notifications as read', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error marking all notifications as read:', error);
+                showNotification('An error occurred: ' + error.message, true);
+
+                // Alternative approach - fallback to simpler request
+                if (confirm('Error with initial request. Try alternative method?')) {
+                    simplifiedMarkAllAsRead();
+                }
+            });
+        }
+
+        // Alternative approach without FormData
+        function simplifiedMarkAllAsRead() {
+            fetch('/Notifications/MarkAllAsRead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
                 }
             })
             .then(response => response.json())
@@ -456,15 +552,14 @@
                         }
                     });
 
-                    // Optional: Provide user feedback
                     showNotification('All notifications marked as read');
                 } else {
                     showNotification(data.message || 'Error marking notifications as read', true);
                 }
             })
             .catch(error => {
-                console.error('Error marking all notifications as read:', error);
-                showNotification('An error occurred', true);
+                console.error('Error with simplified approach:', error);
+                showNotification('All attempts failed. Please try again later.', true);
             });
         }
 
@@ -478,7 +573,11 @@
 
             setTimeout(() => {
                 notification.style.opacity = '0';
-                setTimeout(() => document.body.removeChild(notification), 500);
+                setTimeout(() => {
+                    if (document.body.contains(notification)) {
+                        document.body.removeChild(notification);
+                    }
+                }, 500);
             }, 3000);
         }
 
@@ -493,7 +592,12 @@
                     'Content-Type': 'application/x-www-form-urlencoded',
                 }
             })
-            .then(response => response.json())
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Server response was not OK');
+                }
+                return response.json();
+            })
             .then(data => {
                 if (data.success) {
                     document.querySelector('.notifications-container').innerHTML = `
@@ -502,10 +606,14 @@
                             <p>You don't have any notifications</p>
                         </div>
                     `;
+                    showNotification('All notifications cleared');
+                } else {
+                    showNotification(data.message || 'Error clearing notifications', true);
                 }
             })
             .catch(error => {
                 console.error('Error clearing all notifications:', error);
+                showNotification('Error clearing notifications', true);
             });
         }
 

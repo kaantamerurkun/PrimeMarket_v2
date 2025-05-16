@@ -37,8 +37,8 @@
                 {
                     <div class="message @(message.SentByMe ? "you" : "")" style="margin-bottom: 20px;">
                         <img src="@(message.SentByMe ?
-                               (string.IsNullOrEmpty(ViewBag.CurrentUserImage) ? "/images/PrimeMarket_Logo_V2.png" : ViewBag.CurrentUserImage) :
-                               (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/PrimeMarket_Logo_V2.png" : Model.OtherUserProfileImage))"
+                               (string.IsNullOrEmpty(ViewBag.CurrentUserImage) ? "/images/placeholder.png" : ViewBag.CurrentUserImage) :
+                               (string.IsNullOrEmpty(Model.OtherUserProfileImage) ? "/images/placeholder.png" : Model.OtherUserProfileImage))"
                              alt="@(message.SentByMe ? "You" : Model.OtherUserName)"
                              style="width: 40px; height: 40px; border-radius: 50%;">
 

@@ -305,12 +305,32 @@
       "PackagePath": "staticwebassets\\images\\listings\\1_b8d81f6f-3ade-46de-a6f1-1b5d2ca31912.webp"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\20_1f0ab64d-99fe-4324-8a72-f3bacc19365b.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\20_1f0ab64d-99fe-4324-8a72-f3bacc19365b.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\20_30df8657-7527-4698-8282-13372eb74d28.png",
       "PackagePath": "staticwebassets\\images\\listings\\20_30df8657-7527-4698-8282-13372eb74d28.png"
     },
     {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\20_ba12901f-4836-4b3f-bc61-481b281a888e.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\20_ba12901f-4836-4b3f-bc61-481b281a888e.webp"
+    },
+    {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\20_ba15c5e7-04c8-477e-bcbb-a71d6d5aa89a.png",
       "PackagePath": "staticwebassets\\images\\listings\\20_ba15c5e7-04c8-477e-bcbb-a71d6d5aa89a.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\21_6568c406-01d6-4e4b-810f-d76f104727e1.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\21_6568c406-01d6-4e4b-810f-d76f104727e1.webp"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\21_9c37c289-2d53-4753-b5fd-2088bd617fb4.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\21_9c37c289-2d53-4753-b5fd-2088bd617fb4.webp"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\21_ad3fe6a9-86d0-4d32-9405-e01a70bd4440.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\21_ad3fe6a9-86d0-4d32-9405-e01a70bd4440.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\21_d9f118ec-ab14-445c-bed7-4abab36e356e.png",
@@ -331,6 +351,10 @@
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\22_4a578056-8c2f-4ddf-b4f3-6103bb460514.png",
       "PackagePath": "staticwebassets\\images\\listings\\22_4a578056-8c2f-4ddf-b4f3-6103bb460514.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\22_7fcbded4-e147-4a07-89e3-52fcbd9a58ef.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\22_7fcbded4-e147-4a07-89e3-52fcbd9a58ef.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\22_9a118728-92a1-42d4-a6c9-6c566b027ed8.png",
@@ -429,8 +453,8 @@
       "PackagePath": "staticwebassets\\images\\listings\\39_395bac84-dd0b-4c3f-b62b-233ced874392.png"
     },
     {
-      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\3_9230b330-a7ac-48b7-b00a-bf5197c03d69.webp",
-      "PackagePath": "staticwebassets\\images\\listings\\3_9230b330-a7ac-48b7-b00a-bf5197c03d69.webp"
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\3_aa1dee4a-f4c1-439c-8061-b66e5987cd08.webp",
+      "PackagePath": "staticwebassets\\images\\listings\\3_aa1dee4a-f4c1-439c-8061-b66e5987cd08.webp"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\listings\\40_5c82be10-efca-4e85-8b24-60b3e54d065a.png",
@@ -875,6 +899,10 @@
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\verified.png",
       "PackagePath": "staticwebassets\\images\\verified.png"
+    },
+    {
+      "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\images\\view-icon.png",
+      "PackagePath": "staticwebassets\\images\\view-icon.png"
     },
     {
       "Id": "C:\\Users\\urkun\\source\\repos\\PrimeMarket_13.04.2025\\PrimeMarket\\wwwroot\\js\\404.js",

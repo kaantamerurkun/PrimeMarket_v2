@@ -8,10 +8,20 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - PrimeMarket</title>
     <link rel="stylesheet" href="/css/SignUp.css">
+    <style>
+        a {
+            color: #4caf50;
+            text-decoration: none;
+        }
+
+            a:hover {
+                text-decoration: underline;
+            }
+    </style>
 </head>
 <body>
     <div style="display: flex; justify-content: center; padding-top: 20px">
-        <a><img height="150" width="175" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" /></a>
+        <a><img class="logo-img" src="/images/PrimeMarket_Logo.png" alt="PrimeMarket Logo" /></a>
     </div>
     <br />
     <h2>Sign Up</h2>
@@ -66,11 +76,13 @@
                     </button>
                 </div>
                 <br />
-                <p>Already have an account? <a asp-action="Login" asp-controller="User">Login</a></p>
+                <p>
+                    Already have an account? <a asp-action="Login" asp-controller="User">Login</a>
+                </p>
             </div>
 
             <!-- Terms column -->
-            <div>
+            <div style="margin-bottom:100px">
                 <p style="text-align: center;">Terms Of Conditions For PrimeMarket</p>
                 <br>
                 <div class="terms-box" style="
@@ -117,7 +129,7 @@
                     </div>
 
                 </div>
-            </div>
+            </di>
         </div>
     </form>
 

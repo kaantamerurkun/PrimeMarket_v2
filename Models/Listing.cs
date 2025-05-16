@@ -43,6 +43,7 @@ namespace PrimeMarket.Models
         public ListingStatus Status { get; set; } = ListingStatus.Pending;
 
         public string? RejectionReason { get; set; }
+        public int? ViewCount { get; set; } = 0;
 
         // Navigation properties
         [ForeignKey("SellerId")]
@@ -108,5 +109,8 @@ namespace PrimeMarket.Models
         public virtual SparePart SparePart { get; set; }
         public virtual HeatingCooling HeatingCooling { get; set; }
         public virtual Camera Camera { get; set; }
+
+        //Other
+        public virtual Other Other { get; set; }
     }
 }

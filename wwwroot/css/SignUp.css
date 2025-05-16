@@ -2,7 +2,11 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: Arial, sans-serif;
+    font-family: Calibri, sans-serif;
+}
+.logo-img {
+    height: 200px;
+    margin-bottom: 20px;
 }
 
 body {

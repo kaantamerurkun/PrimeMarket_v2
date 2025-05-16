@@ -639,7 +639,7 @@
                                 </div>
                                 <div class="listing-actions">
 
-                                    @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold)
+                                    @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold && listing.Status != PrimeMarket.Models.Enum.ListingStatus.Pending)
                                     {
                                         <a href="@Url.Action("EditListing", "Listing", new { id = listing.Id })" class="btn-edit" style="border-radius: 50px;">Edit</a>
                                         <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>

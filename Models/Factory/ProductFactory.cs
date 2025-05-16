@@ -14,6 +14,15 @@ namespace PrimeMarket.Models.Factory
             // Normalize subcategory to match with switch cases
             string? normalizedSubcategory = subcategory?.Trim();
             string? normalizedDetailcategory = detailcategory?.Trim();
+            if (category == "Other")
+            {
+                switch (normalizedSubcategory)
+                {
+                    case "Other":
+                    case "Others":
+                        return new Other();
+                }
+            }
             if (category == "Phone")
             {
                 normalizedDetailcategory = null;

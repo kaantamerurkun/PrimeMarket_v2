@@ -73,13 +73,19 @@ wwwroot\images\listings\19_10cd19c3-1c8c-4185-9694-0d7d1031ffe8.png
 wwwroot\images\listings\2_194c98c1-1039-4f87-a56d-c47347938aa3.webp
 wwwroot\images\listings\2_23a3c632-1552-4d16-a65f-d738d1c05fa2.webp
 wwwroot\images\listings\2_d0f536d8-9138-477e-a068-06b80db047c4.webp
+wwwroot\images\listings\20_1f0ab64d-99fe-4324-8a72-f3bacc19365b.webp
 wwwroot\images\listings\20_30df8657-7527-4698-8282-13372eb74d28.png
+wwwroot\images\listings\20_ba12901f-4836-4b3f-bc61-481b281a888e.webp
 wwwroot\images\listings\20_ba15c5e7-04c8-477e-bcbb-a71d6d5aa89a.png
+wwwroot\images\listings\21_6568c406-01d6-4e4b-810f-d76f104727e1.webp
+wwwroot\images\listings\21_9c37c289-2d53-4753-b5fd-2088bd617fb4.webp
+wwwroot\images\listings\21_ad3fe6a9-86d0-4d32-9405-e01a70bd4440.webp
 wwwroot\images\listings\21_d9f118ec-ab14-445c-bed7-4abab36e356e.png
 wwwroot\images\listings\21_ef8845f3-a0f9-42ab-b632-36eadc5e9bdb.jpg
 wwwroot\images\listings\22_32b286a9-fc19-4582-b28c-669aefc3b38e.png
 wwwroot\images\listings\22_38f510ca-9955-4334-b8b1-7ed3259a1766.png
 wwwroot\images\listings\22_4a578056-8c2f-4ddf-b4f3-6103bb460514.png
+wwwroot\images\listings\22_7fcbded4-e147-4a07-89e3-52fcbd9a58ef.webp
 wwwroot\images\listings\22_9a118728-92a1-42d4-a6c9-6c566b027ed8.png
 wwwroot\images\listings\22_cacdeba1-c00d-4a67-8862-10f75ec449c8.jpg
 wwwroot\images\listings\22_e2fdb988-e9e8-488f-9ac5-6dd38a5c71a3.png
@@ -90,7 +96,7 @@ wwwroot\images\listings\26_3a01a6bf-ae6c-4ffd-8287-847a53525352.jpg
 wwwroot\images\listings\27_fc5c69c6-2144-45ae-9890-b2ebb98c53e8.jpg
 wwwroot\images\listings\28_7be97138-677b-4b19-9d79-ccab46cec00f.png
 wwwroot\images\listings\29_51268fa0-4cb5-4e37-834d-7782d8e54db4.jpg
-wwwroot\images\listings\3_9230b330-a7ac-48b7-b00a-bf5197c03d69.webp
+wwwroot\images\listings\3_aa1dee4a-f4c1-439c-8061-b66e5987cd08.webp
 wwwroot\images\listings\30_555e1dd6-a540-48dc-8e11-0b148eec7ca4.jpg
 wwwroot\images\listings\31_f7e74a4b-9ea7-490c-a611-5365892a914d.jpg
 wwwroot\images\listings\32_0cd1877c-8293-4dad-8eea-b1cc93e65870.jpg
@@ -217,6 +223,7 @@ wwwroot\images\verification\front_21_b28c2083-2e1a-47cf-943b-97c2213cb935.jpg
 wwwroot\images\verification\front_22_1af44678-d485-440b-a9f6-1426740ae863.jpeg
 wwwroot\images\verification\front_3_f2c07732-198e-4722-85fe-f3d662c54b9a.jpeg
 wwwroot\images\verified.png
+wwwroot\images\view-icon.png
 wwwroot\js\404.js
 wwwroot\js\category-filtering.js
 wwwroot\js\site.js

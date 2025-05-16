@@ -206,6 +206,9 @@ namespace PrimeMarket.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("ViewCount")
+                        .HasColumnType("int");
+
                     b.HasKey("Id");
 
                     b.HasIndex("SellerId");
@@ -1111,6 +1114,25 @@ namespace PrimeMarket.Migrations
                         .IsUnique();
 
                     b.ToTable("Mouses");
+                });
+
+            modelBuilder.Entity("PrimeMarket.Models.Products.Other", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ListingId")
+                        .IsUnique();
+
+                    b.ToTable("Others");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.OtherPhone", b =>
@@ -2181,6 +2203,17 @@ namespace PrimeMarket.Migrations
                     b.Navigation("Listing");
                 });
 
+            modelBuilder.Entity("PrimeMarket.Models.Products.Other", b =>
+                {
+                    b.HasOne("PrimeMarket.Models.Listing", "Listing")
+                        .WithOne("Other")
+                        .HasForeignKey("PrimeMarket.Models.Products.Other", "ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Listing");
+                });
+
             modelBuilder.Entity("PrimeMarket.Models.Products.OtherPhone", b =>
                 {
                     b.HasOne("PrimeMarket.Models.Listing", "Listing")
@@ -2497,6 +2530,9 @@ namespace PrimeMarket.Migrations
                         .IsRequired();
 
                     b.Navigation("Offers");
+
+                    b.Navigation("Other")
+                        .IsRequired();
 
                     b.Navigation("OtherPhone")
                         .IsRequired();

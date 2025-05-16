@@ -206,12 +206,15 @@ namespace PrimeMarket.Controllers
                     // Add stock for first-hand items
                     Stock = model.Condition == "First-Hand" ? model.Stock : null,
                     Category = model.Category,
-                    SubCategory = model.SubCategory,
+                    SubCategory = (model.SubCategory == null ||
+                      model.SubCategory == "undefined" ||
+                      string.IsNullOrEmpty(model.SubCategory)) ? string.Empty
+                      : model.SubCategory,
                     // Improved handling of DetailCategory
                     DetailCategory = (model.DetailCategory == null ||
-                  model.DetailCategory == "undefined" ||
-                  string.IsNullOrEmpty(model.DetailCategory)) ? string.Empty
-                  : model.DetailCategory,
+                      model.DetailCategory == "undefined" ||
+                      string.IsNullOrEmpty(model.DetailCategory)) ? string.Empty
+                      : model.DetailCategory,
                     RejectionReason = null,
                     Location = model.Location,
                     Status = ListingStatus.Pending,
@@ -223,8 +226,20 @@ namespace PrimeMarket.Controllers
 
                 _logger.LogInformation("Listing created with ID: {ListingId}", listing.Id);
 
+                // Check if this is an "Others" category listing
+                if (model.Category == "Others" || (model.Category != null && model.Category.Equals("Others", StringComparison.OrdinalIgnoreCase)))
+                {
+                    // Direct handling for Others category
+                    var othersProduct = new Models.Products.Other
+                    {
+                        ListingId = listing.Id
+                    };
+
+                    _context.Others.Add(othersProduct);
+                    _logger.LogInformation("Others product added for listing {ListingId}", listing.Id);
+                }
                 // Create the appropriate product model based on the category/subcategory
-                if (!string.IsNullOrEmpty(model.Category) && !string.IsNullOrEmpty(model.SubCategory))
+                else if (!string.IsNullOrEmpty(model.Category) && !string.IsNullOrEmpty(model.SubCategory))
                 {
                     try
                     {
@@ -233,11 +248,7 @@ namespace PrimeMarket.Controllers
                         {
                             product.ListingId = listing.Id;
 
-                            // Modify the section in CreateListing method that handles setting dynamic properties
-                            // around line 153 in ListingController.cs
-
-                            // Inside the if(product != null) block, replace the existing DynamicProperties section with this:
-
+                            // Process dynamic properties
                             if (model.DynamicProperties != null)
                             {
                                 foreach (var prop in model.DynamicProperties)
@@ -475,9 +486,33 @@ namespace PrimeMarket.Controllers
             };
 
             // Fetch product-specific properties
-            // Fetch product-specific properties
             var dynamicProperties = new Dictionary<string, string>();
-            if (!string.IsNullOrEmpty(listing.SubCategory))
+
+            // Check if this is an "Others" category listing
+            if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
+            {
+                var product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                if (product != null)
+                {
+                    _logger.LogInformation("Found Others product for listing {ListingId}", id);
+
+                    // Extract properties using reflection
+                    foreach (var prop in product.GetType().GetProperties())
+                    {
+                        // Skip navigation or system properties
+                        if (prop.Name == "Id" || prop.Name == "ListingId" || prop.Name == "Listing")
+                            continue;
+
+                        var value = prop.GetValue(product);
+                        if (value != null)
+                        {
+                            dynamicProperties[prop.Name] = value.ToString();
+                            _logger.LogInformation("Added property {PropertyName} with value {Value}", prop.Name, value);
+                        }
+                    }
+                }
+            }
+            else if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 object product = null;
                 // Get the appropriate product type based on subcategory
@@ -602,11 +637,14 @@ namespace PrimeMarket.Controllers
                         product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
 
-                    // General fallback (if any final top‑level category exists)
+                    // Others
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
 
-                    // Default – not recognised
+                    // Default – not recognised
                     default:
-                        product = null;           // log or handle as needed
+                        product = null;           // log or handle as needed
                         break;
                 }
 
@@ -724,10 +762,7 @@ namespace PrimeMarket.Controllers
             }
         }
 
-        // Update the EditListing POST method in ListingController.cs
-        // Updated EditListing POST method in ListingController.cs
 
-        // Updated EditListing POST method in ListingController.cs
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
@@ -888,33 +923,78 @@ namespace PrimeMarket.Controllers
                 }
 
                 // Update product-specific properties if applicable
-                if (model.DynamicProperties != null && !string.IsNullOrEmpty(listing.SubCategory))
+                if (model.Category == "Others" || string.Equals(model.Category, "Others", StringComparison.OrdinalIgnoreCase))
+                {
+                    // For "Others" category, update the Others table
+                    var othersProduct = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listing.Id);
+
+                    // If the Others product doesn't exist yet, create it
+                    if (othersProduct == null)
+                    {
+                        othersProduct = new Models.Products.Other
+                        {
+                            ListingId = listing.Id
+                        };
+                        _context.Others.Add(othersProduct);
+                        _logger.LogInformation("Created new Others product for listing {ListingId}", listing.Id);
+                    }
+
+                    // Update any dynamic properties if they exist
+                    if (model.DynamicProperties != null)
+                    {
+                        foreach (var prop in model.DynamicProperties)
+                        {
+                            // Find property with case-insensitive comparison
+                            var properties = othersProduct.GetType().GetProperties();
+                            var productProp = properties.FirstOrDefault(p =>
+                                string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase));
+
+                            if (productProp != null && productProp.CanWrite)
+                            {
+                                try
+                                {
+                                    // Skip if value is empty
+                                    if (string.IsNullOrWhiteSpace(prop.Value))
+                                        continue;
+
+                                    // Handle different property types
+                                    if (productProp.PropertyType == typeof(bool))
+                                    {
+                                        bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
+                                        productProp.SetValue(othersProduct, boolValue);
+                                    }
+                                    else if (productProp.PropertyType == typeof(int))
+                                    {
+                                        if (int.TryParse(prop.Value, out int intValue))
+                                        {
+                                            productProp.SetValue(othersProduct, intValue);
+                                        }
+                                    }
+                                    else if (productProp.PropertyType == typeof(decimal))
+                                    {
+                                        if (decimal.TryParse(prop.Value, out decimal decimalValue))
+                                        {
+                                            productProp.SetValue(othersProduct, decimalValue);
+                                        }
+                                    }
+                                    else
+                                    {
+                                        productProp.SetValue(othersProduct, prop.Value);
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.LogError(ex, "Error setting property {PropertyName}: {ErrorMessage}",
+                                        productProp.Name, ex.Message);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (model.DynamicProperties != null && !string.IsNullOrEmpty(listing.SubCategory))
                 {
                     await UpdateDynamicPropertiesAsync(listing.Id, listing.SubCategory, model.DynamicProperties);
                 }
-
-                // Create notifications
-                //if (wasApproved)
-                //{
-                //    // Notify admins that an approved listing was edited and needs review
-                //    var adminUserId = await _context.Admins
-                //                .Select(a => a.Id)   // Admin row → UserId
-                //                .FirstOrDefaultAsync();
-
-                //    if (adminUserId != 0)      // adjust type if Guid/int
-                //    {
-                //        var adminNotification = new Notification
-                //        {
-                //            UserId = adminUserId,                   // ✅ guaranteed to exist in Users
-                //            Message = $"Updated listing '{model.Title}' needs review",
-                //            Type = NotificationType.ListingApproved,
-                //            RelatedEntityId = listing.Id,
-                //            CreatedAt = DateTime.UtcNow
-                //        };
-
-                //        _context.Notifications.Add(adminNotification);
-                //    }
-                //}
 
                 // Notify user about the status change
                 if (originalStatus != listing.Status)
@@ -941,7 +1021,7 @@ namespace PrimeMarket.Controllers
                     TempData["SuccessMessage"] = "Your listing has been updated successfully.";
                 }
 
-                return RedirectToAction("MyListings");
+                return RedirectToAction("MyProfilePage", "User");
             }
             catch (Exception ex)
             {
@@ -959,56 +1039,69 @@ namespace PrimeMarket.Controllers
         }
 
         // Helper method to get dynamic properties for a specific product
+        // Helper method to get dynamic properties for a specific product
         private async Task<Dictionary<string, string>> GetDynamicPropertiesAsync(int listingId, string subcategory)
         {
             var result = new Dictionary<string, string>();
 
             dynamic product = null;
 
-            // Get the appropriate product based on subcategory
-            switch (subcategory)
+            // Special case for "Others" category
+            if (subcategory == "Others")
             {
-                case "IOS Phone":
-                    product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Android Phone":
-                    product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Laptops":
-                    product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Desktops":
-                    product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "IOS Tablets":
-                case "Android Tablets":
-                case "Other Tablets":
-                case "Tablets":
-                    // Check all tablet types
-                    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    if (product == null)
-                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    if (product == null)
-                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Washers":
-                    product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Dishwashers":
-                    product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Fridges":
-                    product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Ovens":
-                    product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Vacuum Cleaner":
-                    product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Televisions":
-                    product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
+                product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listingId);
+            }
+            else
+            {
+                // Get the appropriate product based on subcategory
+                switch (subcategory)
+                {
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Laptops":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Desktops":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "IOS Tablets":
+                    case "Android Tablets":
+                    case "Other Tablets":
+                    case "Tablets":
+                        // Check all tablet types
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        if (product == null)
+                            product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        if (product == null)
+                            product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Washers":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Dishwashers":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Fridges":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Ovens":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Vacuum Cleaner":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    // Additional case for Others
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                }
             }
 
             // If product is found, extract properties
@@ -1032,54 +1125,68 @@ namespace PrimeMarket.Controllers
         }
 
         // Helper method to update dynamic properties for a specific product
+        // Update for the UpdateDynamicPropertiesAsync method to handle "Others" category
+
         private async Task UpdateDynamicPropertiesAsync(int listingId, string subcategory, Dictionary<string, string> properties)
         {
             dynamic product = null;
 
-            // Get the appropriate product based on subcategory
-            switch (subcategory)
+            // Special case for "Others" category
+            if (subcategory == "Others")
             {
-                case "IOS Phone":
-                    product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Android Phone":
-                    product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Laptops":
-                    product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Desktops":
-                    product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "IOS Tablets":
-                case "Android Tablets":
-                case "Other Tablets":
-                case "Tablets":
-                    // Check all tablet types
-                    product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    if (product == null)
-                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    if (product == null)
-                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Washers":
-                    product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Dishwashers":
-                    product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Fridges":
-                    product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Ovens":
-                    product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Vacuum Cleaner":
-                    product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
-                case "Televisions":
-                    product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == listingId);
-                    break;
+                product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listingId);
+            }
+            else
+            {
+                // Get the appropriate product based on subcategory
+                switch (subcategory)
+                {
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Laptops":
+                        product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Desktops":
+                        product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "IOS Tablets":
+                    case "Android Tablets":
+                    case "Other Tablets":
+                    case "Tablets":
+                        // Check all tablet types
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        if (product == null)
+                            product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        if (product == null)
+                            product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Washers":
+                        product = await _context.Washers.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Dishwashers":
+                        product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Fridges":
+                        product = await _context.Fridges.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Ovens":
+                        product = await _context.Ovens.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Vacuum Cleaner":
+                        product = await _context.VacuumCleaners.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                    // Additional case for Others
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listingId);
+                        break;
+                }
             }
 
             // Update product properties if product exists
@@ -1143,18 +1250,24 @@ namespace PrimeMarket.Controllers
         }
 
         [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> DeleteListing(int id)
-{
-    var listing = await _context.Listings.FindAsync(id);
-    if (listing == null)
-        return Json(new { success = false, message = "Listing not found." });
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteListing(int id)
+        {
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null)
+                return Json(new { success = false, message = "Listing not found." });
 
-    _context.Listings.Remove(listing);
-    await _context.SaveChangesAsync();
+            _context.Listings.Remove(listing);
+            await _context.SaveChangesAsync();
 
-    return Json(new { success = true });
-}
+            return Json(new
+            {
+                success = true,
+                RedirectToAction = Url.Action("MyProfilePage", "User"),
+            }
+            
+            );
+        }
 
 
         
@@ -1249,9 +1362,28 @@ public async Task<IActionResult> DeleteListing(int id)
                 return NotFound();
             }
 
-            // Get product-specific details (existing code)
+            if (userId != listing.SellerId)
+            {
+                if (listing.ViewCount == null)
+                {
+                    listing.ViewCount = 1;
+                }
+                else
+                {
+                    listing.ViewCount++;
+                }
+                await _context.SaveChangesAsync();
+            }
+
+            // Get product-specific details
             dynamic product = null;
-            if (!string.IsNullOrEmpty(listing.DetailCategory))
+
+            // Special handling for "Others" category
+            if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
+            {
+                product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+            }
+            else if (!string.IsNullOrEmpty(listing.DetailCategory))
             {
                 switch (listing.DetailCategory)
                 {
@@ -1264,7 +1396,7 @@ public async Task<IActionResult> DeleteListing(int id)
                         product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Accessory":
-                    case "Computer Accesories":
+                    case "Computer Accessories":
                         product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Component":
@@ -1347,9 +1479,12 @@ public async Task<IActionResult> DeleteListing(int id)
                     case "Computer Bags":
                         product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                 }
             }
-            if (!string.IsNullOrEmpty(listing.SubCategory))
+            else if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
                 {
@@ -1364,15 +1499,19 @@ public async Task<IActionResult> DeleteListing(int id)
                         product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Spare Part":
+                    case "Spare Parts":
                         product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Phone Accessory":
+                    case "Phone Accessories":
                         product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "IOS Tablet":
+                    case "IOS Tablets":
                         product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Android Tablet":
+                    case "Android Tablets":
                         product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Tablet":
@@ -1380,16 +1519,22 @@ public async Task<IActionResult> DeleteListing(int id)
                         product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Tablet Accessory":
+                    case "Tablet Accessories":
                         product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Television":
+                    case "Televisions":
                         product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Heating & Cooling":
                         product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Camera":
+                    case "Cameras":
                         product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                 }
             }
@@ -1402,7 +1547,7 @@ public async Task<IActionResult> DeleteListing(int id)
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings (existing code)
+            // Get related listings
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -1412,7 +1557,7 @@ public async Task<IActionResult> DeleteListing(int id)
                 .Take(4)
                 .ToListAsync();
 
-            // Get active offers if this is a second-hand listing (existing code)
+            // Get active offers if this is a second-hand listing
             List<Offer> activeOffers = new List<Offer>();
             if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
             {
@@ -1472,8 +1617,8 @@ public async Task<IActionResult> DeleteListing(int id)
             return View(viewModel);
         }
         // Add this method to your ListingController.cs file
-// ListingController.cs - Updated Search Method
-[HttpGet]
+        // ListingController.cs - Updated Search Method
+        [HttpGet]
 public async Task<IActionResult> Search(string query)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
@@ -1593,7 +1738,18 @@ public async Task<IActionResult> Search(string query)
             {
                 return NotFound();
             }
-
+            if (userId != listing.SellerId)
+            {
+                if (listing.ViewCount == null)
+                {
+                    listing.ViewCount = 1;
+                }
+                else
+                {
+                    listing.ViewCount++;
+                }
+                await _context.SaveChangesAsync();
+            }
             // Get product-specific details (existing code)
             dynamic product = null;
             if (!string.IsNullOrEmpty(listing.DetailCategory))

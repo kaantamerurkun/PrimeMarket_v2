@@ -23,8 +23,6 @@ namespace PrimeMarket.Controllers
             _logger = logger;
         }
 
-        // Modify the MyProfitLossReport method in ReportController.cs
-        // Modify the MyProfitLossReport method in ReportController.cs
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> MyProfitLossReport(string timeRange = "all")
@@ -37,12 +35,19 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get all completed sales for this user
+                // Force the timeRange to be a valid value
+                if (timeRange != "week" && timeRange != "month" && timeRange != "quarter" && timeRange != "year" && timeRange != "all")
+                {
+                    timeRange = "all";
+                }
+
+                // Get all completed sales for this user - make sure to get fresh data from the database
                 var sales = await _context.Purchases
                     .Include(p => p.Listing)
                     .Include(p => p.Buyer)
                     .Where(p => p.Listing.SellerId == userId && p.PaymentStatus == PaymentStatus.Completed)
                     .OrderByDescending(p => p.CreatedAt)
+                    .AsNoTracking() // This ensures we get fresh data
                     .ToListAsync();
 
                 // Calculate date range based on selected timeRange
@@ -97,7 +102,7 @@ namespace PrimeMarket.Controllers
                     .ToList();
 
                 // Prepare monthly revenue data for the chart
-                var revenueByMonth = new Dictionary<string, decimal>();
+                var chartData = new List<ChartDataPoint>();
 
                 // Determine the appropriate start date for chart data based on timeRange
                 DateTime chartStartDate;
@@ -110,91 +115,104 @@ namespace PrimeMarket.Controllers
                         chartStartDate = DateTime.UtcNow.AddDays(-7);
                         dataPoints = 7;
                         timeFormat = "MM/dd"; // Month/Day
+
+                        // Daily data points for week
+                        for (int i = 0; i < dataPoints; i++)
+                        {
+                            var date = chartStartDate.AddDays(i);
+                            var dayRevenue = filteredSales
+                                .Where(s => s.CreatedAt?.Date == date.Date)
+                                .Sum(s => s.Amount);
+
+                            chartData.Add(new ChartDataPoint
+                            {
+                                Label = date.ToString(timeFormat),
+                                Value = dayRevenue
+                            });
+                        }
                         break;
+
                     case "month":
                         chartStartDate = DateTime.UtcNow.AddDays(-30);
                         dataPoints = 30;
                         timeFormat = "MM/dd"; // Month/Day
+
+                        // Daily data points for month
+                        for (int i = 0; i < dataPoints; i++)
+                        {
+                            var date = chartStartDate.AddDays(i);
+                            var dayRevenue = filteredSales
+                                .Where(s => s.CreatedAt?.Date == date.Date)
+                                .Sum(s => s.Amount);
+
+                            chartData.Add(new ChartDataPoint
+                            {
+                                Label = date.ToString(timeFormat),
+                                Value = dayRevenue
+                            });
+                        }
                         break;
+
                     case "quarter":
                         chartStartDate = DateTime.UtcNow.AddMonths(-3);
                         dataPoints = 12; // Weekly data points
                         timeFormat = "MM/dd"; // Month/Day
+
+                        // Weekly data points for quarter
+                        for (int i = 0; i < dataPoints; i++)
+                        {
+                            var weekStart = chartStartDate.AddDays(i * 7);
+                            var weekEnd = weekStart.AddDays(6);
+                            var weekRevenue = filteredSales
+                                .Where(s => s.CreatedAt >= weekStart && s.CreatedAt <= weekEnd)
+                                .Sum(s => s.Amount);
+
+                            chartData.Add(new ChartDataPoint
+                            {
+                                Label = $"{weekStart.ToString("MM/dd")}-{weekEnd.ToString("MM/dd")}",
+                                Value = weekRevenue
+                            });
+                        }
                         break;
+
                     case "year":
                         chartStartDate = DateTime.UtcNow.AddYears(-1);
                         dataPoints = 12; // Monthly data points
                         timeFormat = "MMM yyyy"; // Month Year
+
+                        // Monthly data points for year
+                        for (int i = 0; i < dataPoints; i++)
+                        {
+                            var monthStart = DateTime.UtcNow.AddMonths(-12 + i);
+                            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+
+                            var monthRevenue = filteredSales
+                                .Where(s => s.CreatedAt >= monthStart && s.CreatedAt <= monthEnd)
+                                .Sum(s => s.Amount);
+
+                            chartData.Add(new ChartDataPoint
+                            {
+                                Label = monthStart.ToString("MMM yyyy"),
+                                Value = monthRevenue
+                            });
+                        }
                         break;
-                    default:
+
+                    default: // "all"
                         // For 'all', show up to the last 24 months of data
                         chartStartDate = sales.Any()
                             ? sales.Min(s => s.CreatedAt ?? DateTime.UtcNow.AddYears(-2))
                             : DateTime.UtcNow.AddYears(-2);
                         dataPoints = 24; // Monthly data points
                         timeFormat = "MMM yyyy"; // Month Year
-                        break;
-                }
 
-                // Generate the data points for the chart
-                var chartData = new List<ChartDataPoint>();
-
-                // Ensure we have at least one data point even if there are no sales
-                if (!filteredSales.Any())
-                {
-                    // Add a single data point with zero value for current date
-                    chartData.Add(new ChartDataPoint
-                    {
-                        Label = DateTime.UtcNow.ToString(timeFormat),
-                        Value = 0
-                    });
-                }
-                else if (timeRange == "week" || timeRange == "month")
-                {
-                    // Daily data points
-                    for (int i = 0; i < dataPoints; i++)
-                    {
-                        var date = chartStartDate.AddDays(i);
-                        var dayRevenue = filteredSales
-                            .Where(s => s.CreatedAt?.Date == date.Date)
-                            .Sum(s => s.Amount);
-
-                        chartData.Add(new ChartDataPoint
-                        {
-                            Label = date.ToString(timeFormat),
-                            Value = dayRevenue
-                        });
-                    }
-                }
-                else if (timeRange == "quarter")
-                {
-                    // Weekly data points
-                    for (int i = 0; i < dataPoints; i++)
-                    {
-                        var weekStart = chartStartDate.AddDays(i * 7);
-                        var weekEnd = weekStart.AddDays(6);
-                        var weekRevenue = filteredSales
-                            .Where(s => s.CreatedAt >= weekStart && s.CreatedAt <= weekEnd)
-                            .Sum(s => s.Amount);
-
-                        chartData.Add(new ChartDataPoint
-                        {
-                            Label = $"{weekStart.ToString("MM/dd")}-{weekEnd.ToString("MM/dd")}",
-                            Value = weekRevenue
-                        });
-                    }
-                }
-                else
-                {
-                    // For year and all time, use monthly data points
-
-                    // If we have very few months of data but "all time" is selected,
-                    // make sure we at least have 2 data points
-                    if (timeRange == "all" && filteredSales.Count > 0)
-                    {
                         // Calculate the actual date range in months
-                        var minDate = filteredSales.Min(s => s.CreatedAt ?? DateTime.UtcNow);
-                        var maxDate = filteredSales.Max(s => s.CreatedAt ?? DateTime.UtcNow);
+                        var minDate = sales.Any()
+                            ? sales.Min(s => s.CreatedAt ?? DateTime.UtcNow)
+                            : DateTime.UtcNow.AddYears(-2);
+                        var maxDate = sales.Any()
+                            ? sales.Max(s => s.CreatedAt ?? DateTime.UtcNow)
+                            : DateTime.UtcNow;
                         var monthsSpan = ((maxDate.Year - minDate.Year) * 12) + maxDate.Month - minDate.Month;
 
                         // If we have less than 2 months of data, adjust to show at least 2 data points
@@ -205,32 +223,30 @@ namespace PrimeMarket.Controllers
                             // Make sure we show at least 2 months
                             dataPoints = Math.Max(2, monthsSpan + 1);
                         }
-                    }
 
-                    // Monthly data points for year and all time
-                    for (int i = 0; i < dataPoints; i++)
-                    {
-                        var monthStart = timeRange == "year"
-                            ? chartStartDate.AddMonths(i)
-                            : DateTime.UtcNow.AddMonths(-dataPoints + i + 1);
-
-                        // For "all time" with very few data points, use the adjusted range
-                        if (timeRange == "all" && dataPoints <= 2)
+                        // Monthly data points for all time
+                        for (int i = 0; i < dataPoints; i++)
                         {
-                            monthStart = chartStartDate.AddMonths(i);
+                            var monthStart = DateTime.UtcNow.AddMonths(-dataPoints + i + 1);
+
+                            // For "all time" with very few data points, use the adjusted range
+                            if (dataPoints <= 2)
+                            {
+                                monthStart = chartStartDate.AddMonths(i);
+                            }
+
+                            var monthEnd = monthStart.AddMonths(1).AddDays(-1);
+                            var monthRevenue = filteredSales
+                                .Where(s => s.CreatedAt >= monthStart && s.CreatedAt <= monthEnd)
+                                .Sum(s => s.Amount);
+
+                            chartData.Add(new ChartDataPoint
+                            {
+                                Label = monthStart.ToString("MMM yyyy"),
+                                Value = monthRevenue
+                            });
                         }
-
-                        var monthEnd = monthStart.AddMonths(1).AddDays(-1);
-                        var monthRevenue = filteredSales
-                            .Where(s => s.CreatedAt >= monthStart && s.CreatedAt <= monthEnd)
-                            .Sum(s => s.Amount);
-
-                        chartData.Add(new ChartDataPoint
-                        {
-                            Label = monthStart.ToString("MMM yyyy"),
-                            Value = monthRevenue
-                        });
-                    }
+                        break;
                 }
 
                 // If we still somehow ended up with no data points, add a zero point for the current month
@@ -246,7 +262,7 @@ namespace PrimeMarket.Controllers
                 // Create the view model
                 var viewModel = new ProfitLossReportViewModel
                 {
-                    TimeRange = timeRange,
+                    TimeRange = timeRange, // Make sure we pass the correct timeRange to the view
                     PeriodLabel = periodLabel,
                     TotalSales = totalItems, // This now represents total quantity of items
                     TotalRevenue = totalRevenue,
