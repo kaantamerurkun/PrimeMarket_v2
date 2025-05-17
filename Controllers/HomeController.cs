@@ -24,6 +24,7 @@ public class HomeController : Controller
         var listings = _context.Listings
             .Where(l =>
                 l.Status == ListingStatus.Active &&                // still for sale
+                l.Status != ListingStatus.Archived &&              // not archived
                 (!l.Stock.HasValue || l.Stock > 0))                // second-hand OR stock-positive
                    .Include(l => l.Images)
             .OrderByDescending(l => l.CreatedAt)

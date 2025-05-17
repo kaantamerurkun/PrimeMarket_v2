@@ -43,11 +43,14 @@ namespace PrimeMarket.Controllers
             try
             {
                 // Get all bookmarks (items in cart) for the current user
+                // Exclude archived listings
                 var bookmarks = await _context.Bookmarks
                     .Include(b => b.Listing)
                     .ThenInclude(l => l.Images)
                     .Include(b => b.Listing.Seller)
-                    .Where(b => b.UserId == userId && b.Listing.Status == ListingStatus.Active)
+                    .Where(b => b.UserId == userId &&
+                               b.Listing.Status == ListingStatus.Active &&
+                               b.Listing.Status != ListingStatus.Archived)
                     .ToListAsync();
 
                 var model = new CartViewModel

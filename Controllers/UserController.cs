@@ -980,12 +980,14 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             ViewBag.ListingId = id;
             return View();
         }
-// UserController.cs - Updated User_MainPageAsync Method
-[UserAuthenticationFilter]
-public async Task<IActionResult> User_MainPageAsync()
+        // UserController.cs - Updated User_MainPageAsync Method
+        [UserAuthenticationFilter]
+        public async Task<IActionResult> User_MainPageAsync()
         {
             var approvedListings = await _context.Listings
-                .Where(l => l.Status == ListingStatus.Active && (!l.Stock.HasValue || l.Stock > 0))
+                .Where(l => l.Status == ListingStatus.Active &&
+                           l.Status != ListingStatus.Archived &&
+                           (!l.Stock.HasValue || l.Stock > 0))
                 .Include(l => l.Images)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
@@ -1024,7 +1026,9 @@ public async Task<IActionResult> User_MainPageAsync()
             var bookmarks = await _context.Bookmarks
                 .Include(b => b.Listing)
                 .ThenInclude(l => l.Images)
-                .Where(b => b.UserId == userId && b.Listing.Status == Models.Enum.ListingStatus.Active)
+                .Where(b => b.UserId == userId &&
+                           b.Listing.Status == Models.Enum.ListingStatus.Active &&
+                           b.Listing.Status != Models.Enum.ListingStatus.Archived)
                 .ToListAsync();
 
             return View(bookmarks);

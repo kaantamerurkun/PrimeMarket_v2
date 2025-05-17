@@ -246,10 +246,19 @@ namespace PrimeMarket.Controllers
             // Get the specific product details based on the category
             dynamic? product = null;
 
-            if (!string.IsNullOrEmpty(listing.DetailCategory))
+            // Special handling for "Others" category
+            if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
+            {
+                product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+            }
+            else if (!string.IsNullOrEmpty(listing.DetailCategory))
             {
                 switch (listing.DetailCategory)
                 {
+                    case "Television":
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                     case "Laptops":
                     case "Laptop":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -259,7 +268,7 @@ namespace PrimeMarket.Controllers
                         product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Accessory":
-                    case "Computer Accesories":
+                    case "Computer Accessories":
                         product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Component":
@@ -342,9 +351,53 @@ namespace PrimeMarket.Controllers
                     case "Computer Bags":
                         product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Phone":
+                    case "Other Phones":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Spare Part":
+                    case "Spare Parts":
+                        product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessory":
+                    case "Phone Accessories":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Tablet":
+                    case "IOS Tablets":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablet":
+                    case "Android Tablets":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablet":
+                    case "Other Tablets":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessory":
+                    case "Tablet Accessories":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Heating & Cooling":
+                        product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Camera":
+                    case "Cameras":
+                        product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                 }
             }
-            if (!string.IsNullOrEmpty(listing.SubCategory))
+            else if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
                 {
@@ -359,15 +412,19 @@ namespace PrimeMarket.Controllers
                         product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Spare Part":
+                    case "Spare Parts":
                         product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Phone Accessory":
+                    case "Phone Accessories":
                         product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "IOS Tablet":
+                    case "IOS Tablets":
                         product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Android Tablet":
+                    case "Android Tablets":
                         product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Tablet":
@@ -375,16 +432,22 @@ namespace PrimeMarket.Controllers
                         product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Tablet Accessory":
+                    case "Tablet Accessories":
                         product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Television":
+                    case "Televisions":
                         product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Heating & Cooling":
                         product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Camera":
+                    case "Cameras":
                         product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                 }
             }
@@ -680,7 +743,6 @@ namespace PrimeMarket.Controllers
         }
 
 
-        [HttpGet]
         public async Task<IActionResult> UsageReport()
         {
             // Check if admin is logged in
@@ -713,7 +775,7 @@ namespace PrimeMarket.Controllers
             // Get listing statistics
             var totalListings = await _context.Listings.CountAsync();
             var pendingListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Pending);
-            var approvedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Approved);
+            var approvedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Active);
 
             // Count listings with Sold status
             var soldListingsCount = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Sold);

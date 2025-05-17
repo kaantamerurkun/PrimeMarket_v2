@@ -2,6 +2,7 @@
 @{
 
     var isVerified = Context.Session.GetString("IsUserVerified") == "true";
+    var isLoggedIn = Context.Session.GetString("UserId") != null;
 
     ViewData["Title"] = Model.Listing.Title;
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -610,6 +611,55 @@
         padding: 20px;
         color: #666;
         }
+        <!-- Add this to the <style > section in Details.cshtml -->
+        .listing-status {
+        display: inline-block;
+        padding: 5px 10px;
+        border-radius: 15px;
+        font-size: 14px;
+        font-weight: bold;
+        margin-left: 15px;
+        }
+
+        .pending {
+        background-color: #ffc107;
+        color: #212529;
+        }
+
+        .active {
+        background-color: #28a745;
+        color: white;
+        }
+
+        .rejected {
+        background-color: #dc3545;
+        color: white;
+        }
+
+        .sold {
+        background-color: #17a2b8;
+        color: white;
+        }
+
+        .archived {
+        background-color: #6c757d;
+        color: white;
+        }
+
+        .archived-message {
+        background-color: #f8f9fa;
+        border-left: 3px solid #6c757d;
+        padding: 15px;
+        margin: 15px 0;
+        color: #6c757d;
+        border-radius: 5px;
+        }
+
+        .owner-note {
+        font-style: italic;
+        color: #6c757d;
+        margin-top: 10px;
+        }
     </style>
     <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
 
@@ -625,6 +675,19 @@
             </h1>
             <div class="price">@Model.Listing.Price.ToString("C")</div>
         </div>
+        <!-- Add this block right after the listing-header div -->
+        @if (Model.IsArchived)
+        {
+            <div class="archived-message" style="background-color: #f8f9fa; border-left: 3px solid #6c757d; padding: 15px; margin: 15px 0 30px 0; color: #6c757d; border-radius: 5px;">
+                <strong>This listing has been archived by the seller and is no longer available.</strong>
+            </div>
+            @if (Model.IsOwner)
+            {
+                <p class="owner-note" style="font-style: italic; color: #6c757d; margin-top: 10px; margin-bottom: 20px;">
+                    Note: As the owner, you can still view this archived listing, but it's hidden from other users.
+                </p>
+            }
+        }
 
         <div class="main-content">
             <div class="image-gallery">
@@ -784,65 +847,86 @@
                     </h3>
                     <p class="phone">@(string.IsNullOrEmpty(Model.Listing.Seller?.PhoneNumber) ? "No phone number" : Model.Listing.Seller.PhoneNumber)</p>
 
-                <!-- Message/Offer Buttons -->
-                @if (!Model.IsOwner)
-                {
-                    <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
-                        <button class="btn-sendmessage">Send Message</button>
-                    </a>
-                }
-                else
-                {
-                    <p class="owner-badge">You are the seller of this listing</p>
-
-                    <!-- If second-hand and has active offers, show them -->
-                    @if (Model.Listing.Condition == "Second-Hand" && Model.ActiveOffers != null && Model.ActiveOffers.Any())
+                    <!-- Message/Offer Buttons -->
+                    @if (!Model.IsOwner)
                     {
-                        <div class="active-offers-container">
-                            <h4>Active Offers</h4>
-                            @foreach (var offer in Model.ActiveOffers)
-                            {
-                                <div class="offer-item">
-                                    <div class="offer-details">
-                                        <p>From: @offer.Buyer.FirstName @offer.Buyer.LastName</p>
-                                        <p>Amount: @offer.OfferAmount.ToString("C")</p>
-                                        <p>Message: @(string.IsNullOrEmpty(offer.Message) ? "No message" : offer.Message)</p>
-                                    </div>
-                                    <div class="offer-actions">
-                                        <button class="btn-accept" onclick="respondToOffer(@offer.Id, true)">Accept</button>
-                                        <button class="btn-reject" onclick="respondToOffer(@offer.Id, false)">Reject</button>
-                                    </div>
-                                </div>
-                            }
-                        </div>
+                        <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
+                            <button class="btn-sendmessage">Send Message</button>
+                        </a>
                     }
-                }
+                    else
+                    {
+                        <p class="owner-badge">You are the seller of this listing</p>
+
+                        <!-- If second-hand and has active offers, show them -->
+                        @if (Model.Listing.Condition == "Second-Hand" && Model.ActiveOffers != null && Model.ActiveOffers.Any())
+                        {
+                            <div class="active-offers-container">
+                                <h4>Active Offers</h4>
+                                @foreach (var offer in Model.ActiveOffers)
+                                {
+                                    <div class="offer-item">
+                                        <div class="offer-details">
+                                            <p>From: @offer.Buyer.FirstName @offer.Buyer.LastName</p>
+                                            <p>Amount: @offer.OfferAmount.ToString("C")</p>
+                                            <p>Message: @(string.IsNullOrEmpty(offer.Message) ? "No message" : offer.Message)</p>
+                                        </div>
+                                        <div class="offer-actions">
+                                            <button class="btn-accept" onclick="respondToOffer(@offer.Id, true)">Accept</button>
+                                            <button class="btn-reject" onclick="respondToOffer(@offer.Id, false)">Reject</button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
             </div>
         </div>
-    </div>
 
-    <!-- Related Listings -->
-    @if (Model.RelatedListings != null && Model.RelatedListings.Any())
-    {
-        <div class="related-listings">
-            <h3>Similar Listings</h3>
-            <div class="related-listings-grid">
-                @foreach (var related in Model.RelatedListings)
-                {
-                    <a href="@Url.Action("Details", "Listing", new { id = related.Id })" class="related-listing-item">
-                        <div class="related-image">
-                            @{
-                                var relatedImage = related.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
-                                ?? related.Images?.FirstOrDefault()?.ImagePath
-                                ?? "/images/placeholder.png";
-                            }
-                            <img src="@relatedImage" alt="@related.Title">
-                        </div>
-                        <div class="related-info">
-                            <h4>@related.Title</h4>
-                            <p class="related-price">@related.Price.ToString("C")</p>
-                        </div>
-                    </a>
+        <!-- Related Listings -->
+        @if (Model.RelatedListings != null && Model.RelatedListings.Any())
+        {
+            <div class="related-listings">
+                <h3>Similar Listings</h3>
+                <div class="related-listings-grid">
+                    @foreach (var related in Model.RelatedListings)
+                    {
+                        @if (isLoggedIn)
+                        {
+                            <a href="@Url.Action("Details", "Listing", new { id = related.Id })
+                            " class="related-listing-item">
+                                <div class="related-image">
+                                    @{
+                                        var relatedImage = related.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                    ?? related.Images?.FirstOrDefault()?.ImagePath
+                                    ?? "/images/placeholder.png";
+                                    }
+                                    <img src="@relatedImage" alt="@related.Title">
+                                </div>
+                                <div class="related-info">
+                                    <h4>@related.Title</h4>
+                                    <p class="related-price">@related.Price.ToString("C")</p>
+                                </div>
+                            </a>
+                        }else
+                        {
+                            <a href="@Url.Action("Guest_Listing_Details", "Listing", new { id = related.Id })
+                                        " class="related-listing-item">
+                                <div class="related-image">
+                                    @{
+                                        var relatedImage = related.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath
+                                        ?? related.Images?.FirstOrDefault()?.ImagePath
+                                        ?? "/images/placeholder.png";
+                                    }
+                                    <img src="@relatedImage" alt="@related.Title">
+                                </div>
+                                <div class="related-info">
+                                    <h4>@related.Title</h4>
+                                    <p class="related-price">@related.Price.ToString("C")</p>
+                                </div>
+                            </a>
+                        }
                 }
             </div>
         </div>

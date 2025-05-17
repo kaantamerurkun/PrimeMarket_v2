@@ -1255,52 +1255,80 @@ namespace PrimeMarket.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteListing(int id)
         {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "You must be logged in to delete listings." });
+            }
+
             var listing = await _context.Listings
                 .Include(l => l.Purchases)  // Include purchases to check if there's purchase history
-                .FirstOrDefaultAsync(l => l.Id == id);
+                .FirstOrDefaultAsync(l => l.Id == id && l.SellerId == userId);
 
             if (listing == null)
-                return Json(new { success = false, message = "Listing not found." });
-
-
-            // Check if this listing is a first-hand item with remaining stock and has purchase history
-            bool hasStock = listing.Condition == "First-Hand" && listing.Stock.HasValue && listing.Stock.Value > 0;
-            bool hasPurchaseHistory = listing.Purchases != null && listing.Purchases.Any();
-
-            if (hasPurchaseHistory || hasStock)
             {
-                // Archive the listing instead of deleting it
-                listing.Status = ListingStatus.Archived;
-                listing.UpdatedAt = DateTime.UtcNow;
-
-                _logger.LogInformation($"Listing {listing.Id} '{listing.Title}' was archived instead of deleted due to purchase history or remaining stock");
-
-                await _context.SaveChangesAsync();
-
-                return Json(new
-                {
-                    success = true,
-                    message = "Listing has been archived.",
-                    RedirectToAction = Url.Action("MyProfilePage", "User"),
-                });
+                return Json(new { success = false, message = "Listing not found or you don't have permission to delete it." });
             }
-            else
-            {
-                // No purchase history and no remaining stock, proceed with deletion
-                _context.Listings.Remove(listing);
-                await _context.SaveChangesAsync();
 
-                return Json(new
+            try
+            {
+                // Check if this listing is second-hand and has not been sold yet
+                if (listing.Condition == "Second-Hand" && listing.Status != ListingStatus.Sold)
                 {
-                    success = true,
-                    message = "Listing has been deleted.",
-                    RedirectToAction = Url.Action("MyProfilePage", "User"),
-                });
+                    // Archive the listing instead of deleting it
+                    listing.Status = ListingStatus.Archived;
+                    listing.UpdatedAt = DateTime.UtcNow;
+
+                    _logger.LogInformation($"Listing {listing.Id} '{listing.Title}' was archived by the seller");
+
+                    await _context.SaveChangesAsync();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Listing has been archived.",
+                        RedirectToAction = Url.Action("MyProfilePage", "User"),
+                    });
+                }
+                // Check if this listing is a first-hand item with remaining stock and has purchase history
+                else if (listing.Condition == "First-Hand" && listing.Stock.HasValue && listing.Stock.Value > 0 &&
+                        (listing.Purchases != null && listing.Purchases.Any()))
+                {
+                    // Archive the listing instead of deleting it
+                    listing.Status = ListingStatus.Archived;
+                    listing.UpdatedAt = DateTime.UtcNow;
+
+                    _logger.LogInformation($"Listing {listing.Id} '{listing.Title}' was archived instead of deleted due to purchase history or remaining stock");
+
+                    await _context.SaveChangesAsync();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Listing has been archived.",
+                        RedirectToAction = Url.Action("MyProfilePage", "User"),
+                    });
+                }
+                else
+                {
+                    // No purchase history and no remaining stock, proceed with deletion
+                    _context.Listings.Remove(listing);
+                    await _context.SaveChangesAsync();
+
+                    return Json(new
+                    {
+                        success = true,
+                        message = "Listing has been deleted.",
+                        RedirectToAction = Url.Action("MyProfilePage", "User"),
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error handling listing deletion/archival");
+                return Json(new { success = false, message = $"An error occurred: {ex.Message}" });
             }
         }
-
-
-
 
         #region Browse and Search
 
@@ -1381,11 +1409,11 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // If not approved and current user is not the seller or an admin, return not found
+            // If not approved, archived, or otherwise unavailable and current user is not the seller or an admin, return not found
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
-            if (listing.Status != ListingStatus.Active &&
+            if ((listing.Status != ListingStatus.Active || listing.Status == ListingStatus.Archived) &&
                 userId != listing.SellerId &&
                 !isAdmin)
             {
@@ -1417,6 +1445,10 @@ namespace PrimeMarket.Controllers
             {
                 switch (listing.DetailCategory)
                 {
+                    case "Television":
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                     case "Laptops":
                     case "Laptop":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -1511,6 +1543,47 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Others":
                         product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Phone":
+                    case "Other Phones":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Spare Part":
+                    case "Spare Parts":
+                        product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessory":
+                    case "Phone Accessories":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Tablet":
+                    case "IOS Tablets":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablet":
+                    case "Android Tablets":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablet":
+                    case "Other Tablets":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessory":
+                    case "Tablet Accessories":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Heating & Cooling":
+                        product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Camera":
+                    case "Cameras":
+                        product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                 }
             }
@@ -1646,10 +1719,8 @@ namespace PrimeMarket.Controllers
 
             return View(viewModel);
         }
-        // Add this method to your ListingController.cs file
-        // ListingController.cs - Updated Search Method
         [HttpGet]
-public async Task<IActionResult> Search(string query)
+        public async Task<IActionResult> Search(string query)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (string.IsNullOrEmpty(query))
@@ -1675,8 +1746,8 @@ public async Task<IActionResult> Search(string query)
                 // We'll still search for this number in titles and descriptions
                 var numberResults = await _context.Listings
                     .Where(l => l.Status == ListingStatus.Active &&
-                          (l.Title.Contains(query) ||
-                           l.Description.Contains(query)))
+                             (l.Title.Contains(query) ||
+                              l.Description.Contains(query)))
                     .Include(l => l.Images)
                     .OrderByDescending(l => l.CreatedAt)
                     .ToListAsync();
@@ -1695,7 +1766,8 @@ public async Task<IActionResult> Search(string query)
                 {
                     var listing = await _context.Listings
                         .Include(l => l.Images)
-                        .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Active);
+                        .FirstOrDefaultAsync(l => l.Id == listingId &&
+                                            l.Status == ListingStatus.Active);
 
                     if (listing != null)
                     {
@@ -1711,13 +1783,14 @@ public async Task<IActionResult> Search(string query)
             }
 
             // For regular search, look for matches in title, category, subcategory, or detail category
+            // Exclude archived listings
             var results = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
-                      (l.Title.Contains(query) ||
-                       l.Category.Contains(query) ||
-                       l.SubCategory.Contains(query) ||
-                       l.DetailCategory.Contains(query) ||
-                       l.Description.Contains(query)))
+                         (l.Title.Contains(query) ||
+                          l.Category.Contains(query) ||
+                          l.SubCategory.Contains(query) ||
+                          l.DetailCategory.Contains(query) ||
+                          l.Description.Contains(query)))
                 .Include(l => l.Images)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
@@ -1758,16 +1831,17 @@ public async Task<IActionResult> Search(string query)
                 return NotFound();
             }
 
-            // If not approved and current user is not the seller or an admin, return not found
+            // If not approved or archived for guest users, return not found
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
-            if (listing.Status != ListingStatus.Active &&
+            if ((listing.Status != ListingStatus.Active || listing.Status == ListingStatus.Archived) &&
                 userId != listing.SellerId &&
                 !isAdmin)
             {
                 return NotFound();
             }
+
             if (userId != listing.SellerId)
             {
                 if (listing.ViewCount == null)
@@ -1782,10 +1856,18 @@ public async Task<IActionResult> Search(string query)
             }
             // Get product-specific details (existing code)
             dynamic product = null;
-            if (!string.IsNullOrEmpty(listing.DetailCategory))
+            if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
+            {
+                product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+            }
+            else if (!string.IsNullOrEmpty(listing.DetailCategory))
             {
                 switch (listing.DetailCategory)
                 {
+                    case "Television":
+                    case "Televisions":
+                        product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                     case "Laptops":
                     case "Laptop":
                         product = await _context.Laptops.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -1795,7 +1877,7 @@ public async Task<IActionResult> Search(string query)
                         product = await _context.Desktops.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Accessory":
-                    case "Computer Accesories":
+                    case "Computer Accessories":
                         product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Component":
@@ -1878,9 +1960,53 @@ public async Task<IActionResult> Search(string query)
                     case "Computer Bags":
                         product = await _context.ComputerBags.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Phone":
+                        product = await _context.IOSPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Phone":
+                        product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Phone":
+                    case "Other Phones":
+                        product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Spare Part":
+                    case "Spare Parts":
+                        product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Phone Accessory":
+                    case "Phone Accessories":
+                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "IOS Tablet":
+                    case "IOS Tablets":
+                        product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Android Tablet":
+                    case "Android Tablets":
+                        product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Other Tablet":
+                    case "Other Tablets":
+                        product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Tablet Accessory":
+                    case "Tablet Accessories":
+                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Heating & Cooling":
+                        product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Camera":
+                    case "Cameras":
+                        product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
                 }
             }
-            if (!string.IsNullOrEmpty(listing.SubCategory))
+            else if (!string.IsNullOrEmpty(listing.SubCategory))
             {
                 switch (listing.SubCategory)
                 {
@@ -1891,34 +2017,46 @@ public async Task<IActionResult> Search(string query)
                         product = await _context.AndroidPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Phone":
+                    case "Other Phones":
                         product = await _context.OtherPhones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Spare Part":
+                    case "Spare Parts":
                         product = await _context.SpareParts.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Phone Accessory":
+                    case "Phone Accessories":
                         product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "IOS Tablet":
+                    case "IOS Tablets":
                         product = await _context.IOSTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Android Tablet":
+                    case "Android Tablets":
                         product = await _context.AndroidTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Other Tablet":
+                    case "Other Tablets":
                         product = await _context.OtherTablets.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Tablet Accessory":
+                    case "Tablet Accessories":
                         product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Television":
+                    case "Televisions":
                         product = await _context.Televisions.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Heating & Cooling":
                         product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Camera":
+                    case "Cameras":
                         product = await _context.Cameras.FirstOrDefaultAsync(p => p.ListingId == id);
+                        break;
+                    case "Others":
+                        product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                 }
             }
@@ -1931,7 +2069,7 @@ public async Task<IActionResult> Search(string query)
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings (existing code)
+            // Get related listings
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -1941,7 +2079,7 @@ public async Task<IActionResult> Search(string query)
                 .Take(4)
                 .ToListAsync();
 
-            // Get active offers if this is a second-hand listing (existing code)
+            // Get active offers if this is a second-hand listing
             List<Offer> activeOffers = new List<Offer>();
             if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
             {
@@ -2000,9 +2138,6 @@ public async Task<IActionResult> Search(string query)
 
             return View(viewModel);
         }
-
-
-
         #endregion
 
         #region User Interactions
@@ -2098,6 +2233,10 @@ public async Task<IActionResult> Search(string query)
             // Verify listing is active and available
             if (listing.Status != ListingStatus.Active)
                 return Json(new { success = false, message = "This listing is not available for offers." });
+
+            // Check if listing is archived
+            if (listing.Status == ListingStatus.Archived)
+                return Json(new { success = false, message = "This listing has been archived by the seller and is no longer available for offers." });
 
             if (listing.SellerId == userId.Value)
                 return Json(new { success = false, message = "You cannot make an offer on your own listing." });
