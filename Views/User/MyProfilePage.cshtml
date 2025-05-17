@@ -1,4 +1,4 @@
-﻿```cshtml
+﻿
 @model PrimeMarket.Models.ViewModel.UserProfileViewModel
 @{
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -14,7 +14,10 @@
     <link rel="stylesheet" href="/css/MyProfilePage.css" />
     <title>My Profile</title>
     <style>
-        /* Main container with proper header spacing */
+        .listing-status.archived {
+            background-color: #6c757d;
+            color: white;
+        }
         .main-content {
             margin-top: 80px; /* Adjust this value based on your header height */
             padding-top: 20px;
@@ -592,6 +595,9 @@
                 <button class="filter-btn" data-filter="active" style="border-radius: 50px;">Active</button>
                 <button class="filter-btn" data-filter="rejected" style="border-radius: 50px;">Rejected</button>
                 <button class="filter-btn" data-filter="sold" style="border-radius: 50px;">Sold</button>
+                <!-- Add this button in the listings-filter div after the "Sold" button -->
+                <button class="filter-btn" data-filter="archived" style="border-radius: 50px;">Archived</button>
+
             </div>
 
             <div class="my-listings-container">
@@ -639,7 +645,7 @@
                                 </div>
                                 <div class="listing-actions">
 
-                                    @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold && listing.Status != PrimeMarket.Models.Enum.ListingStatus.Pending)
+                                    @if (listing.Status != PrimeMarket.Models.Enum.ListingStatus.Sold && listing.Status != PrimeMarket.Models.Enum.ListingStatus.Pending && listing.Status != PrimeMarket.Models.Enum.ListingStatus.Archived)
                                     {
                                         <a href="@Url.Action("EditListing", "Listing", new { id = listing.Id })" class="btn-edit" style="border-radius: 50px;">Edit</a>
                                         <button class="btn-delete" data-id="@listing.Id" style="border-radius: 50px;">Delete</button>

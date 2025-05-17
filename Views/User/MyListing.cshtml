@@ -532,7 +532,7 @@
         </div>
 
         <div style="margin-top:25px; display:flex; justify-content:center; gap: 15px;">
-            @if (Model.Status != PrimeMarket.Models.Enum.ListingStatus.Sold && Model.Status != PrimeMarket.Models.Enum.ListingStatus.Pending)
+            @if (Model.Status != PrimeMarket.Models.Enum.ListingStatus.Sold && Model.Status != PrimeMarket.Models.Enum.ListingStatus.Pending && Model.Status != PrimeMarket.Models.Enum.ListingStatus.Archived)
             {
                 <a href="@Url.Action("EditListing", "Listing", new { id = Model.Id })">
                     <button class="edit-btn">Edit</button>

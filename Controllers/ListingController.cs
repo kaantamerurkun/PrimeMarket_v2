@@ -13,6 +13,8 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Globalization;
+using Microsoft.Build.Tasks;
+using Message = PrimeMarket.Models.Message;
 
 
 namespace PrimeMarket.Controllers
@@ -1253,24 +1255,52 @@ namespace PrimeMarket.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteListing(int id)
         {
-            var listing = await _context.Listings.FindAsync(id);
+            var listing = await _context.Listings
+                .Include(l => l.Purchases)  // Include purchases to check if there's purchase history
+                .FirstOrDefaultAsync(l => l.Id == id);
+
             if (listing == null)
                 return Json(new { success = false, message = "Listing not found." });
 
-            _context.Listings.Remove(listing);
-            await _context.SaveChangesAsync();
 
-            return Json(new
+            // Check if this listing is a first-hand item with remaining stock and has purchase history
+            bool hasStock = listing.Condition == "First-Hand" && listing.Stock.HasValue && listing.Stock.Value > 0;
+            bool hasPurchaseHistory = listing.Purchases != null && listing.Purchases.Any();
+
+            if (hasPurchaseHistory || hasStock)
             {
-                success = true,
-                RedirectToAction = Url.Action("MyProfilePage", "User"),
+                // Archive the listing instead of deleting it
+                listing.Status = ListingStatus.Archived;
+                listing.UpdatedAt = DateTime.UtcNow;
+
+                _logger.LogInformation($"Listing {listing.Id} '{listing.Title}' was archived instead of deleted due to purchase history or remaining stock");
+
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Listing has been archived.",
+                    RedirectToAction = Url.Action("MyProfilePage", "User"),
+                });
             }
-            
-            );
+            else
+            {
+                // No purchase history and no remaining stock, proceed with deletion
+                _context.Listings.Remove(listing);
+                await _context.SaveChangesAsync();
+
+                return Json(new
+                {
+                    success = true,
+                    message = "Listing has been deleted.",
+                    RedirectToAction = Url.Action("MyProfilePage", "User"),
+                });
+            }
         }
 
 
-        
+
 
         #region Browse and Search
 

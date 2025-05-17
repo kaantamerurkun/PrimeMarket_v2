@@ -8,6 +8,7 @@
         public int PendingListings { get; set; }
         public int ApprovedListings { get; set; }
         public int SoldListings { get; set; }
+        public int ArchivedListings { get; set; }
         public List<CategoryStatViewModel> CategoryStats { get; set; }
     }
 }

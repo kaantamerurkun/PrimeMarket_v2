@@ -718,12 +718,16 @@ namespace PrimeMarket.Controllers
             // Count listings with Sold status
             var soldListingsCount = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Sold);
 
+            // Count listings with Archived status
+            var archivedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Archived);
+
             // Calculate total items sold by taking into account purchase quantities
+            // Include purchases from listings with any status (including Archived)
             var totalItemsSold = await _context.Purchases
                 .Where(p => p.PaymentStatus == PaymentStatus.Completed || p.PaymentStatus == PaymentStatus.Authorized)
                 .SumAsync(p => p.Quantity);
 
-            // Get category breakdown
+            // Get category breakdown (include all listings in all statuses)
             var categoryStats = await _context.Listings
                 .GroupBy(l => l.Category)
                 .Select(g => new CategoryStatViewModel
@@ -742,7 +746,8 @@ namespace PrimeMarket.Controllers
                 TotalListings = totalListings,
                 PendingListings = pendingListings,
                 ApprovedListings = approvedListings,
-                SoldListings = totalItemsSold, // Updated to use the total quantity sold
+                SoldListings = totalItemsSold, // Using the total quantity sold
+                ArchivedListings = archivedListings, // Added Archived listings count
                 CategoryStats = categoryStats
             };
 
