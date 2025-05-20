@@ -41,6 +41,12 @@
                 <input type="hidden" name="offerId" value="@Model.OfferId">
 
                 <div class="form-group">
+                    <div class="autofill-option">
+                        <button type="button" id="loadSavedDetails" class="btn-autofill">Use Saved Payment Details</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="fullname">Cardholder Name</label>
                     <input type="text" id="fullname" name="CardholderName" placeholder="Name on card" required>
                 </div>
@@ -63,6 +69,19 @@
                         <input type="password" id="cvv" name="Cvv" placeholder="123" required
                                maxlength="4" pattern="[0-9]{3,4}">
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shippingAddress">Shipping Address</label>
+                    <textarea id="shippingAddress" name="ShippingAddress" placeholder="Enter your shipping address" required
+                              rows="3" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 15px; font-size: 16px;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="savePaymentDetails" name="SavePaymentDetails" value="true">
+                        Save payment details for future purchases
+                    </label>
                 </div>
 
                 <div class="payment-actions">
@@ -105,7 +124,7 @@
         display: flex;
         gap: 30px;
         margin-top: 30px;
-        justify-content: center;
+        text-align:center;
     }
 
     .purchase-summary {
@@ -227,6 +246,21 @@
             background-color: #0055b3;
         }
 
+    .btn-autofill {
+        padding: 10px 15px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+        .btn-autofill:hover {
+            background-color: #0055b3;
+        }
+
     .alert-danger {
         background-color: #f8d7da;
         color: #721c24;
@@ -277,6 +311,7 @@
             const cardNumber = cardInput.value.replace(/\s/g, '');
             const expiry = expiryInput.value;
             const cvv = document.getElementById('cvv').value;
+            const shippingAddress = document.getElementById('shippingAddress').value;
 
             let isValid = true;
 
@@ -299,9 +334,33 @@
                 isValid = false;
             }
 
+            // Validate shipping address
+            if (shippingAddress.trim().length < 10) {
+                alert('Please enter a valid shipping address (at least 10 characters)');
+                isValid = false;
+            }
+
             if (!isValid) {
                 e.preventDefault();
             }
+        });
+
+        // Load saved payment details
+        document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
+            fetch('/Payment/GetSavedPaymentDetails')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('fullname').value = data.cardholderName || '';
+                        document.getElementById('shippingAddress').value = data.shippingAddress || '';
+                        // For security reasons, we don't autofill the full card number, expiry or CVV
+                    } else {
+                        alert('No saved payment details found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading saved details:', error);
+                });
         });
     });
 </script>

@@ -1,4 +1,5 @@
-﻿@model PrimeMarket.Models.ViewModel.MultipleCheckoutViewModel
+﻿```html
+@model PrimeMarket.Models.ViewModel.MultipleCheckoutViewModel
 @{
     ViewData["Title"] = "Checkout";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
@@ -59,6 +60,12 @@
                 @Html.AntiForgeryToken()
 
                 <div class="form-group">
+                    <div class="autofill-option">
+                        <button type="button" id="loadSavedDetails" class="btn-autofill">Use Saved Payment Details</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="cardholderName">Cardholder Name</label>
                     <input type="text" id="cardholderName" name="CardholderName" placeholder="Name on card" required>
                 </div>
@@ -81,6 +88,19 @@
                         <input type="password" id="cvv" name="Cvv" placeholder="123" required
                                maxlength="4" pattern="[0-9]{3,4}">
                     </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="shippingAddress">Shipping Address</label>
+                    <textarea id="shippingAddress" name="ShippingAddress" placeholder="Enter your shipping address" required
+                              rows="3" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 15px; font-size: 16px;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="savePaymentDetails" name="SavePaymentDetails" value="true">
+                        Save payment details for future purchases
+                    </label>
                 </div>
 
                 <!-- Hidden fields for quantities -->
@@ -112,12 +132,14 @@
         white-space: normal;
         max-width: 100%;
     }
+
     .logo img {
         width: 120px;
         height: 50px;
         object-fit: cover;
         border-radius: 8px;
     }
+
     .container {
         max-width: 1200px;
         margin: 0 auto;
@@ -392,6 +414,21 @@
             background-color: #0055b3;
         }
 
+    .btn-autofill {
+        padding: 10px 15px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+        .btn-autofill:hover {
+            background-color: #0055b3;
+        }
+
     .alert-danger {
         background-color: #f8d7da;
         color: #721c24;
@@ -432,10 +469,10 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all the elements we need
-        const quantityInputs = document.querySelectorAll('.quantity-input');
-        const decreaseButtons = document.querySelectorAll('.decrease-btn');
-        const increaseButtons = document.querySelectorAll('.increase-btn');
+        // Get all the elements we need - with null checks
+        const quantityInputs = document.querySelectorAll('.quantity-input') || [];
+        const decreaseButtons = document.querySelectorAll('.decrease-btn') || [];
+        const increaseButtons = document.querySelectorAll('.increase-btn') || [];
         const checkoutTotal = document.getElementById('checkout-total');
         const paymentAmount = document.getElementById('payment-amount');
 
@@ -518,12 +555,22 @@
         // Function to update item total
         function updateItemTotal(itemId) {
             const itemSummary = document.querySelector(`.item-summary[data-bookmark-id="${itemId}"]`);
-            const price = parseFloat(itemSummary.getAttribute('data-price'));
-            const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${itemId}"]`).value);
-            const itemTotal = document.getElementById(`item-total-${itemId}`);
+            if (!itemSummary) return;
 
-            const total = price * quantity;
-            itemTotal.textContent = formatCurrency(total);
+            const price = parseFloat(itemSummary.getAttribute('data-price'));
+
+            // Safely get quantity
+            let quantity = 1;
+            const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
+            if (quantityInput && quantityInput.value) {
+                quantity = parseInt(quantityInput.value);
+            }
+
+            const itemTotal = document.getElementById(`item-total-${itemId}`);
+            if (itemTotal) {
+                const total = price * quantity;
+                itemTotal.textContent = formatCurrency(total);
+            }
         }
 
         // Function to update total amount
@@ -534,13 +581,26 @@
             itemSummaries.forEach(item => {
                 const price = parseFloat(item.getAttribute('data-price'));
                 const bookmarkId = item.getAttribute('data-bookmark-id');
-                const quantity = parseInt(document.querySelector(`.quantity-input[data-id="${bookmarkId}"]`).value);
+
+                // Get quantity - safely handle missing elements
+                let quantity = 1;
+                const quantityElement = document.querySelector(`.quantity-input[data-id="${bookmarkId}"]`);
+                if (quantityElement && quantityElement.value) {
+                    quantity = parseInt(quantityElement.value);
+                } else {
+                    // Try getting from quantity-display if input not found
+                    const displayElement = item.querySelector('.quantity-display');
+                    if (displayElement) {
+                        quantity = parseInt(displayElement.textContent) || 1;
+                    }
+                }
 
                 total += price * quantity;
             });
 
-            checkoutTotal.textContent = formatCurrency(total);
-            paymentAmount.textContent = formatCurrency(total);
+            // Safely update UI elements
+            if (checkoutTotal) checkoutTotal.textContent = formatCurrency(total);
+            if (paymentAmount) paymentAmount.textContent = formatCurrency(total);
         }
 
         // Function to format currency
@@ -576,6 +636,7 @@
             const cardNumber = cardInput.value.replace(/\s/g, '');
             const expiry = expiryInput.value;
             const cvv = document.getElementById('cvv').value;
+            const shippingAddress = document.getElementById('shippingAddress').value;
 
             let isValid = true;
 
@@ -598,9 +659,33 @@
                 isValid = false;
             }
 
+            // Validate shipping address
+            if (shippingAddress.trim().length < 10) {
+                alert('Please enter a valid shipping address (at least 10 characters)');
+                isValid = false;
+            }
+
             if (!isValid) {
                 e.preventDefault();
             }
         });
+
+        // Load saved payment details
+        document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
+            fetch('/Payment/GetSavedPaymentDetails')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('cardholderName').value = data.cardholderName || '';
+                        document.getElementById('shippingAddress').value = data.shippingAddress || '';
+                        // For security reasons, we don't autofill the full card number, expiry or CVV
+                    } else {
+                        alert('No saved payment details found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading saved details:', error);
+                });
+        });
     });
-</script>
+    </script>

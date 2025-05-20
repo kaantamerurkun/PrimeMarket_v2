@@ -25,6 +25,14 @@ namespace PrimeMarket.Models
         [Required]
         public PaymentStatus PaymentStatus { get; set; } = PaymentStatus.Pending;
 
+        // New payment details fields
+        public string CardholderName { get; set; }
+
+        // For security, we should only store last 4 digits
+        public string LastFourDigits { get; set; }
+
+        public string ShippingAddress { get; set; }
+
         // Navigation properties
         [ForeignKey("BuyerId")]
         public virtual User Buyer { get; set; }

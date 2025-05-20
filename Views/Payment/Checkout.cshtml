@@ -1,12 +1,11 @@
-﻿
-@model PrimeMarket.Models.ViewModel.CheckoutViewModel
+﻿@model PrimeMarket.Models.ViewModel.CheckoutViewModel
 @{
     ViewData["Title"] = "Checkout";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 
 <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
-    <h1>Checkout</h1>
+    <h1 style="text-align:center">Checkout</h1>
 
     <div class="checkout-container">
         <div class="checkout-summary">
@@ -44,6 +43,12 @@
                 <input type="hidden" name="ListingId" value="@Model.ListingId">
 
                 <div class="form-group">
+                    <div class="autofill-option">
+                        <button type="button" id="loadSavedDetails" class="btn-autofill">Use Saved Payment Details</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
                     <label for="fullname">Cardholder Name</label>
                     <input type="text" id="fullname" name="CardholderName" placeholder="Name on card" required>
                 </div>
@@ -68,6 +73,19 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label for="shippingAddress">Shipping Address</label>
+                    <textarea id="shippingAddress" name="ShippingAddress" placeholder="Enter your shipping address" required
+                              rows="3" style="width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 15px; font-size: 16px;"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>
+                        <input type="checkbox" id="savePaymentDetails" name="SavePaymentDetails" value="true">
+                        Save payment details for future purchases
+                    </label>
+                </div>
+
                 <div class="payment-actions">
                     <a href="@Url.Action("Details", "Listing", new { id = Model.ListingId })" class="btn-cancel">Cancel</a>
                     <button type="submit" class="btn-pay">Pay Now @Model.ListingPrice.ToString("C")</button>
@@ -86,6 +104,7 @@
         white-space: normal;
         max-width: 100%;
     }
+
     .container {
         margin: 120px auto 50px auto; /* top, horizontal center, bottom */
         max-width: 1000px;
@@ -97,10 +116,12 @@
         object-fit: cover;
         border-radius: 8px;
     }
+
     .checkout-container {
         display: flex;
         gap: 30px;
         margin-top: 30px;
+        text-align: center;
     }
 
     .checkout-summary {
@@ -221,7 +242,8 @@
         .btn-pay:hover {
             background-color: #0055b3;
         }
-        .btn-cancel:hover {
+
+    .btn-cancel:hover {
         background-color: #dc5455;
         color: white;
     }
@@ -234,18 +256,30 @@
         margin-bottom: 20px;
     }
 
+    .btn-autofill {
+        padding: 10px 15px;
+        background-color: #0066cc;
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        font-size: 14px;
+        margin-bottom: 15px;
+    }
+
+        .btn-autofill:hover {
+            background-color: #0055b3;
+        }
+
     @@media (max-width: 768px) {
-        .checkout-container
+        .checkout-container {
+            flex-direction: column;
+        }
 
-    {
-        flex-direction: column;
-    }
-
-    .checkout-summary,
-    .checkout-payment {
-        flex: 0 0 100%;
-    }
-
+        .checkout-summary,
+        .checkout-payment {
+            flex: 0 0 100%;
+        }
     }
 </style>
 
@@ -260,8 +294,7 @@
         const payAmount = document.getElementById('payAmount');
 
         // Get price from model
-        const unitPrice = @Model.ListingPrice;
-
+    const unitPrice = parseFloat('@Model.ListingPrice');
         // Update total price based on quantity
         function updateTotalPrice() {
             const quantity = parseInt(quantityInput.value);
@@ -281,7 +314,7 @@
         }
 
         // Handle decrease button click
-        decreaseBtn.addEventListener('click', function() {
+        decreaseBtn?.addEventListener('click', function() {
             let quantity = parseInt(quantityInput.value);
             if (quantity > 1) {
                 quantityInput.value = --quantity;
@@ -290,7 +323,7 @@
         });
 
         // Handle increase button click
-        increaseBtn.addEventListener('click', function() {
+        increaseBtn?.addEventListener('click', function() {
             let quantity = parseInt(quantityInput.value);
             // You might want to add a maximum limit here based on stock
             // For now we'll use a reasonable limit of 100
@@ -319,7 +352,7 @@
                     value = value.substring(0, 2) + '/' + value.substring(2, 4);
                 }
             }
-            
+
             e.target.value = value;
         });
 
@@ -329,6 +362,7 @@
             const cardNumber = cardInput.value.replace(/\s/g, '');
             const expiry = expiryInput.value;
             const cvv = document.getElementById('cvv').value;
+            const shippingAddress = document.getElementById('shippingAddress').value;
 
             let isValid = true;
 
@@ -351,9 +385,33 @@
                 isValid = false;
             }
 
+            // Validate shipping address
+            if (shippingAddress.trim().length < 10) {
+                alert('Please enter a valid shipping address (at least 10 characters)');
+                isValid = false;
+            }
+
             if (!isValid) {
                 e.preventDefault();
             }
+        });
+
+        // Load saved payment details
+        document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
+            fetch('/Payment/GetSavedPaymentDetails')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('fullname').value = data.cardholderName || '';
+                        document.getElementById('shippingAddress').value = data.shippingAddress || '';
+                        // For security reasons, we don't autofill the full card number, expiry or CVV
+                    } else {
+                        alert('No saved payment details found');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading saved details:', error);
+                });
         });
     });
 </script>

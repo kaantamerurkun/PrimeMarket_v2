@@ -31,6 +31,44 @@ namespace PrimeMarket.Controllers
 
         [HttpGet]
         [UserAuthenticationFilter]
+        public async Task<IActionResult> GetSavedPaymentDetails()
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return Json(new { success = false, message = "Not logged in" });
+            }
+
+            try
+            {
+                // Get the most recent purchase for this user
+                var latestPurchase = await _context.Purchases
+                    .Where(p => p.BuyerId == userId && !string.IsNullOrEmpty(p.CardholderName) && !string.IsNullOrEmpty(p.ShippingAddress))
+                    .OrderByDescending(p => p.CreatedAt)
+                    .FirstOrDefaultAsync();
+
+                if (latestPurchase == null)
+                {
+                    return Json(new { success = false, message = "No saved payment details found" });
+                }
+
+                // Return only non-sensitive information
+                return Json(new
+                {
+                    success = true,
+                    cardholderName = latestPurchase.CardholderName,
+                    shippingAddress = latestPurchase.ShippingAddress
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error retrieving saved payment details");
+                return Json(new { success = false, message = "An error occurred" });
+            }
+        }
+
+        [HttpGet]
+        [UserAuthenticationFilter]
         [Route("Payment/Cart")]
         public async Task<IActionResult> Cart()
         {
@@ -356,8 +394,6 @@ namespace PrimeMarket.Controllers
         }
 
 
-        // Modified ProcessPayment method in PaymentController.cs
-
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
@@ -411,6 +447,9 @@ namespace PrimeMarket.Controllers
                     quantity = listing.Stock.Value;
                 }
 
+                // Store only the last 4 digits of the card number for reference
+                string lastFourDigits = model.CardNumber.Replace(" ", "").Substring(Math.Max(0, model.CardNumber.Replace(" ", "").Length - 4));
+
                 // Create purchase record
                 var purchase = new Purchase
                 {
@@ -419,7 +458,11 @@ namespace PrimeMarket.Controllers
                     Amount = listing.Price * quantity, // Multiply by quantity
                     PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
                     Quantity = quantity, // Store the quantity
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    // Save payment details (if requested)
+                    CardholderName = model.CardholderName,
+                    LastFourDigits = lastFourDigits,
+                    ShippingAddress = model.ShippingAddress
                 };
 
                 _context.Purchases.Add(purchase);
@@ -538,6 +581,9 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
+                // Store only the last 4 digits of the card number for reference
+                string lastFourDigits = model.CardNumber.Replace(" ", "").Substring(Math.Max(0, model.CardNumber.Replace(" ", "").Length - 4));
+
                 // Validate all quantities against stock limits before processing any purchases
                 foreach (var bookmark in bookmarks)
                 {
@@ -595,7 +641,11 @@ namespace PrimeMarket.Controllers
                         Amount = listing.Price * quantity, // Multiply by quantity
                         PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
                         Quantity = quantity, // Store the quantity
-                        CreatedAt = DateTime.UtcNow
+                        CreatedAt = DateTime.UtcNow,
+                        // Save payment details
+                        CardholderName = model.CardholderName,
+                        LastFourDigits = lastFourDigits,
+                        ShippingAddress = model.ShippingAddress
                     };
 
                     _context.Purchases.Add(purchase);
@@ -667,12 +717,6 @@ namespace PrimeMarket.Controllers
         }
 
 
-        // Process offer purchase for second-hand listings
-        // Add a new [HttpPost] method named ProcessOfferPurchase that will handle the form submission
-        // This needs to be added to PaymentController.cs
-
-
-        // In PaymentController.cs
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> ProcessOfferPurchase(int offerId)
@@ -1110,10 +1154,11 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("PurchaseStatus", new { purchaseId });
             }
         }
+
         [HttpPost]
         [UserAuthenticationFilter]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> ProcessOfferPurchase(int offerId, string CardholderName, string CardNumber, string ExpiryDate, string Cvv)
+        public async Task<IActionResult> ProcessOfferPurchase(int offerId, string CardholderName, string CardNumber, string ExpiryDate, string Cvv, string ShippingAddress, bool SavePaymentDetails = false)
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
@@ -1149,6 +1194,9 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Details", "Listing", new { id = offer.ListingId });
                 }
 
+                // Store only the last 4 digits of the card number for reference
+                string lastFourDigits = CardNumber.Replace(" ", "").Substring(Math.Max(0, CardNumber.Replace(" ", "").Length - 4));
+
                 // Create purchase record
                 var purchase = new Purchase
                 {
@@ -1158,7 +1206,11 @@ namespace PrimeMarket.Controllers
                     Amount = offer.OfferAmount, // Use the offer amount, not listing price
                     PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
                     Quantity = 1, // Second-hand items always have quantity 1
-                    CreatedAt = DateTime.UtcNow
+                    CreatedAt = DateTime.UtcNow,
+                    // Save payment details
+                    CardholderName = CardholderName,
+                    LastFourDigits = lastFourDigits,
+                    ShippingAddress = ShippingAddress
                 };
 
                 // First add and save the purchase to get its ID
