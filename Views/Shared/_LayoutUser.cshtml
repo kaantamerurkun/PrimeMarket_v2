@@ -388,7 +388,9 @@
 
                         <div class="dropdown-item notification-item" id="notificationDropdownItem">
                             <img src="/images/NotificationBell.png" alt="Notifications" />
+                            <a asp-action="Index" asp-controller="Notifications" style="text-decoration:none">
                             Notifications
+                            </a>
                             @if (unreadCount > 0)
                             {
                                 <span class="notification-badge">@(unreadCount > 9 ? "9+" : unreadCount.ToString())</span>

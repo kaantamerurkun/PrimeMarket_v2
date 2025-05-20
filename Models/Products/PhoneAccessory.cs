@@ -6,10 +6,5 @@ namespace PrimeMarket.Models.Products
 {
     public class PhoneAccessory : BaseProduct
     {
-        [Display(Name = "Compatible Models")]
-        public string CompatibleModels { get; set; }
-
-        [Display(Name = "Warranty Period")]
-        public string Warranty { get; set; }
     }
 }

@@ -965,218 +965,6 @@
         </form>
     </div>
 </div>
-</body>
-</html>
-<script>
-    // Change main image when thumbnail is clicked
-    function changeMainImage(imageSrc) {
-        document.getElementById('main-image').src = imageSrc;
-    }
-
-    // Open offer modal
-    function openOfferModal() {
-        document.getElementById('offerModal').style.display = 'block';
-    }
-
-    // Close offer modal
-    function closeOfferModal() {
-        document.getElementById('offerModal').style.display = 'none';
-    }
-
-    // Toggle bookmark
-    function toggleBookmark(listingId) {
-        fetch('/Listing/ToggleBookmark', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `listingId=${listingId}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                const bookmarkBtn = document.getElementById('bookmark-btn');
-                if (data.isBookmarked) {
-                    bookmarkBtn.textContent = "Remove from Bookmark";
-                } else {
-                    bookmarkBtn.textContent = "Add to Bookmark";
-                }
-
-                // Show feedback message
-                showNotification(data.message);
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    // Add to cart functionality for First-Hand items
-    function addToCart(listingId) {
-        fetch('/Payment/AddToCart', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `listingId=${listingId}`
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message);
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error adding to cart:', error);
-            alert('An error occurred while adding the item to your cart.');
-        });
-    }
-
-    // Handle offer submission
-    document.getElementById('offerForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const listingId = document.getElementById('listingId').value;
-        const offerAmount = document.getElementById('offerAmount').value;
-        const message = document.getElementById('offerMessage').value;
-
-        fetch('/Listing/MakeOffer', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                listingId: listingId,
-                offerAmount: offerAmount,
-                offerAmountRaw: offerAmount,
-                message: message
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.success) {
-                showNotification(data.message);
-                closeOfferModal();
-            } else {
-                alert(data.message);
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('An error occurred while submitting your offer. Please try again.');
-        });
-    });
-
-    // Modify the existing script section to ensure respondToOffer is properly defined
-        function respondToOffer(offerId, accept) {
-            // Get the anti-forgery token
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-
-            fetch('/Listing/RespondToOffer', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'RequestVerificationToken': token
-                },
-                body: `offerId=${offerId}&accept=${accept}`
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    // Show success notification
-                    showNotification(data.message);
-
-                    // Reload the page to reflect changes
-                    setTimeout(() => location.reload(), 1500);
-                } else {
-                    // Show error message
-                    alert(data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error responding to offer:', error);
-                alert('An error occurred while processing your response. Please try again.');
-            });
-        }
-
-    // Ensure showNotification function is defined
-    function showNotification(message, isError = false) {
-        const notification = document.createElement('div');
-        notification.textContent = message;
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
-        notification.style.color = 'white';
-        notification.style.padding = '10px 20px';
-        notification.style.borderRadius = '5px';
-        notification.style.zIndex = '9999';
-        notification.style.transition = 'opacity 0.5s ease-in-out';
-
-        document.body.appendChild(notification);
-
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 500);
-        }, 3000);
-    }
-
-    // Close modal when clicking outside
-    window.onclick = function(event) {
-        const modal = document.getElementById('offerModal');
-        if (event.target === modal) {
-            closeOfferModal();
-        }
-    }
-
-    // Optional: Pre-populate offer amount with a percentage of the listing price
-    document.addEventListener('DOMContentLoaded', function() {
-        const offerAmountInput = document.getElementById('offerAmount');
-        if (offerAmountInput) {
-            offerAmountInput.addEventListener('input', function() {
-                // Ensure the offer doesn't exceed the listing price
-                    const maxPrice = parseFloat('@Model.Listing.Price');
-                if (parseFloat(this.value) > maxPrice) {
-                    this.value = maxPrice;
-                }
-            });
-        }
-    });
-
-    // Notification helper
-    function showNotification(message) {
-        const notification = document.createElement('div');
-        notification.className = 'notification';
-        notification.textContent = message;
-        notification.style.position = 'fixed';
-        notification.style.bottom = '20px';
-        notification.style.right = '20px';
-        notification.style.backgroundColor = '#28a745';
-        notification.style.color = 'white';
-        notification.style.padding = '10px 20px';
-        notification.style.borderRadius = '5px';
-        notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
-        notification.style.zIndex = '9999';
-        notification.style.transition = 'opacity 0.5s ease-in-out';
-
-        document.body.appendChild(notification);
-
-        // Remove after 3 seconds
-        setTimeout(() => {
-            notification.style.opacity = '0';
-            setTimeout(() => {
-                document.body.removeChild(notification);
-            }, 500);
-        }, 3000);
-    }
-</script>
 <!-- Add this section to Views/Listing/Details.cshtml after the seller info section -->
 <!-- Reviews Section -->
 @if (Model.Listing.Condition == "First-Hand")
@@ -1266,41 +1054,232 @@
         </div>
     </div>
 }
-
+</body>
+</html>
 <script>
-    // Add review form submission
-    document.getElementById('reviewForm')?.addEventListener('submit', function(e) {
-        e.preventDefault();
+        // Change main image when thumbnail is clicked
+    function changeMainImage(imageSrc) {
+        document.getElementById('main-image').src = imageSrc;
+    }
 
-        const listingId = document.getElementById('listingId').value;
-        const rating = document.querySelector('input[name="rating"]:checked')?.value;
-        const comment = document.getElementById('comment').value;
+    // Open offer modal
+    function openOfferModal() {
+        document.getElementById('offerModal').style.display = 'block';
+    }
 
-        if (!rating) {
-            alert('Please select a rating');
-            return;
-        }
+    // Close offer modal
+    function closeOfferModal() {
+        document.getElementById('offerModal').style.display = 'none';
+    }
 
-        fetch('/ProductReview/AddReview', {
+    // Toggle bookmark
+    function toggleBookmark(listingId) {
+        fetch('/Listing/ToggleBookmark', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/x-www-form-urlencoded',
-                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
             },
-            body: `listingId=${listingId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+            body: `listingId=${listingId}`
         })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert(data.message);
-                location.reload();
+                const bookmarkBtn = document.getElementById('bookmark-btn');
+                if (data.isBookmarked) {
+                    bookmarkBtn.textContent = "Remove from Bookmark";
+                } else {
+                    bookmarkBtn.textContent = "Add to Bookmark";
+                }
+
+                // Show feedback message
+                showNotification(data.message);
             } else {
                 alert(data.message);
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred while submitting your review.');
         });
+    }
+
+    // Add to cart functionality for First-Hand items
+    function addToCart(listingId) {
+        fetch('/Payment/AddToCart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `listingId=${listingId}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showNotification(data.message);
+            } else {
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error adding to cart:', error);
+            alert('An error occurred while adding the item to your cart.');
+        });
+    }
+
+    // Respond to offer function
+    function respondToOffer(offerId, accept) {
+        // Get the anti-forgery token
+        const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+        fetch('/Listing/RespondToOffer', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'RequestVerificationToken': token
+            },
+            body: `offerId=${offerId}&accept=${accept}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Show success notification
+                showNotification(data.message);
+
+                // Reload the page to reflect changes
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                // Show error message
+                alert(data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error responding to offer:', error);
+            alert('An error occurred while processing your response. Please try again.');
+        });
+    }
+
+    // Notification helper
+    function showNotification(message, isError = false) {
+        const notification = document.createElement('div');
+        notification.textContent = message;
+        notification.style.position = 'fixed';
+        notification.style.bottom = '20px';
+        notification.style.right = '20px';
+        notification.style.backgroundColor = isError ? '#dc3545' : '#28a745';
+        notification.style.color = 'white';
+        notification.style.padding = '10px 20px';
+        notification.style.borderRadius = '5px';
+        notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+        notification.style.zIndex = '9999';
+        notification.style.transition = 'opacity 0.5s ease-in-out';
+
+        document.body.appendChild(notification);
+
+        // Remove after 3 seconds
+        setTimeout(() => {
+            notification.style.opacity = '0';
+            setTimeout(() => {
+                document.body.removeChild(notification);
+            }, 500);
+        }, 3000);
+    }
+
+    // Document ready event handler
+    document.addEventListener('DOMContentLoaded', function() {
+        // Handle offer form submission
+        const offerForm = document.getElementById('offerForm');
+        if (offerForm) {
+            offerForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const listingId = document.getElementById('listingId').value;
+                const offerAmount = document.getElementById('offerAmount').value;
+                const message = document.getElementById('offerMessage').value;
+
+                fetch('/Listing/MakeOffer', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        listingId: listingId,
+                        offerAmount: offerAmount,
+                        offerAmountRaw: offerAmount,
+                        message: message
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showNotification(data.message);
+                        closeOfferModal();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting your offer. Please try again.');
+                });
+            });
+        }
+
+        // Handle review form submission
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+
+                const listingId = document.getElementById('listingId').value;
+                const rating = document.querySelector('input[name="rating"]:checked')?.value;
+                const comment = document.getElementById('comment').value;
+
+                if (!rating) {
+                    alert('Please select a rating');
+                    return;
+                }
+
+                fetch('/ProductReview/AddReview', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                    },
+                    body: `listingId=${listingId}&rating=${rating}&comment=${encodeURIComponent(comment)}`
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert(data.message);
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while submitting your review.');
+                });
+            });
+        }
+
+        // Offer amount input validation
+        const offerAmountInput = document.getElementById('offerAmount');
+        if (offerAmountInput) {
+            offerAmountInput.addEventListener('input', function() {
+                // Ensure the offer doesn't exceed the listing price
+                const maxPrice = parseFloat(offerAmountInput.getAttribute('max'));
+                if (parseFloat(this.value) > maxPrice) {
+                    this.value = maxPrice;
+                }
+            });
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('offerModal');
+            if (event.target === modal) {
+                closeOfferModal();
+            }
+        };
     });
 </script>

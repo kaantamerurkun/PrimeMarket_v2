@@ -4,6 +4,62 @@
     box-sizing: border-box;
     font-family: Calibri, sans-serif;
 }
+/* Add this CSS to fix the notification dropdown text color issue */
+
+/* Ensure dropdown text is always visible regardless of background */
+.user-dropdown-menu .dropdown-item {
+    color: #333 !important; /* Force dark text color */
+}
+
+/* Fix for notification items specifically */
+.notification-item,
+.notification-item * {
+    color: #333 !important; /* Ensure text is dark */
+}
+
+/* Make sure notification content is visible */
+.notification-content p,
+.notification-time,
+.notification-header h3,
+.mark-all-read,
+.view-all-link {
+    color: #333 !important;
+}
+
+/* When hovering, maintain text visibility */
+.dropdown-item:hover {
+    background-color: #f0f0f0;
+    color: #333 !important;
+}
+
+/* Fix for active/selected items */
+.notification-item.active,
+.notification-item.active * {
+    color: #333 !important;
+}
+
+/* Specific fix for notification submenu which appears to be turning white */
+.notification-submenu {
+    background-color: white;
+    border: 1px solid #eee;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+/* Fix for the submenu notification list items */
+.notification-list-item {
+    color: #333 !important;
+}
+
+    .notification-list-item.unread {
+        background-color: #f0f7ff;
+        border-left-color: #0066cc;
+    }
+
+/* Ensure notification badge remains visible */
+.notification-badge {
+    color: white !important; /* Badge text should stay white for contrast */
+    background-color: #dc3545 !important;
+}
 
 body {
     background-color: #f0f8ff;

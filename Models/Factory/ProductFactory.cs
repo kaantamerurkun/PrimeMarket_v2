@@ -45,7 +45,7 @@ namespace PrimeMarket.Models.Factory
                         return new SparePart();
                 }
             }
-            if (category == "Tablet")
+            if (category == "Tablets")
             {
                 normalizedDetailcategory = null;
                 switch (normalizedSubcategory)

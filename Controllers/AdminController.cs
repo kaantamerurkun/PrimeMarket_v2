@@ -269,7 +269,8 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Computer Accessory":
                     case "Computer Accessories":
-                        product = await _context.ComputerAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Computer Accessorys":
+                        product = await _context.ComputerAccessorys.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Computer Component":
                     case "Computer Components":
@@ -296,7 +297,7 @@ namespace PrimeMarket.Controllers
                         product = await _context.MicrowaveOvens.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Dishwasher":
-                    case "Diswashers":
+                    case "Dishwashers":
                         product = await _context.Dishwashers.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Oven":
@@ -332,8 +333,8 @@ namespace PrimeMarket.Controllers
                         product = await _context.Speakers.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Headphone & Earphone":
-                    case "Headphone & Earphones":
-                        product = await _context.HeadphonesEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Headphones & Earphones":
+                        product = await _context.HeadphoneEarphones.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Webcam":
                     case "Webcams":
@@ -370,7 +371,8 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Phone Accessory":
                     case "Phone Accessories":
-                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Phone Accessorys":
+                        product = await _context.PhoneAccessorys.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "IOS Tablet":
                     case "IOS Tablets":
@@ -386,7 +388,8 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Tablet Accessory":
                     case "Tablet Accessories":
-                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Tablet Accessorys":
+                        product = await _context.TabletAccessorys.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Heating & Cooling":
                         product = await _context.HeatingCoolings.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -417,7 +420,8 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Phone Accessory":
                     case "Phone Accessories":
-                        product = await _context.PhoneAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Phone Accessorys":
+                        product = await _context.PhoneAccessorys.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "IOS Tablet":
                     case "IOS Tablets":
@@ -433,7 +437,8 @@ namespace PrimeMarket.Controllers
                         break;
                     case "Tablet Accessory":
                     case "Tablet Accessories":
-                        product = await _context.TabletAccessories.FirstOrDefaultAsync(p => p.ListingId == id);
+                    case "Tablet Accessorys":
+                        product = await _context.TabletAccessorys.FirstOrDefaultAsync(p => p.ListingId == id);
                         break;
                     case "Television":
                     case "Televisions":

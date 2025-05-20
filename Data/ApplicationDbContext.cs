@@ -45,9 +45,9 @@ namespace PrimeMarket.Data
         public DbSet<Oven> Ovens { get; set; }
         public DbSet<VacuumCleaner> VacuumCleaners { get; set; }
         public DbSet<Television> Televisions { get; set; }
-        public DbSet<PhoneAccessory> PhoneAccessories { get; set; }
-        public DbSet<TabletAccessory> TabletAccessories { get; set; }
-        public DbSet<ComputerAccessory> ComputerAccessories { get; set; }
+        public DbSet<PhoneAccessory> PhoneAccessorys { get; set; }
+        public DbSet<TabletAccessory> TabletAccessorys { get; set; }
+        public DbSet<ComputerAccessory> ComputerAccessorys { get; set; }
         public DbSet<ComputerComponent> ComputerComponents { get; set; }
         public DbSet<Monitor> Monitors { get; set; }
         public DbSet<Stove> Stoves { get; set; }
@@ -60,7 +60,7 @@ namespace PrimeMarket.Data
         public DbSet<SewingMachine> SewingMachines { get; set; }
         public DbSet<Keyboard> Keyboards { get; set; }
         public DbSet<Speaker> Speakers { get; set; }
-        public DbSet<HeadphoneEarphone> HeadphonesEarphones { get; set; }
+        public DbSet<HeadphoneEarphone> HeadphoneEarphones { get; set; }
         public DbSet<HeatingCooling> HeatingCoolings { get; set; }
         public DbSet<Camera> Cameras { get; set; }
         public DbSet<Other> Others { get; set; }

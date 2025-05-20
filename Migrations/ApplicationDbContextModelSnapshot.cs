@@ -562,27 +562,15 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ConnectionType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ListingId")
                         .IsUnique();
 
-                    b.ToTable("ComputerAccessories");
+                    b.ToTable("ComputerAccessorys");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.ComputerBag", b =>
@@ -612,16 +600,8 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -813,7 +793,7 @@ namespace PrimeMarket.Migrations
                     b.HasIndex("ListingId")
                         .IsUnique();
 
-                    b.ToTable("HeadphonesEarphones");
+                    b.ToTable("HeadphoneEarphones");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.HeatingCooling", b =>
@@ -1078,16 +1058,8 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1278,23 +1250,15 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ListingId")
                         .IsUnique();
 
-                    b.ToTable("PhoneAccessories");
+                    b.ToTable("PhoneAccessorys");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.SewingMachine", b =>
@@ -1324,16 +1288,8 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -1389,23 +1345,15 @@ namespace PrimeMarket.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("CompatibleModels")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<int>("ListingId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Warranty")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ListingId")
                         .IsUnique();
 
-                    b.ToTable("TabletAccessories");
+                    b.ToTable("TabletAccessorys");
                 });
 
             modelBuilder.Entity("PrimeMarket.Models.Products.Television", b =>

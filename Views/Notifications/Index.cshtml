@@ -15,8 +15,8 @@
         <div class="notifications-header">
             <h1>All Notifications</h1>
             <div class="notifications-actions">
-                <button id="markAllReadBtn" type="button" class="btn-mark-all">Mark All as Read</button>
-                <button id="clearAllBtn" type="button" class="btn-clear-all">Clear All</button>
+                <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button>
+                <button id="clearAllBtn" class="btn-clear-all">Clear All</button>
             </div>
         </div>
 
@@ -33,7 +33,7 @@
                 <div class="notifications-list">
                     @foreach (var notification in Model)
                     {
-                        <div class="notification-item @(notification.IsRead ? "read" : "unread")" id="notification-@notification.Id">
+                        <div class="notification-item @(notification.IsRead ? "read" : "unread")" id="notification-@notification.Id" data-id="@notification.Id" data-type="@((int)notification.Type)" data-entity-id="@notification.RelatedEntityId">
                             <div class="notification-icon">
                                 @switch (notification.Type)
                                 {
@@ -272,52 +272,51 @@
         }
 
     @@media (max-width: 768px) {
-        .notifications-header
+        .notifications-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
 
-    {
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 10px;
+        .notification-item {
+            flex-direction: column;
+            padding: 15px 20px;
+        }
+
+        .notification-icon {
+            margin-bottom: 10px;
+        }
+
+        .notification-content {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .notification-actions {
+            margin-left: 0;
+            flex-direction: row;
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .btn-mark-read,
+        .btn-delete {
+            flex: 1;
+            text-align: center;
+            max-width: 48%;
+        }
     }
-
-    .notification-item {
-        flex-direction: column;
-        padding: 15px 20px;
-    }
-
-    .notification-icon {
-        margin-bottom: 10px;
-    }
-
-    .notification-content {
-        width: 100%;
-        margin-bottom: 10px;
-    }
-
-    .notification-actions {
-        margin-left: 0;
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-between;
-    }
-
-    .btn-mark-read,
-    .btn-delete {
-        flex: 1;
-        text-align: center;
-        max-width: 48%;
-    }
-
-    }</style>
+</style>
 
 <script>
-    // Complete replacement for the notifications JavaScript
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log('Document loaded - Binding notification events');
 
-    document.addEventListener('DOMContentLoaded', function() {
         // Mark single notification as read
         const markReadButtons = document.querySelectorAll('.btn-mark-read');
         markReadButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevent item click handler from firing
                 const notificationId = this.getAttribute('data-id');
                 markAsRead(notificationId);
             });
@@ -326,26 +325,32 @@
         // Delete single notification
         const deleteButtons = document.querySelectorAll('.btn-delete');
         deleteButtons.forEach(button => {
-            button.addEventListener('click', function() {
+            button.addEventListener('click', function (e) {
+                e.stopPropagation(); // Prevent item click handler from firing
                 const notificationId = this.getAttribute('data-id');
                 deleteNotification(notificationId);
             });
         });
 
-        // Mark all as read
+        // Mark all as read - Direct implementation
         const markAllReadBtn = document.getElementById('markAllReadBtn');
         if (markAllReadBtn) {
-            markAllReadBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            console.log('Found markAllReadBtn, attaching click event');
+            markAllReadBtn.addEventListener('click', function () {
+                console.log('Mark All as Read button clicked');
                 markAllAsRead();
             });
+        } else {
+            console.error('Mark All as Read button not found in the DOM');
         }
 
         // Clear all notifications
         const clearAllBtn = document.getElementById('clearAllBtn');
         if (clearAllBtn) {
-            clearAllBtn.addEventListener('click', function(e) {
-                e.preventDefault();
+            clearAllBtn.addEventListener('click', function () {
+                if (!confirm('Are you sure you want to delete all notifications?')) {
+                    return;
+                }
                 clearAll();
             });
         }
@@ -353,57 +358,64 @@
         // Handle notification clicks to navigate
         const notificationItems = document.querySelectorAll('.notification-item');
         notificationItems.forEach(item => {
-            item.addEventListener('click', function(event) {
+            item.addEventListener('click', function (event) {
                 // Don't navigate if clicking on a button
                 if (event.target.tagName === 'BUTTON') {
                     return;
                 }
 
-                const notificationId = this.id.split('-')[1];
-                const notification = @Html.Raw(Json.Serialize(Model));
-                const notificationData = notification.find(n => n.Id == notificationId);
+                const notificationId = this.getAttribute('data-id');
+                const notificationType = parseInt(this.getAttribute('data-type'));
+                const entityId = this.getAttribute('data-entity-id');
 
-                if (notificationData) {
-                    handleNotificationClick(notificationData);
-                }
+                // Mark as read
+                markAsRead(notificationId);
+
+                // Then navigate based on type
+                handleNotificationNavigation(notificationType, entityId);
             });
         });
 
         function markAsRead(notificationId) {
-            fetch('/Notifications/MarkAsRead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `notificationId=${notificationId}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Server response was not OK');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const notificationItem = document.getElementById(`notification-${notificationId}`);
-                    if (notificationItem) {
-                        notificationItem.classList.remove('unread');
-                        notificationItem.classList.add('read');
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                        const markReadBtn = notificationItem.querySelector('.btn-mark-read');
-                        if (markReadBtn) {
-                            markReadBtn.remove();
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Notifications/MarkAsRead', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('RequestVerificationToken', token);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            const notificationItem = document.getElementById(`notification-${notificationId}`);
+                            if (notificationItem) {
+                                notificationItem.classList.remove('unread');
+                                notificationItem.classList.add('read');
+
+                                const markReadBtn = notificationItem.querySelector('.btn-mark-read');
+                                if (markReadBtn) {
+                                    markReadBtn.remove();
+                                }
+                            }
+                            showNotification('Notification marked as read');
+                        } else {
+                            showNotification(response.message || 'Error marking notification as read', true);
                         }
+                    } catch (e) {
+                        showNotification('Error processing response', true);
                     }
-                    showNotification('Notification marked as read');
                 } else {
-                    showNotification(data.message || 'Error marking notification as read', true);
+                    showNotification('Server error', true);
                 }
-            })
-            .catch(error => {
-                console.error('Error marking notification as read:', error);
-                showNotification('Error marking notification as read', true);
-            });
+            };
+
+            xhr.onerror = function() {
+                showNotification('Connection error', true);
+            };
+
+            xhr.send(`notificationId=${notificationId}`);
         }
 
         function deleteNotification(notificationId) {
@@ -411,160 +423,159 @@
                 return;
             }
 
-            fetch('/Notifications/DeleteNotification', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
-                body: `notificationId=${notificationId}`
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Server response was not OK');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    const notificationItem = document.getElementById(`notification-${notificationId}`);
-                    if (notificationItem) {
-                        notificationItem.style.height = notificationItem.offsetHeight + 'px';
-                        notificationItem.style.opacity = '0';
-                        notificationItem.style.marginTop = '0';
-                        notificationItem.style.marginBottom = '0';
-                        notificationItem.style.padding = '0';
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                        setTimeout(() => {
-                            notificationItem.style.height = '0';
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Notifications/DeleteNotification', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('RequestVerificationToken', token);
 
-                            setTimeout(() => {
-                                notificationItem.remove();
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            const notificationItem = document.getElementById(`notification-${notificationId}`);
+                            if (notificationItem) {
+                                // Animate removal
+                                notificationItem.style.height = notificationItem.offsetHeight + 'px';
+                                notificationItem.style.opacity = '0';
+                                notificationItem.style.marginTop = '0';
+                                notificationItem.style.marginBottom = '0';
+                                notificationItem.style.padding = '0';
 
-                                // Check if all notifications are gone
-                                const remainingNotifications = document.querySelectorAll('.notification-item');
-                                if (remainingNotifications.length === 0) {
-                                    document.querySelector('.notifications-container').innerHTML = `
-                                        <div class="empty-notifications">
-                                            <i class="fas fa-bell-slash"></i>
-                                            <p>You don't have any notifications</p>
-                                        </div>
-                                    `;
-                                }
-                            }, 300);
-                        }, 300);
+                                setTimeout(() => {
+                                    notificationItem.style.height = '0';
 
-                        showNotification('Notification deleted');
+                                    setTimeout(() => {
+                                        notificationItem.remove();
+
+                                        // Check if all notifications are gone
+                                        const remainingNotifications = document.querySelectorAll('.notification-item');
+                                        if (remainingNotifications.length === 0) {
+                                            document.querySelector('.notifications-container').innerHTML = `
+                                                <div class="empty-notifications">
+                                                    <i class="fas fa-bell-slash"></i>
+                                                    <p>You don't have any notifications</p>
+                                                </div>
+                                            `;
+                                        }
+                                    }, 300);
+                                }, 300);
+
+                                showNotification('Notification deleted');
+                            }
+                        } else {
+                            showNotification(response.message || 'Error deleting notification', true);
+                        }
+                    } catch (e) {
+                        showNotification('Error processing response', true);
                     }
                 } else {
-                    showNotification(data.message || 'Error deleting notification', true);
+                    showNotification('Server error', true);
                 }
-            })
-            .catch(error => {
-                console.error('Error deleting notification:', error);
-                showNotification('Error deleting notification', true);
-            });
+            };
+
+            xhr.onerror = function() {
+                showNotification('Connection error', true);
+            };
+
+            xhr.send(`notificationId=${notificationId}`);
         }
 
         function markAllAsRead() {
-            // Get the CSRF token from the hidden form
-            let token = '';
-            const tokenElement = document.querySelector('input[name="__RequestVerificationToken"]');
-            if (tokenElement) {
-                token = tokenElement.value;
-            }
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            console.log('Marking all as read with token:', token ? 'Token found' : 'Token missing');
 
-            // Create form data object with token
-            const formData = new FormData();
-            if (token) {
-                formData.append('__RequestVerificationToken', token);
-            }
+            // Standard XMLHttpRequest for maximum compatibility
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Notifications/MarkAllAsRead', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('RequestVerificationToken', token);
 
-            // Debug info
-            console.log('Attempting to mark all as read');
-            console.log('Token present:', !!token);
+            xhr.onload = function() {
+                console.log('XHR response received, status:', xhr.status);
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        console.log('Response parsed:', response);
 
-            // Make the API call
-            fetch('/Notifications/MarkAllAsRead', {
-                method: 'POST',
-                headers: {
-                    // Set CSRF token in header if available
-                    ...(token && { 'RequestVerificationToken': token })
-                },
-                body: formData
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                if (!response.ok) {
-                    throw new Error('Server returned: ' + response.status);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('Response data:', data);
-                if (data.success) {
-                    // Update UI
-                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-                    unreadNotifications.forEach(item => {
-                        item.classList.remove('unread');
-                        item.classList.add('read');
+                        if (response.success) {
+                            // Update UI
+                            const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                            unreadNotifications.forEach(item => {
+                                item.classList.remove('unread');
+                                item.classList.add('read');
 
-                        const markReadBtn = item.querySelector('.btn-mark-read');
-                        if (markReadBtn) {
-                            markReadBtn.remove();
+                                const markReadBtn = item.querySelector('.btn-mark-read');
+                                if (markReadBtn) {
+                                    markReadBtn.remove();
+                                }
+                            });
+
+                            showNotification('All notifications marked as read');
+                        } else {
+                            showNotification(response.message || 'Error marking notifications as read', true);
                         }
-                    });
-
-                    showNotification('All notifications marked as read');
+                    } catch (e) {
+                        console.error('Error parsing response:', e);
+                        showNotification('Error processing response', true);
+                    }
                 } else {
-                    showNotification(data.message || 'Error marking notifications as read', true);
+                    console.error('Server error:', xhr.status);
+                    showNotification('Server error: ' + xhr.status, true);
                 }
-            })
-            .catch(error => {
-                console.error('Error marking all notifications as read:', error);
-                showNotification('An error occurred: ' + error.message, true);
+            };
 
-                // Alternative approach - fallback to simpler request
-                if (confirm('Error with initial request. Try alternative method?')) {
-                    simplifiedMarkAllAsRead();
-                }
-            });
+            xhr.onerror = function() {
+                console.error('XHR error');
+                showNotification('Connection error', true);
+            };
+
+            console.log('Sending XHR request to /Notifications/MarkAllAsRead');
+            xhr.send();
         }
 
-        // Alternative approach without FormData
-        function simplifiedMarkAllAsRead() {
-            fetch('/Notifications/MarkAllAsRead', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-                    unreadNotifications.forEach(item => {
-                        item.classList.remove('unread');
-                        item.classList.add('read');
+        function clearAll() {
+            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
-                        const markReadBtn = item.querySelector('.btn-mark-read');
-                        if (markReadBtn) {
-                            markReadBtn.remove();
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/Notifications/ClearAll', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.setRequestHeader('RequestVerificationToken', token);
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    try {
+                        const response = JSON.parse(xhr.responseText);
+                        if (response.success) {
+                            document.querySelector('.notifications-container').innerHTML = `
+                                <div class="empty-notifications">
+                                    <i class="fas fa-bell-slash"></i>
+                                    <p>You don't have any notifications</p>
+                                </div>
+                            `;
+                            showNotification('All notifications cleared');
+                        } else {
+                            showNotification(response.message || 'Error clearing notifications', true);
                         }
-                    });
-
-                    showNotification('All notifications marked as read');
+                    } catch (e) {
+                        showNotification('Error processing response', true);
+                    }
                 } else {
-                    showNotification(data.message || 'Error marking notifications as read', true);
+                    showNotification('Server error: ' + xhr.status, true);
                 }
-            })
-            .catch(error => {
-                console.error('Error with simplified approach:', error);
-                showNotification('All attempts failed. Please try again later.', true);
-            });
+            };
+
+            xhr.onerror = function() {
+                showNotification('Connection error', true);
+            };
+
+            xhr.send();
         }
 
-        // Improved notification function
         function showNotification(message, isError = false) {
+            console.log('Showing notification:', message, isError ? '(error)' : '(success)');
             const notification = document.createElement('div');
             notification.textContent = message;
             notification.className = `custom-notification ${isError ? 'error' : 'success'}`;
@@ -581,66 +592,27 @@
             }, 3000);
         }
 
-        function clearAll() {
-            if (!confirm('Are you sure you want to delete all notifications?')) {
-                return;
-            }
-
-            fetch('/Notifications/ClearAll', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Server response was not OK');
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success) {
-                    document.querySelector('.notifications-container').innerHTML = `
-                        <div class="empty-notifications">
-                            <i class="fas fa-bell-slash"></i>
-                            <p>You don't have any notifications</p>
-                        </div>
-                    `;
-                    showNotification('All notifications cleared');
-                } else {
-                    showNotification(data.message || 'Error clearing notifications', true);
-                }
-            })
-            .catch(error => {
-                console.error('Error clearing all notifications:', error);
-                showNotification('Error clearing notifications', true);
-            });
-        }
-
-        function handleNotificationClick(notification) {
-            // Mark as read first
-            markAsRead(notification.Id);
-
+        function handleNotificationNavigation(notificationType, entityId) {
             // Navigate based on notification type
-            switch (notification.Type) {
+            switch (notificationType) {
                 case 0: // ListingApproved
                 case 1: // ListingRejected
-                    window.location.href = `/User/MyListing?id=${notification.RelatedEntityId}`;
+                    window.location.href = `/User/MyListing?id=${entityId}`;
                     break;
                 case 2: // NewMessage
                     window.location.href = `/Message/Conversations`;
                     break;
                 case 3: // NewOffer
                 case 4: // OfferAccepted
-                case 5: // OfferRejected
-                    window.location.href = `/User/MyListing?id=${notification.RelatedEntityId}`;
+                case 5: // OfferRejected:
+                    window.location.href = `/User/MyListing?id=${entityId}`;
                     break;
                 case 6: // VerificationApproved
-                case 7: // VerificationRejected
+                case 7: // VerificationRejected:
                     window.location.href = `/User/MyProfilePage`;
                     break;
-                case 8: // PurchaseCompleted
-                    window.location.href = `/Payment/PurchaseComplete?purchaseId=${notification.RelatedEntityId}`;
+                case 8: // PurchaseCompleted:
+                    window.location.href = `/Payment/PurchaseComplete?purchaseId=${entityId}`;
                     break;
                 default:
                     // Do nothing or stay on the page

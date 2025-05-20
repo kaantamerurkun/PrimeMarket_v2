@@ -76,7 +76,7 @@ namespace PrimeMarket.Controllers
 
                 if (notification == null)
                 {
-                    return Json(new { success = false, message = "Notification not found" });
+                    return Json(new { success = false});
                 }
 
                 notification.IsRead = true;
@@ -87,7 +87,7 @@ namespace PrimeMarket.Controllers
             }
             catch (Exception ex)
             {
-                return Json(new { success = false, message = $"Error marking notification as read: {ex.Message}" });
+                return Json(new { success = false});
             }
         }
 
@@ -133,7 +133,6 @@ namespace PrimeMarket.Controllers
                 return Json(new
                 {
                     success = false,
-                    message = $"Error marking notifications as read: {ex.Message}",
                     details = ex.StackTrace
                 });
             }

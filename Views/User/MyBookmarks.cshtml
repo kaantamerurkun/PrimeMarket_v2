@@ -38,6 +38,7 @@
                 @foreach (var bookmark in Model)
                 {
                     <div class="bookmark-item" id="bookmark-@bookmark.Id">
+                        <a href="@Url.Action("Details", "Listing", new { id = bookmark.ListingId })" class="btn-view">
                         <div class="bookmark-image">
                             @{
                                 var mainImage = bookmark.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
@@ -51,9 +52,10 @@
                             <p class="location">@bookmark.Listing.Location</p>
                             <p class="condition">@bookmark.Listing.Condition</p>
                         </div>
+                        </a>
                         <div class="bookmark-actions">
-                            <a href="@Url.Action("Details", "Listing", new { id = bookmark.ListingId })" class="btn-view">View</a>
-                            <button class="btn-remove" onclick="removeBookmark(@bookmark.ListingId, @bookmark.Id)">Remove</button>                            <a href="@Url.Action("AddToCart", "Payment", new { listingId = bookmark.ListingId })" class="btn-cart">Add to Cart</a>
+                            <button class="btn-remove" onclick="removeBookmark(@bookmark.ListingId, @bookmark.Id)">Remove</button>
+@*                             <a href="@Url.Action("AddToCart", "Payment", new { listingId = bookmark.ListingId })" class="btn-cart">Add to Cart</a> *@
                         </div>
                     </div>
                 }

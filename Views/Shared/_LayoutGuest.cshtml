@@ -238,28 +238,6 @@
 
     <script src="/js/category-filtering.js"></script>
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const mainCategoryList = document.getElementById("mainCategories");
-            if (mainCategoryList) {
-                Object.entries(allCategories).forEach(([name, subs]) => {
-                    const item = createDropdownItem(name, subs);
-                    mainCategoryList.appendChild(item);
-                });
-            }
-
-            // Close all menus when clicking outside
-            document.addEventListener("click", () => {
-                if (openMainMenu) {
-                    openMainMenu.style.display = "none";
-                    openMainMenu = null;
-                }
-
-                if (openSubMenu) {
-                    openSubMenu.style.display = "none";
-                    openSubMenu = null;
-                }
-            });
 
                 document.addEventListener('DOMContentLoaded', function() {
                 const searchForm = document.getElementById('header-search-form');
@@ -332,7 +310,6 @@
                     }
                 }
             });
-        });
     </script>
 </body>
 </html>
