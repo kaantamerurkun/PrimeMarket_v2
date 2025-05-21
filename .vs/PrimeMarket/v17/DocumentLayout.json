@@ -562,8 +562,7 @@
               "RelativeToolTip": "Views\\Payment\\CheckoutMultiple.cshtml",
               "ViewState": "AgIAAJoCAAAAAAAAAAAuwJ0CAAANAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-20T19:33:23.678Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-20T19:33:23.678Z"
             },
             {
               "$type": "Document",
@@ -575,8 +574,7 @@
               "RelativeToolTip": "Models\\ViewModel\\MultiplePaymentViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-20T18:29:12.292Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-20T18:29:12.292Z"
             },
             {
               "$type": "Document",
@@ -588,8 +586,7 @@
               "RelativeToolTip": "Views\\Payment\\Checkout.cshtml",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-02T19:57:01.007Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-02T19:57:01.007Z"
             },
             {
               "$type": "Document",
@@ -626,8 +623,7 @@
               "RelativeToolTip": "Models\\ViewModel\\PaymentViewModel.cs",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-02T10:04:38.68Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-02T10:04:38.68Z"
             },
             {
               "$type": "Document",
@@ -663,8 +659,7 @@
               "RelativeToolTip": "Views\\Payment\\Cart.cshtml",
               "ViewState": "AgIAAGUBAAAAAAAAAAAAAAAAAAAPAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-05-11T17:54:51.554Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-11T17:54:51.554Z"
             },
             {
               "$type": "Document",
@@ -676,8 +671,7 @@
               "RelativeToolTip": "Controllers\\ListingController.cs",
               "ViewState": "AgIAAIMGAAAAAAAAAAAAwI8GAAAeAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-05-16T17:35:49.768Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-05-16T17:35:49.768Z"
             },
             {
               "$type": "Document",
