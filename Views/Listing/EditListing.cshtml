@@ -1,8 +1,13 @@
 ﻿@model PrimeMarket.Models.ViewModel.ListingViewModel
+@using PrimeMarket.Helpers
 @{
     ViewData["Title"] = "Edit Listing";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
+
+    // Get dynamic fields using the helper class
+    var productFields = ProductFieldHelper.GetProductFields(Model.Category, Model.SubCategory, Model.DetailCategory);
 }
+
 <div class="center-wrapper">
 <div class="page-wrapper">
     <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
@@ -123,14 +128,89 @@
                     </div>
                 </div>
 
-                <div class="form-section">
-                    <h2>Specific Details</h2>
-                    <p class="category-info">Category: @Model.Category > @Model.SubCategory @(!string.IsNullOrEmpty(Model.DetailCategory) ? $"> {Model.DetailCategory}" : "")</p>
+                @if (productFields.Any())
+                {
+                    <div class="form-section">
+                        <h2>Specific Details</h2>
+                        <p class="category-info">Category: @Model.Category > @Model.SubCategory @(!string.IsNullOrEmpty(Model.DetailCategory) ? $"> {Model.DetailCategory}" : "")</p>
 
-                    <div id="dynamicFields" class="dynamic-fields">
-                        <!-- Dynamic fields will be populated by JavaScript based on the category -->
+                        <div class="dynamic-fields">
+                            @foreach (var field in productFields)
+                            {
+                                <div class="form-group">
+                                    <label for="@field.Name">@field.Label @(field.IsRequired ? Html.Raw("<span class=\"required\">*</span>") : "")</label>
+                                    
+                                    @{
+                                        // Get existing value for this field
+                                        var existingValue = "";
+                                        if (Model.DynamicProperties != null)
+                                        {
+                                            // Try exact match first
+                                            Model.DynamicProperties.TryGetValue(field.Name, out existingValue);
+                                            
+                                            // If no exact match, try case-insensitive
+                                            if (string.IsNullOrEmpty(existingValue))
+                                            {
+                                                var matchedKey = Model.DynamicProperties.Keys
+                                                    .FirstOrDefault(k => string.Equals(k, field.Name, StringComparison.OrdinalIgnoreCase));
+                                                if (matchedKey != null)
+                                                {
+                                                    existingValue = Model.DynamicProperties[matchedKey];
+                                                }
+                                            }
+                                        }
+                                    }
+
+                                    @if (field.Type == "select" && field.Options != null && field.Options.Any())
+                                    {
+                                        <select id="@field.Name" name="DynamicProperties[@field.Name]" class="form-control" @(field.IsRequired ? Html.Raw("required") : Html.Raw(""))>
+                                            <option value="">Select @field.Label</option>
+                                            @foreach (var option in field.Options)
+                                            {
+                                                var isSelected = false;
+                                                if (!string.IsNullOrEmpty(existingValue))
+                                                {
+                                                    isSelected = string.Equals(option, existingValue, StringComparison.OrdinalIgnoreCase) ||
+                                                                 (existingValue == "True" && option == "Yes") ||
+                                                                 (existingValue == "False" && option == "No");
+                                                }
+                                                    @if (isSelected)
+                                                    {
+                                                        <option value="@option" selected>@option</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@option">@option</option>
+                                                    }                                            }
+                                        </select>
+                                    }
+                                    else if (field.Type == "number")
+                                    {
+                                        <input type="number" id="@field.Name" name="DynamicProperties[@field.Name]" 
+                                               class="form-control" placeholder="@field.Placeholder" 
+                                               value="@existingValue" step="any" min="0"
+                                               @(field.IsRequired ? Html.Raw("required") : Html.Raw("")) />
+                                    }
+                                    else
+                                    {
+                                        <input type="text" id="@field.Name" name="DynamicProperties[@field.Name]" 
+                                               class="form-control" placeholder="@field.Placeholder" 
+                                               value="@existingValue"
+                                               @(field.IsRequired ? Html.Raw("required") : Html.Raw("")) />
+                                    }
+                                </div>
+                            }
+                        </div>
                     </div>
-                </div>
+                }
+                else
+                {
+                    <div class="form-section">
+                        <h2>Specific Details</h2>
+                        <p class="category-info">Category: @Model.Category > @Model.SubCategory @(!string.IsNullOrEmpty(Model.DetailCategory) ? $"> {Model.DetailCategory}" : "")</p>
+                        <p>No specific details available for this category.</p>
+                    </div>
+                }
 
                 <div class="form-actions">
                     <a asp-action="MyProfilePage" asp-controller="User" class="btn-cancel">Cancel</a>
@@ -156,14 +236,12 @@
         object-fit: cover;
         border-radius: 8px;
     }
-    /* Center the entire page content */
 
     .page-wrapper {
         max-width: 1200px;
         margin: 0 auto;
         padding: 0 20px;
     }
-
 
     .container {
         width: 100%;
@@ -178,18 +256,18 @@
         position: relative;
     }
 
-        .image-item.marked-for-deletion::after {
-            content: "Will be deleted";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(220, 53, 69, 0.9);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 3px;
-            font-size: 12px;
-        }
+    .image-item.marked-for-deletion::after {
+        content: "Will be deleted";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: rgba(220, 53, 69, 0.9);
+        color: white;
+        padding: 5px 10px;
+        border-radius: 3px;
+        font-size: 12px;
+    }
 
     .alert-info {
         background-color: #d1ecf1;
@@ -208,10 +286,10 @@
         margin-bottom: 20px;
     }
 
-        .alert-danger ul {
-            margin: 0;
-            padding-left: 20px;
-        }
+    .alert-danger ul {
+        margin: 0;
+        padding-left: 20px;
+    }
 
     .edit-listing-header {
         display: flex;
@@ -243,18 +321,18 @@
         border-bottom: 1px solid #ddd;
     }
 
-        .form-section:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+    .form-section:last-child {
+        border-bottom: none;
+        margin-bottom: 0;
+        padding-bottom: 0;
+    }
 
-        .form-section h2 {
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 22px;
-            text-align: center;
-        }
+    .form-section h2 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 22px;
+        text-align: center;
+    }
 
     .info-text {
         color: #666;
@@ -275,13 +353,12 @@
         margin-bottom: 20px;
     }
 
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 500;
+    }
 
-    /* All input fields, textareas, and selects with 50px border radius */
     .form-control {
         width: 100%;
         padding: 10px 20px;
@@ -293,7 +370,7 @@
     textarea.form-control {
         resize: vertical;
         min-height: 120px;
-        border-radius: 25px; /* Slightly less rounded for textarea */
+        border-radius: 25px;
         padding: 15px 20px;
     }
 
@@ -390,9 +467,9 @@
         padding: 0;
     }
 
-        .delete-image-btn:hover {
-            background-color: #dc3545;
-        }
+    .delete-image-btn:hover {
+        background-color: #dc3545;
+    }
 
     .btn-danger {
         background-color: #dc3545;
@@ -404,9 +481,9 @@
         margin-bottom: 15px;
     }
 
-        .btn-danger:hover {
-            background-color: #c82333;
-        }
+    .btn-danger:hover {
+        background-color: #c82333;
+    }
 
     .image-preview {
         display: flex;
@@ -416,12 +493,12 @@
         justify-content: center;
     }
 
-        .image-preview img {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 15px;
-        }
+    .image-preview img {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 15px;
+    }
 
     .dynamic-fields {
         display: grid;
@@ -457,10 +534,10 @@
         font-size: 16px;
     }
 
-        .btn-save:hover {
-            background-color: #0055b3;
-            color: white;
-        }
+    .btn-save:hover {
+        background-color: #0055b3;
+        color: white;
+    }
 
     .btn-cancel:hover {
         background-color: #dc5454;
@@ -468,36 +545,33 @@
     }
 
     @@media (max-width: 768px) {
-        .page-wrapper
+        .page-wrapper {
+            padding: 0 15px;
+        }
 
-    {
-        padding: 0 15px;
+        .edit-listing-header {
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            text-align: center;
+        }
+
+        .dynamic-fields {
+            grid-template-columns: 1fr;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .btn-cancel, .btn-save {
+            width: 100%;
+            max-width: 300px;
+        }
     }
+</style>
 
-    .edit-listing-header {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-        text-align: center;
-    }
-
-    .dynamic-fields {
-        grid-template-columns: 1fr;
-    }
-
-    .form-actions {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .btn-cancel, .btn-save {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    }</style>
-
-<!-- JavaScript section remains the same as original -->
 <script>
     document.addEventListener('DOMContentLoaded', function() {
         // Track deleted image IDs
@@ -564,47 +638,6 @@
             updateImagesUI();
         };
 
-        // Delete all images button
-        const deleteAllBtn = document.getElementById('deleteAllImages');
-        if (deleteAllBtn) {
-            deleteAllBtn.addEventListener('click', function() {
-                // Check if there are new images uploaded
-                const hasNewImages = newImagesInput.files.length > 0;
-
-                if (!hasNewImages) {
-                    imagesErrorContainer.style.display = 'block';
-                    return;
-                }
-
-                // Confirm deletion
-                if (confirm('Are you sure you want to delete all current images? Your new uploaded images will be used instead.')) {
-                    // Get all image elements
-                    const imageItems = document.querySelectorAll('.image-item');
-
-                    // For each image, add its ID to deletedImageIds and create hidden input
-                    imageItems.forEach(item => {
-                        const imageId = item.getAttribute('data-id');
-                        deletedImageIds.push(imageId);
-
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'hidden';
-                        hiddenInput.name = 'DeletedImageIds';
-                        hiddenInput.value = imageId;
-                        deletedImagesContainer.appendChild(hiddenInput);
-
-                        // Remove from UI
-                        item.remove();
-                    });
-
-                    // Update UI to show all images deleted
-                    updateImagesUI();
-
-                    // Hide error message if it was showing
-                    imagesErrorContainer.style.display = 'none';
-                }
-            });
-        }
-
         // Helper function to update the images UI
         function updateImagesUI() {
             const imageItems = document.querySelectorAll('.image-item');
@@ -612,9 +645,6 @@
 
             if (imageItems.length === 0 && currentImages) {
                 currentImages.innerHTML = '<p>All current images will be deleted. New uploaded images will be used instead.</p>';
-                if (deleteAllBtn) {
-                    deleteAllBtn.style.display = 'none';
-                }
             }
         }
 
@@ -646,268 +676,5 @@
                 return false;
             }
         });
-
-        // Load product-specific fields based on category and subcategory
-        loadDynamicFields();
-
-        function loadDynamicFields() {
-            const category = '@Model.Category';
-            const subcategory = '@Model.SubCategory';
-            const detailCategory = '@(Model.DetailCategory ?? "")';
-            const fieldsContainer = document.getElementById('dynamicFields');
-
-            const fieldDefinitions = getCategoryFields(subcategory || detailCategory);
-
-    const dynamicProperties = @Html.Raw(Json.Serialize(Model.DynamicProperties ?? new Dictionary<string, string>()));
-
-                if (!fieldDefinitions || fieldDefinitions.length === 0) {
-                    fieldsContainer.innerHTML = '<p>No specific details for this category.</p>';
-                    return;
-                }
-
-                fieldsContainer.innerHTML = '';
-
-                fieldDefinitions.forEach(field => {
-                    const fieldDiv = document.createElement('div');
-                    fieldDiv.className = 'form-group';
-
-                    const label = document.createElement('label');
-                    label.setAttribute('for', field.name);
-                    label.textContent = field.label;
-                    fieldDiv.appendChild(label);
-
-                    // Try to find value by exact match or case-insensitive match
-                    let existingValue = dynamicProperties[field.name];
-
-                    // If no exact match, try case-insensitive search
-                    if (!existingValue) {
-                        const keys = Object.keys(dynamicProperties);
-                        const matchedKey = keys.find(key => key.toLowerCase() === field.name.toLowerCase());
-                        if (matchedKey) {
-                            existingValue = dynamicProperties[matchedKey];
-                        }
-                    }
-
-                    if (field.type === 'select') {
-                        const select = document.createElement('select');
-                        select.id = field.name;
-                        select.name = `DynamicProperties[${field.name}]`;
-                        select.className = 'form-control';
-
-                        const emptyOption = document.createElement('option');
-                        emptyOption.value = '';
-                        emptyOption.textContent = `Select ${field.label}`;
-                        select.appendChild(emptyOption);
-
-                        field.options.forEach(option => {
-                            const optEl = document.createElement('option');
-                            optEl.value = option;
-                            optEl.textContent = option;
-
-                            // Check for matching value
-                            if (existingValue) {
-                                if (option.toLowerCase() === existingValue.toLowerCase()) {
-                                    optEl.selected = true;
-                                } else if (existingValue === 'True' && option === 'Yes') {
-                                    optEl.selected = true;
-                                } else if (existingValue === 'False' && option === 'No') {
-                                    optEl.selected = true;
-                                }
-                            }
-
-                            select.appendChild(optEl);
-                        });
-
-                        fieldDiv.appendChild(select);
-                    } else {
-                        const input = document.createElement('input');
-                        input.type = field.type || 'text';
-                        input.id = field.name;
-                        input.name = `DynamicProperties[${field.name}]`;
-                        input.className = 'form-control';
-                        input.placeholder = field.placeholder || '';
-
-                        if (existingValue) {
-                            input.value = existingValue;
-                        }
-
-                        fieldDiv.appendChild(input);
-                    }
-
-                    fieldsContainer.appendChild(fieldDiv);
-                });
-
-                // Log for debugging
-                console.log('Dynamic Properties:', dynamicProperties);
-                console.log('Field Definitions:', fieldDefinitions);
-        }
-
-
-        function getCategoryFields(subcategory) {
-            // This is a simplified version - in a real application, you might want to fetch this from server
-            const categoryFields = {
-                "Laptops": [
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 16GB" },
-                    { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
-                    { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
-                    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 4GB" },
-                    { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA GTX 1650" },
-                    { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3200MHz" },
-                    { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Backlit" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 15.6 inch" },
-                    { name: "processor", label: "Processor", type: "text", placeholder: "e.g. Intel i7-12700H" },
-                    { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
-                    { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 512GB SSD" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Desktops": [
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 32GB" },
-                    { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
-                    { name: "hdmi", label: "HDMI", type: "select", options: ["Yes", "No"] },
-                    { name: "gpuMemory", label: "GPU Memory", type: "text", placeholder: "e.g. 8GB" },
-                    { name: "gpu", label: "Graphics Card", type: "text", placeholder: "e.g. NVIDIA RTX 3080" },
-                    { name: "memorySpeed", label: "Memory Speed", type: "text", placeholder: "e.g. 3600MHz" },
-                    { name: "keyboard", label: "Keyboard", type: "text", placeholder: "e.g. Mechanical" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 27 inch" },
-                    { name: "processor", label: "Processor", type: "text", placeholder: "e.g. AMD Ryzen 9" },
-                    { name: "operatingSystem", label: "Operating System", type: "text", placeholder: "e.g. Windows 11" },
-                    { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "IOS Phone": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 3200mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.1 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Lightning, USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                ],
-                "Android Phone": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 108MP quad camera" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 5000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.7 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Other Phones": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 13MP" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 4000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 6.5 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 6GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                ],
-                "IOS Tablets": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                ],
-                "Android Tablets": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 8MP" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 7000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.4 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 4GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 64GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Other Tablets": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 5MP" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 6000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 8 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. Micro USB" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 3GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                ],
-                "Washers": [
-                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
-                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
-                    { name: "color", label: "Color", type: "text", placeholder: "e.g. White" },
-                    { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 8 kg" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
-                ],
-                "Dishwashers": [
-                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
-                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
-                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
-                    { name: "capacity", label: "Washing Capacity", type: "text", placeholder: "e.g. 12 place settings" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Fridges": [
-                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
-                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 70x180x65 cm" },
-                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Silver" },
-                    { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 350L" },
-                    { name: "freezer", label: "Freezer", type: "select", options: ["Yes", "No"] },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 3 years" }
-                ],
-                "Ovens": [
-                    { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A+" },
-                    { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x60x55 cm" },
-                    { name: "color", label: "Color", type: "text", placeholder: "e.g. Black" },
-                    { name: "timer", label: "Timer", type: "select", options: ["Yes", "No"] },
-                    { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 65L" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Vacuum Cleaner": [
-                    { name: "cableLength", label: "Cable Length", type: "text", placeholder: "e.g. 7m" },
-                    { name: "waterContainer", label: "Water Container", type: "select", options: ["Yes", "No"] },
-                    { name: "weight", label: "Weight", type: "text", placeholder: "e.g. 4.5 kg" },
-                    { name: "power", label: "Power", type: "text", placeholder: "e.g. 900W" },
-                    { name: "dustContainer", label: "Dust Container", type: "text", placeholder: "e.g. 2L" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                "Televisions": [
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 55 inch" },
-                    { name: "smartTV", label: "Smart TV", type: "select", options: ["Yes", "No"] },
-                    { name: "hdmi", label: "HDMI", type: "text", placeholder: "e.g. 3 ports" },
-                    { name: "resolution", label: "Resolution", type: "text", placeholder: "e.g. 4K UHD" },
-                    { name: "displayTechnology", label: "Display Technology", type: "text", placeholder: "e.g. OLED" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
-                ],
-                // For tablets specifically, include all variations
-                "Tablets": [
-                    { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
-                    { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
-                    { name: "batteryPower", label: "Battery Power", type: "text", placeholder: "e.g. 8000mAh" },
-                    { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 10.9 inch" },
-                    { name: "chargingPort", label: "Charging Port", type: "text", placeholder: "e.g. USB-C" },
-                    { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 8GB" },
-                    { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 256GB" },
-                    { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
-                ]
-            };
-
-            // Try to find the exact category match first
-            if (categoryFields[subcategory]) {
-                return categoryFields[subcategory];
-            }
-
-            // If not found, try some common fallbacks
-            if (subcategory.includes("Tablet")) {
-                return categoryFields["Tablets"];
-            }
-            if (subcategory.includes("Phone")) {
-                return categoryFields["Other Phones"];
-            }
-
-            // Return empty array if no match found
-            return [];
-        }
     });
 </script>
