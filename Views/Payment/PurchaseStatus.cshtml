@@ -375,7 +375,7 @@
                 <div class="seller-actions">
                     <h3>Confirm Shipping</h3>
                     <p>Please confirm when you have shipped the item to the buyer.</p>
-
+                    <p style="margin-top:10px;margin-bottom:10px"><span style="color:#2cb73a">Shipping Address:</span><span style="color:#ffb901">@Model.ShippingAddress</span></p>
                     <form method="post" action="@Url.Action("ConfirmShipping", "Payment")">
                         @Html.AntiForgeryToken()
                         <input style="border-radius:50px" type="hidden" name="purchaseId" value="@Model.PurchaseId" />
@@ -407,7 +407,7 @@
                 <div class="buyer-actions">
                     <h3>Confirm Receipt</h3>
                     <p>Please confirm when you have received the item from the seller.</p>
-
+                    <p style="margin-top:10px;margin-bottom:10px"><span style="color:#2cb73a">Shipping Address:</span><span style="color:#ffb901">@Model.ShippingAddress</span></p>
                     <form method="post" action="@Url.Action("ConfirmReceived", "Payment")">
                         @Html.AntiForgeryToken()
                         <input type="hidden" name="purchaseId" value="@Model.PurchaseId" />

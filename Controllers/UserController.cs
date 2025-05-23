@@ -179,7 +179,7 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                         </div>
                         <div class='footer'>
                             <p>This is an automated message, please do not reply to this email.</p>
-                            <p>PrimeMarket &copy; 2024. All rights reserved.</p>
+                            <p>PrimeMarket &copy; 2025. All rights reserved.</p>
                         </div>
                     </div>
                 </body>

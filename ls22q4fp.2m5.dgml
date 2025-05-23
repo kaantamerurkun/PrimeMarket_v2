@@ -1,0 +1,869 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<DirectedGraph GraphDirection="LeftToRight" ZoomLevel="-1" xmlns="http://schemas.microsoft.com/vs/2009/dgml">
+  <Nodes>
+    <Node Id="AdminActions" Category="Table" Bounds="40,465,114.01,25" Group="Collapsed" Label="AdminActions" />
+    <Node Id="AdminActions_ActionDetails" Category="NOT NULL" Description="nvarchar(max)" Label="ActionDetails nvarchar(max)" />
+    <Node Id="AdminActions_ActionType" Category="NOT NULL" Description="nvarchar(50)" Label="ActionType nvarchar(50)" />
+    <Node Id="AdminActions_AdminId" Category="FK" Description="int" Label="AdminId int" />
+    <Node Id="AdminActions_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="AdminActions_EntityId" Category="NULL" Description="int" Label="EntityId int" />
+    <Node Id="AdminActions_EntityType" Category="NOT NULL" Description="nvarchar(50)" Label="EntityType nvarchar(50)" />
+    <Node Id="AdminActions_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="AdminActions_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Admins" Category="Table" Bounds="57.0383333333334,520,79.9333333333333,25" Group="Collapsed" Label="Admins" />
+    <Node Id="Admins_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Admins_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Admins_Password" Category="NOT NULL" Description="nvarchar(max)" Label="Password nvarchar(max)" />
+    <Node Id="Admins_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Admins_Username" Category="NOT NULL" Description="nvarchar(50)" Label="Username nvarchar(50)" />
+    <Node Id="AndroidPhones" Category="Table" Bounds="1210.77177470136,135,121.473333333333,25" Group="Collapsed" Label="AndroidPhones" />
+    <Node Id="AndroidPhones_BatteryPower" Category="NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="AndroidPhones_Camera" Category="NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="AndroidPhones_ChargingPort" Category="NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="AndroidPhones_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="AndroidPhones_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="AndroidPhones_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="AndroidPhones_Ram" Category="NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="AndroidPhones_ScreenSize" Category="NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="AndroidPhones_Storage" Category="NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="AndroidPhones_Warranty" Category="NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="AndroidTablets" Category="Table" Bounds="948.154908034698,135,120.563333333333,25" Group="Collapsed" Label="AndroidTablets" />
+    <Node Id="AndroidTablets_BatteryPower" Category="NOT NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="AndroidTablets_Camera" Category="NOT NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="AndroidTablets_ChargingPort" Category="NOT NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="AndroidTablets_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="AndroidTablets_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="AndroidTablets_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="AndroidTablets_Ram" Category="NOT NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="AndroidTablets_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="AndroidTablets_Storage" Category="NOT NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="AndroidTablets_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="BeveragePreparations" Category="Table" Bounds="1026.95736666667,300,155.3,25" Group="Collapsed" Label="BeveragePreparations" />
+    <Node Id="BeveragePreparations_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="BeveragePreparations_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Bookmarks" Category="Table" Bounds="39.9999999999999,300,98.5766666666667,25" Group="Collapsed" Label="Bookmarks" />
+    <Node Id="Bookmarks_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Bookmarks_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Bookmarks_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Bookmarks_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Bookmarks_UserId" Category="FK" Description="int" Label="UserId int" />
+    <Node Id="Cameras" Category="Table" Bounds="613.322359041827,245,85.5233333333333,25" Group="Collapsed" Label="Cameras" />
+    <Node Id="Cameras_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Cameras_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ComputerAccessorys" Category="Table" Bounds="1445.01766666667,300,150.55,25" Group="Collapsed" Label="ComputerAccessorys" />
+    <Node Id="ComputerAccessorys_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="ComputerAccessorys_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ComputerBags" Category="Table" Bounds="799.851474701364,135,118.303333333333,25" Group="Collapsed" Label="ComputerBags" />
+    <Node Id="ComputerBags_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="ComputerBags_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ComputerComponents" Category="Table" Bounds="835.903933333333,300,161.053333333333,25" Group="Collapsed" Label="ComputerComponents" />
+    <Node Id="ComputerComponents_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="ComputerComponents_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Database" Category="Database" Bounds="0,0,2258.69473333333,585" Group="Expanded" Label="PrimeMarketDb" />
+    <Node Id="Desktops" Category="Table" Bounds="769.977492728486,190,88.99,25" Group="Collapsed" Label="Desktops" />
+    <Node Id="Desktops_Gpu" Category="NOT NULL" Description="nvarchar(max)" Label="Gpu nvarchar(max)" />
+    <Node Id="Desktops_GpuMemory" Category="NOT NULL" Description="nvarchar(max)" Label="GpuMemory nvarchar(max)" />
+    <Node Id="Desktops_Hdmi" Category="NOT NULL" Description="bit" Label="Hdmi bit" />
+    <Node Id="Desktops_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Desktops_Keyboard" Category="NOT NULL" Description="nvarchar(max)" Label="Keyboard nvarchar(max)" />
+    <Node Id="Desktops_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Desktops_MemorySpeed" Category="NOT NULL" Description="nvarchar(max)" Label="MemorySpeed nvarchar(max)" />
+    <Node Id="Desktops_OperatingSystem" Category="NOT NULL" Description="nvarchar(max)" Label="OperatingSystem nvarchar(max)" />
+    <Node Id="Desktops_Processor" Category="NOT NULL" Description="nvarchar(max)" Label="Processor nvarchar(max)" />
+    <Node Id="Desktops_Ram" Category="NOT NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="Desktops_RamType" Category="NOT NULL" Description="nvarchar(max)" Label="RamType nvarchar(max)" />
+    <Node Id="Desktops_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="Desktops_Storage" Category="NOT NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="Desktops_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="Dishwashers" Category="Table" Bounds="477.912259041826,245,105.41,25" Group="Collapsed" Label="Dishwashers" />
+    <Node Id="Dishwashers_Capacity" Category="NOT NULL" Description="nvarchar(max)" Label="Capacity nvarchar(max)" />
+    <Node Id="Dishwashers_Color" Category="NOT NULL" Description="nvarchar(max)" Label="Color nvarchar(max)" />
+    <Node Id="Dishwashers_Dimensions" Category="NOT NULL" Description="nvarchar(max)" Label="Dimensions nvarchar(max)" />
+    <Node Id="Dishwashers_EnergyClass" Category="NOT NULL" Description="nvarchar(max)" Label="EnergyClass nvarchar(max)" />
+    <Node Id="Dishwashers_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Dishwashers_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Dishwashers_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="EmailVerifications" Category="Table" Bounds="184.01,465,133.336666666667,25" Group="Collapsed" Label="EmailVerifications" />
+    <Node Id="EmailVerifications_Code" Category="NOT NULL" Description="nvarchar(6)" Label="Code nvarchar(6)" />
+    <Node Id="EmailVerifications_Email" Category="NOT NULL" Description="nvarchar(max)" Label="Email nvarchar(max)" />
+    <Node Id="EmailVerifications_Expiration" Category="NOT NULL" Description="datetime2" Label="Expiration datetime2" />
+    <Node Id="EmailVerifications_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="FoodPreparations" Category="Table" Bounds="569.467066666666,300,133.483333333333,25" Group="Collapsed" Label="FoodPreparations" />
+    <Node Id="FoodPreparations_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="FoodPreparations_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Fridges" Category="Table" Bounds="1027.17599237516,245,78.4433333333332,25" Group="Collapsed" Label="Fridges" />
+    <Node Id="Fridges_Color" Category="NOT NULL" Description="nvarchar(max)" Label="Color nvarchar(max)" />
+    <Node Id="Fridges_Dimensions" Category="NOT NULL" Description="nvarchar(max)" Label="Dimensions nvarchar(max)" />
+    <Node Id="Fridges_EnergyClass" Category="NOT NULL" Description="nvarchar(max)" Label="EnergyClass nvarchar(max)" />
+    <Node Id="Fridges_Freezer" Category="NOT NULL" Description="bit" Label="Freezer bit" />
+    <Node Id="Fridges_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Fridges_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Fridges_Volume" Category="NOT NULL" Description="nvarchar(max)" Label="Volume nvarchar(max)" />
+    <Node Id="Fridges_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="HeadphoneEarphones" Category="Table" Bounds="2061.4014,300,157.293333333333,25" Group="Collapsed" Label="HeadphoneEarphones" />
+    <Node Id="HeadphoneEarphones_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="HeadphoneEarphones_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="HeatingCoolings" Category="Table" Bounds="1231.89952570849,245,127.986666666667,25" Group="Collapsed" Label="HeatingCoolings" />
+    <Node Id="HeatingCoolings_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="HeatingCoolings_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="IOSPhones" Category="Table" Bounds="1317.70423333333,300,97.3133333333333,25" Group="Collapsed" Label="IOSPhones" />
+    <Node Id="IOSPhones_BatteryPower" Category="NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="IOSPhones_Camera" Category="NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="IOSPhones_ChargingPort" Category="NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="IOSPhones_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="IOSPhones_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="IOSPhones_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="IOSPhones_Ram" Category="NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="IOSPhones_ScreenSize" Category="NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="IOSPhones_Storage" Category="NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="IOSPhones_Warranty" Category="NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="IOSTablets" Category="Table" Bounds="1086.20819946847,80,96.4033333333334,25" Group="Collapsed" Label="IOSTablets" />
+    <Node Id="IOSTablets_BatteryPower" Category="NOT NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="IOSTablets_Camera" Category="NOT NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="IOSTablets_ChargingPort" Category="NOT NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="IOSTablets_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="IOSTablets_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="IOSTablets_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="IOSTablets_Ram" Category="NOT NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="IOSTablets_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="IOSTablets_Storage" Category="NOT NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="IOSTablets_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="Irons" Category="Table" Bounds="1135.61942570849,245,66.28,25" Group="Collapsed" Label="Irons" />
+    <Node Id="Irons_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Irons_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Keyboards" Category="Table" Bounds="443.9003,300,95.5666666666666,25" Group="Collapsed" Label="Keyboards" />
+    <Node Id="Keyboards_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Keyboards_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Laptops" Category="Table" Bounds="1098.71834136803,135,82.0533333333333,25" Group="Collapsed" Label="Laptops" />
+    <Node Id="Laptops_Gpu" Category="NOT NULL" Description="nvarchar(max)" Label="Gpu nvarchar(max)" />
+    <Node Id="Laptops_GpuMemory" Category="NOT NULL" Description="nvarchar(max)" Label="GpuMemory nvarchar(max)" />
+    <Node Id="Laptops_Hdmi" Category="NOT NULL" Description="bit" Label="Hdmi bit" />
+    <Node Id="Laptops_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Laptops_Keyboard" Category="NOT NULL" Description="nvarchar(max)" Label="Keyboard nvarchar(max)" />
+    <Node Id="Laptops_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Laptops_MemorySpeed" Category="NOT NULL" Description="nvarchar(max)" Label="MemorySpeed nvarchar(max)" />
+    <Node Id="Laptops_OperatingSystem" Category="NOT NULL" Description="nvarchar(max)" Label="OperatingSystem nvarchar(max)" />
+    <Node Id="Laptops_Processor" Category="NOT NULL" Description="nvarchar(max)" Label="Processor nvarchar(max)" />
+    <Node Id="Laptops_Ram" Category="NOT NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="Laptops_RamType" Category="NOT NULL" Description="nvarchar(max)" Label="RamType nvarchar(max)" />
+    <Node Id="Laptops_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="Laptops_Storage" Category="NOT NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="Laptops_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="ListingImages" Category="Table" Bounds="943.654766135139,80,112.553333333333,25" Group="Collapsed" Label="ListingImages" />
+    <Node Id="ListingImages_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="ListingImages_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="ListingImages_ImagePath" Category="NOT NULL" Description="nvarchar(max)" Label="ImagePath nvarchar(max)" />
+    <Node Id="ListingImages_IsMainImage" Category="NOT NULL" Description="bit" Label="IsMainImage bit" />
+    <Node Id="ListingImages_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ListingImages_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Listings" Category="Table" Bounds="1031.4064447636,355,79.5733333333333,25" Group="Collapsed" Label="Listings" />
+    <Node Id="Listings_Category" Category="NOT NULL" Description="nvarchar(max)" Label="Category nvarchar(max)" />
+    <Node Id="Listings_Condition" Category="NOT NULL" Description="nvarchar(max)" Label="Condition nvarchar(max)" />
+    <Node Id="Listings_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Listings_Description" Category="NOT NULL" Description="nvarchar(max)" Label="Description nvarchar(max)" />
+    <Node Id="Listings_DetailCategory" Category="NOT NULL" Description="nvarchar(max)" Label="DetailCategory nvarchar(max)" />
+    <Node Id="Listings_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Listings_Location" Category="NOT NULL" Description="nvarchar(max)" Label="Location nvarchar(max)" />
+    <Node Id="Listings_Price" Category="NOT NULL" Description="decimal(18, 2)" Label="Price decimal(18, 2)" />
+    <Node Id="Listings_RejectionReason" Category="NULL" Description="nvarchar(max)" Label="RejectionReason nvarchar(max)" />
+    <Node Id="Listings_SellerId" Category="FK" Description="int" Label="SellerId int" />
+    <Node Id="Listings_Status" Category="NOT NULL" Description="int" Label="Status int" />
+    <Node Id="Listings_Stock" Category="NULL" Description="int" Label="Stock int" />
+    <Node Id="Listings_SubCategory" Category="NOT NULL" Description="nvarchar(max)" Label="SubCategory nvarchar(max)" />
+    <Node Id="Listings_Title" Category="NOT NULL" Description="nvarchar(max)" Label="Title nvarchar(max)" />
+    <Node Id="Listings_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Listings_ViewCount" Category="NULL" Description="int" Label="ViewCount int" />
+    <Node Id="Messages" Category="Table" Bounds="322.116866666667,300,91.7833333333333,25" Group="Collapsed" Label="Messages" />
+    <Node Id="Messages_Content" Category="NOT NULL" Description="nvarchar(max)" Label="Content nvarchar(max)" />
+    <Node Id="Messages_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Messages_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Messages_IsRead" Category="NOT NULL" Description="bit" Label="IsRead bit" />
+    <Node Id="Messages_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Messages_ReceiverId" Category="FK" Description="int" Label="ReceiverId int" />
+    <Node Id="Messages_SenderId" Category="FK" Description="int" Label="SenderId int" />
+    <Node Id="Messages_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Microphones" Category="Table" Bounds="1389.88629237516,245,109.463333333333,25" Group="Collapsed" Label="Microphones" />
+    <Node Id="Microphones_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Microphones_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="MicrowaveOvens" Category="Table" Bounds="866.989225708493,245,130.186666666667,25" Group="Collapsed" Label="MicrowaveOvens" />
+    <Node Id="MicrowaveOvens_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="MicrowaveOvens_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Monitors" Category="Table" Bounds="1348.07465939515,190,87.8666666666668,25" Group="Collapsed" Label="Monitors" />
+    <Node Id="Monitors_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Monitors_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Mouses" Category="Table" Bounds="888.967592728486,190,81.0599999999999,25" Group="Collapsed" Label="Mouses" />
+    <Node Id="Mouses_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Mouses_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Notifications" Category="Table" Bounds="504.940493013535,355,107.18,25" Group="Collapsed" Label="Notifications" />
+    <Node Id="Notifications_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Notifications_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Notifications_IsRead" Category="NOT NULL" Description="bit" Label="IsRead bit" />
+    <Node Id="Notifications_Message" Category="NOT NULL" Description="nvarchar(max)" Label="Message nvarchar(max)" />
+    <Node Id="Notifications_RelatedEntityId" Category="NULL" Description="int" Label="RelatedEntityId int" />
+    <Node Id="Notifications_Type" Category="NOT NULL" Description="int" Label="Type int" />
+    <Node Id="Notifications_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Notifications_UserId" Category="FK" Description="int" Label="UserId int" />
+    <Node Id="Offers" Category="Table" Bounds="375.808825708493,245,72.1033333333334,25" Group="Collapsed" Label="Offers" />
+    <Node Id="Offers_BuyerId" Category="FK" Description="int" Label="BuyerId int" />
+    <Node Id="Offers_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Offers_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Offers_IsCounterOffer" Category="NOT NULL" Description="bit" Label="IsCounterOffer bit" />
+    <Node Id="Offers_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Offers_Message" Category="NOT NULL" Description="nvarchar(max)" Label="Message nvarchar(max)" />
+    <Node Id="Offers_MessageId" Category="FK" Description="int" Label="MessageId int" />
+    <Node Id="Offers_OfferAmount" Category="NOT NULL" Description="decimal(18, 2)" Label="OfferAmount decimal(18, 2)" />
+    <Node Id="Offers_OriginalOfferId" Category="FK" Description="int" Label="OriginalOfferId int" />
+    <Node Id="Offers_ResponseDate" Category="NULL" Description="datetime2" Label="ResponseDate datetime2" />
+    <Node Id="Offers_Status" Category="NOT NULL" Description="int" Label="Status int" />
+    <Node Id="Offers_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="OtherPhones" Category="Table" Bounds="630.924059395153,190,109.053333333333,25" Group="Collapsed" Label="OtherPhones" />
+    <Node Id="OtherPhones_BatteryPower" Category="NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="OtherPhones_Camera" Category="NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="OtherPhones_ChargingPort" Category="NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="OtherPhones_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="OtherPhones_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="OtherPhones_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="OtherPhones_Ram" Category="NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="OtherPhones_ScreenSize" Category="NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="OtherPhones_Storage" Category="NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="OtherPhones_Warranty" Category="NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="OtherTablets" Category="Table" Bounds="728.84579237516,245,108.143333333333,25" Group="Collapsed" Label="OtherTablets" />
+    <Node Id="OtherTablets_BatteryPower" Category="NOT NULL" Description="nvarchar(max)" Label="BatteryPower nvarchar(max)" />
+    <Node Id="OtherTablets_Camera" Category="NOT NULL" Description="nvarchar(max)" Label="Camera nvarchar(max)" />
+    <Node Id="OtherTablets_ChargingPort" Category="NOT NULL" Description="nvarchar(max)" Label="ChargingPort nvarchar(max)" />
+    <Node Id="OtherTablets_FaceRecognition" Category="NOT NULL" Description="bit" Label="FaceRecognition bit" />
+    <Node Id="OtherTablets_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="OtherTablets_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="OtherTablets_Ram" Category="NOT NULL" Description="nvarchar(max)" Label="Ram nvarchar(max)" />
+    <Node Id="OtherTablets_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="OtherTablets_Storage" Category="NOT NULL" Description="nvarchar(max)" Label="Storage nvarchar(max)" />
+    <Node Id="OtherTablets_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="Others" Category="Table" Bounds="1212.25746666667,300,75.4466666666667,25" Group="Collapsed" Label="Others" />
+    <Node Id="Others_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Others_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Ovens" Category="Table" Bounds="732.9505,300,72.9533333333334,25" Group="Collapsed" Label="Ovens" />
+    <Node Id="Ovens_Color" Category="NOT NULL" Description="nvarchar(max)" Label="Color nvarchar(max)" />
+    <Node Id="Ovens_Dimensions" Category="NOT NULL" Description="nvarchar(max)" Label="Dimensions nvarchar(max)" />
+    <Node Id="Ovens_EnergyClass" Category="NOT NULL" Description="nvarchar(max)" Label="EnergyClass nvarchar(max)" />
+    <Node Id="Ovens_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Ovens_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Ovens_Timer" Category="NOT NULL" Description="bit" Label="Timer bit" />
+    <Node Id="Ovens_Volume" Category="NOT NULL" Description="nvarchar(max)" Label="Volume nvarchar(max)" />
+    <Node Id="Ovens_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="PhoneAccessorys" Category="Table" Bounds="1900.4013,300,131,25" Group="Collapsed" Label="PhoneAccessorys" />
+    <Node Id="PhoneAccessorys_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="PhoneAccessorys_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ProductReviews" Category="Table" Bounds="168.576766666667,300,123.54,25" Group="Collapsed" Label="ProductReviews" />
+    <Node Id="ProductReviews_Comment" Category="NOT NULL" Description="nvarchar(1000)" Label="Comment nvarchar(1000)" />
+    <Node Id="ProductReviews_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="ProductReviews_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="ProductReviews_IsVerifiedPurchase" Category="NOT NULL" Description="bit" Label="IsVerifiedPurchase bit" />
+    <Node Id="ProductReviews_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="ProductReviews_Rating" Category="NOT NULL" Description="int" Label="Rating int" />
+    <Node Id="ProductReviews_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="ProductReviews_UserId" Category="FK" Description="int" Label="UserId int" />
+    <Node Id="PurchaseConfirmations" Category="Table" Bounds="250.220717915051,135,161.91,25" Group="Collapsed" Label="PurchaseConfirmations" />
+    <Node Id="PurchaseConfirmations_BuyerReceivedProduct" Category="NOT NULL" Description="bit" Label="BuyerReceivedProduct bit" />
+    <Node Id="PurchaseConfirmations_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="PurchaseConfirmations_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="PurchaseConfirmations_PaymentReleased" Category="NOT NULL" Description="bit" Label="PaymentReleased bit" />
+    <Node Id="PurchaseConfirmations_PaymentReleasedDate" Category="NULL" Description="datetime2" Label="PaymentReleasedDate datetime2" />
+    <Node Id="PurchaseConfirmations_PurchaseId" Category="FK" Description="int" Label="PurchaseId int" />
+    <Node Id="PurchaseConfirmations_ReceiptConfirmedDate" Category="NULL" Description="datetime2" Label="ReceiptConfirmedDate datetime2" />
+    <Node Id="PurchaseConfirmations_SellerShippedProduct" Category="NOT NULL" Description="bit" Label="SellerShippedProduct bit" />
+    <Node Id="PurchaseConfirmations_ShippingConfirmedDate" Category="NULL" Description="datetime2" Label="ShippingConfirmedDate datetime2" />
+    <Node Id="PurchaseConfirmations_ShippingProvider" Category="NULL" Description="nvarchar(max)" Label="ShippingProvider nvarchar(max)" />
+    <Node Id="PurchaseConfirmations_TrackingNumber" Category="NULL" Description="nvarchar(max)" Label="TrackingNumber nvarchar(max)" />
+    <Node Id="PurchaseConfirmations_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Purchases" Category="Table" Bounds="482.924052031103,190,92.5866666666666,25" Group="Collapsed" Label="Purchases" />
+    <Node Id="Purchases_Amount" Category="NOT NULL" Description="decimal(18, 2)" Label="Amount decimal(18, 2)" />
+    <Node Id="Purchases_BuyerId" Category="FK" Description="int" Label="BuyerId int" />
+    <Node Id="Purchases_CardholderName" Category="NOT NULL" Description="nvarchar(max)" Label="CardholderName nvarchar(max)" />
+    <Node Id="Purchases_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Purchases_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Purchases_LastFourDigits" Category="NOT NULL" Description="nvarchar(max)" Label="LastFourDigits nvarchar(max)" />
+    <Node Id="Purchases_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Purchases_OfferId" Category="FK" Description="int" Label="OfferId int" />
+    <Node Id="Purchases_PaymentStatus" Category="NOT NULL" Description="int" Label="PaymentStatus int" />
+    <Node Id="Purchases_Quantity" Category="NOT NULL" Description="int" Label="Quantity int" />
+    <Node Id="Purchases_ShippingAddress" Category="NOT NULL" Description="nvarchar(max)" Label="ShippingAddress nvarchar(max)" />
+    <Node Id="Purchases_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="SellerRatings" Category="Table" Bounds="442.130817915051,135,108.12,25" Group="Collapsed" Label="SellerRatings" />
+    <Node Id="SellerRatings_BuyerId" Category="FK" Description="int" Label="BuyerId int" />
+    <Node Id="SellerRatings_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="SellerRatings_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="SellerRatings_PurchaseId" Category="FK" Description="int" Label="PurchaseId int" />
+    <Node Id="SellerRatings_Rating" Category="NOT NULL" Description="int" Label="Rating int" />
+    <Node Id="SellerRatings_SellerId" Category="FK" Description="int" Label="SellerId int" />
+    <Node Id="SellerRatings_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="SewingMachines" Category="Table" Bounds="1529.34972570849,245,128.37,25" Group="Collapsed" Label="SewingMachines" />
+    <Node Id="SewingMachines_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="SewingMachines_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="SpareParts" Category="Table" Bounds="1000.02769272849,190,96.1433333333334,25" Group="Collapsed" Label="SpareParts" />
+    <Node Id="SpareParts_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="SpareParts_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Speakers" Category="Table" Bounds="1230.75789272849,190,87.3166666666666,25" Group="Collapsed" Label="Speakers" />
+    <Node Id="Speakers_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Speakers_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Stoves" Category="Table" Bounds="1126.17112606182,190,74.5866666666666,25" Group="Collapsed" Label="Stoves" />
+    <Node Id="Stoves_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Stoves_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="TabletAccessorys" Category="Table" Bounds="1625.56776666667,300,130.09,25" Group="Collapsed" Label="TabletAccessorys" />
+    <Node Id="TabletAccessorys_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="TabletAccessorys_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Televisions" Category="Table" Bounds="1687.71982570849,245,97.3133333333333,25" Group="Collapsed" Label="Televisions" />
+    <Node Id="Televisions_DisplayTechnology" Category="NOT NULL" Description="nvarchar(max)" Label="DisplayTechnology nvarchar(max)" />
+    <Node Id="Televisions_Hdmi" Category="NOT NULL" Description="nvarchar(max)" Label="Hdmi nvarchar(max)" />
+    <Node Id="Televisions_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Televisions_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Televisions_Resolution" Category="NOT NULL" Description="nvarchar(max)" Label="Resolution nvarchar(max)" />
+    <Node Id="Televisions_ScreenSize" Category="NOT NULL" Description="nvarchar(max)" Label="ScreenSize nvarchar(max)" />
+    <Node Id="Televisions_SmartTV" Category="NOT NULL" Description="bit" Label="SmartTV bit" />
+    <Node Id="Televisions_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="UserRatings" Category="Table" Bounds="371.947059680202,355,102.993333333333,25" Group="Collapsed" Label="UserRatings" />
+    <Node Id="UserRatings_Comment" Category="NOT NULL" Description="nvarchar(max)" Label="Comment nvarchar(max)" />
+    <Node Id="UserRatings_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="UserRatings_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="UserRatings_RatedUserId" Category="FK" Description="int" Label="RatedUserId int" />
+    <Node Id="UserRatings_RaterId" Category="FK" Description="int" Label="RaterId int" />
+    <Node Id="UserRatings_Rating" Category="NOT NULL" Description="int" Label="Rating int" />
+    <Node Id="UserRatings_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="Users" Category="Table" Bounds="387.762364591485,410,68.88,25" Group="Collapsed" Label="Users" />
+    <Node Id="Users_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="Users_Email" Category="NOT NULL" Description="nvarchar(100)" Label="Email nvarchar(100)" />
+    <Node Id="Users_FirstName" Category="NOT NULL" Description="nvarchar(50)" Label="FirstName nvarchar(50)" />
+    <Node Id="Users_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Users_IsAdmin" Category="NOT NULL" Description="bit" Label="IsAdmin bit" />
+    <Node Id="Users_IsEmailVerified" Category="NOT NULL" Description="bit" Label="IsEmailVerified bit" />
+    <Node Id="Users_IsIdVerified" Category="NOT NULL" Description="bit" Label="IsIdVerified bit" />
+    <Node Id="Users_LastName" Category="NOT NULL" Description="nvarchar(50)" Label="LastName nvarchar(50)" />
+    <Node Id="Users_PasswordHash" Category="NOT NULL" Description="nvarchar(max)" Label="PasswordHash nvarchar(max)" />
+    <Node Id="Users_PhoneNumber" Category="NULL" Description="nvarchar(15)" Label="PhoneNumber nvarchar(15)" />
+    <Node Id="Users_ProfileImagePath" Category="NULL" Description="nvarchar(max)" Label="ProfileImagePath nvarchar(max)" />
+    <Node Id="Users_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="VacuumCleaners" Category="Table" Bounds="1587.56152606182,190,128.073333333333,25" Group="Collapsed" Label="VacuumCleaners" />
+    <Node Id="VacuumCleaners_CableLength" Category="NOT NULL" Description="nvarchar(max)" Label="CableLength nvarchar(max)" />
+    <Node Id="VacuumCleaners_DustContainer" Category="NOT NULL" Description="nvarchar(max)" Label="DustContainer nvarchar(max)" />
+    <Node Id="VacuumCleaners_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="VacuumCleaners_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="VacuumCleaners_Power" Category="NOT NULL" Description="nvarchar(max)" Label="Power nvarchar(max)" />
+    <Node Id="VacuumCleaners_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="VacuumCleaners_WaterContainer" Category="NOT NULL" Description="bit" Label="WaterContainer bit" />
+    <Node Id="VacuumCleaners_Weight" Category="NOT NULL" Description="nvarchar(max)" Label="Weight nvarchar(max)" />
+    <Node Id="VerificationDocuments" Category="Table" Bounds="181.690293013535,355,160.256666666667,25" Group="Collapsed" Label="VerificationDocuments" />
+    <Node Id="VerificationDocuments_BackImagePath" Category="NOT NULL" Description="nvarchar(max)" Label="BackImagePath nvarchar(max)" />
+    <Node Id="VerificationDocuments_CreatedAt" Category="NULL" Description="datetime2" Label="CreatedAt datetime2" />
+    <Node Id="VerificationDocuments_FaceImagePath" Category="NOT NULL" Description="nvarchar(max)" Label="FaceImagePath nvarchar(max)" />
+    <Node Id="VerificationDocuments_FrontImagePath" Category="NOT NULL" Description="nvarchar(max)" Label="FrontImagePath nvarchar(max)" />
+    <Node Id="VerificationDocuments_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="VerificationDocuments_RejectionReason" Category="NOT NULL" Description="nvarchar(max)" Label="RejectionReason nvarchar(max)" />
+    <Node Id="VerificationDocuments_Status" Category="NOT NULL" Description="int" Label="Status int" />
+    <Node Id="VerificationDocuments_UpdatedAt" Category="NULL" Description="datetime2" Label="UpdatedAt datetime2" />
+    <Node Id="VerificationDocuments_UserId" Category="FK" Description="int" Label="UserId int" />
+    <Node Id="Washers" Category="Table" Bounds="1785.65786666667,300,84.7433333333333,25" Group="Collapsed" Label="Washers" />
+    <Node Id="Washers_Capacity" Category="NOT NULL" Description="nvarchar(max)" Label="Capacity nvarchar(max)" />
+    <Node Id="Washers_Color" Category="NOT NULL" Description="nvarchar(max)" Label="Color nvarchar(max)" />
+    <Node Id="Washers_Dimensions" Category="NOT NULL" Description="nvarchar(max)" Label="Dimensions nvarchar(max)" />
+    <Node Id="Washers_EnergyClass" Category="NOT NULL" Description="nvarchar(max)" Label="EnergyClass nvarchar(max)" />
+    <Node Id="Washers_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Washers_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="Washers_Warranty" Category="NOT NULL" Description="nvarchar(max)" Label="Warranty nvarchar(max)" />
+    <Node Id="Webcams" Category="Table" Bounds="1465.94142606182,190,91.6199999999999,25" Group="Collapsed" Label="Webcams" />
+    <Node Id="Webcams_Id" Category="PK" Description="int" Label="Id int" />
+    <Node Id="Webcams_ListingId" Category="FK" Description="int" Label="ListingId int" />
+    <Node Id="dbo" Category="Schema" Bounds="20,40,2218.69473333333,525" Group="Expanded" Label="dbo" />
+  </Nodes>
+  <Links>
+    <Link Source="AdminActions" Target="AdminActions_ActionDetails" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_ActionType" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_AdminId" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_CreatedAt" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_EntityId" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_EntityType" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_Id" Category="Contains" />
+    <Link Source="AdminActions" Target="AdminActions_UpdatedAt" Category="Contains" />
+    <Link Source="AdminActions_AdminId" Target="Admins_Id" Category="Foreign Key" Label="FK_AdminActions_Admins_AdminId" />
+    <Link Source="Admins" Target="Admins_CreatedAt" Category="Contains" />
+    <Link Source="Admins" Target="Admins_Id" Category="Contains" />
+    <Link Source="Admins" Target="Admins_Password" Category="Contains" />
+    <Link Source="Admins" Target="Admins_UpdatedAt" Category="Contains" />
+    <Link Source="Admins" Target="Admins_Username" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_BatteryPower" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_Camera" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_ChargingPort" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_FaceRecognition" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_Id" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_ListingId" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_Ram" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_ScreenSize" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_Storage" Category="Contains" />
+    <Link Source="AndroidPhones" Target="AndroidPhones_Warranty" Category="Contains" />
+    <Link Source="AndroidPhones_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_AndroidPhones_Listings_ListingId" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_BatteryPower" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_Camera" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_ChargingPort" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_FaceRecognition" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_Id" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_ListingId" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_Ram" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_ScreenSize" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_Storage" Category="Contains" />
+    <Link Source="AndroidTablets" Target="AndroidTablets_Warranty" Category="Contains" />
+    <Link Source="AndroidTablets_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_AndroidTablets_Listings_ListingId" />
+    <Link Source="BeveragePreparations" Target="BeveragePreparations_Id" Category="Contains" />
+    <Link Source="BeveragePreparations" Target="BeveragePreparations_ListingId" Category="Contains" />
+    <Link Source="BeveragePreparations_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_BeveragePreparations_Listings_ListingId" />
+    <Link Source="Bookmarks" Target="Bookmarks_CreatedAt" Category="Contains" />
+    <Link Source="Bookmarks" Target="Bookmarks_Id" Category="Contains" />
+    <Link Source="Bookmarks" Target="Bookmarks_ListingId" Category="Contains" />
+    <Link Source="Bookmarks" Target="Bookmarks_UpdatedAt" Category="Contains" />
+    <Link Source="Bookmarks" Target="Bookmarks_UserId" Category="Contains" />
+    <Link Source="Bookmarks_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Bookmarks_Listings_ListingId" />
+    <Link Source="Bookmarks_UserId" Target="Users_Id" Category="Foreign Key" Label="FK_Bookmarks_Users_UserId" />
+    <Link Source="Cameras" Target="Cameras_Id" Category="Contains" />
+    <Link Source="Cameras" Target="Cameras_ListingId" Category="Contains" />
+    <Link Source="Cameras_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Cameras_Listings_ListingId" />
+    <Link Source="ComputerAccessorys" Target="ComputerAccessorys_Id" Category="Contains" />
+    <Link Source="ComputerAccessorys" Target="ComputerAccessorys_ListingId" Category="Contains" />
+    <Link Source="ComputerAccessorys_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_ComputerAccessorys_Listings_ListingId" />
+    <Link Source="ComputerBags" Target="ComputerBags_Id" Category="Contains" />
+    <Link Source="ComputerBags" Target="ComputerBags_ListingId" Category="Contains" />
+    <Link Source="ComputerBags_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_ComputerBags_Listings_ListingId" />
+    <Link Source="ComputerComponents" Target="ComputerComponents_Id" Category="Contains" />
+    <Link Source="ComputerComponents" Target="ComputerComponents_ListingId" Category="Contains" />
+    <Link Source="ComputerComponents_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_ComputerComponents_Listings_ListingId" />
+    <Link Source="Database" Target="dbo" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Gpu" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_GpuMemory" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Hdmi" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Id" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Keyboard" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_ListingId" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_MemorySpeed" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_OperatingSystem" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Processor" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Ram" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_RamType" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_ScreenSize" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Storage" Category="Contains" />
+    <Link Source="Desktops" Target="Desktops_Warranty" Category="Contains" />
+    <Link Source="Desktops_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Desktops_Listings_ListingId" />
+    <Link Source="Dishwashers" Target="Dishwashers_Capacity" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_Color" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_Dimensions" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_EnergyClass" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_Id" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_ListingId" Category="Contains" />
+    <Link Source="Dishwashers" Target="Dishwashers_Warranty" Category="Contains" />
+    <Link Source="Dishwashers_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Dishwashers_Listings_ListingId" />
+    <Link Source="EmailVerifications" Target="EmailVerifications_Code" Category="Contains" />
+    <Link Source="EmailVerifications" Target="EmailVerifications_Email" Category="Contains" />
+    <Link Source="EmailVerifications" Target="EmailVerifications_Expiration" Category="Contains" />
+    <Link Source="EmailVerifications" Target="EmailVerifications_Id" Category="Contains" />
+    <Link Source="FoodPreparations" Target="FoodPreparations_Id" Category="Contains" />
+    <Link Source="FoodPreparations" Target="FoodPreparations_ListingId" Category="Contains" />
+    <Link Source="FoodPreparations_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_FoodPreparations_Listings_ListingId" />
+    <Link Source="Fridges" Target="Fridges_Color" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_Dimensions" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_EnergyClass" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_Freezer" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_Id" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_ListingId" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_Volume" Category="Contains" />
+    <Link Source="Fridges" Target="Fridges_Warranty" Category="Contains" />
+    <Link Source="Fridges_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Fridges_Listings_ListingId" />
+    <Link Source="HeadphoneEarphones" Target="HeadphoneEarphones_Id" Category="Contains" />
+    <Link Source="HeadphoneEarphones" Target="HeadphoneEarphones_ListingId" Category="Contains" />
+    <Link Source="HeadphoneEarphones_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_HeadphoneEarphones_Listings_ListingId" />
+    <Link Source="HeatingCoolings" Target="HeatingCoolings_Id" Category="Contains" />
+    <Link Source="HeatingCoolings" Target="HeatingCoolings_ListingId" Category="Contains" />
+    <Link Source="HeatingCoolings_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_HeatingCoolings_Listings_ListingId" />
+    <Link Source="IOSPhones" Target="IOSPhones_BatteryPower" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_Camera" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_ChargingPort" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_FaceRecognition" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_Id" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_ListingId" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_Ram" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_ScreenSize" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_Storage" Category="Contains" />
+    <Link Source="IOSPhones" Target="IOSPhones_Warranty" Category="Contains" />
+    <Link Source="IOSPhones_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_IOSPhones_Listings_ListingId" />
+    <Link Source="IOSTablets" Target="IOSTablets_BatteryPower" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_Camera" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_ChargingPort" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_FaceRecognition" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_Id" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_ListingId" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_Ram" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_ScreenSize" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_Storage" Category="Contains" />
+    <Link Source="IOSTablets" Target="IOSTablets_Warranty" Category="Contains" />
+    <Link Source="IOSTablets_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_IOSTablets_Listings_ListingId" />
+    <Link Source="Irons" Target="Irons_Id" Category="Contains" />
+    <Link Source="Irons" Target="Irons_ListingId" Category="Contains" />
+    <Link Source="Irons_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Irons_Listings_ListingId" />
+    <Link Source="Keyboards" Target="Keyboards_Id" Category="Contains" />
+    <Link Source="Keyboards" Target="Keyboards_ListingId" Category="Contains" />
+    <Link Source="Keyboards_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Keyboards_Listings_ListingId" />
+    <Link Source="Laptops" Target="Laptops_Gpu" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_GpuMemory" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Hdmi" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Id" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Keyboard" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_ListingId" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_MemorySpeed" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_OperatingSystem" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Processor" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Ram" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_RamType" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_ScreenSize" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Storage" Category="Contains" />
+    <Link Source="Laptops" Target="Laptops_Warranty" Category="Contains" />
+    <Link Source="Laptops_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Laptops_Listings_ListingId" />
+    <Link Source="ListingImages" Target="ListingImages_CreatedAt" Category="Contains" />
+    <Link Source="ListingImages" Target="ListingImages_Id" Category="Contains" />
+    <Link Source="ListingImages" Target="ListingImages_ImagePath" Category="Contains" />
+    <Link Source="ListingImages" Target="ListingImages_IsMainImage" Category="Contains" />
+    <Link Source="ListingImages" Target="ListingImages_ListingId" Category="Contains" />
+    <Link Source="ListingImages" Target="ListingImages_UpdatedAt" Category="Contains" />
+    <Link Source="ListingImages_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_ListingImages_Listings_ListingId" />
+    <Link Source="Listings" Target="Listings_Category" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Condition" Category="Contains" />
+    <Link Source="Listings" Target="Listings_CreatedAt" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Description" Category="Contains" />
+    <Link Source="Listings" Target="Listings_DetailCategory" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Id" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Location" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Price" Category="Contains" />
+    <Link Source="Listings" Target="Listings_RejectionReason" Category="Contains" />
+    <Link Source="Listings" Target="Listings_SellerId" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Status" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Stock" Category="Contains" />
+    <Link Source="Listings" Target="Listings_SubCategory" Category="Contains" />
+    <Link Source="Listings" Target="Listings_Title" Category="Contains" />
+    <Link Source="Listings" Target="Listings_UpdatedAt" Category="Contains" />
+    <Link Source="Listings" Target="Listings_ViewCount" Category="Contains" />
+    <Link Source="Listings_SellerId" Target="Users_Id" Category="Foreign Key" Label="FK_Listings_Users_SellerId" />
+    <Link Source="Messages" Target="Messages_Content" Category="Contains" />
+    <Link Source="Messages" Target="Messages_CreatedAt" Category="Contains" />
+    <Link Source="Messages" Target="Messages_Id" Category="Contains" />
+    <Link Source="Messages" Target="Messages_IsRead" Category="Contains" />
+    <Link Source="Messages" Target="Messages_ListingId" Category="Contains" />
+    <Link Source="Messages" Target="Messages_ReceiverId" Category="Contains" />
+    <Link Source="Messages" Target="Messages_SenderId" Category="Contains" />
+    <Link Source="Messages" Target="Messages_UpdatedAt" Category="Contains" />
+    <Link Source="Messages_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Messages_Listings_ListingId" />
+    <Link Source="Messages_ReceiverId" Target="Users_Id" Category="Foreign Key" Label="FK_Messages_Users_ReceiverId" />
+    <Link Source="Messages_SenderId" Target="Users_Id" Category="Foreign Key" Label="FK_Messages_Users_SenderId" />
+    <Link Source="Microphones" Target="Microphones_Id" Category="Contains" />
+    <Link Source="Microphones" Target="Microphones_ListingId" Category="Contains" />
+    <Link Source="Microphones_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Microphones_Listings_ListingId" />
+    <Link Source="MicrowaveOvens" Target="MicrowaveOvens_Id" Category="Contains" />
+    <Link Source="MicrowaveOvens" Target="MicrowaveOvens_ListingId" Category="Contains" />
+    <Link Source="MicrowaveOvens_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_MicrowaveOvens_Listings_ListingId" />
+    <Link Source="Monitors" Target="Monitors_Id" Category="Contains" />
+    <Link Source="Monitors" Target="Monitors_ListingId" Category="Contains" />
+    <Link Source="Monitors_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Monitors_Listings_ListingId" />
+    <Link Source="Mouses" Target="Mouses_Id" Category="Contains" />
+    <Link Source="Mouses" Target="Mouses_ListingId" Category="Contains" />
+    <Link Source="Mouses_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Mouses_Listings_ListingId" />
+    <Link Source="Notifications" Target="Notifications_CreatedAt" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_Id" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_IsRead" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_Message" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_RelatedEntityId" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_Type" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_UpdatedAt" Category="Contains" />
+    <Link Source="Notifications" Target="Notifications_UserId" Category="Contains" />
+    <Link Source="Notifications_UserId" Target="Users_Id" Category="Foreign Key" Label="FK_Notifications_Users_UserId" />
+    <Link Source="Offers" Target="Offers_BuyerId" Category="Contains" />
+    <Link Source="Offers" Target="Offers_CreatedAt" Category="Contains" />
+    <Link Source="Offers" Target="Offers_Id" Category="Contains" />
+    <Link Source="Offers" Target="Offers_IsCounterOffer" Category="Contains" />
+    <Link Source="Offers" Target="Offers_ListingId" Category="Contains" />
+    <Link Source="Offers" Target="Offers_Message" Category="Contains" />
+    <Link Source="Offers" Target="Offers_MessageId" Category="Contains" />
+    <Link Source="Offers" Target="Offers_OfferAmount" Category="Contains" />
+    <Link Source="Offers" Target="Offers_OriginalOfferId" Category="Contains" />
+    <Link Source="Offers" Target="Offers_ResponseDate" Category="Contains" />
+    <Link Source="Offers" Target="Offers_Status" Category="Contains" />
+    <Link Source="Offers" Target="Offers_UpdatedAt" Category="Contains" />
+    <Link Source="Offers_BuyerId" Target="Users_Id" Category="Foreign Key" Label="FK_Offers_Users_BuyerId" />
+    <Link Source="Offers_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Offers_Listings_ListingId" />
+    <Link Source="Offers_MessageId" Target="Messages_Id" Category="Foreign Key" Label="FK_Offers_Messages_MessageId" />
+    <Link Source="Offers_OriginalOfferId" Target="Offers_Id" Category="Foreign Key" Label="FK_Offers_Offers_OriginalOfferId" />
+    <Link Source="OtherPhones" Target="OtherPhones_BatteryPower" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_Camera" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_ChargingPort" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_FaceRecognition" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_Id" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_ListingId" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_Ram" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_ScreenSize" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_Storage" Category="Contains" />
+    <Link Source="OtherPhones" Target="OtherPhones_Warranty" Category="Contains" />
+    <Link Source="OtherPhones_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_OtherPhones_Listings_ListingId" />
+    <Link Source="OtherTablets" Target="OtherTablets_BatteryPower" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_Camera" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_ChargingPort" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_FaceRecognition" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_Id" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_ListingId" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_Ram" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_ScreenSize" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_Storage" Category="Contains" />
+    <Link Source="OtherTablets" Target="OtherTablets_Warranty" Category="Contains" />
+    <Link Source="OtherTablets_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_OtherTablets_Listings_ListingId" />
+    <Link Source="Others" Target="Others_Id" Category="Contains" />
+    <Link Source="Others" Target="Others_ListingId" Category="Contains" />
+    <Link Source="Others_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Others_Listings_ListingId" />
+    <Link Source="Ovens" Target="Ovens_Color" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_Dimensions" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_EnergyClass" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_Id" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_ListingId" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_Timer" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_Volume" Category="Contains" />
+    <Link Source="Ovens" Target="Ovens_Warranty" Category="Contains" />
+    <Link Source="Ovens_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Ovens_Listings_ListingId" />
+    <Link Source="PhoneAccessorys" Target="PhoneAccessorys_Id" Category="Contains" />
+    <Link Source="PhoneAccessorys" Target="PhoneAccessorys_ListingId" Category="Contains" />
+    <Link Source="PhoneAccessorys_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_PhoneAccessorys_Listings_ListingId" />
+    <Link Source="ProductReviews" Target="ProductReviews_Comment" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_CreatedAt" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_Id" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_IsVerifiedPurchase" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_ListingId" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_Rating" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_UpdatedAt" Category="Contains" />
+    <Link Source="ProductReviews" Target="ProductReviews_UserId" Category="Contains" />
+    <Link Source="ProductReviews_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_ProductReviews_Listings_ListingId" />
+    <Link Source="ProductReviews_UserId" Target="Users_Id" Category="Foreign Key" Label="FK_ProductReviews_Users_UserId" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_BuyerReceivedProduct" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_CreatedAt" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_Id" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_PaymentReleased" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_PaymentReleasedDate" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_PurchaseId" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_ReceiptConfirmedDate" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_SellerShippedProduct" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_ShippingConfirmedDate" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_ShippingProvider" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_TrackingNumber" Category="Contains" />
+    <Link Source="PurchaseConfirmations" Target="PurchaseConfirmations_UpdatedAt" Category="Contains" />
+    <Link Source="PurchaseConfirmations_PurchaseId" Target="Purchases_Id" Category="Foreign Key" Label="FK_PurchaseConfirmations_Purchases_PurchaseId" />
+    <Link Source="Purchases" Target="Purchases_Amount" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_BuyerId" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_CardholderName" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_CreatedAt" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_Id" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_LastFourDigits" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_ListingId" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_OfferId" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_PaymentStatus" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_Quantity" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_ShippingAddress" Category="Contains" />
+    <Link Source="Purchases" Target="Purchases_UpdatedAt" Category="Contains" />
+    <Link Source="Purchases_BuyerId" Target="Users_Id" Category="Foreign Key" Label="FK_Purchases_Users_BuyerId" />
+    <Link Source="Purchases_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Purchases_Listings_ListingId" />
+    <Link Source="Purchases_OfferId" Target="Offers_Id" Category="Foreign Key" Label="FK_Purchases_Offers_OfferId" />
+    <Link Source="SellerRatings" Target="SellerRatings_BuyerId" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_CreatedAt" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_Id" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_PurchaseId" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_Rating" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_SellerId" Category="Contains" />
+    <Link Source="SellerRatings" Target="SellerRatings_UpdatedAt" Category="Contains" />
+    <Link Source="SellerRatings_BuyerId" Target="Users_Id" Category="Foreign Key" Label="FK_SellerRatings_Users_BuyerId" />
+    <Link Source="SellerRatings_PurchaseId" Target="Purchases_Id" Category="Foreign Key" Label="FK_SellerRatings_Purchases_PurchaseId" />
+    <Link Source="SellerRatings_SellerId" Target="Users_Id" Category="Foreign Key" Label="FK_SellerRatings_Users_SellerId" />
+    <Link Source="SewingMachines" Target="SewingMachines_Id" Category="Contains" />
+    <Link Source="SewingMachines" Target="SewingMachines_ListingId" Category="Contains" />
+    <Link Source="SewingMachines_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_SewingMachines_Listings_ListingId" />
+    <Link Source="SpareParts" Target="SpareParts_Id" Category="Contains" />
+    <Link Source="SpareParts" Target="SpareParts_ListingId" Category="Contains" />
+    <Link Source="SpareParts_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_SpareParts_Listings_ListingId" />
+    <Link Source="Speakers" Target="Speakers_Id" Category="Contains" />
+    <Link Source="Speakers" Target="Speakers_ListingId" Category="Contains" />
+    <Link Source="Speakers_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Speakers_Listings_ListingId" />
+    <Link Source="Stoves" Target="Stoves_Id" Category="Contains" />
+    <Link Source="Stoves" Target="Stoves_ListingId" Category="Contains" />
+    <Link Source="Stoves_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Stoves_Listings_ListingId" />
+    <Link Source="TabletAccessorys" Target="TabletAccessorys_Id" Category="Contains" />
+    <Link Source="TabletAccessorys" Target="TabletAccessorys_ListingId" Category="Contains" />
+    <Link Source="TabletAccessorys_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_TabletAccessorys_Listings_ListingId" />
+    <Link Source="Televisions" Target="Televisions_DisplayTechnology" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_Hdmi" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_Id" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_ListingId" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_Resolution" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_ScreenSize" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_SmartTV" Category="Contains" />
+    <Link Source="Televisions" Target="Televisions_Warranty" Category="Contains" />
+    <Link Source="Televisions_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Televisions_Listings_ListingId" />
+    <Link Source="UserRatings" Target="UserRatings_Comment" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_CreatedAt" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_Id" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_RatedUserId" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_RaterId" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_Rating" Category="Contains" />
+    <Link Source="UserRatings" Target="UserRatings_UpdatedAt" Category="Contains" />
+    <Link Source="UserRatings_RatedUserId" Target="Users_Id" Category="Foreign Key" Label="FK_UserRatings_Users_RatedUserId" />
+    <Link Source="UserRatings_RaterId" Target="Users_Id" Category="Foreign Key" Label="FK_UserRatings_Users_RaterId" />
+    <Link Source="Users" Target="Users_CreatedAt" Category="Contains" />
+    <Link Source="Users" Target="Users_Email" Category="Contains" />
+    <Link Source="Users" Target="Users_FirstName" Category="Contains" />
+    <Link Source="Users" Target="Users_Id" Category="Contains" />
+    <Link Source="Users" Target="Users_IsAdmin" Category="Contains" />
+    <Link Source="Users" Target="Users_IsEmailVerified" Category="Contains" />
+    <Link Source="Users" Target="Users_IsIdVerified" Category="Contains" />
+    <Link Source="Users" Target="Users_LastName" Category="Contains" />
+    <Link Source="Users" Target="Users_PasswordHash" Category="Contains" />
+    <Link Source="Users" Target="Users_PhoneNumber" Category="Contains" />
+    <Link Source="Users" Target="Users_ProfileImagePath" Category="Contains" />
+    <Link Source="Users" Target="Users_UpdatedAt" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_CableLength" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_DustContainer" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_Id" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_ListingId" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_Power" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_Warranty" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_WaterContainer" Category="Contains" />
+    <Link Source="VacuumCleaners" Target="VacuumCleaners_Weight" Category="Contains" />
+    <Link Source="VacuumCleaners_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_VacuumCleaners_Listings_ListingId" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_BackImagePath" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_CreatedAt" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_FaceImagePath" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_FrontImagePath" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_Id" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_RejectionReason" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_Status" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_UpdatedAt" Category="Contains" />
+    <Link Source="VerificationDocuments" Target="VerificationDocuments_UserId" Category="Contains" />
+    <Link Source="VerificationDocuments_UserId" Target="Users_Id" Category="Foreign Key" Label="FK_VerificationDocuments_Users_UserId" />
+    <Link Source="Washers" Target="Washers_Capacity" Category="Contains" />
+    <Link Source="Washers" Target="Washers_Color" Category="Contains" />
+    <Link Source="Washers" Target="Washers_Dimensions" Category="Contains" />
+    <Link Source="Washers" Target="Washers_EnergyClass" Category="Contains" />
+    <Link Source="Washers" Target="Washers_Id" Category="Contains" />
+    <Link Source="Washers" Target="Washers_ListingId" Category="Contains" />
+    <Link Source="Washers" Target="Washers_Warranty" Category="Contains" />
+    <Link Source="Washers_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Washers_Listings_ListingId" />
+    <Link Source="Webcams" Target="Webcams_Id" Category="Contains" />
+    <Link Source="Webcams" Target="Webcams_ListingId" Category="Contains" />
+    <Link Source="Webcams_ListingId" Target="Listings_Id" Category="Foreign Key" Label="FK_Webcams_Listings_ListingId" />
+    <Link Source="dbo" Target="AdminActions" Category="Contains" />
+    <Link Source="dbo" Target="Admins" Category="Contains" />
+    <Link Source="dbo" Target="AndroidPhones" Category="Contains" />
+    <Link Source="dbo" Target="AndroidTablets" Category="Contains" />
+    <Link Source="dbo" Target="BeveragePreparations" Category="Contains" />
+    <Link Source="dbo" Target="Bookmarks" Category="Contains" />
+    <Link Source="dbo" Target="Cameras" Category="Contains" />
+    <Link Source="dbo" Target="ComputerAccessorys" Category="Contains" />
+    <Link Source="dbo" Target="ComputerBags" Category="Contains" />
+    <Link Source="dbo" Target="ComputerComponents" Category="Contains" />
+    <Link Source="dbo" Target="Desktops" Category="Contains" />
+    <Link Source="dbo" Target="Dishwashers" Category="Contains" />
+    <Link Source="dbo" Target="EmailVerifications" Category="Contains" />
+    <Link Source="dbo" Target="FoodPreparations" Category="Contains" />
+    <Link Source="dbo" Target="Fridges" Category="Contains" />
+    <Link Source="dbo" Target="HeadphoneEarphones" Category="Contains" />
+    <Link Source="dbo" Target="HeatingCoolings" Category="Contains" />
+    <Link Source="dbo" Target="IOSPhones" Category="Contains" />
+    <Link Source="dbo" Target="IOSTablets" Category="Contains" />
+    <Link Source="dbo" Target="Irons" Category="Contains" />
+    <Link Source="dbo" Target="Keyboards" Category="Contains" />
+    <Link Source="dbo" Target="Laptops" Category="Contains" />
+    <Link Source="dbo" Target="ListingImages" Category="Contains" />
+    <Link Source="dbo" Target="Listings" Category="Contains" />
+    <Link Source="dbo" Target="Messages" Category="Contains" />
+    <Link Source="dbo" Target="Microphones" Category="Contains" />
+    <Link Source="dbo" Target="MicrowaveOvens" Category="Contains" />
+    <Link Source="dbo" Target="Monitors" Category="Contains" />
+    <Link Source="dbo" Target="Mouses" Category="Contains" />
+    <Link Source="dbo" Target="Notifications" Category="Contains" />
+    <Link Source="dbo" Target="Offers" Category="Contains" />
+    <Link Source="dbo" Target="OtherPhones" Category="Contains" />
+    <Link Source="dbo" Target="OtherTablets" Category="Contains" />
+    <Link Source="dbo" Target="Others" Category="Contains" />
+    <Link Source="dbo" Target="Ovens" Category="Contains" />
+    <Link Source="dbo" Target="PhoneAccessorys" Category="Contains" />
+    <Link Source="dbo" Target="ProductReviews" Category="Contains" />
+    <Link Source="dbo" Target="PurchaseConfirmations" Category="Contains" />
+    <Link Source="dbo" Target="Purchases" Category="Contains" />
+    <Link Source="dbo" Target="SellerRatings" Category="Contains" />
+    <Link Source="dbo" Target="SewingMachines" Category="Contains" />
+    <Link Source="dbo" Target="SpareParts" Category="Contains" />
+    <Link Source="dbo" Target="Speakers" Category="Contains" />
+    <Link Source="dbo" Target="Stoves" Category="Contains" />
+    <Link Source="dbo" Target="TabletAccessorys" Category="Contains" />
+    <Link Source="dbo" Target="Televisions" Category="Contains" />
+    <Link Source="dbo" Target="UserRatings" Category="Contains" />
+    <Link Source="dbo" Target="Users" Category="Contains" />
+    <Link Source="dbo" Target="VacuumCleaners" Category="Contains" />
+    <Link Source="dbo" Target="VerificationDocuments" Category="Contains" />
+    <Link Source="dbo" Target="Washers" Category="Contains" />
+    <Link Source="dbo" Target="Webcams" Category="Contains" />
+  </Links>
+  <Categories>
+    <Category Id="Contains" Label="İçerir" Description="Bağlantı kaynağının hedef nesneyi içerip içermediği" CanBeDataDriven="False" CanLinkedNodesBeDataDriven="True" IncomingActionLabel="İçeren" IsContainment="True" OutgoingActionLabel="İçerir" />
+    <Category Id="Database" />
+    <Category Id="FK" />
+    <Category Id="Foreign Key" />
+    <Category Id="NOT NULL" />
+    <Category Id="NULL" />
+    <Category Id="PK" />
+    <Category Id="Schema" />
+    <Category Id="Table" />
+  </Categories>
+  <Properties>
+    <Property Id="Bounds" DataType="System.Windows.Rect" />
+    <Property Id="CanBeDataDriven" Label="CanBeDataDriven" Description="CanBeDataDriven" DataType="System.Boolean" />
+    <Property Id="CanLinkedNodesBeDataDriven" Label="CanLinkedNodesBeDataDriven" Description="CanLinkedNodesBeDataDriven" DataType="System.Boolean" />
+    <Property Id="Description" Label="Açıklama" Description="Açıklama" DataType="System.String" />
+    <Property Id="Expression" DataType="System.String" />
+    <Property Id="GraphDirection" DataType="Microsoft.VisualStudio.Diagrams.Layout.LayoutOrientation" />
+    <Property Id="Group" Label="Grup" Description="Düğümü grup olarak göster" DataType="Microsoft.VisualStudio.GraphModel.GraphGroupStyle" />
+    <Property Id="GroupLabel" DataType="System.String" />
+    <Property Id="IncomingActionLabel" Label="IncomingActionLabel" Description="IncomingActionLabel" DataType="System.String" />
+    <Property Id="IsContainment" DataType="System.Boolean" />
+    <Property Id="IsEnabled" DataType="System.Boolean" />
+    <Property Id="Label" Label="Etiket" Description="Annotatable nesnesinin görüntülenebilir etiketi" DataType="System.String" />
+    <Property Id="OutgoingActionLabel" Label="OutgoingActionLabel" Description="OutgoingActionLabel" DataType="System.String" />
+    <Property Id="TargetType" DataType="System.Type" />
+    <Property Id="Value" DataType="System.String" />
+    <Property Id="ValueLabel" DataType="System.String" />
+    <Property Id="ZoomLevel" DataType="System.String" />
+  </Properties>
+  <Styles>
+    <Style TargetType="Node" GroupLabel="Table" ValueLabel="True">
+      <Condition Expression="HasCategory('Table')" />
+      <Setter Property="Background" Value="#FFC0C0C0" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Schema" ValueLabel="True">
+      <Condition Expression="HasCategory('Schema')" />
+      <Setter Property="Background" Value="#FF7F9169" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="PK" ValueLabel="True">
+      <Condition Expression="HasCategory('PK')" />
+      <Setter Property="Background" Value="#FF008000" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="NULL" ValueLabel="True">
+      <Condition Expression="HasCategory('NULL')" />
+      <Setter Property="Background" Value="#FF808040" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="FK" ValueLabel="True">
+      <Condition Expression="HasCategory('FK')" />
+      <Setter Property="Background" Value="#FF8080FF" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="NOT NULL" ValueLabel="True">
+      <Condition Expression="HasCategory('NOT NULL')" />
+      <Setter Property="Background" Value="#FFC0A000" />
+    </Style>
+    <Style TargetType="Node" GroupLabel="Database" ValueLabel="True">
+      <Condition Expression="HasCategory('Database')" />
+      <Setter Property="Background" Value="#FFFFFFFF" />
+    </Style>
+  </Styles>
+</DirectedGraph>

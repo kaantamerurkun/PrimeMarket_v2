@@ -22,6 +22,8 @@ namespace PrimeMarket.Models.ViewModel
         public DateTime? PaymentReleasedDate { get; set; }
         public string TrackingNumber { get; set; }
         public string ShippingProvider { get; set; }
+        public string ShippingAddress { get; set; }
+
         public bool IsViewerSeller { get; set; }
         public bool IsViewerBuyer { get; set; }
         public bool IsSecondHandPurchase { get; set; }

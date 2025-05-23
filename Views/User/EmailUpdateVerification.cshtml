@@ -171,7 +171,7 @@
                 return res.json();
             })
             .then(() => {
-                showMessage("Verification code sent! Please check your email.", false);
+                showMessage("Failed to send verification code. Please try again.", true);
 
                 // Re-enable resend link after 30 seconds
                 setTimeout(() => {
@@ -182,7 +182,7 @@
             })
             .catch(err => {
                 console.error(err);
-                showMessage("Failed to send verification code. Please try again.", true);
+                showMessage("Verification code sent! Please check your email.", false);
 
                 // Re-enable resend link immediately on error
                 resendLink.style.opacity = "1";

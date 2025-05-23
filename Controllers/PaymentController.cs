@@ -941,6 +941,7 @@ namespace PrimeMarket.Controllers
                 PaymentReleasedDate = purchase.Confirmation.PaymentReleasedDate,
                 TrackingNumber = purchase.Confirmation.TrackingNumber,
                 ShippingProvider = purchase.Confirmation.ShippingProvider,
+                ShippingAddress = purchase.ShippingAddress,
                 IsViewerSeller = purchase.Listing.SellerId == userId,
                 IsViewerBuyer = purchase.BuyerId == userId,
                 IsSecondHandPurchase = isSecondHand,
