@@ -884,6 +884,8 @@ namespace PrimeMarket.Controllers
             return View(model);
         }
 
+        // Update the PurchaseStatus action in PaymentController.cs
+
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> PurchaseStatus(int purchaseId)
@@ -933,14 +935,14 @@ namespace PrimeMarket.Controllers
                 PurchaseDate = purchase.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = purchase.PaymentStatus,
                 IsFirstHand = !isSecondHand,
-                SellerShippedProduct = purchase.Confirmation.SellerShippedProduct,
-                ShippingConfirmedDate = purchase.Confirmation.ShippingConfirmedDate,
-                BuyerReceivedProduct = purchase.Confirmation.BuyerReceivedProduct,
-                ReceiptConfirmedDate = purchase.Confirmation.ReceiptConfirmedDate,
-                PaymentReleased = purchase.Confirmation.PaymentReleased,
-                PaymentReleasedDate = purchase.Confirmation.PaymentReleasedDate,
-                TrackingNumber = purchase.Confirmation.TrackingNumber,
-                ShippingProvider = purchase.Confirmation.ShippingProvider,
+                SellerShippedProduct = purchase.Confirmation?.SellerShippedProduct ?? false,
+                ShippingConfirmedDate = purchase.Confirmation?.ShippingConfirmedDate,
+                BuyerReceivedProduct = purchase.Confirmation?.BuyerReceivedProduct ?? false,
+                ReceiptConfirmedDate = purchase.Confirmation?.ReceiptConfirmedDate,
+                PaymentReleased = purchase.Confirmation?.PaymentReleased ?? false,
+                PaymentReleasedDate = purchase.Confirmation?.PaymentReleasedDate,
+                TrackingNumber = purchase.Confirmation?.TrackingNumber,
+                ShippingProvider = purchase.Confirmation?.ShippingProvider,
                 ShippingAddress = purchase.ShippingAddress,
                 IsViewerSeller = purchase.Listing.SellerId == userId,
                 IsViewerBuyer = purchase.BuyerId == userId,
@@ -1317,6 +1319,147 @@ namespace PrimeMarket.Controllers
 
             return Json(new { success = true });
         }
+        // Add this method to PaymentController.cs
 
+        // Add this method to PaymentController.cs
+
+        [HttpPost]
+        [UserAuthenticationFilter]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CancelPurchase(int purchaseId)
+        {
+            var userId = HttpContext.Session.GetInt32("UserId");
+            if (userId == null)
+            {
+                return RedirectToAction("Login", "User");
+            }
+
+            try
+            {
+                var purchase = await _context.Purchases
+                    .Include(p => p.Listing)
+                    .Include(p => p.Buyer)
+                    .Include(p => p.Confirmation)
+                    .Include(p => p.Offer)
+                    .FirstOrDefaultAsync(p => p.Id == purchaseId);
+
+                if (purchase == null)
+                {
+                    TempData["ErrorMessage"] = "Purchase not found.";
+                    return RedirectToAction("MyPurchase");
+                }
+
+                // Check if the user is either the buyer or the seller
+                bool isBuyer = purchase.BuyerId == userId;
+                bool isSeller = purchase.Listing.SellerId == userId;
+
+                if (!isBuyer && !isSeller)
+                {
+                    TempData["ErrorMessage"] = "You don't have permission to cancel this purchase.";
+                    return RedirectToAction("MyPurchase");
+                }
+
+                // Check if purchase can be cancelled (only if not yet shipped)
+                if (purchase.Confirmation?.SellerShippedProduct == true)
+                {
+                    TempData["ErrorMessage"] = "Cannot cancel purchase after item has been shipped.";
+                    return RedirectToAction("PurchaseStatus", new { purchaseId });
+                }
+
+                // Check if payment has already been completed
+                if (purchase.PaymentStatus == PaymentStatus.Completed)
+                {
+                    TempData["ErrorMessage"] = "Cannot cancel a completed purchase.";
+                    return RedirectToAction("PurchaseStatus", new { purchaseId });
+                }
+
+                // Update purchase status
+                purchase.PaymentStatus = PaymentStatus.Refunded;
+                purchase.UpdatedAt = DateTime.UtcNow;
+
+                // Handle first-hand listings - restore stock
+                if (purchase.Listing.Condition == "First-Hand")
+                {
+                    if (purchase.Listing.Stock.HasValue)
+                    {
+                        purchase.Listing.Stock += purchase.Quantity;
+                    }
+                    else
+                    {
+                        purchase.Listing.Stock = purchase.Quantity;
+                    }
+
+                    // If listing was marked as sold due to stock being 0, reactivate it
+                    if (purchase.Listing.Status == ListingStatus.Sold)
+                    {
+                        purchase.Listing.Status = ListingStatus.Active;
+                    }
+                }
+                else if (purchase.Listing.Condition == "Second-Hand")
+                {
+                    // For second-hand items, reactivate the listing
+                    if (purchase.Listing.Status == ListingStatus.Sold)
+                    {
+                        purchase.Listing.Status = ListingStatus.Active;
+                    }
+
+                    // Update the related offer status if exists
+                    if (purchase.Offer != null)
+                    {
+                        purchase.Offer.Status = OfferStatus.Cancelled;
+                        purchase.Offer.UpdatedAt = DateTime.UtcNow;
+                    }
+                }
+
+                purchase.Listing.UpdatedAt = DateTime.UtcNow;
+
+                // Create notifications for both parties
+                var buyerNotification = new Notification
+                {
+                    UserId = purchase.BuyerId,
+                    Message = $"Your purchase of '{purchase.Listing.Title}' has been cancelled. Payment will be refunded.",
+                    Type = NotificationType.PurchaseCancelled,
+                    RelatedEntityId = purchaseId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                var sellerNotification = new Notification
+                {
+                    UserId = purchase.Listing.SellerId,
+                    Message = $"The purchase of your listing '{purchase.Listing.Title}' has been cancelled.",
+                    Type = NotificationType.PurchaseCancelled,
+                    RelatedEntityId = purchaseId,
+                    CreatedAt = DateTime.UtcNow
+                };
+
+                _context.Notifications.Add(buyerNotification);
+                _context.Notifications.Add(sellerNotification);
+
+                // Create messages in the conversation
+                var cancelMessage = new Message
+                {
+                    SenderId = userId.Value,
+                    ReceiverId = isBuyer ? purchase.Listing.SellerId : purchase.BuyerId,
+                    ListingId = purchase.ListingId,
+                    Content = $"The purchase of this item has been cancelled. {(purchase.Listing.Condition == "First-Hand" ? $"Stock has been restored ({purchase.Quantity} {(purchase.Quantity > 1 ? "units" : "unit")})." : "The offer has been cancelled.")}",
+                    IsRead = false,
+                    CreatedAt = DateTime.UtcNow
+                };
+                _context.Messages.Add(cancelMessage);
+
+                await _context.SaveChangesAsync();
+
+                string userType = isBuyer ? "buyer" : "seller";
+                TempData["SuccessMessage"] = $"Purchase has been cancelled successfully as {userType}. {(purchase.Listing.Condition == "First-Hand" ? "Stock has been restored." : "")}";
+
+                return RedirectToAction("PurchaseStatus", new { purchaseId });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error cancelling purchase");
+                TempData["ErrorMessage"] = "An error occurred while cancelling the purchase: " + ex.Message;
+                return RedirectToAction("PurchaseStatus", new { purchaseId });
+            }
+        }
     }
 }

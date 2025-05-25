@@ -17,6 +17,7 @@ namespace PrimeMarket.Models.Enum
         VerificationRejected,
         PurchaseCompleted,
         OfferCancelled,
-        ListingUpdated
+        ListingUpdated,
+        PurchaseCancelled  // New notification type for purchase cancellation
     }
 }

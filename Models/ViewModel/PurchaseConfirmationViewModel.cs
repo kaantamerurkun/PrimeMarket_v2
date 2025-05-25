@@ -1,4 +1,6 @@
-﻿using PrimeMarket.Models.Enum;
+﻿// Update PurchaseConfirmationViewModel.cs with additional properties
+
+using PrimeMarket.Models.Enum;
 
 namespace PrimeMarket.Models.ViewModel
 {
@@ -31,10 +33,14 @@ namespace PrimeMarket.Models.ViewModel
         public int Quantity { get; set; } = 1; // Default to 1
 
         // Helper property to calculate unit price
-
-        
-
-        // Helper property to calculate unit price
         public decimal UnitPrice => Quantity > 0 ? Amount / Quantity : Amount;
+
+        // Helper property to check if purchase is cancelled
+        public bool IsCancelled => PaymentStatus == PaymentStatus.Refunded;
+
+        // Helper property to check if purchase can be cancelled
+        public bool CanBeCancelled => PaymentStatus != PaymentStatus.Completed &&
+                                      PaymentStatus != PaymentStatus.Refunded &&
+                                      !SellerShippedProduct;
     }
 }

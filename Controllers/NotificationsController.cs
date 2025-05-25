@@ -245,6 +245,8 @@ namespace PrimeMarket.Controllers
                                           .ToListAsync();
             return View(notifications);
         }
+        // Update the Details action in NotificationsController.cs to handle PurchaseCancelled
+
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> Details(int id)
@@ -289,6 +291,7 @@ namespace PrimeMarket.Controllers
                 case NotificationType.NewOffer:
                 case NotificationType.OfferAccepted:
                 case NotificationType.OfferRejected:
+                case NotificationType.OfferCancelled:
                     var offer = await _context.Offers.FirstOrDefaultAsync(o => o.Id == notification.RelatedEntityId);
                     return RedirectToAction("Details", "Listing", new { id = offer?.ListingId ?? notification.RelatedEntityId });
                 case NotificationType.VerificationApproved:
@@ -304,17 +307,12 @@ namespace PrimeMarket.Controllers
                     }
                     return RedirectToAction("MyProfilePage", "User");
                 case NotificationType.PurchaseCompleted:
+                case NotificationType.PurchaseCancelled: // Handle cancelled purchases
                     var purchase = await _context.Purchases.FindAsync(notification.RelatedEntityId);
                     if (purchase != null)
                     {
-                        if (purchase.BuyerId == userId)
-                        {
-                            return RedirectToAction("PurchaseComplete", "Payment", new { purchaseId = purchase.Id });
-                        }
-                        else
-                        {
-                            return RedirectToAction("MySales", "Payment");
-                        }
+                        // Always redirect to PurchaseStatus for both completed and cancelled purchases
+                        return RedirectToAction("PurchaseStatus", "Payment", new { purchaseId = purchase.Id });
                     }
                     break;
             }
