@@ -14,11 +14,9 @@
 
     };
 
-    // Store references to open menus for better control
     let openMainMenu = null;
     let openSubMenu = null;
 
-    // Track the active filter for listings
     let activeFilter = {
         category: null,
         subcategory: null,
@@ -60,7 +58,6 @@
                     subLi.style.whiteSpace = "nowrap";
                     subLi.style.cursor = "pointer";
 
-                    // Add hover effect
                     subLi.addEventListener('mouseover', () => {
                         subLi.style.backgroundColor = '#f0f7ff';
                     });
@@ -68,7 +65,6 @@
                         subLi.style.backgroundColor = '';
                     });
 
-                    // Add click event for filtering
                     subLi.addEventListener('click', (e) => {
                         e.stopPropagation();
                         activeFilter = {
@@ -94,7 +90,6 @@
                     innerLi.style.position = "relative";
                     innerLi.style.cursor = "pointer";
 
-                    // Add hover effect
                     innerLi.addEventListener('mouseover', () => {
                         innerLi.style.backgroundColor = '#f0f7ff';
                     });
@@ -129,7 +124,6 @@
                             detailLi.style.whiteSpace = "nowrap";
                             detailLi.style.cursor = "pointer";
 
-                            // Add hover effect
                             detailLi.addEventListener('mouseover', () => {
                                 detailLi.style.backgroundColor = '#f0f7ff';
                             });
@@ -137,7 +131,6 @@
                                 detailLi.style.backgroundColor = '';
                             });
 
-                            // Add click event for filtering
                             detailLi.addEventListener('click', (e) => {
                                 e.stopPropagation();
                                 activeFilter = {
@@ -156,18 +149,14 @@
 
                         innerLi.addEventListener("mouseover", (e) => {
                             e.stopPropagation();
-                            // Close any previously open sub-menu
                             if (openSubMenu && openSubMenu !== deepUl) {
                                 openSubMenu.style.display = "none";
                             }
-                            // Show this sub-menu
                             deepUl.style.display = "block";
-                            // Update reference to open sub-menu
                             openSubMenu = deepUl;
                         });
                     }
 
-                    // Add click event for filtering when there are no detail categories
                     if (!Array.isArray(subItems[key]) || subItems[key].length === 0) {
                         innerLi.addEventListener('click', (e) => {
                             e.stopPropagation();
@@ -189,27 +178,21 @@
 
             li.addEventListener("mouseover", (e) => {
                 e.stopPropagation();
-                // Close any previously open main menu
                 if (openMainMenu && openMainMenu !== ul) {
                     openMainMenu.style.display = "none";
-                    // Also close any open sub-menu
                     if (openSubMenu) {
                         openSubMenu.style.display = "none";
                         openSubMenu = null;
                     }
                 }
-                // Show this menu
                 ul.style.display = "block";
-                // Update reference to open main menu
                 openMainMenu = ul;
             });
         }
 
-        // Add click event for filtering at the top category level
         if (level === 'main') {
             li.addEventListener('click', (e) => {
                 e.stopPropagation();
-                // Only apply filter if it doesn't have sub-items or they're empty
                 if (!subItems || Object.keys(subItems).length === 0) {
                     activeFilter = {
                         category: name,
@@ -222,10 +205,8 @@
             });
         }
 
-        // Add hover effect for main items
         if (level === 'main') {
             li.addEventListener('mouseover', () => {
-/*                li.style.color = '#0066cc';*/
             });
             li.addEventListener('mouseout', () => {
                 li.style.color = '';
@@ -238,10 +219,8 @@
     function loadCategories() {
         const mainCategoryList = document.getElementById("mainCategories");
         if (mainCategoryList) {
-            // Clear existing items
             mainCategoryList.innerHTML = '';
 
-            // Add "All Categories" option
             const allCategoriesItem = document.createElement("li");
             allCategoriesItem.textContent = "All Categories";
             allCategoriesItem.style.cursor = "pointer";
@@ -263,7 +242,6 @@
             });
             mainCategoryList.appendChild(allCategoriesItem);
 
-            // Add category items
             Object.entries(allCategories).forEach(([name, subs]) => {
                 const item = createDropdownItem(name, subs);
                 mainCategoryList.appendChild(item);
@@ -288,22 +266,18 @@
         let noResultsFound = true;
 
 
-        // Apply the filter
         allItems.forEach(item => {
             if (!activeFilter.category) {
-                // Show all items if no filter is active
                 item.style.display = 'block';
                 noResultsFound = false;
                 return;
             }
 
-            // Get category data from the item
             const categoryElement = item.querySelector('.item-category');
             const subcategoryElement = item.querySelector('.item-subcategory');
             const detailCategoryElement = item.querySelector('.item-detail-category');
 
-            // If we don't have category data in the DOM, let's extract it from the data attributes
-            // or fallback to making all items visible when filtered
+
             let category = categoryElement ? categoryElement.textContent :
                 (item.dataset.category || '');
             let subcategory = subcategoryElement ? subcategoryElement.textContent :
@@ -311,7 +285,6 @@
             let detailCategory = detailCategoryElement ? detailCategoryElement.textContent :
                 (item.dataset.detailCategory || '');
 
-            // Check if the item matches the active filter
             let matches = category.includes(activeFilter.category);
 
             if (matches && activeFilter.subcategory) {
@@ -322,7 +295,6 @@
                 }
             }
 
-            // Show or hide the item
             if (matches) {
                 item.style.display = 'block';
                 noResultsFound = false;
@@ -331,7 +303,6 @@
             }
         });
 
-        // Show "no results" message if needed
         const noResultsMessage = document.getElementById('no-results-message');
         if (noResultsFound) {
             if (!noResultsMessage) {
@@ -363,7 +334,6 @@
 
                     itemsGrid.appendChild(message);
 
-                    // Add event listener to the clear filters button
                     document.getElementById('clear-filters').addEventListener('click', () => {
                         activeFilter = {
                             category: null,
@@ -379,14 +349,11 @@
         }
     }
 
-    // Add category data as data attributes to listing items
     function enhanceListingItems() {
         const allItems = document.querySelectorAll('.item-card-link');
 
         allItems.forEach(item => {
-            // Check if we can extract category data from the DOM
             if (!item.dataset.category) {
-                // Try to find category info in the item details
                 const categoryText = item.querySelector('.item-category-text');
                 const subcategoryText = item.querySelector('.item-subcategory-text');
                 const detailCategoryText = item.querySelector('.item-detail-category-text');
@@ -401,15 +368,11 @@
                     item.dataset.detailCategory = detailCategoryText.textContent.trim();
                 }
 
-                // If we couldn't find the data, add hidden elements with the category data
                 if (!item.dataset.category) {
-                    // Extract from the link URL or other sources if possible
-                    // For now, we'll just add the hidden elements that will be updated server-side
                     const card = item.querySelector('.item-card');
                     if (card) {
                         const info = card.querySelector('.item-info');
                         if (info) {
-                            // Create hidden spans for category data that will be populated server-side
                             const categorySpan = document.createElement('span');
                             categorySpan.className = 'item-category';
                             categorySpan.style.display = 'none';
@@ -432,14 +395,11 @@
         });
     }
 
-    // Close all menus when clicking outside
     document.addEventListener("click", () => {
         closeAllMenus();
     });
 
-    // Initialize the categories
     loadCategories();
 
-    // Enhance listing items with category data
     enhanceListingItems();
 });

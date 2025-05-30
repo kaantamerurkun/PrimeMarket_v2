@@ -21,7 +21,6 @@ namespace PrimeMarket.Models
 
         public bool IsRead { get; set; } = false;
 
-        // Navigation property
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }

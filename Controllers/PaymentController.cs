@@ -41,7 +41,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the most recent purchase for this user
                 var latestPurchase = await _context.Purchases
                     .Where(p => p.BuyerId == userId && !string.IsNullOrEmpty(p.CardholderName) && !string.IsNullOrEmpty(p.ShippingAddress))
                     .OrderByDescending(p => p.CreatedAt)
@@ -52,7 +51,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "No saved payment details found" });
                 }
 
-                // Return only non-sensitive information
                 return Json(new
                 {
                     success = true,
@@ -80,8 +78,7 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get all bookmarks (items in cart) for the current user
-                // Exclude archived listings
+
                 var bookmarks = await _context.Bookmarks
                     .Include(b => b.Listing)
                     .ThenInclude(l => l.Images)
@@ -103,7 +100,7 @@ namespace PrimeMarket.Controllers
                         ImageUrl = b.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                                   b.Listing.Images?.FirstOrDefault()?.ImagePath ??
                                   "/images/placeholder.png",
-                        MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null // Set MaxStock based on listing condition
+                        MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null 
                     }).ToList(),
                     TotalPrice = bookmarks.Sum(b => {
                         int q = HttpContext.Session.GetInt32($"Quantity_{b.Id}") ?? 1;
@@ -160,7 +157,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Check if the listing exists and is available
                 var listing = await _context.Listings
                     .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == ListingStatus.Active);
 
@@ -169,19 +165,16 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "This listing is not available." });
                 }
 
-                // Check if listing is first-hand (only first-hand items can be added to cart)
                 if (listing.Condition != "First-Hand")
                 {
                     return Json(new { success = false, message = "Only first-hand items can be added to cart. You can make an offer for second-hand items." });
                 }
 
-                // Check if the listing has stock
                 if (listing.Stock == null || listing.Stock <= 0)
                 {
                     return Json(new { success = false, message = "This item is out of stock." });
                 }
 
-                // Check if this listing is already in the user's bookmarks/cart
                 var existingBookmark = await _context.Bookmarks
                     .FirstOrDefaultAsync(b => b.UserId == userId && b.ListingId == listingId);
 
@@ -190,7 +183,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "This item is already in your cart." });
                 }
 
-                // Add the listing to bookmarks (cart)
                 var bookmark = new Bookmark
                 {
                     UserId = userId.Value,
@@ -222,7 +214,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Find the bookmark and check it belongs to the user
                 var bookmark = await _context.Bookmarks
                     .FirstOrDefaultAsync(b => b.Id == bookmarkId && b.UserId == userId);
 
@@ -255,7 +246,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Get the listing
             var listing = await _context.Listings
                 .Include(l => l.Seller)
                 .Include(l => l.Images)
@@ -267,35 +257,32 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Cart");
             }
 
-            // Check if it's a first-hand listing (only first-hand can be bought directly)
             if (listing.Condition != "First-Hand")
             {
                 TempData["ErrorMessage"] = "Second-hand listings can only be purchased through an offer.";
                 return RedirectToAction("Details", "Listing", new { id = listingId });
             }
 
-            // Check if there's stock available
             if (!listing.Stock.HasValue || listing.Stock <= 0)
             {
                 TempData["ErrorMessage"] = "This item is out of stock.";
                 return RedirectToAction("Details", "Listing", new { id = listingId });
             }
 
-            // Validate quantity against available stock
             if (quantity > listing.Stock)
             {
-                quantity = listing.Stock.Value; // Limit to max available stock
+                quantity = listing.Stock.Value; 
             }
 
             if (quantity < 1)
             {
-                quantity = 1; // Ensure minimum quantity is 1
+                quantity = 1; 
             }
 
-            // Store quantity in ViewBag for the view
+
             ViewBag.Quantity = quantity;
 
-            // Prepare checkout model
+
             var model = new CheckoutViewModel
             {
                 ListingId = listing.Id,
@@ -305,8 +292,8 @@ namespace PrimeMarket.Controllers
                 ListingImage = listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                               listing.Images?.FirstOrDefault()?.ImagePath ??
                               "/images/placeholder.png",
-                Quantity = quantity, // Add quantity to model
-                TotalPrice = listing.Price * quantity // Calculate total price with quantity
+                Quantity = quantity,
+                TotalPrice = listing.Price * quantity 
             };
 
             return View(model);
@@ -324,7 +311,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Get all items in cart
             var bookmarks = await _context.Bookmarks
                 .Include(b => b.Listing)
                 .ThenInclude(l => l.Images)
@@ -338,7 +324,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Cart");
             }
 
-            // Check all items for stock availability and first-hand condition
             foreach (var bookmark in bookmarks)
             {
                 if (bookmark.Listing.Condition != "First-Hand")
@@ -353,18 +338,15 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Cart");
                 }
 
-                // Get quantity from session if available
                 int quantity = 1;
                 if (HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}") != null)
                 {
                     quantity = HttpContext.Session.GetInt32($"Quantity_{bookmark.Id}").Value;
                 }
 
-                // Pass the quantity to the view via ViewData
                 ViewData[$"Quantity_{bookmark.Id}"] = quantity;
             }
 
-            // Prepare checkout model
             var model = new MultipleCheckoutViewModel
             {
                 Items = bookmarks.Select(b => new CartItemViewModel
@@ -377,7 +359,6 @@ namespace PrimeMarket.Controllers
                     ImageUrl = b.Listing.Images?.FirstOrDefault(i => i.IsMainImage)?.ImagePath ??
                               b.Listing.Images?.FirstOrDefault()?.ImagePath ??
                               "/images/placeholder.png",
-                    // Add MaxStock information
                     MaxStock = b.Listing.Condition == "First-Hand" ? b.Listing.Stock : null
                 }).ToList(),
                 TotalPrice = bookmarks.Sum(b => {
@@ -413,7 +394,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the listing
                 var listing = await _context.Listings
                     .Include(l => l.Seller)
                     .FirstOrDefaultAsync(l => l.Id == model.ListingId && l.Status == ListingStatus.Active);
@@ -424,55 +404,46 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Checkout", new { listingId = model.ListingId });
                 }
 
-                // Check if this is a first-hand listing (only first-hand can be bought directly)
                 if (listing.Condition != "First-Hand")
                 {
                     TempData["ErrorMessage"] = "Second-hand listings can only be purchased through an offer.";
                     return RedirectToAction("Details", "Listing", new { id = model.ListingId });
                 }
 
-                // Check if there's enough stock
                 if (!listing.Stock.HasValue || listing.Stock <= 0)
                 {
                     TempData["ErrorMessage"] = "This item is out of stock.";
                     return RedirectToAction("Details", "Listing", new { id = model.ListingId });
                 }
 
-                // Get and validate quantity
                 int quantity = model.Quantity > 0 ? model.Quantity : 1;
 
-                // Ensure we don't exceed available stock
                 if (quantity > listing.Stock.Value)
                 {
                     quantity = listing.Stock.Value;
                 }
 
-                // Store only the last 4 digits of the card number for reference
                 string lastFourDigits = model.CardNumber.Replace(" ", "").Substring(Math.Max(0, model.CardNumber.Replace(" ", "").Length - 4));
 
-                // Create purchase record
                 var purchase = new Purchase
                 {
                     BuyerId = userId.Value,
                     ListingId = listing.Id,
-                    Amount = listing.Price * quantity, // Multiply by quantity
-                    PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
-                    Quantity = quantity, // Store the quantity
+                    Amount = listing.Price * quantity, 
+                    PaymentStatus = PaymentStatus.Authorized, 
+                    Quantity = quantity, 
                     CreatedAt = DateTime.UtcNow,
-                    // Save payment details (if requested)
                     CardholderName = model.CardholderName,
                     LastFourDigits = lastFourDigits,
                     ShippingAddress = model.ShippingAddress
                 };
 
                 _context.Purchases.Add(purchase);
-                // Save changes to generate the purchase ID before creating the confirmation
                 await _context.SaveChangesAsync();
 
-                // Create purchase confirmation record for tracking shipping/delivery
                 var confirmation = new PurchaseConfirmation
                 {
-                    PurchaseId = purchase.Id, // Now this is a valid ID
+                    PurchaseId = purchase.Id, 
                     SellerShippedProduct = false,
                     BuyerReceivedProduct = false,
                     PaymentReleased = false,
@@ -481,10 +452,8 @@ namespace PrimeMarket.Controllers
 
                 _context.PurchaseConfirmations.Add(confirmation);
 
-                // Reduce stock of first-hand listing by the purchased quantity
                 listing.Stock -= quantity;
 
-                // If stock reaches 0, mark as sold out
                 if (listing.Stock <= 0)
                 {
                     listing.Status = ListingStatus.Sold;
@@ -492,7 +461,6 @@ namespace PrimeMarket.Controllers
 
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // Create notifications for buyer and seller
                 var buyerNotification = new Notification
                 {
                     UserId = userId.Value,
@@ -545,7 +513,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get all items in cart
                 var bookmarks = await _context.Bookmarks
                     .Include(b => b.Listing)
                     .ThenInclude(l => l.Seller)
@@ -558,10 +525,8 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Cart");
                 }
 
-                // Create a Dictionary for easy lookup of quantities
                 var quantityDict = new Dictionary<int, int>();
 
-                // First check session for quantities
                 foreach (var bookmark in bookmarks)
                 {
                     int quantity = 1;
@@ -572,7 +537,6 @@ namespace PrimeMarket.Controllers
                     quantityDict[bookmark.Id] = quantity;
                 }
 
-                // Then check if quantities were submitted in the form (override session values)
                 if (quantities != null)
                 {
                     foreach (var item in quantities)
@@ -581,33 +545,27 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Store only the last 4 digits of the card number for reference
                 string lastFourDigits = model.CardNumber.Replace(" ", "").Substring(Math.Max(0, model.CardNumber.Replace(" ", "").Length - 4));
 
-                // Validate all quantities against stock limits before processing any purchases
                 foreach (var bookmark in bookmarks)
                 {
                     var listing = bookmark.Listing;
 
-                    // Skip validation for second-hand items
                     if (listing.Condition != "First-Hand")
                         continue;
 
-                    // Double-check that it's a first-hand listing with available stock
                     if (!listing.Stock.HasValue || listing.Stock <= 0)
                     {
                         TempData["ErrorMessage"] = $"Item '{listing.Title}' is out of stock.";
                         return RedirectToAction("CheckoutMultiple");
                     }
 
-                    // Get quantity for this item (default to 1 if not specified)
                     int quantity = 1;
                     if (quantityDict.TryGetValue(bookmark.Id, out int qty))
                     {
                         quantity = qty;
                     }
 
-                    // Check if there's enough stock
                     if (listing.Stock < quantity)
                     {
                         TempData["ErrorMessage"] = $"Not enough stock available for {listing.Title}. Only {listing.Stock} in stock.";
@@ -615,44 +573,37 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Process each item as a separate purchase
                 foreach (var bookmark in bookmarks)
                 {
                     var listing = bookmark.Listing;
 
-                    // Double-check that it's a first-hand listing with available stock
                     if (listing.Condition != "First-Hand" || !listing.Stock.HasValue || listing.Stock <= 0)
                     {
-                        continue; // Skip this item
+                        continue; 
                     }
 
-                    // Get quantity for this item (default to 1 if not specified)
                     int quantity = 1;
                     if (quantityDict.TryGetValue(bookmark.Id, out int qty))
                     {
                         quantity = qty;
                     }
 
-                    // Create purchase record
                     var purchase = new Purchase
                     {
                         BuyerId = userId.Value,
                         ListingId = listing.Id,
-                        Amount = listing.Price * quantity, // Multiply by quantity
-                        PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
-                        Quantity = quantity, // Store the quantity
+                        Amount = listing.Price * quantity,
+                        PaymentStatus = PaymentStatus.Authorized, 
+                        Quantity = quantity,
                         CreatedAt = DateTime.UtcNow,
-                        // Save payment details
                         CardholderName = model.CardholderName,
                         LastFourDigits = lastFourDigits,
                         ShippingAddress = model.ShippingAddress
                     };
 
                     _context.Purchases.Add(purchase);
-                    // Save changes to get the purchase ID
                     await _context.SaveChangesAsync();
 
-                    // Create purchase confirmation record
                     var confirmation = new PurchaseConfirmation
                     {
                         PurchaseId = purchase.Id,
@@ -664,10 +615,8 @@ namespace PrimeMarket.Controllers
 
                     _context.PurchaseConfirmations.Add(confirmation);
 
-                    // Reduce stock by quantity
                     listing.Stock -= quantity;
 
-                    // If stock reaches 0, mark as sold out
                     if (listing.Stock <= 0)
                     {
                         listing.Status = ListingStatus.Sold;
@@ -675,7 +624,6 @@ namespace PrimeMarket.Controllers
 
                     listing.UpdatedAt = DateTime.UtcNow;
 
-                    // Create notifications
                     var buyerNotification = new Notification
                     {
                         UserId = userId.Value,
@@ -697,10 +645,8 @@ namespace PrimeMarket.Controllers
                     _context.Notifications.Add(buyerNotification);
                     _context.Notifications.Add(sellerNotification);
 
-                    // Remove from bookmarks/cart
                     _context.Bookmarks.Remove(bookmark);
 
-                    // Remove quantity from session
                     HttpContext.Session.Remove($"Quantity_{bookmark.Id}");
                 }
 
@@ -729,7 +675,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the offer with listing and images
                 var offer = await _context.Offers
                     .Include(o => o.Listing)
                     .ThenInclude(l => l.Images)
@@ -742,7 +687,6 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("MyOffers", "User");
                 }
 
-                // Check if listing is still available
                 if (offer.Listing.Status != ListingStatus.Active)
                 {
                     TempData["ErrorMessage"] = "This listing is no longer available.";
@@ -781,7 +725,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Get the purchase
             var purchase = await _context.Purchases
                 .Include(p => p.Listing)
                 .ThenInclude(l => l.Images)
@@ -804,7 +747,7 @@ namespace PrimeMarket.Controllers
                 Amount = purchase.Amount,
                 SellerName = $"{purchase.Listing.Seller.FirstName} {purchase.Listing.Seller.LastName}",
                 PurchaseDate = purchase.CreatedAt ?? DateTime.UtcNow,
-                Quantity = purchase.Quantity // Include the quantity
+                Quantity = purchase.Quantity 
             };
 
             return View(model);
@@ -839,7 +782,7 @@ namespace PrimeMarket.Controllers
                               "/images/placeholder.png",
                 SellerName = $"{p.Listing.Seller.FirstName} {p.Listing.Seller.LastName}",
                 Amount = p.Amount,
-                Quantity = p.Quantity, // Include the quantity
+                Quantity = p.Quantity, 
                 PurchaseDate = p.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = p.PaymentStatus
             }).ToList();
@@ -876,7 +819,7 @@ namespace PrimeMarket.Controllers
                               "/images/placeholder.png",
                 BuyerName = $"{p.Buyer.FirstName} {p.Buyer.LastName}",
                 Amount = p.Amount,
-                Quantity = p.Quantity, // Include the quantity
+                Quantity = p.Quantity, 
                 SaleDate = p.CreatedAt ?? DateTime.MinValue,
                 PaymentStatus = p.PaymentStatus
             }).ToList();
@@ -884,7 +827,6 @@ namespace PrimeMarket.Controllers
             return View(model);
         }
 
-        // Update the PurchaseStatus action in PaymentController.cs
 
         [HttpGet]
         [UserAuthenticationFilter]
@@ -902,7 +844,7 @@ namespace PrimeMarket.Controllers
                 .Include(p => p.Listing.Seller)
                 .Include(p => p.Buyer)
                 .Include(p => p.Confirmation)
-                .Include(p => p.Offer) // Include the offer information
+                .Include(p => p.Offer) 
                 .FirstOrDefaultAsync(p => p.Id == purchaseId);
 
             if (purchase == null)
@@ -911,7 +853,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyPurchase");
             }
 
-            // Check if the user is either the buyer or the seller
             if (purchase.BuyerId != userId && purchase.Listing.SellerId != userId)
             {
                 TempData["ErrorMessage"] = "You don't have permission to view this purchase.";
@@ -948,7 +889,7 @@ namespace PrimeMarket.Controllers
                 IsViewerBuyer = purchase.BuyerId == userId,
                 IsSecondHandPurchase = isSecondHand,
                 OfferAmount = offerAmount,
-                Quantity = purchase.Quantity // Include the quantity
+                Quantity = purchase.Quantity 
             };
 
             return View(model);
@@ -977,7 +918,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MySales");
             }
 
-            // Check if the user is the seller
             if (purchase.Listing.SellerId != userId)
             {
                 TempData["ErrorMessage"] = "You don't have permission to confirm shipping for this purchase.";
@@ -986,14 +926,12 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Update confirmation
                 purchase.Confirmation.SellerShippedProduct = true;
                 purchase.Confirmation.ShippingConfirmedDate = DateTime.UtcNow;
                 purchase.Confirmation.TrackingNumber = trackingNumber;
                 purchase.Confirmation.ShippingProvider = shippingProvider;
                 purchase.Confirmation.UpdatedAt = DateTime.UtcNow;
 
-                // Create notification for buyer
                 var notification = new Notification
                 {
                     UserId = purchase.BuyerId,
@@ -1005,7 +943,6 @@ namespace PrimeMarket.Controllers
 
                 _context.Notifications.Add(notification);
 
-                // Add a message to the conversation between buyer and seller
                 var message = new Message
                 {
                     SenderId = userId.Value,
@@ -1053,7 +990,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyPurchase");
             }
 
-            // Check if the user is the buyer
             if (purchase.BuyerId != userId)
             {
                 TempData["ErrorMessage"] = "You don't have permission to confirm receipt for this purchase.";
@@ -1062,19 +998,16 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Check if seller has confirmed shipping
                 if (!purchase.Confirmation.SellerShippedProduct)
                 {
                     TempData["ErrorMessage"] = "The seller has not confirmed shipping yet.";
                     return RedirectToAction("PurchaseStatus", new { purchaseId });
                 }
 
-                // Update confirmation
                 purchase.Confirmation.BuyerReceivedProduct = true;
                 purchase.Confirmation.ReceiptConfirmedDate = DateTime.UtcNow;
                 purchase.Confirmation.UpdatedAt = DateTime.UtcNow;
 
-                // If both shipping and receipt are confirmed, release payment and update listing status
                 if (purchase.Confirmation.SellerShippedProduct && purchase.Confirmation.BuyerReceivedProduct)
                 {
                     purchase.Confirmation.PaymentReleased = true;
@@ -1082,7 +1015,6 @@ namespace PrimeMarket.Controllers
                     purchase.PaymentStatus = PaymentStatus.Completed;
                     purchase.UpdatedAt = DateTime.UtcNow;
 
-                    // Update the listing status to Sold
                     if (purchase.Listing.Condition == "First-Hand" &&
                     purchase.Listing.Stock.HasValue &&
                     purchase.Listing.Stock.Value <= 0)
@@ -1091,7 +1023,6 @@ namespace PrimeMarket.Controllers
                         purchase.Listing.UpdatedAt = DateTime.UtcNow;
                         }
 
-                    // Create notification for seller
                     var sellerNotification = new Notification
                     {
                         UserId = purchase.Listing.SellerId,
@@ -1103,7 +1034,6 @@ namespace PrimeMarket.Controllers
 
                     _context.Notifications.Add(sellerNotification);
 
-                    // Add a message to the conversation about payment release
                     var paymentMessage = new Message
                     {
                         SenderId = userId.Value,
@@ -1116,7 +1046,6 @@ namespace PrimeMarket.Controllers
                     _context.Messages.Add(paymentMessage);
                 }
 
-                // Create notification for seller that item was received
                 var notification = new Notification
                 {
                     UserId = purchase.Listing.SellerId,
@@ -1128,7 +1057,6 @@ namespace PrimeMarket.Controllers
 
                 _context.Notifications.Add(notification);
 
-                // Add a message to the conversation between buyer and seller
                 var receiptMessage = new Message
                 {
                     SenderId = userId.Value,
@@ -1171,7 +1099,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the offer with listing
                 var offer = await _context.Offers
                     .Include(o => o.Listing)
                     .ThenInclude(l => l.Seller)
@@ -1183,47 +1110,40 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("MyOffers", "User");
                 }
 
-                // Check if listing is still available
                 if (offer.Listing.Status != ListingStatus.Active)
                 {
                     TempData["ErrorMessage"] = "This listing is no longer available.";
                     return RedirectToAction("MyOffers", "User");
                 }
 
-                // Check that this is a second-hand listing
                 if (offer.Listing.Condition != "Second-Hand")
                 {
                     TempData["ErrorMessage"] = "Invalid operation. This offer is not for a second-hand listing.";
                     return RedirectToAction("Details", "Listing", new { id = offer.ListingId });
                 }
 
-                // Store only the last 4 digits of the card number for reference
                 string lastFourDigits = CardNumber.Replace(" ", "").Substring(Math.Max(0, CardNumber.Replace(" ", "").Length - 4));
 
-                // Create purchase record
                 var purchase = new Purchase
                 {
                     BuyerId = userId.Value,
                     ListingId = offer.ListingId,
                     OfferId = offer.Id,
-                    Amount = offer.OfferAmount, // Use the offer amount, not listing price
-                    PaymentStatus = PaymentStatus.Authorized, // Payment is authorized but held in escrow
-                    Quantity = 1, // Second-hand items always have quantity 1
+                    Amount = offer.OfferAmount,
+                    PaymentStatus = PaymentStatus.Authorized,
+                    Quantity = 1, 
                     CreatedAt = DateTime.UtcNow,
-                    // Save payment details
                     CardholderName = CardholderName,
                     LastFourDigits = lastFourDigits,
                     ShippingAddress = ShippingAddress
                 };
 
-                // First add and save the purchase to get its ID
                 _context.Purchases.Add(purchase);
                 await _context.SaveChangesAsync();
 
-                // Now create the purchase confirmation with the valid purchase ID
                 var confirmation = new PurchaseConfirmation
                 {
-                    PurchaseId = purchase.Id, // Now this ID exists in the database
+                    PurchaseId = purchase.Id,
                     SellerShippedProduct = false,
                     BuyerReceivedProduct = false,
                     PaymentReleased = false,
@@ -1232,15 +1152,12 @@ namespace PrimeMarket.Controllers
 
                 _context.PurchaseConfirmations.Add(confirmation);
 
-                // Update offer status
                 offer.Status = OfferStatus.Purchased;
                 offer.UpdatedAt = DateTime.UtcNow;
 
-                // Update listing status
                 offer.Listing.Status = ListingStatus.Sold;
                 offer.Listing.UpdatedAt = DateTime.UtcNow;
 
-                // Create notifications for buyer and seller
                 var buyerNotification = new Notification
                 {
                     UserId = userId.Value,
@@ -1262,7 +1179,6 @@ namespace PrimeMarket.Controllers
                 _context.Notifications.Add(buyerNotification);
                 _context.Notifications.Add(sellerNotification);
 
-                // Create a message in the conversation about the purchase
                 var purchaseMessage = new Message
                 {
                     SenderId = userId.Value,
@@ -1274,7 +1190,6 @@ namespace PrimeMarket.Controllers
                 };
                 _context.Messages.Add(purchaseMessage);
 
-                // Save all the changes
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("PurchaseComplete", new { purchaseId = purchase.Id });
@@ -1286,7 +1201,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("MyOffers", "User");
             }
         }
-        // Controllers/PaymentController.cs
         [HttpPost]
         public IActionResult UpdateCartQuantities([FromBody] List<CartItemQuantityDto> items)
         {
@@ -1301,7 +1215,6 @@ namespace PrimeMarket.Controllers
 
                 var listing = bookmark.Listing;
 
-                // ---- VALIDATE, don’t modify ----
                 if (listing.Stock.HasValue && req.Quantity > listing.Stock.Value)
                 {
                     return Json(new
@@ -1313,15 +1226,12 @@ namespace PrimeMarket.Controllers
                     });
                 }
 
-                // just remember the quantity in session for this user
                 HttpContext.Session.SetInt32($"Quantity_{req.BookmarkId}", req.Quantity);
             }
 
             return Json(new { success = true });
         }
-        // Add this method to PaymentController.cs
 
-        // Add this method to PaymentController.cs
 
         [HttpPost]
         [UserAuthenticationFilter]
@@ -1349,7 +1259,6 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("MyPurchase");
                 }
 
-                // Check if the user is either the buyer or the seller
                 bool isBuyer = purchase.BuyerId == userId;
                 bool isSeller = purchase.Listing.SellerId == userId;
 
@@ -1359,25 +1268,21 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("MyPurchase");
                 }
 
-                // Check if purchase can be cancelled (only if not yet shipped)
                 if (purchase.Confirmation?.SellerShippedProduct == true)
                 {
                     TempData["ErrorMessage"] = "Cannot cancel purchase after item has been shipped.";
                     return RedirectToAction("PurchaseStatus", new { purchaseId });
                 }
 
-                // Check if payment has already been completed
                 if (purchase.PaymentStatus == PaymentStatus.Completed)
                 {
                     TempData["ErrorMessage"] = "Cannot cancel a completed purchase.";
                     return RedirectToAction("PurchaseStatus", new { purchaseId });
                 }
 
-                // Update purchase status
                 purchase.PaymentStatus = PaymentStatus.Refunded;
                 purchase.UpdatedAt = DateTime.UtcNow;
 
-                // Handle first-hand listings - restore stock
                 if (purchase.Listing.Condition == "First-Hand")
                 {
                     if (purchase.Listing.Stock.HasValue)
@@ -1389,7 +1294,6 @@ namespace PrimeMarket.Controllers
                         purchase.Listing.Stock = purchase.Quantity;
                     }
 
-                    // If listing was marked as sold due to stock being 0, reactivate it
                     if (purchase.Listing.Status == ListingStatus.Sold)
                     {
                         purchase.Listing.Status = ListingStatus.Active;
@@ -1397,13 +1301,11 @@ namespace PrimeMarket.Controllers
                 }
                 else if (purchase.Listing.Condition == "Second-Hand")
                 {
-                    // For second-hand items, reactivate the listing
                     if (purchase.Listing.Status == ListingStatus.Sold)
                     {
                         purchase.Listing.Status = ListingStatus.Active;
                     }
 
-                    // Update the related offer status if exists
                     if (purchase.Offer != null)
                     {
                         purchase.Offer.Status = OfferStatus.Cancelled;
@@ -1413,7 +1315,6 @@ namespace PrimeMarket.Controllers
 
                 purchase.Listing.UpdatedAt = DateTime.UtcNow;
 
-                // Create notifications for both parties
                 var buyerNotification = new Notification
                 {
                     UserId = purchase.BuyerId,
@@ -1435,7 +1336,6 @@ namespace PrimeMarket.Controllers
                 _context.Notifications.Add(buyerNotification);
                 _context.Notifications.Add(sellerNotification);
 
-                // Create messages in the conversation
                 var cancelMessage = new Message
                 {
                     SenderId = userId.Value,

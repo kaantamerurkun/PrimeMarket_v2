@@ -1,5 +1,4 @@
-﻿// Models/ViewModel/PaymentViewModel.cs
-namespace PrimeMarket.Models.ViewModel
+﻿namespace PrimeMarket.Models.ViewModel
 {
     public class PaymentViewModel
     {
@@ -10,6 +9,6 @@ namespace PrimeMarket.Models.ViewModel
         public string Cvv { get; set; }
         public string ShippingAddress { get; set; }
         public bool SavePaymentDetails { get; set; }
-        public int Quantity { get; set; } = 1; // Default to 1
+        public int Quantity { get; set; } = 1; 
     }
 }

@@ -18,7 +18,6 @@ namespace PrimeMarket.Models
 
         public string Comment { get; set; }
 
-        // Navigation properties
         [ForeignKey("RaterId")]
         public virtual User Rater { get; set; }
 

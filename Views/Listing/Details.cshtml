@@ -376,7 +376,6 @@
         margin: 0;
         }
 
-        /* Modal Styles */
         .modal {
         display: none;
         position: fixed;
@@ -407,7 +406,6 @@
         cursor: pointer;
         }
 
-        /* Responsive design */
         @@media (max-width: 768px) {
         .main-content {
         flex-direction: column;
@@ -611,7 +609,6 @@
         padding: 20px;
         color: #666;
         }
-        <!-- Add this to the <style > section in Details.cshtml -->
         .listing-status {
         display: inline-block;
         padding: 5px 10px;
@@ -675,7 +672,6 @@
             </h1>
             <div class="price">@Model.Listing.Price.ToString("C")</div>
         </div>
-        <!-- Add this block right after the listing-header div -->
         @if (Model.IsArchived)
         {
             <div class="archived-message" style="background-color: #f8f9fa; border-left: 3px solid #6c757d; padding: 15px; margin: 15px 0 30px 0; color: #6c757d; border-radius: 5px;">
@@ -753,7 +749,6 @@
                     </div>
                 }
 
-                <!-- Action Buttons -->
                 <div style="display:flex; gap:10px;justify-content: space-between;margin-top: 15px" class="action-buttons">
                     @if (!Model.IsOwner)
                     {
@@ -767,7 +762,6 @@
                     {
                         @if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock.HasValue && Model.Listing.Stock > 0))
                         {
-                            <!-- First-Hand with stock: show Buy Now and Add to Cart buttons -->
                             <a style= "text-decoration:none" href="@Url.Action("Checkout", "Payment", new { listingId = Model.Listing.Id })">
                                 <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-buynow">Buy Now</button>
                             </a>
@@ -778,12 +772,10 @@
                         }
                         else if (Model.Listing.Condition == "First-Hand" && (Model.Listing.Stock == null || Model.Listing.Stock <= 0))
                         {
-                            <!-- First-Hand out of stock: show disabled button -->
                             <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-outofstock" disabled>Out of Stock</button>
                         }
                         else if (Model.Listing.Condition == "Second-Hand")
                         {
-                            <!-- Second-Hand: show Make an Offer button -->
                             <button style="display:flex;flex: 0 0 30%;font-size:0.8em" class="btn-makeoffer" onclick="openOfferModal()">Make an Offer</button>
                         }
                     }
@@ -791,7 +783,6 @@
             </div>
         </div>
 
-        <!-- Product Specifications -->
         @if (Model.Product != null)
         {
             <div class="product-specifications">
@@ -813,7 +804,6 @@
             </div>
         }
 
-        <!-- Description -->
         <div class="description-section">
             <h3>Description</h3>
             <div class="description-content">
@@ -821,7 +811,6 @@
             </div>
         </div>
 
-        <!-- Seller Info -->
         <div class="seller-info">
             <div class="seller-card">
                 <img src="@(string.IsNullOrEmpty(Model.Listing.Seller?.ProfileImagePath) ? "/images/placeholder.png" : Model.Listing.Seller.ProfileImagePath)"
@@ -847,7 +836,6 @@
                     </h3>
                     <p class="phone">@(string.IsNullOrEmpty(Model.Listing.Seller?.PhoneNumber) ? "No phone number" : Model.Listing.Seller.PhoneNumber)</p>
 
-                    <!-- Message/Offer Buttons -->
                     @if (!Model.IsOwner)
                     {
                         <a href="@Url.Action("StartConversation", "Message", new { userId = Model.Listing.SellerId, listingId = Model.Listing.Id })">
@@ -858,7 +846,6 @@
                     {
                         <p class="owner-badge">You are the seller of this listing</p>
 
-                        <!-- If second-hand and has active offers, show them -->
                         @if (Model.Listing.Condition == "Second-Hand" && Model.ActiveOffers != null && Model.ActiveOffers.Any())
                         {
                             <div class="active-offers-container">
@@ -884,7 +871,6 @@
             </div>
         </div>
 
-        <!-- Related Listings -->
         @if (Model.RelatedListings != null && Model.RelatedListings.Any())
         {
             <div class="related-listings">
@@ -933,7 +919,6 @@
     }
 </div>
 
-<!-- Offer Modal -->
 <div id="offerModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeOfferModal()">&times;</span>
@@ -965,8 +950,7 @@
         </form>
     </div>
 </div>
-<!-- Add this section to Views/Listing/Details.cshtml after the seller info section -->
-<!-- Reviews Section -->
+
 @if (Model.Listing.Condition == "First-Hand")
 {
     <div class="reviews-section">
@@ -1057,22 +1041,18 @@
 </body>
 </html>
 <script>
-        // Change main image when thumbnail is clicked
     function changeMainImage(imageSrc) {
         document.getElementById('main-image').src = imageSrc;
     }
 
-    // Open offer modal
     function openOfferModal() {
         document.getElementById('offerModal').style.display = 'block';
     }
 
-    // Close offer modal
     function closeOfferModal() {
         document.getElementById('offerModal').style.display = 'none';
     }
 
-    // Toggle bookmark
     function toggleBookmark(listingId) {
         fetch('/Listing/ToggleBookmark', {
             method: 'POST',
@@ -1091,7 +1071,6 @@
                     bookmarkBtn.textContent = "Add to Bookmark";
                 }
 
-                // Show feedback message
                 showNotification(data.message);
             } else {
                 alert(data.message);
@@ -1102,7 +1081,6 @@
         });
     }
 
-    // Add to cart functionality for First-Hand items
     function addToCart(listingId) {
         fetch('/Payment/AddToCart', {
             method: 'POST',
@@ -1125,9 +1103,7 @@
         });
     }
 
-    // Respond to offer function
     function respondToOffer(offerId, accept) {
-        // Get the anti-forgery token
         const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
 
         fetch('/Listing/RespondToOffer', {
@@ -1141,13 +1117,10 @@
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Show success notification
                 showNotification(data.message);
 
-                // Reload the page to reflect changes
                 setTimeout(() => location.reload(), 1500);
             } else {
-                // Show error message
                 alert(data.message);
             }
         })
@@ -1157,7 +1130,6 @@
         });
     }
 
-    // Notification helper
     function showNotification(message, isError = false) {
         const notification = document.createElement('div');
         notification.textContent = message;
@@ -1174,7 +1146,6 @@
 
         document.body.appendChild(notification);
 
-        // Remove after 3 seconds
         setTimeout(() => {
             notification.style.opacity = '0';
             setTimeout(() => {
@@ -1183,9 +1154,7 @@
         }, 3000);
     }
 
-    // Document ready event handler
     document.addEventListener('DOMContentLoaded', function() {
-        // Handle offer form submission
         const offerForm = document.getElementById('offerForm');
         if (offerForm) {
             offerForm.addEventListener('submit', function(e) {
@@ -1223,7 +1192,6 @@
             });
         }
 
-        // Handle review form submission
         const reviewForm = document.getElementById('reviewForm');
         if (reviewForm) {
             reviewForm.addEventListener('submit', function(e) {
@@ -1262,11 +1230,9 @@
             });
         }
 
-        // Offer amount input validation
         const offerAmountInput = document.getElementById('offerAmount');
         if (offerAmountInput) {
             offerAmountInput.addEventListener('input', function() {
-                // Ensure the offer doesn't exceed the listing price
                 const maxPrice = parseFloat(offerAmountInput.getAttribute('max'));
                 if (parseFloat(this.value) > maxPrice) {
                     this.value = maxPrice;
@@ -1274,7 +1240,6 @@
             });
         }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('offerModal');
             if (event.target === modal) {

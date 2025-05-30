@@ -591,7 +591,6 @@
     </div>
 </div>
 
-<!-- Cancel Confirmation Modal -->
 <div id="cancelModal" class="modal">
     <div class="modal-content">
         <span class="close-btn" onclick="closeCancelModal()">&times;</span>
@@ -623,31 +622,26 @@
     }
 
     function confirmCancel() {
-        // Create a form to submit the cancellation
         const form = document.createElement('form');
         form.method = 'POST';
         form.action = '@Url.Action("CancelPurchase", "Payment")';
 
-        // Add anti-forgery token
         const tokenInput = document.createElement('input');
         tokenInput.type = 'hidden';
         tokenInput.name = '__RequestVerificationToken';
         tokenInput.value = document.querySelector('input[name="__RequestVerificationToken"]').value;
         form.appendChild(tokenInput);
 
-        // Add purchase ID
         const purchaseIdInput = document.createElement('input');
         purchaseIdInput.type = 'hidden';
         purchaseIdInput.name = 'purchaseId';
         purchaseIdInput.value = '@Model.PurchaseId';
         form.appendChild(purchaseIdInput);
 
-        // Submit the form
         document.body.appendChild(form);
         form.submit();
     }
 
-    // Close modal when clicking outside
     window.onclick = function(event) {
         const modal = document.getElementById('cancelModal');
         if (event.target === modal) {

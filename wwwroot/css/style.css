@@ -28,7 +28,6 @@ body {
     gap: 15px;
 }
 
-/* ✅ Fix search box layout */
 .search-box input {
     padding: 8px 16px;
     border: 1px solid #ddd;
@@ -38,7 +37,6 @@ body {
     transition: border-color 0.3s ease;
 }
 
-/* ✅ Buttons styling */
 .btn-gotoprofile,
 .btn-logout,
 .btn-notification,
@@ -95,7 +93,6 @@ body {
         transition: 0.3s;
         color: white;
     }
-    /* ✅ Main Content */
     .content,
     .listing-content,
     .search-content,
@@ -107,7 +104,6 @@ body {
         margin: 80px auto 0;
     }
 
-/* ✅ Categories Sidebar */
 .categories {
     width: 200px;
 }
@@ -132,7 +128,6 @@ body {
     color: #007bff;
 }
 
-/* ✅ Listings Section */
 .listings {
     flex: 1;
 }
@@ -160,7 +155,6 @@ body {
     transform: translateY(-5px);
 }
 
-/* Listing Details Page */
 .listing-content {
     flex-direction: column;
 }
@@ -200,7 +194,6 @@ body {
     border-radius: 4px;
 }
 
-/* Search Results Page */
 .search-content {
     flex-direction: column;
 }
@@ -218,7 +211,6 @@ body {
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;
 }
 
-/* Live Chat Page */
 .chat-container {
     width: 100%;
     max-width: 800px;
@@ -251,7 +243,6 @@ body {
 .main-section {
     display: flex;
     justify-content: flex-start; 
-  /*align-items: center;*/
 }
 .main-section categories {
     display: flex;
@@ -260,7 +251,7 @@ body {
         display: flex;
     }
     .main-section listing-info {
-        margin-left: auto; /* Sağ div'i en sağa iter */
+        margin-left: auto;
     }
     .message-content {
         background: #f5f5f5;
@@ -1035,14 +1026,13 @@ footer {
     transition: transform 0.3s ease;
 }
 
-    /* search barı yukarı çekme */
     .search-bar.focused {
         position: fixed;
-        top: 14%; /* yukarı çıkma miktarı ayarlıyoruz */
+        top: 14%; 
         left: 50%;
-        transform: translateX(-50%); /* kodun calısması içingerekli */
+        transform: translateX(-50%); 
         z-index: 1000;
-        max-width: 50%; /* değişim */
+        max-width: 50%; 
     }
 * {
     margin: 0;
@@ -1242,17 +1232,17 @@ h1 {
 }
 
     .star-rating .star {
-        font-size: 45px; /* Increased star size */
-        color: #ddd; /* Light gray color for inactive stars */
+        font-size: 45px; 
+        color: #ddd; 
         transition: color 0.2s ease;
     }
 
         .star-rating .star.hover {
-            color: #FEBA00; /* Bright yellow for hover state */
+            color: #FEBA00;
         }
 
         .star-rating .star.selected {
-            color: #FEBA00; /* Bright yellow for selected state */
+            color: #FEBA00; 
         }
 
 .overall-rating {

@@ -4,7 +4,6 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
     ViewBag.Title = "Edit Profile";
 
-    // Check if user is verified
     bool isVerified = Model != null && ViewBag.IsVerified != null ? ViewBag.IsVerified : false;
 }
 
@@ -30,7 +29,6 @@
             <div class="profile-card">
                 <h1>Edit Profile</h1>
 
-                <!-- PROFILE INFO FORM -->
                 <form asp-action="UpdateProfile" asp-controller="User" method="post" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <h2>Profile Info</h2>
@@ -42,12 +40,10 @@
                             <label for="profile-image-upload" class="camera-button">
                                 @if (isVerified)
                                 {
-                                    <!-- Blue verification tick for verified users -->
                                     <img src="/images/verified.png" alt="Verified" class="camera-icon">
                                 }
                                 else
                                 {
-                                    <!-- Camera icon for non-verified users -->
                                     <img src="/images/camera-icon.jpg" alt="Camera" class="camera-icon">
                                 }
                             </label>
@@ -76,7 +72,6 @@
                     </div>
                 </form>
 
-                <!-- Email form section enhancements for EditProfile.cshtml -->
                 <form asp-action="UpdateEmail" asp-controller="User" method="post">
                     @Html.AntiForgeryToken()
                     <h2>Email Address</h2>
@@ -99,7 +94,6 @@
                 </form>
 
 
-                <!-- PASSWORD FORM -->
                 <form asp-action="UpdatePassword" asp-controller="User" method="post">
                     @Html.AntiForgeryToken()
                     <h2>Change Password</h2>
@@ -123,7 +117,6 @@
                     </div>
                 </form>
 
-                <!-- VERIFICATION FORM -->
                 <form id="verification-form" enctype="multipart/form-data">
                     @Html.AntiForgeryToken()
                     <h2>Verify Your Account</h2>

@@ -86,7 +86,6 @@
     </div>
 </div>
 
-<!-- Delete Confirmation Modal -->
 <div id="deleteModal" class="modal">
     <div class="modal-content">
         <span class="close">&times;</span>
@@ -393,7 +392,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Filter buttons functionality
         const filterButtons = document.querySelectorAll('.filter-btn');
         const listingCards = document.querySelectorAll('.listing-card');
 
@@ -401,11 +399,9 @@
             button.addEventListener('click', function() {
                 const filter = this.getAttribute('data-filter');
 
-                // Update active button
                 filterButtons.forEach(btn => btn.classList.remove('active'));
                 this.classList.add('active');
 
-                // Filter listings
                 listingCards.forEach(card => {
                     if (filter === 'all' || card.getAttribute('data-status') === filter) {
                         card.style.display = 'block';
@@ -414,7 +410,6 @@
                     }
                 });
 
-                // Show empty state if no listings match the filter
                 const visibleListings = document.querySelectorAll('.listing-card[style="display: block"]');
                 const emptyState = document.querySelector('.empty-listings');
                 const listingsGrid = document.querySelector('.listings-grid');
@@ -431,7 +426,6 @@
 
                         listingsGrid.parentNode.appendChild(emptyDiv);
 
-                        // Add event listener to the "Show All Listings" button
                         emptyDiv.querySelector('.filter-btn').addEventListener('click', function() {
                             filterButtons.forEach(btn => {
                                 if (btn.getAttribute('data-filter') === 'all') {
@@ -454,7 +448,6 @@
             });
         });
 
-        // Delete listing functionality
         const deleteButtons = document.querySelectorAll('.btn-delete');
         const deleteModal = document.getElementById('deleteModal');
         const closeModal = document.querySelector('.close');
@@ -503,7 +496,6 @@
                 if (data.success) {
                     deleteModal.style.display = 'none';
 
-                    // Remove the listing card with animation
                     const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
                     if (listingCard) {
                         listingCard.style.opacity = '0';
@@ -512,7 +504,6 @@
                         setTimeout(() => {
                             listingCard.remove();
 
-                            // Check if there are any listings left
                             const remainingListings = document.querySelectorAll('.listing-card');
                             if (remainingListings.length === 0) {
                                 document.querySelector('.my-listings-container').innerHTML = `
@@ -526,7 +517,6 @@
                         }, 300);
                     }
 
-                    // Show success message
                     const successAlert = document.createElement('div');
                     successAlert.className = 'alert alert-success';
                     successAlert.textContent = 'Listing deleted successfully';
@@ -534,13 +524,11 @@
                     const header = document.querySelector('.my-listings-header');
                     header.parentNode.insertBefore(successAlert, header.nextSibling);
 
-                    // Remove alert after 3 seconds
                     setTimeout(() => {
                         successAlert.style.opacity = '0';
                         setTimeout(() => successAlert.remove(), 300);
                     }, 3000);
                 } else {
-                    // Show error message
                     alert(data.message || 'Error deleting listing. Please try again.');
                     deleteModal.style.display = 'none';
                 }

@@ -15,7 +15,6 @@ namespace PrimeMarket.Models.Products
         [ForeignKey("Listing")]
         public int ListingId { get; set; }
 
-        // Navigation property
         public virtual Listing Listing { get; set; }
     }
 }

@@ -8,7 +8,7 @@
         public decimal Price { get; set; }
         public string SellerName { get; set; }
         public string ImageUrl { get; set; }
-        public int? MaxStock { get; set; } // Added property to store the maximum available stock
+        public int? MaxStock { get; set; } 
         public int Quantity { get; set; } = 1;
     }
 }

@@ -1,5 +1,4 @@
-﻿/* Reset and Base Styling */
-* {
+﻿* {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
@@ -16,12 +15,10 @@ body {
     padding-top: 40px;
 }
 
-/* Logo */
 .logo {
     margin-bottom: 20px;
 }
 
-/* Payment Card Container */
 .payment-card {
     background-color: white;
     border-radius: 10px;
@@ -32,7 +29,6 @@ body {
     text-align: left;
 }
 
-    /* Title */
     .payment-card h2 {
         margin-bottom: 25px;
         font-size: 1.5rem;
@@ -40,7 +36,6 @@ body {
         color: #222;
     }
 
-/* Form Labels & Inputs */
 label {
     display: block;
     margin-bottom: 6px;
@@ -58,7 +53,6 @@ input[type="password"] {
     font-size: 1em;
 }
 
-/* Button */
 .pay-button {
     width: 100%;
     padding: 14px;
@@ -76,7 +70,6 @@ input[type="password"] {
         background-color: #0052b4;
     }
 
-/* Responsive Design */
 @media (max-width: 600px) {
     .payment-card {
         padding: 20px;

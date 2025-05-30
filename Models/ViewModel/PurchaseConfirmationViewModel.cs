@@ -1,5 +1,4 @@
-﻿// Update PurchaseConfirmationViewModel.cs with additional properties
-
+﻿
 using PrimeMarket.Models.Enum;
 
 namespace PrimeMarket.Models.ViewModel
@@ -30,15 +29,12 @@ namespace PrimeMarket.Models.ViewModel
         public bool IsViewerBuyer { get; set; }
         public bool IsSecondHandPurchase { get; set; }
         public decimal OfferAmount { get; set; }
-        public int Quantity { get; set; } = 1; // Default to 1
+        public int Quantity { get; set; } = 1; 
 
-        // Helper property to calculate unit price
         public decimal UnitPrice => Quantity > 0 ? Amount / Quantity : Amount;
 
-        // Helper property to check if purchase is cancelled
         public bool IsCancelled => PaymentStatus == PaymentStatus.Refunded;
 
-        // Helper property to check if purchase can be cancelled
         public bool CanBeCancelled => PaymentStatus != PaymentStatus.Completed &&
                                       PaymentStatus != PaymentStatus.Refunded &&
                                       !SellerShippedProduct;

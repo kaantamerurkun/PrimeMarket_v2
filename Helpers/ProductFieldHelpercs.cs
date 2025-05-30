@@ -18,7 +18,6 @@ namespace PrimeMarket.Helpers
 
             foreach (var property in properties)
             {
-                // Skip system properties
                 if (property.Name == "Id" || property.Name == "ListingId" || property.Name == "Listing")
                     continue;
 
@@ -40,7 +39,6 @@ namespace PrimeMarket.Helpers
 
         private static Type GetProductType(string category, string subcategory, string detailCategory)
         {
-            // Handle "Others" category specially
             if (string.Equals(category, "Others", StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(category, "Other", StringComparison.OrdinalIgnoreCase))
             {
@@ -51,7 +49,7 @@ namespace PrimeMarket.Helpers
             {
                 return subcategory?.ToLower() switch
                 {
-                    "ios phone" or "ios phones" => typeof(IOSPhone),
+                    "ios phone" or "ios phones" or "ıos phone" or "ıos phones" => typeof(IOSPhone),
                     "android phone" or "android phones" => typeof(AndroidPhone),
                     "other phone" or "other phones" => typeof(OtherPhone),
                     "phone accessories" or "phone accessory" => typeof(PhoneAccessory),
@@ -64,7 +62,7 @@ namespace PrimeMarket.Helpers
             {
                 return subcategory?.ToLower() switch
                 {
-                    "ios tablet" or "ios tablets" => typeof(IOSTablet),
+                    "ios tablet" or "ios tablets" or "ıos tablet" or "ıos tablets" => typeof(IOSTablet),
                     "android tablet" or "android tablets" => typeof(AndroidTablet),
                     "other tablet" or "other tablets" => typeof(OtherTablet),
                     "tablet accessories" or "tablet accessory" => typeof(TabletAccessory),
@@ -152,7 +150,7 @@ namespace PrimeMarket.Helpers
         {
             if (property.PropertyType == typeof(bool) || property.PropertyType == typeof(bool?))
             {
-                return "select"; // We'll use Yes/No dropdown for boolean
+                return "select"; 
             }
             else if (IsNumericType(property.PropertyType))
             {
@@ -179,7 +177,6 @@ namespace PrimeMarket.Helpers
         {
             string name = property.Name.ToLower();
 
-            // Generate smart placeholders based on property name
             var placeholderMap = new Dictionary<string, string>
             {
                 { "ram", "e.g. 16GB" },
@@ -232,7 +229,6 @@ namespace PrimeMarket.Helpers
                 return new List<string> { "Yes", "No" };
             }
 
-            // Add specific options based on property names
             string name = property.Name.ToLower();
 
             if (name.Contains("energy"))
@@ -244,7 +240,7 @@ namespace PrimeMarket.Helpers
             else if (name.Contains("chargingport") || name.Contains("port"))
                 return new List<string> { "USB-C", "Lightning", "Micro USB", "USB-A", "Other" };
 
-            return null; // No predefined options
+            return null; 
         }
 
         private static bool IsRequired(PropertyInfo property)
@@ -273,9 +269,9 @@ namespace PrimeMarket.Helpers
     {
         public string Name { get; set; }
         public string Label { get; set; }
-        public string Type { get; set; } // "text", "number", "select"
+        public string Type { get; set; }
         public string Placeholder { get; set; }
-        public List<string> Options { get; set; } // For select fields
+        public List<string> Options { get; set; }
         public bool IsRequired { get; set; }
     }
 }

@@ -393,7 +393,6 @@
             color: #666;
         }
 
-        /* Modal styles for rejection */
         .modal {
             display: none;
             position: fixed;
@@ -508,7 +507,6 @@
                     </div>
                 }
 
-                <!-- Listing Images -->
                 <div class="info-section">
                     <h3>Images</h3>
                     <div class="listing-images">
@@ -532,7 +530,6 @@
                     </div>
                 </div>
 
-                <!-- Seller Information -->
                 <div class="info-section">
                     <h3>Seller Information</h3>
                     <div class="seller-profile">
@@ -565,7 +562,6 @@
                     }
                 </div>
 
-                <!-- Listing Details -->
                 <div class="info-section">
                     <h3>Listing Details</h3>
                     <div class="info-grid">
@@ -612,13 +608,11 @@
                     </div>
                 </div>
 
-                <!-- Description -->
                 <div class="info-section">
                     <h3>Description</h3>
                     <p>@Model.Description</p>
                 </div>
 
-                <!-- Product Specifications -->
                 @if (product != null)
                 {
                     <div class="info-section">
@@ -645,7 +639,6 @@
                     </div>
                 }
 
-                <!-- Action Buttons -->
                 @if (Model.Status == PrimeMarket.Models.Enum.ListingStatus.Pending)
                 {
                     <div class="action-buttons">
@@ -658,7 +651,6 @@
                     </div>
                 }
 
-                <!-- Listing History -->
                 @if (listingHistory != null && listingHistory.Any())
                 {
                     <div class="listing-history">
@@ -677,7 +669,6 @@
         </div>
     </div>
 
-    <!-- Rejection Modal -->
     <div id="rejectModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeRejectModal()">&times;</span>
@@ -784,7 +775,6 @@
             </div>
 
 
-            <!-- Listings Container (Fix for innerHTML error) -->
             <div id="profileModalListingsContainer" class="listings-grid"></div>
 
             <div class="modal-actions">
@@ -798,7 +788,6 @@
                         function fetchUserDetails(userId) {
                     if (!userId) return;
 
-                    // Get the CSRF token
                     const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
                     fetch(`/Admin/GetUserDetails?userId=${userId}`, {
@@ -819,7 +808,6 @@
                     .then(user => {
                         console.log('User details received:', user);
 
-                        // Update the UI with the user details
                         document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
                         document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
                         document.getElementById('profileModalUserEmail').textContent = user.email || "";
@@ -835,14 +823,12 @@
                             document.getElementById('profileModalUserImage').src = user.profileImagePath;
                         }
 
-                        // Show verification badge if user is verified
                         if (user.isIdVerified) {
                             document.getElementById('profileModalVerificationBadge').style.display = 'block';
                         } else {
                             document.getElementById('profileModalVerificationBadge').style.display = 'none';
                         }
 
-                        // Fetch user listings after user details are loaded
                     })
                     .catch(error => {
                         console.error('Error fetching user details:', error);
@@ -853,17 +839,14 @@
                         document.getElementById('profileModalUserCreated').textContent = "";
                         document.getElementById('profileModalUserVerification').textContent = "Unknown";
 
-                        // We'll still try to fetch listings in case user details failed but listings might succeed
                     });
                 }
-                // User Profile Modal Functions
         function openUserProfileModal(userId, userName) {
             if (!userId) return;
 
             document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
             document.getElementById('userProfileModal').style.display = 'block';
 
-            // Clear previous data
             document.getElementById('profileModalUserFirstName').textContent = "";
             document.getElementById('profileModalUserLastName').textContent = "";
             document.getElementById('profileModalUserEmail').textContent = "";
@@ -874,10 +857,8 @@
             document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
 
-            // Fetch user details
             fetchUserDetails(userId);
 
-            // Set up close button click handler
             document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
         }
 
@@ -889,14 +870,12 @@
                     }
                 }
 
-        // Close modal when clicking outside
         window.onclick = function(event) {
             const modal = document.getElementById('rejectModal');
             if (event.target === modal) {
                 closeRejectModal();
             }
         }
-        // Update the window.onclick event to handle both modals
         window.onclick = function(event) {
             const rejectModal = document.getElementById('rejectModal');
             const userProfileModal = document.getElementById('userProfileModal');
@@ -909,7 +888,6 @@
                 closeUserProfileModal();
             }
         }
-        // Show/hide other reason textarea
         document.getElementById('reasonOther')?.addEventListener('change', function() {
             document.getElementById('otherReasonText').style.display = this.checked ? 'block' : 'none';
         });
@@ -920,7 +898,6 @@
 
         function closeRejectModal() {
             document.getElementById('rejectModal').style.display = 'none';
-            // Reset form
             document.querySelectorAll('input[name="reason"]').forEach(checkbox => checkbox.checked = false);
             document.getElementById('otherReasonText').style.display = 'none';
             document.getElementById('otherReasonText').value = '';
@@ -944,7 +921,6 @@
                 return;
             }
 
-            // Create a hidden input with the rejection reasons
             const rejectionReasonInput = document.createElement('input');
             rejectionReasonInput.type = 'hidden';
             rejectionReasonInput.name = 'rejectionReason';

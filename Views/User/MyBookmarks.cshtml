@@ -55,7 +55,6 @@
                         </a>
                         <div class="bookmark-actions">
                             <button class="btn-remove" onclick="removeBookmark(@bookmark.ListingId, @bookmark.Id)">Remove</button>
-@*                             <a href="@Url.Action("AddToCart", "Payment", new { listingId = bookmark.ListingId })" class="btn-cart">Add to Cart</a> *@
                         </div>
                     </div>
                 }
@@ -238,7 +237,6 @@
     }</style>
 
 <script>
-            /* ---------- bookmark ---------- */
     function toggleBookmark(listingId) {
         fetch('/Listing/ToggleBookmark', {
             method: 'POST',
@@ -255,7 +253,6 @@
                     bookmarkBtn.textContent = d.isBookmarked ? 'Remove from Bookmark' : 'Add to Bookmark';
                 }
 
-                // Show feedback to user
                 const feedbackDiv = document.createElement('div');
                 feedbackDiv.className = 'bookmark-feedback';
                 feedbackDiv.textContent = d.message;
@@ -271,7 +268,6 @@
 
                 document.body.appendChild(feedbackDiv);
 
-                // Remove feedback after 3 seconds
                 setTimeout(() => {
                     feedbackDiv.style.opacity = '0';
                     feedbackDiv.style.transition = 'opacity 0.5s ease';
@@ -299,7 +295,6 @@
         .then(d => {
             if (!d.success) { alert(d.message); return; }
 
-            // fade-out & remove the card
             const el = document.getElementById(`bookmark-${bookmarkDomId}`);
             if (el) {
                 el.style.opacity = '0';
@@ -307,7 +302,6 @@
                 setTimeout(() => {
                     el.remove();
 
-                    // show empty-state if nothing left
                     if (!document.querySelector('.bookmark-item')) {
                         document.querySelector('.bookmarks-container').innerHTML = `
                             <div class="empty-bookmarks">

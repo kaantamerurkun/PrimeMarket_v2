@@ -11,7 +11,6 @@
         public int TotalPurchases { get; set; }
         public DateTime LastActivity { get; set; }
 
-        // Calculated property for display
         public int DaysSinceLastActive => (DateTime.Now - LastActivity).Days;
     }
 }

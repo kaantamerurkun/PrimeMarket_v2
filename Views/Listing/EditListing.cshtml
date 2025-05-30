@@ -4,7 +4,6 @@
     ViewData["Title"] = "Edit Listing";
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 
-    // Get dynamic fields using the helper class
     var productFields = ProductFieldHelper.GetProductFields(Model.Category, Model.SubCategory, Model.DetailCategory);
 }
 
@@ -124,7 +123,6 @@
                     </div>
 
                     <div id="deletedImagesContainer">
-                        <!-- Hidden inputs for deleted images will be added here by JavaScript -->
                     </div>
                 </div>
 
@@ -141,14 +139,11 @@
                                     <label for="@field.Name">@field.Label @(field.IsRequired ? Html.Raw("<span class=\"required\">*</span>") : "")</label>
                                     
                                     @{
-                                        // Get existing value for this field
                                         var existingValue = "";
                                         if (Model.DynamicProperties != null)
                                         {
-                                            // Try exact match first
                                             Model.DynamicProperties.TryGetValue(field.Name, out existingValue);
                                             
-                                            // If no exact match, try case-insensitive
                                             if (string.IsNullOrEmpty(existingValue))
                                             {
                                                 var matchedKey = Model.DynamicProperties.Keys
@@ -574,13 +569,11 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Track deleted image IDs
         const deletedImageIds = [];
         const newImagesInput = document.getElementById('newImages');
         const deletedImagesContainer = document.getElementById('deletedImagesContainer');
         const imagesErrorContainer = document.getElementById('imagesErrorContainer');
 
-        // Image preview functionality
         const previewContainer = document.getElementById('image-preview');
 
         newImagesInput.addEventListener('change', function() {
@@ -605,11 +598,9 @@
             }
         });
 
-        // Delete single image
         window.deleteImage = function(imageId, buttonElement) {
             const imageItem = buttonElement.closest('.image-item');
 
-            // Check if this would remove all images
             const currentImageCount = document.querySelectorAll('.image-item').length;
             const hasNewImages = newImagesInput.files.length > 0;
 
@@ -618,27 +609,21 @@
                 return;
             }
 
-            // Add to deleted IDs array
             deletedImageIds.push(imageId);
 
-            // Create hidden input for the server
             const hiddenInput = document.createElement('input');
             hiddenInput.type = 'hidden';
             hiddenInput.name = 'DeletedImageIds';
             hiddenInput.value = imageId;
             deletedImagesContainer.appendChild(hiddenInput);
 
-            // Remove from UI
             imageItem.remove();
 
-            // Hide error message if it was showing
             imagesErrorContainer.style.display = 'none';
 
-            // Check if all images are now deleted
             updateImagesUI();
         };
 
-        // Helper function to update the images UI
         function updateImagesUI() {
             const imageItems = document.querySelectorAll('.image-item');
             const currentImages = document.querySelector('.current-images');
@@ -648,7 +633,6 @@
             }
         }
 
-        // Helper function to check image validation state
         function updateImagesValidation() {
             const imageItems = document.querySelectorAll('.image-item');
             const hasExistingImages = imageItems.length > 0;
@@ -661,7 +645,6 @@
             }
         }
 
-        // Form submission validation
         document.getElementById('editListingForm').addEventListener('submit', function(e) {
             const imageItems = document.querySelectorAll('.image-item');
             const hasExistingImages = imageItems.length > 0;
@@ -671,7 +654,6 @@
                 e.preventDefault();
                 imagesErrorContainer.style.display = 'block';
 
-                // Scroll to the error message
                 imagesErrorContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 return false;
             }

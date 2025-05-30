@@ -15,25 +15,20 @@ namespace PrimeMarket.Models.ViewModel
         public DateTime OfferDate { get; set; }
         public DateTime? ResponseDate { get; set; }
 
-        // User details
         public int BuyerId { get; set; }
         public string BuyerName { get; set; }
         public int SellerId { get; set; }
         public string SellerName { get; set; }
 
-        // Counter offer details
         public bool IsCounterOffer { get; set; }
         public int? OriginalOfferId { get; set; }
         public decimal? OriginalOfferAmount { get; set; }
 
-        // Counter offer collections
         public List<OfferDetailViewModel> CounterOffers { get; set; }
 
-        // For checking user permissions
         public bool IsViewerSeller { get; set; }
         public bool IsViewerBuyer { get; set; }
 
-        // Actions available
         public bool CanAccept => Status == OfferStatus.Pending && IsViewerSeller;
         public bool CanReject => Status == OfferStatus.Pending && IsViewerSeller;
         public bool CanCounter => Status == OfferStatus.Pending && IsViewerSeller;

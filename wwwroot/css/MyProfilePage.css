@@ -58,7 +58,6 @@ body {
     right: 20px;
 }
 
-/* Modal Styling */
 #editModal {
     display: none;
     position: fixed;

@@ -1,5 +1,4 @@
-﻿// In ViewComponents/BookmarkCountViewComponent.cs
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PrimeMarket.Data;
 using System.Threading.Tasks;

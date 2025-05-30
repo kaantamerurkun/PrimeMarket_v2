@@ -18,7 +18,6 @@ namespace PrimeMarket.Models.ViewModel
 
         public string ProfileImagePath { get; set; }
 
-        // Password change fields (optional)
         public string CurrentPassword { get; set; }
 
         [MinLength(6)]

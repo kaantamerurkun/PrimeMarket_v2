@@ -69,11 +69,9 @@
             chatMessages.appendChild(newMessage);
             messageInput.value = '';
 
-            // Scroll to the bottom of the chat
             chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Allow sending message by pressing Enter
         document.getElementById('messageInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 sendMessage();

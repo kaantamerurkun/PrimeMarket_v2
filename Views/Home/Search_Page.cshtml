@@ -21,7 +21,6 @@
         <h2 class="results-title">Search Results</h2>
     }
 
-    <!-- Display search results -->
     <div class="search-results">
         @if (ViewBag.ShowIdFormatMessage == true)
         {
@@ -55,10 +54,8 @@
                             <h3>@listing.Title</h3>
                             <p class="result-price">@listing.Price.ToString("C")</p>
 
-                            <!-- Star Rating Display -->
                             <div class="item-rating">
                                 @{
-                                    // Use TryGetValue pattern to avoid null reference exceptions
                                     double? avgRating = null;
                                     if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(listing.Id))
                                     {
@@ -97,7 +94,6 @@
         }
     </div>
 
-    <!-- ID Search Modal -->
     <div id="idSearchModal" class="modal">
         <div class="modal-content">
             <h2 class="modal-title">ID Search Format</h2>
@@ -115,14 +111,12 @@
         const idSearchModal = document.getElementById('idSearchModal');
         const closeModalBtn = document.getElementById('closeModal');
 
-        // Close modal button
         if (closeModalBtn) {
             closeModalBtn.addEventListener('click', function() {
                 idSearchModal.style.display = 'none';
             });
         }
 
-        // Also close modal if clicked outside
         window.addEventListener('click', function(e) {
             if (e.target === idSearchModal) {
                 idSearchModal.style.display = 'none';
@@ -132,7 +126,6 @@
 </script>
 
 <style>
-    /* Logo styles */
     .logo img {
         width: 120px;
         height: 50px;
@@ -140,7 +133,6 @@
         border-radius: 8px;
     }
 
-    /* Star Rating Styles */
     .item-rating {
         margin-bottom: 8px;
     }
@@ -165,7 +157,6 @@
         color: #666;
     }
 
-    /* Results container styles */
     .results-container {
         padding-bottom: 50px;
     }
@@ -256,7 +247,6 @@
         color: #555;
     }
 
-    /* Modal styles */
     .modal {
         display: none;
         position: fixed;
@@ -304,7 +294,6 @@
         color: white;
     }
 
-    /* Responsive adjustments */
     @@media (max-width: 768px) {
         .results-grid
 
@@ -323,7 +312,6 @@
 
     }
 
-    /* Ensure the search form in the header maintains consistent positioning */
     .search-box {
         position: relative;
         width: 300px;
@@ -338,7 +326,6 @@
             transition: border-color 0.3s ease;
         }
 
-    /* Override search page specific styles that may be causing conflicts */
     .search-body {
         font-family: inherit;
         margin: 0;
@@ -351,7 +338,6 @@
         height: auto;
     }
 
-    /* Fix for the header search bar */
     #header-search-form {
         width: 100%;
         position: relative;

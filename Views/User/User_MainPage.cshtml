@@ -10,17 +10,16 @@
     <title>PrimeMarket - Main Page</title>
     <link rel="stylesheet" href="/css/UserMainPage.css" />
     <style>
-        /* Add these styles to both CSS sections in User_MainPage.cshtml and Index.cshtml */
 
         .item-card-link {
             text-decoration: none;
             color: inherit;
             display: block;
             transition: transform 0.2s ease;
-            width: calc(25% - 20px); /* 4 per row */
+            width: calc(25% - 20px); 
             min-width: 250px;
             max-width: 300px;
-            height: 350px; /* Fixed height for all cards */
+            height: 350px;
         }
 
             .item-card-link:hover {
@@ -41,7 +40,7 @@
         .item-image {
             height: 200px;
             overflow: hidden;
-            flex-shrink: 0; /* Prevent image from shrinking */
+            flex-shrink: 0; 
         }
 
             .item-image img {
@@ -55,20 +54,20 @@
             flex-grow: 1;
             display: flex;
             flex-direction: column;
-            overflow: hidden; /* Prevent content from overflowing */
+            overflow: hidden;
         }
 
             .item-info h3 {
                 margin-top: 0;
                 margin-bottom: 10px;
                 font-size: 18px;
-                white-space: nowrap; /* Keep the text on a single line */
-                overflow: hidden; /* Hide overflow text */
-                text-overflow: ellipsis; /* Add ellipsis (...) at the end */
-                max-width: 100%; /* Ensure it takes full width of container */
-                line-height: 1.5; /* Proper line height for descenders */
-                padding-bottom: 5px; /* Extra padding to prevent cutting off descenders */
-                height: 27px; /* Fixed height to accommodate the line height */
+                white-space: nowrap; 
+                overflow: hidden; 
+                text-overflow: ellipsis;
+                max-width: 100%; 
+                line-height: 1.5;
+                padding-bottom: 5px;
+                height: 27px;
             }
         .logo img {
             width: 120px;
@@ -101,7 +100,7 @@
             color: inherit;
             display: block;
             transition: transform 0.2s ease;
-            width: calc(25% - 20px); /* 4 per row */
+            width: calc(25% - 20px); 
             min-width: 250px;
             max-width: 300px;
         }
@@ -177,7 +176,6 @@
             margin-top: 10px;
         }
 
-        /* Star Rating Styles */
         .item-rating {
             margin-bottom: 8px;
         }
@@ -247,7 +245,6 @@
                                 <p class="item-price">@item.Price.ToString("C")</p>
                                 <div class="item-rating">
                                     @{
-                                        // Use TryGetValue pattern to avoid null reference exceptions
                                         double? avgRating = null;
                                         if (ViewBag.ListingRatings != null && ViewBag.ListingRatings.ContainsKey(item.Id))
                                         {

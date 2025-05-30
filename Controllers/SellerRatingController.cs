@@ -33,14 +33,12 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Check if the seller exists
                 var seller = await _context.Users.FindAsync(sellerId);
                 if (seller == null)
                 {
                     return Json(new { success = false, message = "Seller not found." });
                 }
 
-                // Check if the user has completed a purchase from this seller
                 var completedPurchase = await _context.Purchases
                     .Include(p => p.Listing)
                     .Include(p => p.Confirmation)
@@ -56,7 +54,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "You can only rate sellers from whom you have completed a purchase." });
                 }
 
-                // Check if the user has already rated this seller for this purchase
                 var existingRating = await _context.SellerRatings
                     .FirstOrDefaultAsync(r => r.BuyerId == userId &&
                                             r.SellerId == sellerId &&
@@ -64,20 +61,16 @@ namespace PrimeMarket.Controllers
 
                 if (existingRating != null)
                 {
-                    // Update existing rating
                     existingRating.Rating = rating;
-                    //existingRating.Comment = comment;
                     existingRating.UpdatedAt = DateTime.UtcNow;
                 }
                 else
                 {
-                    // Create new rating
                     var sellerRating = new SellerRating
                     {
                         BuyerId = userId.Value,
                         SellerId = sellerId,
                         Rating = rating,
-                        //Comment = comment,
                         PurchaseId = completedPurchase.Id,
                         CreatedAt = DateTime.UtcNow
                     };
@@ -87,7 +80,6 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Calculate new average rating
                 var allRatings = await _context.SellerRatings
                     .Where(r => r.SellerId == sellerId)
                     .ToListAsync();
@@ -133,7 +125,6 @@ namespace PrimeMarket.Controllers
                 var averageRating = ratings.Average(r => r.Rating);
                 var totalRatings = ratings.Count;
 
-                // Get current user's rating if logged in
                 int userRating = 0;
                 var userId = HttpContext.Session.GetInt32("UserId");
                 if (userId != null)
@@ -169,7 +160,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Check if the user has completed a purchase from this seller
                 var hasCompletedPurchase = await _context.Purchases
                     .Include(p => p.Listing)
                     .Include(p => p.Confirmation)

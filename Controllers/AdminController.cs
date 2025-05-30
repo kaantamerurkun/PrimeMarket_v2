@@ -21,10 +21,9 @@ namespace PrimeMarket.Controllers
             _context = context;
         }
 
-        // GET: /Admin/AdminLogin
         public IActionResult AdminLogin()
         {
-            // If already logged in, redirect to dashboard
+            // Redirect admin to dashboard if already logged in
             if (HttpContext.Session.GetInt32("AdminId") != null)
             {
                 return RedirectToAction(nameof(AdminDashboard));
@@ -34,7 +33,6 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> GetUserDetails(int userId)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -50,7 +48,6 @@ namespace PrimeMarket.Controllers
                 return NotFound(new { success = false, message = "User not found" });
             }
 
-            // Return user details as JSON
             return Json(new
             {
                 id = user.Id,
@@ -65,11 +62,9 @@ namespace PrimeMarket.Controllers
             });
         }
 
-        // GET: /Admin/GetUserListings
         [HttpGet]
         public async Task<IActionResult> GetUserListings(int userId)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -87,7 +82,6 @@ namespace PrimeMarket.Controllers
                 return Json(new List<object>());
             }
 
-            // Return listings as JSON
             var result = listings.Select(l => new
             {
                 id = l.Id,
@@ -114,17 +108,17 @@ namespace PrimeMarket.Controllers
             return Json(result);
         }
 
-        // POST: /Admin/AdminLogin
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> AdminLogin(AdminLoginModel model)
         {
+            // Validate login form fields
             if (!ModelState.IsValid)
             {
                 ViewBag.ErrorMessage = "Please enter both username and password.";
                 return View();
             }
-
+            // Check admin credentials
             var admin = await _context.Admins
                 .FirstOrDefaultAsync(a => a.Username == model.Username);
 
@@ -134,19 +128,16 @@ namespace PrimeMarket.Controllers
                 return View();
             }
 
-            // Use secure password comparison
-            //string hashedPassword = ComputeSha256Hash(model.Password);
+
             if (admin.Password != model.Password)
             {
                 ViewBag.ErrorMessage = "Invalid username or password.";
                 return View();
             }
-
-            // Store admin ID in session
+            // Set admin session and log action
             HttpContext.Session.SetInt32("AdminId", admin.Id);
             HttpContext.Session.SetString("AdminUsername", admin.Username);
 
-            // Log the admin action
             var adminAction = new AdminAction
             {
                 AdminId = admin.Id,
@@ -163,10 +154,8 @@ namespace PrimeMarket.Controllers
         }
 
 
-        // GET: /Admin/AdminDashboard
         public IActionResult AdminDashboard()
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -176,14 +165,13 @@ namespace PrimeMarket.Controllers
             return View();
         }
 
-        // GET: /Admin/Logout
         public async Task<IActionResult> Logout()
         {
+            // Log logout event before clearing session
             var adminId = HttpContext.Session.GetInt32("AdminId");
 
             if (adminId != null)
             {
-                // Log the admin action
                 var adminAction = new AdminAction
                 {
                     AdminId = adminId.Value,
@@ -197,7 +185,6 @@ namespace PrimeMarket.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Clear session
             HttpContext.Session.Clear();
 
             return RedirectToAction(nameof(AdminLogin));
@@ -206,7 +193,7 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> PendingListings()
         {
-            // Check if admin is logged in
+            // Fetch listings with Pending status for admin review
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -226,7 +213,6 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> ListingDetails(int id)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -243,10 +229,8 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Get the specific product details based on the category
             dynamic? product = null;
 
-            // Special handling for "Others" category
             if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
             {
                 product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -457,7 +441,7 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Get seller verification status
+
             var sellerVerification = await _context.VerificationDocuments
                 .FirstOrDefaultAsync(v => v.UserId == listing.SellerId);
 
@@ -465,11 +449,9 @@ namespace PrimeMarket.Controllers
             ViewBag.SellerVerification = sellerVerification;
             ViewBag.IsSellerVerified = listing.Seller?.IsIdVerified ?? false;
 
-            // Check if this is an updated listing
             ViewBag.IsUpdatedListing = listing.UpdatedAt.HasValue &&
                                        listing.UpdatedAt.Value > listing.CreatedAt.Value.AddMinutes(5);
 
-            // Get any previous versions/history of the listing if needed
             ViewBag.ListingHistory = await _context.AdminActions
                 .Where(a => a.EntityType == "Listing" && a.EntityId == id)
                 .OrderByDescending(a => a.CreatedAt)
@@ -482,7 +464,7 @@ namespace PrimeMarket.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveListing(int id)
         {
-            // Check if admin is logged in
+            // Admin approves listing, updates status and notifies seller
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -500,7 +482,6 @@ namespace PrimeMarket.Controllers
                 listing.Status = ListingStatus.Active;
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // Create an admin action record
                 var adminAction = new AdminAction
                 {
                     AdminId = adminId.Value,
@@ -512,7 +493,6 @@ namespace PrimeMarket.Controllers
                 };
                 _context.AdminActions.Add(adminAction);
 
-                // Create a notification for the seller
                 var notification = new Notification
                 {
                     UserId = listing.SellerId,
@@ -535,12 +515,11 @@ namespace PrimeMarket.Controllers
             }
         }
 
-        // Updated RejectListing method to handle checkbox rejection reasons
-        // --------------  LISTING REJECT -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectListing(int id, string rejectionReason)
         {
+            // Admin rejects listing with reason and sends notification
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
                 return Json(new { success = false, message = "You are not signed-in as an admin." });
@@ -558,7 +537,7 @@ namespace PrimeMarket.Controllers
                 listing.RejectionReason = rejectionReason;
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // audit + notification (unchanged)
+
                 _context.AdminActions.Add(new AdminAction
                 {
                     AdminId = adminId.Value,
@@ -580,10 +559,7 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // --- key point --------------------------------------------------
-                // If this was an AJAX request (fetch with `Accept: application/json`)
-                // return JSON; otherwise fall back to the old redirect/TempData flow.
-                // ----------------------------------------------------------------
+
                 if (Request.Headers["Accept"].Any(h => h.Contains("application/json")))
                     return Json(new { success = true });
 
@@ -604,7 +580,7 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> PendingVerifications()
         {
-            // Check if admin is logged in
+
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -623,7 +599,6 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> VerificationDetails(int id)
         {
-            // Check if admin is logged in
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
@@ -639,21 +614,20 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Ensure face image property is available in the view
             ViewBag.FaceImagePath = verification.FaceImagePath ?? "/images/user-placeholder.png";
 
             return View(verification);
         }
 
-        // --------------  helper --------------
         private IActionResult Fail(string msg) =>
             Json(new { success = false, message = msg });
 
-        // --------------  APPROVE -------------
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> ApproveVerification(int id)
         {
+            // Admin approves user verification and updates related user status
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null) return Fail("You are not signed-in as an admin.");
 
@@ -697,7 +671,6 @@ namespace PrimeMarket.Controllers
             }
         }
 
-        // --------------  REJECT -------------
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> RejectVerification(int id, string rejectionReason)
@@ -750,14 +723,13 @@ namespace PrimeMarket.Controllers
 
         public async Task<IActionResult> UsageReport()
         {
-            // Check if admin is logged in
+            // Collects usage statistics including listings, sales, and user activity
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
                 return RedirectToAction(nameof(AdminLogin));
             }
 
-            // Get user statistics
             var users = await _context.Users
                 .Select(u => new UserReportViewModel
                 {
@@ -777,24 +749,18 @@ namespace PrimeMarket.Controllers
                 .OrderByDescending(u => u.LastActivity)
                 .ToListAsync();
 
-            // Get listing statistics
             var totalListings = await _context.Listings.CountAsync();
             var pendingListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Pending);
             var approvedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Active);
 
-            // Count listings with Sold status
             var soldListingsCount = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Sold);
 
-            // Count listings with Archived status
             var archivedListings = await _context.Listings.CountAsync(l => l.Status == ListingStatus.Archived);
 
-            // Calculate total items sold by taking into account purchase quantities
-            // Include purchases from listings with any status (including Archived)
             var totalItemsSold = await _context.Purchases
                 .Where(p => p.PaymentStatus == PaymentStatus.Completed || p.PaymentStatus == PaymentStatus.Authorized)
                 .SumAsync(p => p.Quantity);
 
-            // Get category breakdown (include all listings in all statuses)
             var categoryStats = await _context.Listings
                 .GroupBy(l => l.Category)
                 .Select(g => new CategoryStatViewModel
@@ -813,8 +779,8 @@ namespace PrimeMarket.Controllers
                 TotalListings = totalListings,
                 PendingListings = pendingListings,
                 ApprovedListings = approvedListings,
-                SoldListings = totalItemsSold, // Using the total quantity sold
-                ArchivedListings = archivedListings, // Added Archived listings count
+                SoldListings = totalItemsSold, 
+                ArchivedListings = archivedListings, 
                 CategoryStats = categoryStats
             };
 
@@ -824,14 +790,14 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public IActionResult ExportUsageReport()
         {
-            // Check if admin is logged in
+
             var adminId = HttpContext.Session.GetInt32("AdminId");
             if (adminId == null)
             {
                 return RedirectToAction(nameof(AdminLogin));
             }
 
-            // Generate CSV content
+
             var users = _context.Users
                 .Select(u => new
                 {
@@ -850,7 +816,7 @@ namespace PrimeMarket.Controllers
                 })
                 .ToList();
 
-            // Build CSV content
+
             var csv = new StringBuilder();
             csv.AppendLine("User ID,Full Name,Email,Sign Up Date,Total Listings,Total Sales,Total Purchases,Last Activity");
 

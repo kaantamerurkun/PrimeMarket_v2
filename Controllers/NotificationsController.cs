@@ -125,11 +125,9 @@ namespace PrimeMarket.Controllers
             }
             catch (Exception ex)
             {
-                // Log the exception details
                 Console.WriteLine($"Exception in MarkAllAsRead: {ex.Message}");
                 Console.WriteLine($"Stack trace: {ex.StackTrace}");
 
-                // Return a more detailed error
                 return Json(new
                 {
                     success = false,
@@ -245,7 +243,6 @@ namespace PrimeMarket.Controllers
                                           .ToListAsync();
             return View(notifications);
         }
-        // Update the Details action in NotificationsController.cs to handle PurchaseCancelled
 
         [HttpGet]
         [UserAuthenticationFilter]
@@ -265,7 +262,6 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Mark as read
             if (!notification.IsRead)
             {
                 notification.IsRead = true;
@@ -273,14 +269,12 @@ namespace PrimeMarket.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Redirect based on notification type
             switch (notification.Type)
             {
                 case NotificationType.ListingApproved:
                 case NotificationType.ListingRejected:
                     return RedirectToAction("MyListing", "User", new { id = notification.RelatedEntityId });
                 case NotificationType.NewMessage:
-                    // Need to get the conversation details first
                     var message = await _context.Messages.FirstOrDefaultAsync(m => m.Id == notification.RelatedEntityId);
                     if (message != null)
                     {
@@ -296,7 +290,6 @@ namespace PrimeMarket.Controllers
                     return RedirectToAction("Details", "Listing", new { id = offer?.ListingId ?? notification.RelatedEntityId });
                 case NotificationType.VerificationApproved:
                 case NotificationType.VerificationRejected:
-                    // Update session verification status when user clicks on a verification notification
                     if (notification.Type == NotificationType.VerificationApproved)
                     {
                         var user = await _context.Users.FindAsync(userId);
@@ -307,17 +300,15 @@ namespace PrimeMarket.Controllers
                     }
                     return RedirectToAction("MyProfilePage", "User");
                 case NotificationType.PurchaseCompleted:
-                case NotificationType.PurchaseCancelled: // Handle cancelled purchases
+                case NotificationType.PurchaseCancelled:
                     var purchase = await _context.Purchases.FindAsync(notification.RelatedEntityId);
                     if (purchase != null)
                     {
-                        // Always redirect to PurchaseStatus for both completed and cancelled purchases
                         return RedirectToAction("PurchaseStatus", "Payment", new { purchaseId = purchase.Id });
                     }
                     break;
             }
 
-            // Default fallback
             return RedirectToAction("Index");
         }
     }

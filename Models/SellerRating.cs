@@ -16,13 +16,11 @@ namespace PrimeMarket.Models
         [Range(1, 5)]
         public int Rating { get; set; }
 
-        //public string Comment { get; set; }
 
-        // Reference to the purchase that allows this rating
         [Required]
         public int PurchaseId { get; set; }
 
-        // Navigation properties
+
         [ForeignKey("BuyerId")]
         public virtual User Buyer { get; set; }
 

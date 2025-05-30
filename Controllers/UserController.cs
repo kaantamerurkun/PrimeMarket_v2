@@ -59,7 +59,6 @@ namespace PrimeMarket.Controllers
             return RedirectToAction("EditProfile");
         }
 
-// Enhanced UpdateEmail Method
 [HttpPost]
 [ValidateAntiForgeryToken]
 public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
@@ -85,14 +84,11 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
             try
             {
-                // Store the new email in TempData so we can access it after verification
                 TempData["NewEmail"] = model.Email;
                 TempData["IsEmailUpdate"] = true;
 
-                // Send verification code to the new email using the enhanced method
                 SendVerificationCodeForEmailUpdate(model.Email);
 
-                // Redirect to the dedicated email update verification page
                 return RedirectToAction("EmailUpdateVerification", new { email = model.Email });
             }
             catch (Exception ex)
@@ -102,7 +98,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             }
         }
 
-        // New EmailUpdateVerification action
         [HttpGet]
         public IActionResult EmailUpdateVerification(string email)
         {
@@ -110,20 +105,16 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             return View();
         }
 
-        // Enhanced method specifically for email updates
         private void SendVerificationCodeForEmailUpdate(string email)
         {
             var user = _context.Users.FirstOrDefault(u => u.Email == email);
 
-            // Remove any existing verification code for this email
             var existingCode = _context.EmailVerifications.FirstOrDefault(v => v.Email == email);
             if (existingCode != null)
                 _context.EmailVerifications.Remove(existingCode);
 
-            // Generate a new code
             var code = new Random().Next(100000, 999999).ToString();
 
-            // Save the code
             _context.EmailVerifications.Add(new EmailVerification
             {
                 Email = email,
@@ -262,7 +253,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                     ProfileImagePath = user.ProfileImagePath
                 };
 
-                // Set the verification status in ViewBag to be used in the view
                 ViewBag.IsVerified = user.IsIdVerified;
 
                 return View(model);
@@ -285,7 +275,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
             try
             {
-                // Get all offers made by this user
                 var offers = await _context.Offers
                     .Include(o => o.Listing)
                     .ThenInclude(l => l.Images)
@@ -314,7 +303,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             }
             catch (Exception ex)
             {
-                //_logger.LogError(ex, "Error getting user offers");
                 TempData["ErrorMessage"] = "An error occurred while loading your offers.";
                 return View(new List<OfferViewModel>());
             }
@@ -332,7 +320,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
             try
             {
-                // Get the offer and check it belongs to the user
                 var offer = await _context.Offers
                     .Include(o => o.Listing)
                     .FirstOrDefaultAsync(o => o.Id == offerId && o.BuyerId == userId);
@@ -343,18 +330,15 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                     return RedirectToAction("MyOffers");
                 }
 
-                // Check if the offer is in a state that can be canceled
                 if (offer.Status != OfferStatus.Pending)
                 {
                     TempData["ErrorMessage"] = "Only pending offers can be canceled.";
                     return RedirectToAction("MyOffers");
                 }
 
-                // Update the offer status
                 offer.Status = OfferStatus.Cancelled;
                 offer.UpdatedAt = DateTime.UtcNow;
 
-                // Create notification for the seller
                 var notification = new Notification
                 {
                     UserId = offer.Listing.SellerId,
@@ -366,7 +350,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
                 _context.Notifications.Add(notification);
 
-                // Add a message to the conversation about the cancellation
                 var message = new Message
                 {
                     SenderId = userId.Value,
@@ -385,7 +368,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             }
             catch (Exception ex)
             {
-                //_logger.LogError(ex, "Error canceling offer");
                 TempData["ErrorMessage"] = "An error occurred while canceling your offer: " + ex.Message;
                 return RedirectToAction("MyOffers");
             }
@@ -407,14 +389,12 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
             try
             {
-                // Save the ID images and face photo
                 var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "verification");
                 if (!Directory.Exists(uploadsFolder))
                 {
                     Directory.CreateDirectory(uploadsFolder);
                 }
 
-                // Generate unique filenames
                 string frontImageFileName = $"front_{userId}_{Guid.NewGuid()}{Path.GetExtension(idFront.FileName)}";
                 string backImageFileName = $"back_{userId}_{Guid.NewGuid()}{Path.GetExtension(idBack.FileName)}";
                 string faceImageFileName = $"face_{userId}_{Guid.NewGuid()}{Path.GetExtension(facePhoto.FileName)}";
@@ -423,7 +403,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 string backImagePath = Path.Combine(uploadsFolder, backImageFileName);
                 string faceImagePath = Path.Combine(uploadsFolder, faceImageFileName);
 
-                // Save files to disk
                 using (var frontStream = new FileStream(frontImagePath, FileMode.Create))
                 {
                     await idFront.CopyToAsync(frontStream);
@@ -439,12 +418,10 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                     await facePhoto.CopyToAsync(faceStream);
                 }
 
-                // Check if user already has a verification document
                 var existingVerification = await _context.VerificationDocuments.FirstOrDefaultAsync(v => v.UserId == userId);
 
                 if (existingVerification != null)
                 {
-                    // Update existing document
                     existingVerification.FrontImagePath = $"/images/verification/{frontImageFileName}";
                     existingVerification.BackImagePath = $"/images/verification/{backImageFileName}";
                     existingVerification.FaceImagePath = $"/images/verification/{faceImageFileName}";
@@ -454,7 +431,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 }
                 else
                 {
-                    // Create new verification document
                     var verificationDocument = new VerificationDocument
                     {
                         UserId = userId.Value,
@@ -471,7 +447,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
                 await _context.SaveChangesAsync();
 
-                // Create a notification for the user
                 var userNotification = new Notification
                 {
                     UserId = userId.Value,
@@ -497,7 +472,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
         public IActionResult Login()
         {
-            // If already logged in, redirect to main page
             if (HttpContext.Session.GetInt32("UserId") != null)
             {
                 return RedirectToAction("User_MainPage");
@@ -509,7 +483,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         [HttpGet]
         public IActionResult SignUp()
         {
-            // If already logged in, redirect to main page
             if (HttpContext.Session.GetInt32("UserId") != null)
             {
                 return RedirectToAction("User_MainPage");
@@ -547,12 +520,10 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
 
-            // Send verification code 
             try
             {
                 SendVerificationCodeInternal(model.Email);
 
-                // Add a flag to indicate we've already sent a verification code
                 TempData["VerificationSent"] = true;
 
                 return RedirectToAction("EmailVerification", "User", new { email = model.Email });
@@ -672,12 +643,10 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             if (verification == null || verification.Expiration < DateTime.UtcNow)
                 return BadRequest("Invalid or expired verification code.");
 
-            // Check if this is an email update or new account verification
             bool isEmailUpdate = TempData["IsEmailUpdate"] != null && (bool)TempData["IsEmailUpdate"];
 
             if (isEmailUpdate)
             {
-                // This is an email change verification
                 var userId = HttpContext.Session.GetInt32("UserId");
                 if (userId == null)
                     return NotFound("User not found.");
@@ -686,20 +655,16 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 if (user == null)
                     return NotFound("User not found.");
 
-                // Update the user's email
                 user.Email = email;
                 user.IsEmailVerified = true;
                 user.UpdatedAt = DateTime.UtcNow;
 
-                // Update session with new email
                 HttpContext.Session.SetString("UserEmail", user.Email);
 
-                // Set success message
                 TempData["SuccessMessage"] = "Your email has been successfully updated and verified.";
             }
             else
             {
-                // This is a new account verification
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
                 if (user == null)
                     return NotFound("User not found.");
@@ -708,11 +673,9 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 user.UpdatedAt = DateTime.UtcNow;
             }
 
-            // Remove the verification code from database
             _context.EmailVerifications.Remove(verification);
             await _context.SaveChangesAsync();
 
-            // Determine redirect URL based on type of verification
             string redirectUrl = isEmailUpdate
                 ? Url.Action("EditProfile", "User")
                 : Url.Action("Login", "User");
@@ -742,39 +705,32 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 return View();
             }
 
-            // Find the user by email
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
 
-            // Check if user exists and password is correct
             if (user == null)
             {
                 ViewBag.ErrorMessage = "Invalid email or password.";
                 return View();
             }
 
-            // Compute SHA256 hash of the provided password
             string hashedPassword = ComputeSha256Hash(password);
 
-            // Verify the password
             if (user.PasswordHash != hashedPassword)
             {
                 ViewBag.ErrorMessage = "Invalid email or password.";
                 return View();
             }
 
-            // Check if email is verified
             if (!user.IsEmailVerified)
             {
                 ViewBag.ErrorMessage = "Please verify your email before logging in.";
                 return RedirectToAction("EmailVerification", new { email = user.Email });
             }
 
-            // Store user information in session
             HttpContext.Session.SetInt32("UserId", user.Id);
             HttpContext.Session.SetString("UserName", $"{user.FirstName} {user.LastName}");
             HttpContext.Session.SetString("UserEmail", user.Email);
 
-            // Store verification status in session
             HttpContext.Session.SetString("IsUserVerified", user.IsIdVerified.ToString().ToLower());
 
             return RedirectToAction("User_MainPage");
@@ -784,14 +740,11 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         [ValidateAntiForgeryToken]
         public IActionResult Logout()
         {
-            // Clear the session
             HttpContext.Session.Clear();
 
-            // Redirect to home page
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: /User/ResetPassword
         public IActionResult ResetPassword()
         {
             return View();
@@ -806,15 +759,12 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 if (user == null)
                     return Json(new { success = false, message = "No account exists with this email address." });
 
-                // Check for existing reset code
                 var existingCode = await _context.EmailVerifications.FirstOrDefaultAsync(v => v.Email == email);
                 if (existingCode != null)
                     _context.EmailVerifications.Remove(existingCode);
 
-                // Generate a random 6-digit code
                 var code = new Random().Next(100000, 999999).ToString();
 
-                // Save new verification code to database
                 _context.EmailVerifications.Add(new EmailVerification
                 {
                     Email = email,
@@ -823,7 +773,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 });
                 await _context.SaveChangesAsync();
 
-                // Send email with verification code
                 using (var smtpClient = new SmtpClient(_emailSettings.Host))
                 {
                     smtpClient.Port = _emailSettings.Port;
@@ -886,24 +835,20 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         {
             try
             {
-                // Verify the code
                 var verification = await _context.EmailVerifications
                     .FirstOrDefaultAsync(v => v.Email == email && v.Code == code);
 
                 if (verification == null || verification.Expiration < DateTime.UtcNow)
                     return Json(new { success = false, message = "Invalid or expired verification code." });
 
-                // Get the user
                 var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
                 if (user == null)
                     return Json(new { success = false, message = "User not found." });
 
-                // Update password
                 string hashedPassword = ComputeSha256Hash(newPassword);
                 user.PasswordHash = hashedPassword;
                 user.UpdatedAt = DateTime.UtcNow;
 
-                // Remove the verification code
                 _context.EmailVerifications.Remove(verification);
 
                 await _context.SaveChangesAsync();
@@ -920,7 +865,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
 
         #region User Pages
 
-        // Update the MyProfilePage action in UserController.cs:
 
         [HttpGet]
         [UserAuthenticationFilter]
@@ -973,14 +917,12 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         }
 
 
-        // Simple route methods for views
         [UserAuthenticationFilter]
         public IActionResult User_Listing_Details(int id)
         {
             ViewBag.ListingId = id;
             return View();
         }
-        // UserController.cs - Updated User_MainPageAsync Method
         [UserAuthenticationFilter]
         public async Task<IActionResult> User_MainPageAsync()
         {
@@ -992,13 +934,11 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
-            // Calculate average ratings for all listings
             ViewBag.ListingRatings = GetListingRatings(approvedListings.Select(l => l.Id).ToList());
 
             return View(approvedListings);
         }
 
-        // Helper method to get average ratings for a list of listing IDs
         private Dictionary<int, double> GetListingRatings(List<int> listingIds)
         {
             var ratings = _context.ProductReviews
@@ -1040,7 +980,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             return View();
         }
 
-        // Add this method to UserController.cs, replacing the existing OtherUserProfile method
 
         [UserAuthenticationFilter]
         public async Task<IActionResult> OtherUserProfile(int id)
@@ -1053,14 +992,12 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 return NotFound();
             }
 
-            // Get user's listings
             var listings = await _context.Listings
                 .Where(l => l.SellerId == id && l.Status == ListingStatus.Active)
                 .Include(l => l.Images)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
-            // Get rating information
             var ratings = await _context.SellerRatings
                 .Where(r => r.SellerId == id)
                 .ToListAsync();
@@ -1074,7 +1011,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 totalRatings = ratings.Count;
             }
 
-            // Check if current user can rate this seller
             bool canRateUser = false;
             int userRating = 0;
 
@@ -1112,7 +1048,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
         [UserAuthenticationFilter]
         public IActionResult CreateListing()
         {
-            // Check if user is authenticated
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
@@ -1172,7 +1107,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
             }
             if (userId != listing.SellerId)
             {
-                // Increment view count
                 if (listing.ViewCount == null)
                 {
                     listing.ViewCount = 1;
@@ -1184,7 +1118,6 @@ public async Task<IActionResult> UpdateEmail(EditProfileViewModel model)
                 await _context.SaveChangesAsync();
             }
             await _context.SaveChangesAsync();
-            // Get the specific product details based on the category
             dynamic product = null;
 
             if (!string.IsNullOrEmpty(listing.DetailCategory))

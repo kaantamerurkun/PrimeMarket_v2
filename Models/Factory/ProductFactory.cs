@@ -11,7 +11,6 @@ namespace PrimeMarket.Models.Factory
     {
         public static BaseProduct CreateProduct(string category, string subcategory, string detailcategory)
         {
-            // Normalize subcategory to match with switch cases
             string? normalizedSubcategory = subcategory?.Trim();
             string? normalizedDetailcategory = detailcategory?.Trim();
             if (category == "Other")
@@ -65,7 +64,6 @@ namespace PrimeMarket.Models.Factory
                 }
             }
 
-            // Handle subcategories for Electronics category
             if (category == "Electronics")
             {
                 if (normalizedSubcategory == "Computer")
@@ -178,7 +176,6 @@ namespace PrimeMarket.Models.Factory
                 }
             }
 
-            // Default case to handle unmatched inputs
             throw new ArgumentException("Invalid category, subcategory, or detailcategory provided.");
         }
     }

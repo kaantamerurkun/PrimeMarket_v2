@@ -20,7 +20,6 @@ namespace PrimeMarket.Models.ViewModel
         [Required(ErrorMessage = "Condition is required")]
         public string Condition { get; set; }
 
-        // Stock field for First-Hand listings
         [Range(0, int.MaxValue, ErrorMessage = "Stock must be a positive number")]
         public int? Stock { get; set; }
 
@@ -30,7 +29,6 @@ namespace PrimeMarket.Models.ViewModel
         [Required(ErrorMessage = "Subcategory is required")]
         public string SubCategory { get; set; }
 
-        // DetailCategory is optional
         public string DetailCategory { get; set; }
 
         [Required(ErrorMessage = "Location is required")]

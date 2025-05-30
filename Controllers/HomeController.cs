@@ -21,31 +21,32 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        // Retrieve all active listings (not archived, and in stock if applicable)
         var listings = _context.Listings
             .Where(l =>
-                l.Status == ListingStatus.Active &&                // still for sale
-                l.Status != ListingStatus.Archived &&              // not archived
-                (!l.Stock.HasValue || l.Stock > 0))                // second-hand OR stock-positive
-                   .Include(l => l.Images)
-            .OrderByDescending(l => l.CreatedAt)
+                l.Status == ListingStatus.Active &&          // Only active listings      
+                l.Status != ListingStatus.Archived &&        // Exclude archived    
+                (!l.Stock.HasValue || l.Stock > 0))          // Exclude out-of-stock if stock tracking exists    
+                   .Include(l => l.Images)                   // Include images for display
+            .OrderByDescending(l => l.CreatedAt)             // Newest listings first
             .ToList();
 
-        // Calculate average ratings for all listings
+        // Attach average ratings to listings using ViewBag
         ViewBag.ListingRatings = GetListingRatings(listings.Select(l => l.Id).ToList());
 
         return View(listings);
     }
 
-    // Helper method to get average ratings for a list of listing IDs
     private Dictionary<int, double> GetListingRatings(List<int> listingIds)
     {
+        // Calculate average ratings for given listing IDs
         var ratings = _context.ProductReviews
             .Where(r => listingIds.Contains(r.ListingId))
             .GroupBy(r => r.ListingId)
             .Select(g => new
             {
                 ListingId = g.Key,
-                AverageRating = Math.Round(g.Average(r => r.Rating), 1)
+                AverageRating = Math.Round(g.Average(r => r.Rating), 1) // Round to 1 decimal place
             })
             .ToDictionary(x => x.ListingId, x => x.AverageRating);
 
@@ -68,18 +69,17 @@ public class HomeController : Controller
     {
         return View();
     }
-    // Add or update this method in your HomeController.cs file
     public IActionResult Search_Page(string query = null)
     {
+        // Store query in ViewBag for optional display in the view
         ViewBag.SearchTerm = query;
 
-        // If there's a query, redirect to the listing search action
         if (!string.IsNullOrEmpty(query))
         {
+            // Redirect to main search handler in ListingController
             return RedirectToAction("Search", "Listing", new { query });
         }
-
-        // If no query, return an empty list to display "no results" message
+        // If query is empty, return empty result view
         return View(new List<Listing>());
     }
 }

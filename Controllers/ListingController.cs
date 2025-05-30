@@ -67,7 +67,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the offer with listing
                 var offer = await _context.Offers
                     .Include(o => o.Listing)
                     .FirstOrDefaultAsync(o => o.Id == offerId);
@@ -77,10 +76,8 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "Offer not found" });
                 }
 
-                // Check if this is a second-hand listing
                 bool isSecondHand = offer.Listing.Condition == "Second-Hand";
 
-                // Get purchase info if it exists
                 var purchase = await _context.Purchases
                     .Include(p => p.Confirmation)
                     .FirstOrDefaultAsync(p => p.OfferId == offerId);
@@ -119,7 +116,6 @@ namespace PrimeMarket.Controllers
         {
             _logger.LogInformation("CreateListing called with model: {@Model}", model);
 
-            // Check if the user is authenticated
             var userId = HttpContext.Session.GetInt32("UserId");
             if (userId == null)
             {
@@ -127,7 +123,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Basic validation for required fields
             var isValid = true;
 
             if (string.IsNullOrEmpty(model.Title))
@@ -154,7 +149,6 @@ namespace PrimeMarket.Controllers
                 isValid = false;
             }
 
-            // Stock validation for first-hand listings
             if (model.Condition == "First-Hand" && (!model.Stock.HasValue || model.Stock.Value <= 0))
             {
                 ModelState.AddModelError("Stock", "Stock quantity is required for first-hand listings");
@@ -173,7 +167,6 @@ namespace PrimeMarket.Controllers
                 isValid = false;
             }
 
-            // Image validation - FIX: Only validate if both collections are empty
             if ((images == null || images.Count == 0) &&
                 (model.Images == null || model.Images.Count == 0))
             {
@@ -185,19 +178,16 @@ namespace PrimeMarket.Controllers
             {
                 _logger.LogWarning("Model validation failed: {@ModelState}", ModelState);
 
-                // Pass the selected values back to the view
                 ViewBag.SelectedCondition = model.Condition;
                 ViewBag.SelectedCategory = model.Category;
                 ViewBag.SelectedSubCategory = model.SubCategory;
                 ViewBag.SelectedDetailCategory = model.DetailCategory;
 
-                // Return to the create view with the model to retain form data
                 return View("~/Views/User/MyProfilePage.cshtml", model);
             }
 
             try
             {
-                // Create the listing
                 var listing = new Listing
                 {
                     SellerId = userId.Value,
@@ -205,14 +195,12 @@ namespace PrimeMarket.Controllers
                     Price = model.Price,
                     Description = model.Description,
                     Condition = model.Condition,
-                    // Add stock for first-hand items
                     Stock = model.Condition == "First-Hand" ? model.Stock : null,
                     Category = model.Category,
                     SubCategory = (model.SubCategory == null ||
                       model.SubCategory == "undefined" ||
                       string.IsNullOrEmpty(model.SubCategory)) ? string.Empty
                       : model.SubCategory,
-                    // Improved handling of DetailCategory
                     DetailCategory = (model.DetailCategory == null ||
                       model.DetailCategory == "undefined" ||
                       string.IsNullOrEmpty(model.DetailCategory)) ? string.Empty
@@ -228,10 +216,10 @@ namespace PrimeMarket.Controllers
 
                 _logger.LogInformation("Listing created with ID: {ListingId}", listing.Id);
 
-                // Check if this is an "Others" category listing
+
                 if (model.Category == "Others" || (model.Category != null && model.Category.Equals("Others", StringComparison.OrdinalIgnoreCase)))
                 {
-                    // Direct handling for Others category
+
                     var othersProduct = new Models.Products.Other
                     {
                         ListingId = listing.Id
@@ -240,7 +228,7 @@ namespace PrimeMarket.Controllers
                     _context.Others.Add(othersProduct);
                     _logger.LogInformation("Others product added for listing {ListingId}", listing.Id);
                 }
-                // Create the appropriate product model based on the category/subcategory
+
                 else if (!string.IsNullOrEmpty(model.Category) && !string.IsNullOrEmpty(model.SubCategory))
                 {
                     try
@@ -250,12 +238,12 @@ namespace PrimeMarket.Controllers
                         {
                             product.ListingId = listing.Id;
 
-                            // Process dynamic properties
+
                             if (model.DynamicProperties != null)
                             {
                                 foreach (var prop in model.DynamicProperties)
                                 {
-                                    // Find property with case-insensitive comparison
+
                                     PropertyInfo productProp = null;
                                     foreach (var p in product.GetType().GetProperties())
                                     {
@@ -270,11 +258,11 @@ namespace PrimeMarket.Controllers
                                     {
                                         try
                                         {
-                                            // Skip if value is empty
+
                                             if (string.IsNullOrWhiteSpace(prop.Value))
                                                 continue;
 
-                                            // Handle different property types
+
                                             if (productProp.PropertyType == typeof(bool))
                                             {
                                                 bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
@@ -305,7 +293,7 @@ namespace PrimeMarket.Controllers
                                         }
                                         catch (Exception ex)
                                         {
-                                            // Log the error but continue
+
                                             _logger.LogError(ex, "Error setting property {PropertyName}: {ErrorMessage}", productProp.Name, ex.Message);
                                         }
                                     }
@@ -317,7 +305,7 @@ namespace PrimeMarket.Controllers
                                 }
                             }
 
-                            // Add the product to the appropriate DbSet
+
                             var dbSetProperty = _context.GetType().GetProperty(product.GetType().Name + "s");
                             if (dbSetProperty != null)
                             {
@@ -348,12 +336,12 @@ namespace PrimeMarket.Controllers
                     }
                     catch (Exception ex)
                     {
-                        // Log the error but continue with listing creation
+
                         _logger.LogError(ex, "Error creating product for listing {ListingId}: {ErrorMessage}", listing.Id, ex.Message);
                     }
                 }
 
-                // Process and save images
+
                 if (images != null && images.Count > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "listings");
@@ -380,7 +368,7 @@ namespace PrimeMarket.Controllers
                             {
                                 ListingId = listing.Id,
                                 ImagePath = $"/images/listings/{uniqueFileName}",
-                                IsMainImage = isFirstImage // First image is the main image
+                                IsMainImage = isFirstImage 
                             };
 
                             _context.ListingImages.Add(listingImage);
@@ -396,7 +384,7 @@ namespace PrimeMarket.Controllers
 
                 await _context.SaveChangesAsync();
 
-                // Create notifications for all admins
+
                 var admins = await _context.Admins.ToListAsync();
                 if (admins.Any())
                 {
@@ -433,7 +421,7 @@ namespace PrimeMarket.Controllers
             }
         }
 
-        // Rest of the controller methods remain unchanged
+
         [HttpGet]
         [UserAuthenticationFilter]
         public async Task<IActionResult> MyListings()
@@ -475,7 +463,6 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Prepare the view model with existing data
             var model = new ListingViewModel
             {
                 Id = listing.Id,
@@ -490,7 +477,7 @@ namespace PrimeMarket.Controllers
                 Images = listing.Images.ToList()
             };
 
-            // Fetch product-specific properties
+
             var dynamicProperties = new Dictionary<string, string>();
 
 
@@ -706,15 +693,13 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // If product is found, extract properties using reflection
+
             if (product != null)
                 {
-                    // Log for debugging
-                    //_logger.LogInformation("Found product of type {ProductType} for listing {ListingId}", product.GetType().Name, id);
+
 
                     foreach (var prop in product.GetType().GetProperties())
                     {
-                        // Skip navigation or system properties
                         if (prop.Name == "Id" || prop.Name == "ListingId" || prop.Name == "Listing")
                             continue;
 
@@ -730,7 +715,6 @@ namespace PrimeMarket.Controllers
                                 dynamicProperties[prop.Name] = value.ToString();
                             }
 
-                            //_logger.LogInformation("Added property {PropertyName} with value {Value}", prop.Name, value);
                         }
                     }
                 }
@@ -754,7 +738,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Find the image and check if it belongs to the user's listing
                 var image = await _context.ListingImages
                     .Include(i => i.Listing)
                     .FirstOrDefaultAsync(i => i.Id == imageId);
@@ -769,14 +752,12 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "You don't have permission to delete this image" });
                 }
 
-                // Check if this is the only image for the listing
                 var imageCount = await _context.ListingImages.CountAsync(i => i.ListingId == image.ListingId);
                 if (imageCount <= 1)
                 {
                     return Json(new { success = false, message = "Cannot delete the only image. Please upload a new image first." });
                 }
 
-                // If this is the main image, set another image as main
                 if (image.IsMainImage)
                 {
                     var newMainImage = await _context.ListingImages
@@ -788,7 +769,6 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Delete the image file from disk
                 string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                 string imagePath = image.ImagePath.TrimStart('/');
                 string fullPath = Path.Combine(webRootPath, imagePath);
@@ -802,11 +782,10 @@ namespace PrimeMarket.Controllers
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error deleting image file: {FilePath}", fullPath);
-                        // Continue with DB deletion even if file deletion fails
                     }
                 }
 
-                // Remove the image from the database
+
                 _context.ListingImages.Remove(image);
                 await _context.SaveChangesAsync();
 
@@ -840,23 +819,19 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Ensure DeletedImageIds is not null
             if (DeletedImageIds == null)
             {
                 DeletedImageIds = new List<int>();
             }
 
-            // Ensure DetailCategory is never null
             if (model.DetailCategory == null)
             {
                 model.DetailCategory = string.Empty;
             }
 
-            // Check if listing is being edited - store original status
             var originalStatus = listing.Status;
             var wasApproved = listing.Status == ListingStatus.Active;
 
-            // Validate images
             int remainingImagesCount = listing.Images.Count(i => !DeletedImageIds.Contains(i.Id));
             bool willHaveImages = remainingImagesCount > 0 || (newImages != null && newImages.Count > 0);
 
@@ -873,7 +848,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Update listing properties
                 listing.Title = model.Title;
                 listing.Price = model.Price;
                 listing.Description = model.Description;
@@ -881,21 +855,20 @@ namespace PrimeMarket.Controllers
                 listing.DetailCategory = model.DetailCategory;
                 listing.UpdatedAt = DateTime.UtcNow;
 
-                // If listing was previously approved or rejected, reset to pending for admin review
+
                 if (listing.Status == ListingStatus.Active || listing.Status == ListingStatus.Rejected)
                 {
                     listing.Status = ListingStatus.Pending;
                     listing.RejectionReason = null;
                 }
 
-                // Handle deleted images
                 if (DeletedImageIds.Count > 0)
                 {
                     var imagesToDelete = listing.Images.Where(i => DeletedImageIds.Contains(i.Id)).ToList();
 
                     foreach (var imageToDelete in imagesToDelete)
                     {
-                        // If this was the main image, set a new main image
+
                         if (imageToDelete.IsMainImage && listing.Images.Count > DeletedImageIds.Count)
                         {
                             var newMainImage = listing.Images.FirstOrDefault(i => !DeletedImageIds.Contains(i.Id));
@@ -905,7 +878,7 @@ namespace PrimeMarket.Controllers
                             }
                         }
 
-                        // Delete the image file from disk
+
                         string webRootPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot");
                         string imagePath = imageToDelete.ImagePath.TrimStart('/');
                         string fullPath = Path.Combine(webRootPath, imagePath);
@@ -926,7 +899,7 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Process and save new images
+
                 if (newImages != null && newImages.Count > 0)
                 {
                     var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "images", "listings");
@@ -964,7 +937,7 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Ensure at least one image is marked as main
+
                 var anyMainImage = await _context.ListingImages
                     .AnyAsync(i => i.ListingId == listing.Id && !DeletedImageIds.Contains(i.Id) && i.IsMainImage);
 
@@ -979,13 +952,13 @@ namespace PrimeMarket.Controllers
                     }
                 }
 
-                // Update product-specific properties if applicable
+
                 if (model.Category == "Others" || string.Equals(model.Category, "Others", StringComparison.OrdinalIgnoreCase))
                 {
-                    // For "Others" category, update the Others table
+
                     var othersProduct = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == listing.Id);
 
-                    // If the Others product doesn't exist yet, create it
+
                     if (othersProduct == null)
                     {
                         othersProduct = new Models.Products.Other
@@ -996,12 +969,12 @@ namespace PrimeMarket.Controllers
                         _logger.LogInformation("Created new Others product for listing {ListingId}", listing.Id);
                     }
 
-                    // Update any dynamic properties if they exist
+
                     if (model.DynamicProperties != null)
                     {
                         foreach (var prop in model.DynamicProperties)
                         {
-                            // Find property with case-insensitive comparison
+
                             var properties = othersProduct.GetType().GetProperties();
                             var productProp = properties.FirstOrDefault(p =>
                                 string.Equals(p.Name, prop.Key, StringComparison.OrdinalIgnoreCase));
@@ -1010,11 +983,11 @@ namespace PrimeMarket.Controllers
                             {
                                 try
                                 {
-                                    // Skip if value is empty
+
                                     if (string.IsNullOrWhiteSpace(prop.Value))
                                         continue;
 
-                                    // Handle different property types
+
                                     if (productProp.PropertyType == typeof(bool))
                                     {
                                         bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
@@ -1053,7 +1026,7 @@ namespace PrimeMarket.Controllers
                     await UpdateDynamicPropertiesAsync(listing.Id, listing.SubCategory, model.DynamicProperties, listing.DetailCategory);
                 }
 
-                // Notify user about the status change
+
                 if (originalStatus != listing.Status)
                 {
                     var userNotification = new Notification
@@ -1317,12 +1290,11 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // If product is found, extract properties
             if (product != null)
             {
                 foreach (var prop in product.GetType().GetProperties())
                 {
-                    // Skip navigation or system properties
+
                     if (prop.Name == "Id" || prop.Name == "ListingId" || prop.Name == "Listing")
                         continue;
 
@@ -1560,12 +1532,12 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Update product properties if product exists
+
             if (product != null)
             {
                 foreach (var prop in properties)
                 {
-                    // Find property with case-insensitive comparison
+
                     PropertyInfo productProp = null;
                     foreach (var p in product.GetType().GetProperties())
                     {
@@ -1580,11 +1552,11 @@ namespace PrimeMarket.Controllers
                     {
                         try
                         {
-                            // Skip if value is empty
+
                             if (string.IsNullOrWhiteSpace(prop.Value))
                                 continue;
 
-                            // Convert value to appropriate type
+
                             if (productProp.PropertyType == typeof(bool))
                             {
                                 bool boolValue = prop.Value.ToLower() == "yes" || prop.Value.ToLower() == "true";
@@ -1611,7 +1583,7 @@ namespace PrimeMarket.Controllers
                         }
                         catch (Exception ex)
                         {
-                            // Log error but continue
+
                             _logger.LogError(ex, "Error updating property {PropertyName}: {ErrorMessage}",
                                 productProp.Name, ex.Message);
                         }
@@ -1640,7 +1612,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Archive the listing instead of deleting it
                 listing.Status = ListingStatus.Archived;
                 listing.UpdatedAt = DateTime.UtcNow;
 
@@ -1667,16 +1638,15 @@ namespace PrimeMarket.Controllers
         [HttpGet]
         public async Task<IActionResult> Index(string category = null, string subcategory = null, string searchTerm = null, int page = 1)
         {
-            int pageSize = 12; // Number of listings per page
+            int pageSize = 12;
 
-            // Start with all approved listings
             var query = _context.Listings
                 .Where(l => l.Status == ListingStatus.Active)
                 .Include(l => l.Images)
                 .Include(l => l.Seller)
                 .AsQueryable();
 
-            // Apply filters
+
             if (!string.IsNullOrEmpty(category))
             {
                 query = query.Where(l => l.Category == category);
@@ -1698,21 +1668,17 @@ namespace PrimeMarket.Controllers
                 );
             }
 
-            // Get total count for pagination
             var totalItems = await query.CountAsync();
 
-            // Calculate pagination
             var totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
             page = Math.Max(1, Math.Min(page, totalPages));
 
-            // Get page of listings
             var listings = await query
                 .OrderByDescending(l => l.CreatedAt)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
 
-            // Create view model
             var viewModel = new ListingBrowseViewModel
             {
                 Listings = listings,
@@ -1741,7 +1707,6 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // If not approved, archived, or otherwise unavailable and current user is not the seller or an admin, return not found
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
@@ -1765,10 +1730,8 @@ namespace PrimeMarket.Controllers
                 await _context.SaveChangesAsync();
             }
 
-            // Get product-specific details
             dynamic product = null;
 
-            // Special handling for "Others" category
             if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
             {
                 product = await _context.Others.FirstOrDefaultAsync(p => p.ListingId == id);
@@ -1979,7 +1942,6 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Check if user has bookmarked this listing
             bool isBookmarked = false;
             if (userId.HasValue)
             {
@@ -1987,7 +1949,6 @@ namespace PrimeMarket.Controllers
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -1997,7 +1958,6 @@ namespace PrimeMarket.Controllers
                 .Take(4)
                 .ToListAsync();
 
-            // Get active offers if this is a second-hand listing
             List<Offer> activeOffers = new List<Offer>();
             if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
             {
@@ -2008,13 +1968,13 @@ namespace PrimeMarket.Controllers
                     .ToListAsync();
             }
 
-            // Check if user can review this product
+
             bool canReview = false;
             bool hasReviewed = false;
 
             if (userId.HasValue && listing.Condition == "First-Hand")
             {
-                // Check if user has purchased and received this product
+
                 var hasPurchased = await _context.Purchases
                     .Include(p => p.Confirmation)
                     .AnyAsync(p => p.BuyerId == userId.Value &&
@@ -2025,7 +1985,7 @@ namespace PrimeMarket.Controllers
 
                 if (hasPurchased)
                 {
-                    // Check if user has already reviewed
+
                     hasReviewed = await _context.ProductReviews
                         .AnyAsync(r => r.UserId == userId.Value && r.ListingId == id);
 
@@ -2033,12 +1993,12 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Calculate average rating and total reviews
+
             var reviews = listing.Reviews?.ToList() ?? new List<ProductReview>();
             double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
             int totalReviews = reviews.Count;
 
-            // Create view model
+
             var viewModel = new ListingDetailsViewModel
             {
                 Listing = listing,
@@ -2074,13 +2034,11 @@ namespace PrimeMarket.Controllers
 
             ViewBag.SearchTerm = query;
 
-            // Check if search input is just a number without # prefix
+
             if (System.Text.RegularExpressions.Regex.IsMatch(query, @"^\d+$"))
             {
-                // Set ViewBag to show message about using # for ID searches
                 ViewBag.ShowIdFormatMessage = true;
 
-                // We'll still search for this number in titles and descriptions
                 var numberResults = await _context.Listings
                     .Where(l => l.Status == ListingStatus.Active &&
                              (l.Title.Contains(query) ||
@@ -2089,16 +2047,13 @@ namespace PrimeMarket.Controllers
                     .OrderByDescending(l => l.CreatedAt)
                     .ToListAsync();
 
-                // Calculate average ratings for all listings
                 ViewBag.ListingRatings = GetListingRatings(numberResults.Select(l => l.Id).ToList());
 
                 return View("~/Views/Home/Search_Page.cshtml", numberResults);
             }
 
-            // Check if it's an ID search (starts with #)
             if (query.StartsWith("#") && query.Length > 1)
             {
-                // Try to parse the ID
                 if (int.TryParse(query.Substring(1), out int listingId))
                 {
                     var listing = await _context.Listings
@@ -2108,10 +2063,8 @@ namespace PrimeMarket.Controllers
 
                     if (listing != null)
                     {
-                        // Return a list with just one item
                         var singleListing = new List<Listing> { listing };
 
-                        // Calculate ratings for this single listing
                         ViewBag.ListingRatings = GetListingRatings(new List<int> { listing.Id });
 
                         return View("~/Views/Home/Search_Page.cshtml", singleListing);
@@ -2119,8 +2072,7 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // For regular search, look for matches in title, category, subcategory, or detail category
-            // Exclude archived listings
+
             var results = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                          (l.Title.Contains(query) ||
@@ -2132,13 +2084,13 @@ namespace PrimeMarket.Controllers
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
 
-            // Calculate average ratings for all listings
+
             ViewBag.ListingRatings = GetListingRatings(results.Select(l => l.Id).ToList());
 
             return View("~/Views/Home/Search_Page.cshtml", results);
         }
 
-        // Helper method to get average ratings for a list of listing IDs
+
         private Dictionary<int, double> GetListingRatings(List<int> listingIds)
         {
             var ratings = _context.ProductReviews
@@ -2168,7 +2120,6 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // If not approved or archived for guest users, return not found
             var userId = HttpContext.Session.GetInt32("UserId");
             var isAdmin = HttpContext.Session.GetInt32("AdminId") != null;
 
@@ -2191,7 +2142,6 @@ namespace PrimeMarket.Controllers
                 }
                 await _context.SaveChangesAsync();
             }
-            // Get product-specific details (existing code)
             dynamic product = null;
             if (listing.Category == "Others" || string.Equals(listing.Category, "Others", StringComparison.OrdinalIgnoreCase))
             {
@@ -2398,7 +2348,6 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Check if user has bookmarked this listing
             bool isBookmarked = false;
             if (userId.HasValue)
             {
@@ -2406,7 +2355,6 @@ namespace PrimeMarket.Controllers
                     .AnyAsync(b => b.UserId == userId.Value && b.ListingId == id);
             }
 
-            // Get related listings
             var relatedListings = await _context.Listings
                 .Where(l => l.Status == ListingStatus.Active &&
                             l.Id != id &&
@@ -2416,7 +2364,6 @@ namespace PrimeMarket.Controllers
                 .Take(4)
                 .ToListAsync();
 
-            // Get active offers if this is a second-hand listing
             List<Offer> activeOffers = new List<Offer>();
             if (listing.Condition == "Second-Hand" && userId.HasValue && userId.Value == listing.SellerId)
             {
@@ -2427,13 +2374,11 @@ namespace PrimeMarket.Controllers
                     .ToListAsync();
             }
 
-            // Check if user can review this product
             bool canReview = false;
             bool hasReviewed = false;
 
             if (userId.HasValue && listing.Condition == "First-Hand")
             {
-                // Check if user has purchased and received this product
                 var hasPurchased = await _context.Purchases
                     .Include(p => p.Confirmation)
                     .AnyAsync(p => p.BuyerId == userId.Value &&
@@ -2444,7 +2389,6 @@ namespace PrimeMarket.Controllers
 
                 if (hasPurchased)
                 {
-                    // Check if user has already reviewed
                     hasReviewed = await _context.ProductReviews
                         .AnyAsync(r => r.UserId == userId.Value && r.ListingId == id);
 
@@ -2452,12 +2396,10 @@ namespace PrimeMarket.Controllers
                 }
             }
 
-            // Calculate average rating and total reviews
             var reviews = listing.Reviews?.ToList() ?? new List<ProductReview>();
             double averageRating = reviews.Any() ? reviews.Average(r => r.Rating) : 0;
             int totalReviews = reviews.Count;
 
-            // Create view model
             var viewModel = new ListingDetailsViewModel
             {
                 Listing = listing,
@@ -2496,14 +2438,12 @@ namespace PrimeMarket.Controllers
 
                 if (existingBookmark != null)
                 {
-                    // Remove bookmark
                     _context.Bookmarks.Remove(existingBookmark);
                     await _context.SaveChangesAsync();
                     return Json(new { success = true, isBookmarked = false, message = "Item removed from bookmarks." });
                 }
                 else
                 {
-                    // Check if listing exists and is available
                     var listing = await _context.Listings
                         .FirstOrDefaultAsync(l => l.Id == listingId && l.Status == Models.Enum.ListingStatus.Active);
 
@@ -2512,7 +2452,6 @@ namespace PrimeMarket.Controllers
                         return Json(new { success = false, message = "This listing is not available for bookmarking." });
                     }
 
-                    // Add bookmark
                     var bookmark = new Bookmark
                     {
                         UserId = userId.Value,
@@ -2539,14 +2478,12 @@ namespace PrimeMarket.Controllers
             if (userId == null)
                 return Json(new { success = false, message = "Please log in to make an offer." });
 
-            /* ---------- robust parsing of OfferAmount ---------- */
             decimal offerAmount = model.OfferAmount;
 
-            // If normal model-binding produced 0 (or the property is 0 by default),
-            // try to parse any raw string the client might have sent.
+
             if (offerAmount <= 0 && !string.IsNullOrWhiteSpace(model.OfferAmountRaw))
             {
-                // 1) try invariant "dot" culture, 2) try current culture (comma)
+
                 if (!decimal.TryParse(model.OfferAmountRaw, NumberStyles.Any,
                                       CultureInfo.InvariantCulture, out offerAmount))
                 {
@@ -2558,27 +2495,26 @@ namespace PrimeMarket.Controllers
             if (offerAmount <= 0)
                 return Json(new { success = false, message = "Offer amount must be greater than zero." });
 
-            /* ---------- listing & ownership checks ---------- */
+  
             var listing = await _context.Listings.FindAsync(model.ListingId);
             if (listing == null)
                 return Json(new { success = false, message = "Listing not found." });
 
-            // Verify this is a second-hand listing
+
             if (listing.Condition != "Second-Hand")
                 return Json(new { success = false, message = "You can only make offers on second-hand listings." });
 
-            // Verify listing is active and available
+
             if (listing.Status != ListingStatus.Active)
                 return Json(new { success = false, message = "This listing is not available for offers." });
 
-            // Check if listing is archived
+
             if (listing.Status == ListingStatus.Archived)
                 return Json(new { success = false, message = "This listing has been archived by the seller and is no longer available for offers." });
 
             if (listing.SellerId == userId.Value)
                 return Json(new { success = false, message = "You cannot make an offer on your own listing." });
 
-            /* ---------- create Offer + Notification ---------- */
             var message = new Message
             {
                 SenderId = userId.Value,
@@ -2596,7 +2532,7 @@ namespace PrimeMarket.Controllers
                 BuyerId = userId.Value,
                 ListingId = model.ListingId,
                 OfferAmount = offerAmount,
-                Message = model.Message ?? string.Empty, // Ensure the string Message field is not null
+                Message = model.Message ?? string.Empty, 
                 Status = OfferStatus.Pending,
                 CreatedAt = DateTime.UtcNow
             };
@@ -2612,7 +2548,6 @@ namespace PrimeMarket.Controllers
             };
             _context.Notifications.Add(notification);
 
-            // Create a message for the conversation between buyer and seller
             offer.MessageId = message.Id;
             await _context.SaveChangesAsync();
             return Json(new { success = true, message = "Your offer has been sent to the seller." });
@@ -2646,10 +2581,8 @@ namespace PrimeMarket.Controllers
 
                 if (accept)
                 {
-                    // Accept the offer
                     offer.Status = OfferStatus.Accepted;
 
-                    // Create notification for the buyer
                     var acceptNotification = new Notification
                     {
                         UserId = offer.BuyerId,
@@ -2660,9 +2593,7 @@ namespace PrimeMarket.Controllers
                     };
                     _context.Notifications.Add(acceptNotification);
 
-                    // Create a message for the conversation
-                    // In the 'if (accept)' block of RespondToOffer method
-                    // Create a message for the conversation
+
                     var acceptMessage = new Message
                     {
                         SenderId = userId.Value,
@@ -2676,10 +2607,8 @@ namespace PrimeMarket.Controllers
                 }
                 else
                 {
-                    // Reject the offer
                     offer.Status = OfferStatus.Rejected;
 
-                    // Create notification for the buyer
                     var rejectNotification = new Notification
                     {
                         UserId = offer.BuyerId,
@@ -2690,7 +2619,6 @@ namespace PrimeMarket.Controllers
                     };
                     _context.Notifications.Add(rejectNotification);
 
-                    // Create a message for the conversation
                     var rejectMessage = new Message
                     {
                         SenderId = userId.Value,

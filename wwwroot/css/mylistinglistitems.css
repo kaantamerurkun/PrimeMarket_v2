@@ -1,12 +1,12 @@
 ﻿.items-grid {
-    display: block; /* changed from flex to block */
+    display: block; 
     width: 100%;
     margin-top: 20px;
 }
 
 .item-card {
     width: 100%;
-    margin-bottom: 20px; /* replaces gap between flex items */
+    margin-bottom: 20px;
     background: white;
     border-radius: 8px;
     box-shadow: rgba(0, 0, 0, 0.12) 0px 1px 3px, rgba(0, 0, 0, 0.24) 0px 1px 2px;

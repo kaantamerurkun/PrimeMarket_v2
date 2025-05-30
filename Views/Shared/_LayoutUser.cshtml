@@ -17,7 +17,6 @@
                           .Take(5)
                           .ToList();
         unreadCount = notifications.Count();
-        // Get user profile image
         var user = db.Users.FirstOrDefault(u => u.Id == uid.Value);
         if (user != null && !string.IsNullOrEmpty(user.ProfileImagePath))
         {
@@ -100,7 +99,6 @@
         padding: 8px;
         }
 
-        /* User dropdown styles */
         .user-dropdown-wrapper {
         position: relative;
         display: inline-block;
@@ -207,11 +205,10 @@
         padding: 0 3px;
         }
 
-        /* Notification submenu */
         .notification-submenu {
         display: none;
         position: absolute;
-        left: 100%;
+        right: 100%;
         top: 0;
         width: 350px;
         background-color: white;
@@ -293,7 +290,6 @@
         text-decoration: underline;
         }
 
-        /* Style for searchpagestyle.css */
         .search-body {
         font-family: Calibri, sans-serif;
         margin: 0;
@@ -366,7 +362,6 @@
                     </form>
                 </div>
 
-                <!-- User dropdown menu -->
                 <div class="user-dropdown-wrapper" id="userDropdown">
                     <div class="user-dropdown-trigger">
                         <span style="display: flex; align-items: center; gap: 5px;">
@@ -397,7 +392,6 @@
                                 <span class="notification-badge">@(unreadCount > 9 ? "9+" : unreadCount.ToString())</span>
                             }
 
-                            <!-- Notification submenu -->
                             <div class="notification-submenu" id="notificationSubmenu">
                                 <div class="notification-header">
                                     <h3>Notifications</h3>
@@ -474,7 +468,6 @@
     <script src="/js/category-filtering.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // User dropdown functionality
             const userDropdown = document.getElementById('userDropdown');
             const userDropdownTrigger = userDropdown.querySelector('.user-dropdown-trigger');
 
@@ -483,20 +476,17 @@
                 userDropdown.classList.toggle('open');
             });
 
-            // Close dropdown when clicking outside
             document.addEventListener('click', function(e) {
                 if (!userDropdown.contains(e.target)) {
                     userDropdown.classList.remove('open');
                 }
             });
 
-            // Notification submenu functionality
             const notificationDropdownItem = document.getElementById('notificationDropdownItem');
             const notificationSubmenu = document.getElementById('notificationSubmenu');
             const markAllReadBtn = document.getElementById('markAllReadBtn');
             const notificationItems = document.querySelectorAll('.notification-list-item');
 
-            // Show/hide notification submenu
             notificationDropdownItem.addEventListener('mouseenter', function() {
                 this.classList.add('active');
             });
@@ -505,12 +495,10 @@
                 this.classList.remove('active');
             });
 
-            // Prevent notification submenu from closing dropdown
             notificationSubmenu.addEventListener('click', function(e) {
                 e.stopPropagation();
             });
 
-            // Mark all as read
             if (markAllReadBtn) {
                 markAllReadBtn.addEventListener('click', function() {
                     fetch('/Notifications/MarkAllAsRead', {
@@ -522,11 +510,9 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            // Update UI
                             document.querySelectorAll('.notification-list-item.unread').forEach(item => {
                                 item.classList.remove('unread');
                             });
-                            // Remove badge
                             const badge = document.querySelector('.notification-badge');
                             if (badge) badge.style.display = 'none';
                         }
@@ -537,14 +523,12 @@
                 });
             }
 
-            // Handle notification click
             notificationItems.forEach(item => {
                 item.addEventListener('click', function() {
                     const notificationId = this.getAttribute('data-id');
                     const notificationType = this.getAttribute('data-type');
                     const entityId = this.getAttribute('data-entity-id');
 
-                    // Mark as read
                     fetch('/Notifications/MarkAsRead', {
                         method: 'POST',
                         headers: {
@@ -557,7 +541,6 @@
                         if (data.success) {
                             this.classList.remove('unread');
 
-                            // Navigate based on notification type
                             window.location.href = `/Notifications/Details?id=${notificationId}`;
                         }
                     })
@@ -567,41 +550,32 @@
                 });
             });
 
-            // Enhanced search form handling to prevent layout issues
             const searchForm = document.getElementById('header-search-form');
             const searchInput = document.getElementById('header-search-input');
 
             if (searchForm && searchInput) {
-                // Preserve form state during submission to prevent layout shifts
                 searchForm.addEventListener('submit', function (e) {
                     const query = searchInput.value.trim();
 
-                    // If query is empty, prevent submission
                     if (query === '') {
                         e.preventDefault();
                         return false;
                     }
 
-                    // If query is just a number without a # prefix, show modal
                     if (/^\d+$/.test(query)) {
                         e.preventDefault();
 
-                        // Show the ID search format modal
                         showIdSearchModal();
 
-                        // Suggest the correct format
                         searchInput.value = '#' + query;
                         return false;
                     }
 
-                    // Add a loading state to prevent perception of layout shift
                     document.body.classList.add('searching');
 
-                    // Continue with normal submission
                     return true;
                 });
 
-                // Focus/blur events to maintain consistent sizing
                 searchInput.addEventListener('focus', function () {
                     this.parentNode.classList.add('focus');
                 });
@@ -611,12 +585,9 @@
                 });
             }
 
-            // Function to show ID search modal
             function showIdSearchModal() {
-                // Check if modal already exists
                 let modal = document.getElementById('idSearchModal');
 
-                // If not, create it
                 if (!modal) {
                     modal = document.createElement('div');
                     modal.id = 'idSearchModal';
@@ -645,19 +616,16 @@
 
                     document.body.appendChild(modal);
 
-                    // Add event listener to close button
                     document.getElementById('closeModal').addEventListener('click', function () {
                         modal.style.display = 'none';
                     });
 
-                    // Close modal if clicked outside
                     modal.addEventListener('click', function (e) {
                         if (e.target === modal) {
                             modal.style.display = 'none';
                         }
                     });
                 } else {
-                    // Show existing modal
                     modal.style.display = 'flex';
                 }
             }

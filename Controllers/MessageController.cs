@@ -31,7 +31,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Get all unique conversations (grouped by other user and listing)
             var sentMessages = await _context.Messages
                 .Include(m => m.Receiver)
                 .Include(m => m.Listing)
@@ -48,7 +47,6 @@ namespace PrimeMarket.Controllers
                 .OrderByDescending(m => m.CreatedAt)
                 .ToListAsync();
 
-            // Combine and group by conversation
             var conversationGroups = new Dictionary<string, ConversationViewModel>();
 
             foreach (var message in sentMessages)
@@ -67,7 +65,7 @@ namespace PrimeMarket.Controllers
                                       message.Listing.Images.FirstOrDefault()?.ImagePath,
                         LastMessageTime = message.CreatedAt ?? DateTime.MinValue,
                         LastMessageContent = message.Content,
-                        UnreadCount = 0 // You sent this message, so it's read for you
+                        UnreadCount = 0 
                     };
                 }
                 else if (message.CreatedAt > conversationGroups[key].LastMessageTime)
@@ -125,14 +123,12 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Get the other user
             var otherUser = await _context.Users.FindAsync(userId);
             if (otherUser == null)
             {
                 return NotFound();
             }
 
-            // Get the listing
             var listing = await _context.Listings
                 .Include(l => l.Images)
                 .FirstOrDefaultAsync(l => l.Id == listingId);
@@ -142,7 +138,6 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // Get all messages between these users about this listing
             var messages = await _context.Messages
                 .Where(m => ((m.SenderId == currentUserId && m.ReceiverId == userId) ||
                              (m.SenderId == userId && m.ReceiverId == currentUserId)) &&
@@ -150,7 +145,6 @@ namespace PrimeMarket.Controllers
                 .OrderBy(m => m.CreatedAt)
                 .ToListAsync();
 
-            // Mark unread messages as read
             var unreadMessages = messages.Where(m => m.ReceiverId == currentUserId && !m.IsRead).ToList();
             foreach (var message in unreadMessages)
             {
@@ -158,7 +152,6 @@ namespace PrimeMarket.Controllers
             }
             await _context.SaveChangesAsync();
 
-            // Get current user profile image
             var currentUser = await _context.Users.FindAsync(currentUserId);
             ViewBag.CurrentUserImage = currentUser?.ProfileImagePath;
 
@@ -216,7 +209,6 @@ namespace PrimeMarket.Controllers
 
                 _context.Messages.Add(message);
 
-                // Create notification for the receiver
                 var notification = new Notification
                 {
                     UserId = model.ReceiverId,
@@ -267,7 +259,6 @@ namespace PrimeMarket.Controllers
 
                 _context.Messages.Add(message);
 
-                // Create notification for the receiver
                 var notification = new Notification
                 {
                     UserId = model.ReceiverId,
@@ -365,7 +356,6 @@ namespace PrimeMarket.Controllers
                 return RedirectToAction("Login", "User");
             }
 
-            // Check if the listing exists
             var listing = await _context.Listings
                 .Include(l => l.Seller)
                 .FirstOrDefaultAsync(l => l.Id == listingId);
@@ -375,40 +365,34 @@ namespace PrimeMarket.Controllers
                 return NotFound();
             }
 
-            // If userId is 0, set it to the seller's ID
             if (userId == 0)
             {
                 userId = listing.SellerId;
             }
 
-            // Check if the user exists
             var otherUser = await _context.Users.FindAsync(userId);
             if (otherUser == null)
             {
                 return NotFound();
             }
 
-            // Check if trying to message yourself
             if (userId == currentUserId)
             {
                 TempData["ErrorMessage"] = "You cannot message yourself.";
                 return RedirectToAction("Details", "Listing", new { id = listingId });
             }
 
-            // Check if a conversation already exists
             var existingConversation = await _context.Messages
                 .AnyAsync(m => (
                     (m.SenderId == currentUserId && m.ReceiverId == userId) ||
                     (m.SenderId == userId && m.ReceiverId == currentUserId)
                 ) && m.ListingId == listingId);
 
-            // If conversation exists, redirect to it
             if (existingConversation)
             {
                 return RedirectToAction("Conversation", new { userId, listingId });
             }
 
-            // Otherwise create a view model for a new conversation
             var currentUser = await _context.Users.FindAsync(currentUserId);
             ViewBag.CurrentUserImage = currentUser?.ProfileImagePath;
 

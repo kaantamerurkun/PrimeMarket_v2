@@ -21,14 +21,12 @@
     </head>
     <body>
 
-        <!-- Logo -->
         <div class="logo">
             <a asp-action="User_MainPage" asp-controller="User">
             <img src="/images/PrimeMarket_Logo_V2.png" alt="Prime Market Logo" style="height: 80px;">
             </a>
         </div>
 
-        <!-- Payment Card -->
         <div class="payment-card">
         <h2 id="payment-title">Complete Your Payment</h2>
 
@@ -57,7 +55,6 @@
         </form>
         </div>
 
-        <!-- Hidden success message -->
         <div id="success-message" style="display: none; text-align: center; margin-top: 20px;">
             <h2>Payment Successful!</h2>
             <p>Thank you for your payment.</p>
@@ -66,7 +63,6 @@
 
 
     <script>
-        // Format card number with spaces
         document.getElementById('cardnumber').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '').slice(0, 16);
             if (value.length > 0) {
@@ -75,7 +71,6 @@
             e.target.value = value;
         });
 
-        // Format expiry date to MM/YY
         document.getElementById('expiry').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '').slice(0, 4);
             if (value.length >= 3) {
@@ -84,12 +79,10 @@
             e.target.value = value;
         });
 
-        // Allow only numbers in CVV
         document.getElementById('cvv').addEventListener('input', function (e) {
             e.target.value = e.target.value.replace(/\D/g, '').slice(0, 4);
         });
 
-        // Simulate payment processing
         document.getElementById('payment-form').addEventListener('submit', function (e) {
             e.preventDefault();
             const submitButton = document.getElementById('submitButton');
@@ -105,14 +98,12 @@
             paymentTitle.style.display = 'none';
             successMessage.style.display = 'block';
 
-            // Redirect after a short delay (e.g., 1 second)
             setTimeout(() => {
-                window.location.href = '/User/User_MainPage'; // or any other route you want
+                window.location.href = '/User/User_MainPage'; 
             }, 1000);
         }, 2000);
         });
 
-        // Spinner animation
         const style = document.createElement('style');
         style.textContent = `
         @@keyframes spin {

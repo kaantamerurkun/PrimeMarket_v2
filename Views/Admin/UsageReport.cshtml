@@ -307,7 +307,6 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
             const notificationDropdown = document.getElementById('listingNotificationDropdown');
 
@@ -324,11 +323,9 @@
                 });
             }
 
-            // Initialize user table pagination
             initPagination();
         });
 
-        // Pagination variables
         let currentPage = 1;
         const rowsPerPage = 10;
 
@@ -336,22 +333,18 @@
             const table = document.getElementById('userTable');
             const rows = table.querySelectorAll('tbody tr');
 
-            // Show first page by default
             updatePagination(rows);
             showPage(currentPage, rows);
         }
 
         function showPage(page, rows) {
-            // Hide all rows
             rows.forEach(row => {
                 row.style.display = 'none';
             });
 
-            // Calculate start and end index
             const startIndex = (page - 1) * rowsPerPage;
             const endIndex = Math.min(startIndex + rowsPerPage, rows.length);
 
-            // Show rows for current page
             for (let i = startIndex; i < endIndex; i++) {
                 rows[i].style.display = '';
             }
@@ -363,7 +356,6 @@
 
             const pageCount = Math.ceil(rows.length / rowsPerPage);
 
-            // Add previous button
             if (pageCount > 1) {
                 const prevButton = document.createElement('button');
                 prevButton.className = 'page-button';
@@ -378,7 +370,6 @@
                 paginationContainer.appendChild(prevButton);
             }
 
-            // Add page buttons
             for (let i = 1; i <= pageCount; i++) {
                 const pageButton = document.createElement('button');
                 pageButton.className = 'page-button' + (i === currentPage ? ' active' : '');
@@ -391,7 +382,6 @@
                 paginationContainer.appendChild(pageButton);
             }
 
-            // Add next button
             if (pageCount > 1) {
                 const nextButton = document.createElement('button');
                 nextButton.className = 'page-button';
@@ -422,10 +412,8 @@
             const table = document.getElementById('userTable');
             const allRows = table.querySelectorAll('tbody tr');
 
-            // Hide all rows initially
             allRows.forEach(row => row.style.display = 'none');
 
-            // Collect rows that contain the search term in the Name or Email column
             const visibleRows = [];
             allRows.forEach(row => {
                 const name = row.cells[0].textContent.toLowerCase();
@@ -435,7 +423,6 @@
                 }
             });
 
-            // Reset to first page and update pagination for the filtered results
             currentPage = 1;
             updatePagination(visibleRows);
             showPage(currentPage, visibleRows);
@@ -443,6 +430,5 @@
 
     </script>
 
-    <!-- Add Font Awesome for icons -->
 </body>
 </html>

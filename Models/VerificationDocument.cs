@@ -18,13 +18,12 @@ namespace PrimeMarket.Models
         public string BackImagePath { get; set; }
 
         [Required]
-        public string FaceImagePath { get; set; }  // New field for face photo
+        public string FaceImagePath { get; set; }  
 
         public VerificationStatus Status { get; set; } = VerificationStatus.Pending;
 
         public string RejectionReason { get; set; }
 
-        // Navigation property
         [ForeignKey("UserId")]
         public virtual User User { get; set; }
     }

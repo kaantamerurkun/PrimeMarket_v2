@@ -204,7 +204,6 @@
             color: #721c24;
         }
 
-        /* Modal styles */
         .modal {
             display: none;
             position: fixed;
@@ -288,7 +287,6 @@
                 font-weight: normal;
             }
 
-        /* User Profile Modal Styles */
         #userProfileModal {
             z-index: 1010;
         }
@@ -499,15 +497,6 @@
             <div class="header-actions">
                 <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
                 <p>@userName</p>
-
-                <!-- Notification Bell -->
-@*                 <div class="notification-wrapper">
-                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
-                    <div id="listingNotificationDropdown" class="notification-dropdown">
-                        <p class="notification-item">An item is waiting to be approved or rejected</p>
-                        <p class="notification-item">A user sent ID for verification.</p>
-                    </div>
-                </div> *@
             </div>
         </div>
     </header>
@@ -550,10 +539,8 @@
             else
             {
                 <div class="listing-grid">
-                    <!-- Add this style update to PendingListings.cshtml -->
-                    <!-- Add after existing style definitions -->
+
                     <style>
-                        /* ... existing styles ... */
 
                         .listing-updated-badge {
                             position: absolute;
@@ -572,15 +559,13 @@
                         }
                     </style>
 
-                    <!-- Update the listing-card section in PendingListings.cshtml -->
-                    <!-- Replace the existing listing card rendering with: -->
+
                     @foreach (var listing in Model)
                     {
                         var mainImage = listing.Images != null && listing.Images.Any()
                         ? (listing.Images.FirstOrDefault(i => i.IsMainImage)?.ImagePath ?? listing.Images.First().ImagePath)
                         : "/images/placeholder.png";
 
-                        // Check if this is an updated listing
                         bool isUpdated = listing.UpdatedAt.HasValue &&
                         listing.UpdatedAt.Value > listing.CreatedAt.Value.AddMinutes(5);
 
@@ -618,13 +603,11 @@
         </div>
     </div>
 
-    <!-- Modal for listing actions -->
     <div id="listingActionsModal" class="modal">
         <div class="modal-content" style="max-width: 800px; width: 90%;">
             <span class="close" onclick="closeModal()">&times;</span>
             <h2>Review Listing</h2>
 
-            <!-- Listing details section -->
             <div class="listing-review-details" style="display: flex; margin: 20px 0; border-bottom: 1px solid #ddd; padding-bottom: 20px;">
                 <div id="modalListingImage" style="width: 200px; height: 200px; border-radius: 8px; overflow: hidden; margin-right: 20px; flex-shrink: 0;">
                     <img src="" alt="Listing Image" style="width: 100%; height: 100%; object-fit: cover;">
@@ -655,7 +638,6 @@
 
                 <button class="btn-reject" onclick="showRejectForm()">Reject</button>
 
-                <!-- View Details link -->
                 <a id="viewDetailsLink" href="#" style="flex: 1; display: flex; justify-content: center; align-items: center; text-decoration: none;">
                     <button style="width: 100%; background-color: #0066cc;" class="btn-view">View Full Details</button>
                 </a>
@@ -710,7 +692,6 @@
         </div>
     </div>
 
-    <!-- User Profile Modal -->
     <div id="userProfileModal" class="modal">
         <div class="modal-content user-profile-content">
             <span class="close" onclick="closeUserProfileModal()">&times;</span>
@@ -763,7 +744,6 @@
     </div>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
             const notificationDropdown = document.getElementById('listingNotificationDropdown');
 
@@ -780,7 +760,6 @@
                 });
             }
 
-            // Add event listeners for seller name clicks in listing cards
             const sellerNames = document.querySelectorAll('.seller-name');
             sellerNames.forEach(name => {
                 name.addEventListener('click', function(e) {
@@ -792,7 +771,6 @@
                 });
             });
 
-            // Filter buttons functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
             const listingCards = document.querySelectorAll('.listing-card');
 
@@ -801,11 +779,9 @@
                     button.addEventListener('click', function() {
                         const filter = this.getAttribute('data-filter');
 
-                        // Update active button
                         filterButtons.forEach(btn => btn.classList.remove('active'));
                         this.classList.add('active');
 
-                        // Filter listings
                         listingCards.forEach(card => {
                             if (filter === 'all' || card.getAttribute('data-status') === filter) {
                                 card.style.display = 'block';
@@ -817,7 +793,6 @@
                 });
             }
 
-            // Handle "Other" reason checkbox
             const reasonOtherCheckbox = document.getElementById('reasonOther');
             if (reasonOtherCheckbox) {
                 reasonOtherCheckbox.addEventListener('change', function() {
@@ -825,7 +800,6 @@
                 });
             }
 
-            // Close modal when clicking outside
             window.addEventListener('click', function(event) {
                 const listingModal = document.getElementById('listingActionsModal');
                 const userProfileModal = document.getElementById('userProfileModal');
@@ -840,18 +814,14 @@
             });
         });
 
-        // Keep track of which listing we're working with
         let currentListingId = null;
         let currentSellerId = null;
 
-        // Function to open the listing actions modal
         function openListingActions(listingId) {
             currentListingId = listingId;
 
-            // Set the listing ID in the forms
             document.getElementById('approveListingId').value = listingId;
 
-            // Get listing details from the card
             const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
             const imageElement = listingCard.querySelector('.listing-image img');
             const titleElement = listingCard.querySelector('.listing-title');
@@ -860,18 +830,15 @@
             const categoryElement = listingCard.querySelector('.listing-category');
             const dateElement = listingCard.querySelector('.listing-date');
 
-            // Get seller ID
             const sellerNameElement = listingCard.querySelector('.seller-name');
             if (sellerNameElement) {
                 currentSellerId = sellerNameElement.getAttribute('data-user-id');
             }
 
-            // Populate the modal with listing details
             document.getElementById('modalListingImage').querySelector('img').src = imageElement.src;
             document.getElementById('modalListingTitle').textContent = titleElement.textContent;
             document.getElementById('modalListingPrice').textContent = priceElement.textContent;
 
-            // Set up seller with clickable name
             const sellerText = sellerElement.textContent;
             const sellerName = sellerElement.querySelector('.seller-name').textContent;
             const sellerHtml = `Seller: <span class="seller-name" data-user-id="${currentSellerId}" onclick="openUserProfileModal(${currentSellerId}, '${sellerName}')">${sellerName}</span>`;
@@ -880,29 +847,23 @@
             document.getElementById('modalListingCategory').textContent = categoryElement.textContent;
             document.getElementById('modalListingDate').textContent = dateElement.textContent;
 
-            // Set the "View Full Details" link
             document.getElementById('viewDetailsLink').href = `/Admin/ListingDetails/${listingId}`;
 
-            // Hide reject form initially
             document.getElementById('rejectForm').style.display = 'none';
 
-            // Reset any checked checkboxes
             document.querySelectorAll('input[name="reason"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
 
-            // Hide the "Other" text field
             const otherReasonText = document.getElementById('otherReasonText');
             if (otherReasonText) {
                 otherReasonText.style.display = 'none';
                 otherReasonText.value = '';
             }
 
-            // Show the modal
             document.getElementById('listingActionsModal').style.display = 'block';
         }
 
-        // Function to close the modal
         function closeModal() {
             const modal = document.getElementById('listingActionsModal');
             if (modal) {
@@ -910,19 +871,15 @@
             }
         }
 
-        // Function to show the rejection form
         function showRejectForm() {
             document.getElementById('rejectForm').style.display = 'block';
         }
 
-        // Function to hide the rejection form
         function hideRejectForm() {
             document.getElementById('rejectForm').style.display = 'none';
         }
 
-        // Function to handle listing rejection with selected reasons
         function rejectListing() {
-            // gather selected reasons
             const selectedReasons = [];
             document.querySelectorAll('input[name="reason"]:checked').forEach(cb => {
                 if (cb.id === 'reasonOther') {
@@ -949,18 +906,16 @@
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                     'RequestVerificationToken': token,
-                    'Accept': 'application/json'             // <-- tell server we expect JSON
+                    'Accept': 'application/json'            
                 },
                 body: `id=${currentListingId}&rejectionReason=${encodeURIComponent(selectedReasons.join(', '))}`
             })
             .then(async res => {
                 if (!res.ok) throw new Error(`Server error ${res.status}`);
 
-                // guard against wrong payload (e.g., HTML if something mis-routes)
                 const ct = res.headers.get('content-type') || '';
                 if (ct.includes('application/json')) return res.json();
 
-                // unexpected – read as text so we don't crash on .json()
                 const txt = await res.text();
                 throw new Error(txt.slice(0, 200));
             })
@@ -987,14 +942,12 @@
             });
         }
 
-        // User Profile Modal Functions
         function openUserProfileModal(userId, userName) {
             if (!userId) return;
 
             document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
             document.getElementById('userProfileModal').style.display = 'block';
 
-            // Clear previous data
             document.getElementById('profileModalUserFirstName').textContent = "";
             document.getElementById('profileModalUserLastName').textContent = "";
             document.getElementById('profileModalUserEmail').textContent = "";
@@ -1004,17 +957,14 @@
             document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
             document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
-            // Set empty listings message
             document.getElementById('profileModalListingsContainer').innerHTML = `
                 <div class="empty-listings">
                     <p>Loading listings...</p>
                 </div>
             `;
 
-            // Fetch user details
             fetchUserDetails(userId);
 
-            // Set up close button click handler
             document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
         }
 
@@ -1022,7 +972,6 @@
                 function fetchUserDetails(userId) {
                     if (!userId) return;
 
-                    // Get the CSRF token
                     const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
                     fetch(`/Admin/GetUserDetails?userId=${userId}`, {
@@ -1043,7 +992,6 @@
                     .then(user => {
                         console.log('User details received:', user);
 
-                        // Update the UI with the user details
                         document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
                         document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
                         document.getElementById('profileModalUserEmail').textContent = user.email || "";
@@ -1059,14 +1007,12 @@
                             document.getElementById('profileModalUserImage').src = user.profileImagePath;
                         }
 
-                        // Show verification badge if user is verified
                         if (user.isIdVerified) {
                             document.getElementById('profileModalVerificationBadge').style.display = 'block';
                         } else {
                             document.getElementById('profileModalVerificationBadge').style.display = 'none';
                         }
 
-                        // Fetch user listings after user details are loaded
                     })
                     .catch(error => {
                         console.error('Error fetching user details:', error);
@@ -1077,7 +1023,6 @@
                         document.getElementById('profileModalUserCreated').textContent = "";
                         document.getElementById('profileModalUserVerification').textContent = "Unknown";
 
-                        // We'll still try to fetch listings in case user details failed but listings might succeed
                     });
                 }
 
@@ -1097,14 +1042,12 @@ function fetchUserListings(userId) {
         return;
     }
     
-    // Show loading state
     listingsContainer.innerHTML = `
         <div class="empty-listings">
             <p>Loading listings...</p>
         </div>
     `;
 
-    // Get the anti-forgery token
     const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
     fetch(`/Admin/GetUserListings?userId=${userId}`, {
@@ -1125,13 +1068,11 @@ function fetchUserListings(userId) {
     .then(data => {
         console.log('User listings data received:', data);
         
-        // Safely handle the response data
         let listings = [];
         
         if (Array.isArray(data)) {
             listings = data;
         } else if (data && typeof data === 'object') {
-            // Handle possible object response with listings property
             if (Array.isArray(data.listings)) {
                 listings = data.listings;
             } else if (data.success === false) {
@@ -1149,26 +1090,21 @@ function fetchUserListings(userId) {
             return;
         }
 
-        // Build listings HTML
         let listingsHTML = '<div class="listings-grid">';
         
         listings.forEach(listing => {
-            // Safely extract the main image
             let mainImage = "/images/placeholder.png";
             if (listing.images && listing.images.length > 0) {
                 const mainImageObj = listing.images.find(img => img.isMainImage);
                 mainImage = mainImageObj ? mainImageObj.imagePath : listing.images[0].imagePath;
             }
 
-            // Safely get status and convert to lowercase
             const status = (listing.status || 'unknown').toLowerCase();
 
-            // Safe conversion for price
             const price = typeof listing.price === 'number' 
                 ? listing.price.toLocaleString() 
                 : listing.price || '0';
 
-            // Build HTML with appropriate escaping
             listingsHTML += `
                 <div class="listing-card ${status}">
                     <div class="listing-image">
@@ -1206,7 +1142,6 @@ function fetchUserListings(userId) {
                 return;
             }
 
-            // Show the modal
             const modal = document.getElementById('userProfileModal');
             if (!modal) {
                 console.error("User profile modal element not found");
@@ -1215,37 +1150,29 @@ function fetchUserListings(userId) {
 
             modal.style.display = 'block';
 
-            // Set modal title with user name
             const titleEl = document.getElementById('profileModalUserName');
             if (titleEl) {
                 titleEl.textContent = userName ? `${userName}'s Profile` : 'User Profile';
             }
 
-            // Clear previous data and show loading indicators
             resetProfileModalData();
 
-            // Fetch user details
             fetchUserDetails(userId);
 
-            // Set up close button event handler
             const closeBtn = document.getElementById('closeProfileBtn');
             if (closeBtn) {
                 closeBtn.onclick = closeUserProfileModal;
             }
 
-            // Set up the view verification button if present
             const viewVerificationBtn = document.getElementById('viewVerificationBtn');
             if (viewVerificationBtn) {
                 viewVerificationBtn.onclick = function() {
-                    // Find the verification card for this user
                     const verificationCard = document.querySelector(`.verification-card[data-user-id="${userId}"]`);
                     if (verificationCard) {
                         const verificationId = verificationCard.getAttribute('data-id');
                         closeUserProfileModal();
 
-                        // Determine which openImageModal function to call based on which page we're on
                         if (typeof openImageModal === 'function') {
-                            // On the verification page
                             const frontImage = verificationCard.querySelector('.front-image')?.src;
                             const backImage = verificationCard.querySelector('.back-image')?.src;
                             openImageModal(verificationId, userName, frontImage, backImage);
@@ -1258,7 +1185,6 @@ function fetchUserListings(userId) {
         }
 
         function resetProfileModalData() {
-            // Reset all user data fields with loading indicators
             document.getElementById('profileModalUserFirstName').textContent = "Loading...";
             document.getElementById('profileModalUserLastName').textContent = "Loading...";
             document.getElementById('profileModalUserEmail').textContent = "Loading...";
@@ -1268,7 +1194,6 @@ function fetchUserListings(userId) {
             document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
             document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
-            // Clear listings container with loading indicator
             const listingsContainer = document.getElementById('profileModalListingsContainer');
             if (listingsContainer) {
                 listingsContainer.innerHTML = `

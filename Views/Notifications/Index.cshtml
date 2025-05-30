@@ -5,7 +5,6 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 
-<!-- Add this hidden form for CSRF token -->
 <form id="antiForgeryForm" style="display: none;">
     @Html.AntiForgeryToken()
 </form>
@@ -15,7 +14,7 @@
         <div class="notifications-header">
             <h1>All Notifications</h1>
             <div class="notifications-actions">
-                <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button>
+                @* <button id="markAllReadBtn" class="btn-mark-all">Mark All as Read</button> *@
                 <button id="clearAllBtn" class="btn-clear-all">Clear All</button>
             </div>
         </div>
@@ -25,7 +24,7 @@
             {
                 <div class="empty-notifications">
                     <i class="fas fa-bell-slash"></i>
-                    <p>You don't have any notifications</p>
+                    <p>You don't have any notifications to display</p>
                 </div>
             }
             else
@@ -33,7 +32,7 @@
                 <div class="notifications-list">
                     @foreach (var notification in Model)
                     {
-                        <div class="notification-item @(notification.IsRead ? "read" : "unread")" id="notification-@notification.Id" data-id="@notification.Id" data-type="@((int)notification.Type)" data-entity-id="@notification.RelatedEntityId">
+                        <div class="notification-item @(!notification.IsRead ? "unread" : "")" id="notification-@notification.Id" data-id="@notification.Id" data-type="@((int)notification.Type)" data-entity-id="@notification.RelatedEntityId">
                             <div class="notification-icon">
                                 @switch (notification.Type)
                                 {
@@ -89,6 +88,25 @@
 </div>
 
 <style>
+    .notifications-list .notification-item {
+        border-radius: 10px !important;
+        padding: 15px 25px !important;
+        margin-bottom: 15px !important;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05) !important;
+        background-color: white !important;
+        display: flex !important;
+        align-items: flex-start !important;
+        width: 100% !important;
+        max-width: none !important;
+        overflow: visible !important;
+        transition: background-color 0.3s ease !important;
+    }
+
+        .notifications-list .notification-item.unread {
+            border-left: 3px solid #0066cc !important;
+            background-color: #f0f7ff !important;
+        }
+
     .center-wrapper {
         display: flex;
         justify-content: center;
@@ -123,13 +141,12 @@
         gap: 10px;
     }
 
-    /* Make all buttons have 50px border radius */
-    button,
+    .notifications-list button,
     .btn-mark-all,
     .btn-clear-all,
     .btn-mark-read,
     .btn-delete {
-        border-radius: 50px !important;
+        border-radius: 5px !important;
         border: none;
         cursor: pointer;
         transition: background-color 0.3s ease;
@@ -173,23 +190,6 @@
         width: 100%;
     }
 
-    .notification-item {
-        display: flex;
-        align-items: flex-start;
-        padding: 15px 25px;
-        background-color: white;
-        border-radius: 50px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        transition: background-color 0.3s ease;
-        width: 100%;
-        overflow: hidden;
-    }
-
-        .notification-item.unread {
-            border-left: 3px solid #0066cc;
-            background-color: #f0f7ff;
-        }
-
     .notification-icon {
         margin-right: 15px;
         font-size: 24px;
@@ -203,7 +203,7 @@
 
     .notification-content {
         flex: 1;
-        min-width: 0; /* Important for text wrapping */
+        min-width: 0; 
         overflow-wrap: break-word;
         word-wrap: break-word;
         word-break: break-word;
@@ -250,14 +250,13 @@
         color: #dc3545;
     }
 
-    /* Custom notification styling */
     .custom-notification {
         position: fixed;
         bottom: 20px;
         right: 20px;
         color: white;
         padding: 10px 20px;
-        border-radius: 50px;
+        border-radius: 5px;
         z-index: 9999;
         opacity: 1;
         transition: opacity 0.5s ease;
@@ -272,71 +271,76 @@
         }
 
     @@media (max-width: 768px) {
-        .notifications-header {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 10px;
-        }
+        .notifications-header
 
-        .notification-item {
-            flex-direction: column;
-            padding: 15px 20px;
-        }
-
-        .notification-icon {
-            margin-bottom: 10px;
-        }
-
-        .notification-content {
-            width: 100%;
-            margin-bottom: 10px;
-        }
-
-        .notification-actions {
-            margin-left: 0;
-            flex-direction: row;
-            width: 100%;
-            justify-content: space-between;
-        }
-
-        .btn-mark-read,
-        .btn-delete {
-            flex: 1;
-            text-align: center;
-            max-width: 48%;
-        }
+    {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
     }
-</style>
+
+    .notification-item {
+        flex-direction: column;
+        padding: 15px 20px;
+    }
+
+    .notification-icon {
+        margin-bottom: 10px;
+    }
+
+    .notification-content {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    .notification-actions {
+        margin-left: 0;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .btn-mark-read,
+    .btn-delete {
+        flex: 1;
+        text-align: center;
+        max-width: 48%;
+    }
+
+    }</style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        console.log('Document loaded - Binding notification events');
+        console.log('Notifications Index Page - Document loaded');
 
-        // Mark single notification as read
+        function getCSRFToken() {
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            return tokenInput ? tokenInput.value : null;
+        }
+
         const markReadButtons = document.querySelectorAll('.btn-mark-read');
         markReadButtons.forEach(button => {
             button.addEventListener('click', function (e) {
-                e.stopPropagation(); // Prevent item click handler from firing
+                e.stopPropagation();
                 const notificationId = this.getAttribute('data-id');
                 markAsRead(notificationId);
             });
         });
 
-        // Delete single notification
         const deleteButtons = document.querySelectorAll('.btn-delete');
         deleteButtons.forEach(button => {
             button.addEventListener('click', function (e) {
-                e.stopPropagation(); // Prevent item click handler from firing
+                e.stopPropagation();
                 const notificationId = this.getAttribute('data-id');
                 deleteNotification(notificationId);
             });
         });
 
-        // Mark all as read - Direct implementation
         const markAllReadBtn = document.getElementById('markAllReadBtn');
         if (markAllReadBtn) {
             console.log('Found markAllReadBtn, attaching click event');
-            markAllReadBtn.addEventListener('click', function () {
+            markAllReadBtn.addEventListener('click', function (e) {
+                e.preventDefault();
                 console.log('Mark All as Read button clicked');
                 markAllAsRead();
             });
@@ -344,10 +348,10 @@
             console.error('Mark All as Read button not found in the DOM');
         }
 
-        // Clear all notifications
         const clearAllBtn = document.getElementById('clearAllBtn');
         if (clearAllBtn) {
-            clearAllBtn.addEventListener('click', function () {
+            clearAllBtn.addEventListener('click', function (e) {
+                e.preventDefault();
                 if (!confirm('Are you sure you want to delete all notifications?')) {
                     return;
                 }
@@ -355,11 +359,9 @@
             });
         }
 
-        // Handle notification clicks to navigate
         const notificationItems = document.querySelectorAll('.notification-item');
         notificationItems.forEach(item => {
             item.addEventListener('click', function (event) {
-                // Don't navigate if clicking on a button
                 if (event.target.tagName === 'BUTTON') {
                     return;
                 }
@@ -368,54 +370,54 @@
                 const notificationType = parseInt(this.getAttribute('data-type'));
                 const entityId = this.getAttribute('data-entity-id');
 
-                // Mark as read
                 markAsRead(notificationId);
 
-                // Then navigate based on type
-                handleNotificationNavigation(notificationType, entityId);
+                setTimeout(() => {
+                    handleNotificationNavigation(notificationType, entityId);
+                }, 500);
             });
         });
 
         function markAsRead(notificationId) {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const token = getCSRFToken();
+            if (!token) {
+                showNotification('Security token missing. Please refresh the page.', true);
+                return;
+            }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Notifications/MarkAsRead', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.setRequestHeader('RequestVerificationToken', token);
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            const notificationItem = document.getElementById(`notification-${notificationId}`);
-                            if (notificationItem) {
-                                notificationItem.classList.remove('unread');
-                                notificationItem.classList.add('read');
-
-                                const markReadBtn = notificationItem.querySelector('.btn-mark-read');
-                                if (markReadBtn) {
-                                    markReadBtn.remove();
-                                }
-                            }
-                            showNotification('Notification marked as read');
-                        } else {
-                            showNotification(response.message || 'Error marking notification as read', true);
-                        }
-                    } catch (e) {
-                        showNotification('Error processing response', true);
-                    }
-                } else {
-                    showNotification('Server error', true);
+            fetch('/Notifications/MarkAsRead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: `notificationId=${notificationId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            };
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const notificationItem = document.getElementById(`notification-${notificationId}`);
+                    if (notificationItem) {
+                        notificationItem.classList.remove('unread');
+                        notificationItem.classList.add('read');
 
-            xhr.onerror = function() {
-                showNotification('Connection error', true);
-            };
+                        const markReadBtn = notificationItem.querySelector('.btn-mark-read');
+                        if (markReadBtn) {
+                            markReadBtn.remove();
+                        }
+                    }
+                    showNotification('Notification marked as read');
+                } else {
+                }
+            })
+            .catch(error => {
 
-            xhr.send(`notificationId=${notificationId}`);
+            });
         }
 
         function deleteNotification(notificationId) {
@@ -423,155 +425,144 @@
                 return;
             }
 
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const token = getCSRFToken();
+            if (!token) {
+                showNotification('Security token missing. Please refresh the page.', true);
+                return;
+            }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Notifications/DeleteNotification', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.setRequestHeader('RequestVerificationToken', token);
+            fetch('/Notifications/DeleteNotification', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: `notificationId=${notificationId}&__RequestVerificationToken=${encodeURIComponent(token)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    const notificationItem = document.getElementById(`notification-${notificationId}`);
+                    if (notificationItem) {
+                        notificationItem.style.opacity = '0';
+                        notificationItem.style.transform = 'translateX(-20px)';
+                        notificationItem.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
 
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            const notificationItem = document.getElementById(`notification-${notificationId}`);
-                            if (notificationItem) {
-                                // Animate removal
-                                notificationItem.style.height = notificationItem.offsetHeight + 'px';
-                                notificationItem.style.opacity = '0';
-                                notificationItem.style.marginTop = '0';
-                                notificationItem.style.marginBottom = '0';
-                                notificationItem.style.padding = '0';
+                        setTimeout(() => {
+                            notificationItem.remove();
 
-                                setTimeout(() => {
-                                    notificationItem.style.height = '0';
-
-                                    setTimeout(() => {
-                                        notificationItem.remove();
-
-                                        // Check if all notifications are gone
-                                        const remainingNotifications = document.querySelectorAll('.notification-item');
-                                        if (remainingNotifications.length === 0) {
-                                            document.querySelector('.notifications-container').innerHTML = `
-                                                <div class="empty-notifications">
-                                                    <i class="fas fa-bell-slash"></i>
-                                                    <p>You don't have any notifications</p>
-                                                </div>
-                                            `;
-                                        }
-                                    }, 300);
-                                }, 300);
-
-                                showNotification('Notification deleted');
+                            const remainingNotifications = document.querySelectorAll('.notification-item');
+                            if (remainingNotifications.length === 0) {
+                                document.querySelector('.notifications-container').innerHTML = `
+                                    <div class="empty-notifications">
+                                        <i class="fas fa-bell-slash"></i>
+                                        <p>You don't have any notifications to display</p>
+                                    </div>
+                                `;
                             }
-                        } else {
-                            showNotification(response.message || 'Error deleting notification', true);
-                        }
-                    } catch (e) {
-                        showNotification('Error processing response', true);
+                        }, 300);
+
+                        showNotification('Notification deleted');
                     }
                 } else {
-                    showNotification('Server error', true);
+                    showNotification(data.message || 'Error deleting notification', true);
                 }
-            };
-
-            xhr.onerror = function() {
-                showNotification('Connection error', true);
-            };
-
-            xhr.send(`notificationId=${notificationId}`);
+            })
+            .catch(error => {
+                console.error('Error deleting notification:', error);
+                showNotification('Error deleting notification', true);
+            });
         }
 
         function markAllAsRead() {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
-            console.log('Marking all as read with token:', token ? 'Token found' : 'Token missing');
+            const token = getCSRFToken();
+            if (!token) {
+                showNotification('Security token missing. Please refresh the page.', true);
+                return;
+            }
 
-            // Standard XMLHttpRequest for maximum compatibility
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Notifications/MarkAllAsRead', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.setRequestHeader('RequestVerificationToken', token);
+            console.log('Sending mark all as read request...');
 
-            xhr.onload = function() {
-                console.log('XHR response received, status:', xhr.status);
-                if (xhr.status === 200) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        console.log('Response parsed:', response);
-
-                        if (response.success) {
-                            // Update UI
-                            const unreadNotifications = document.querySelectorAll('.notification-item.unread');
-                            unreadNotifications.forEach(item => {
-                                item.classList.remove('unread');
-                                item.classList.add('read');
-
-                                const markReadBtn = item.querySelector('.btn-mark-read');
-                                if (markReadBtn) {
-                                    markReadBtn.remove();
-                                }
-                            });
-
-                            showNotification('All notifications marked as read');
-                        } else {
-                            showNotification(response.message || 'Error marking notifications as read', true);
-                        }
-                    } catch (e) {
-                        console.error('Error parsing response:', e);
-                        showNotification('Error processing response', true);
-                    }
-                } else {
-                    console.error('Server error:', xhr.status);
-                    showNotification('Server error: ' + xhr.status, true);
+            fetch('/Notifications/MarkAllAsRead', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            };
+                return response.json();
+            })
+            .then(data => {
+                console.log('Response data:', data);
+                if (data.success) {
+                    const unreadNotifications = document.querySelectorAll('.notification-item.unread');
+                    unreadNotifications.forEach(item => {
+                        item.classList.remove('unread');
+                        item.classList.add('read');
 
-            xhr.onerror = function() {
-                console.error('XHR error');
-                showNotification('Connection error', true);
-            };
+                        const markReadBtn = item.querySelector('.btn-mark-read');
+                        if (markReadBtn) {
+                            markReadBtn.remove();
+                        }
+                    });
 
-            console.log('Sending XHR request to /Notifications/MarkAllAsRead');
-            xhr.send();
+                    showNotification('All notifications marked as read');
+                } else {
+                }
+            })
+            .catch(error => {
+            });
         }
 
         function clearAll() {
-            const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+            const token = getCSRFToken();
+            if (!token) {
+                showNotification('Security token missing. Please refresh the page.', true);
+                return;
+            }
 
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/Notifications/ClearAll', true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.setRequestHeader('RequestVerificationToken', token);
-
-            xhr.onload = function() {
-                if (xhr.status === 200) {
-                    try {
-                        const response = JSON.parse(xhr.responseText);
-                        if (response.success) {
-                            document.querySelector('.notifications-container').innerHTML = `
-                                <div class="empty-notifications">
-                                    <i class="fas fa-bell-slash"></i>
-                                    <p>You don't have any notifications</p>
-                                </div>
-                            `;
-                            showNotification('All notifications cleared');
-                        } else {
-                            showNotification(response.message || 'Error clearing notifications', true);
-                        }
-                    } catch (e) {
-                        showNotification('Error processing response', true);
-                    }
-                } else {
-                    showNotification('Server error: ' + xhr.status, true);
+            fetch('/Notifications/ClearAll', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'RequestVerificationToken': token
+                },
+                body: `__RequestVerificationToken=${encodeURIComponent(token)}`
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            };
-
-            xhr.onerror = function() {
-                showNotification('Connection error', true);
-            };
-
-            xhr.send();
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    document.querySelector('.notifications-container').innerHTML = `
+                        <div class="empty-notifications">
+                            <i class="fas fa-bell-slash"></i>
+                            <p>You don't have any notifications to display</p>
+                        </div>
+                    `;
+                    showNotification('All notifications cleared');
+                } else {
+                    showNotification(data.message || 'Error clearing notifications', true);
+                }
+            })
+            .catch(error => {
+                console.error('Error clearing notifications:', error);
+                showNotification('Error clearing notifications', true);
+            });
         }
 
         function showNotification(message, isError = false) {
@@ -593,29 +584,27 @@
         }
 
         function handleNotificationNavigation(notificationType, entityId) {
-            // Navigate based on notification type
             switch (notificationType) {
-                case 0: // ListingApproved
-                case 1: // ListingRejected
-                    window.location.href = `/User/MyListing?id=${entityId}`;
+                case 0: 
+                case 1: 
+                    window.location.href = `/User/MyListing/${entityId}`;
                     break;
-                case 2: // NewMessage
+                case 2: 
                     window.location.href = `/Message/Conversations`;
                     break;
-                case 3: // NewOffer
-                case 4: // OfferAccepted
-                case 5: // OfferRejected:
-                    window.location.href = `/User/MyListing?id=${entityId}`;
+                case 3: 
+                case 4: 
+                case 5: 
+                    window.location.href = `/Listing/Details/${entityId}`;
                     break;
-                case 6: // VerificationApproved
-                case 7: // VerificationRejected:
+                case 6:
+                case 7:
                     window.location.href = `/User/MyProfilePage`;
                     break;
-                case 8: // PurchaseCompleted:
-                    window.location.href = `/Payment/PurchaseComplete?purchaseId=${entityId}`;
+                case 8: 
+                    window.location.href = `/Payment/PurchaseStatus/${entityId}`;
                     break;
                 default:
-                    // Do nothing or stay on the page
                     break;
             }
         }

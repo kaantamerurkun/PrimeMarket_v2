@@ -19,7 +19,7 @@
             color: white;
         }
         .main-content {
-            margin-top: 80px; /* Adjust this value based on your header height */
+            margin-top: 80px; 
             padding-top: 20px;
             min-height: calc(100vh - 80px);
         }
@@ -63,10 +63,9 @@
             box-shadow: rgba(67, 71, 85, 0.27) 0px 0px 0.25em, rgba(90, 125, 188, 0.05) 0px 0.25em 1em;
         }
 
-        /* User details styling */
         .user-details-container {
             background-color: #f0f8ff;
-            margin-top: 0; /* Changed from 12% to 0 */
+            margin-top: 0; 
             width: 50%;
             border-radius: 10px;
             padding: 20px;
@@ -90,7 +89,6 @@
             text-align: right;
         }
 
-        /* Listings section styling */
         .my-listings-section {
             margin-top: 40px;
             margin-bottom: 40px;
@@ -290,7 +288,6 @@
             border-radius: 5px;
         }
 
-        /* Delete confirmation modal */
         .modal {
             display: none;
             position: fixed;
@@ -380,7 +377,6 @@
             justify-content: space-between;
         }
 
-        /* No listings message */
         .no-listings-message {
             text-align: center;
             padding: 20px;
@@ -390,7 +386,6 @@
             display: none;
         }
 
-        /* Responsive styles */
         @@media (max-width: 1024px) {
             .profile-section-wrapper
 
@@ -415,7 +410,7 @@
             .main-content
 
         {
-            margin-top: 60px; /* Adjust for smaller header on mobile */
+            margin-top: 60px; 
         }
 
         .profile-section-wrapper {
@@ -452,7 +447,6 @@
 
         }
 
-        /* Success message styling */
         .success-message {
             position: relative;
             z-index: 1000;
@@ -525,7 +519,6 @@
                 </div>
             </div>
         </div>
-        <!-- Add this code to MyProfilePage.cshtml after the user details container and before the buttons div -->
         <div style="display: flex; justify-content: center; align-items: center; flex-direction: column;">
             @if (Model.TotalRatings >= 0)
             {
@@ -580,7 +573,6 @@
 
         <br />
 
-        <!-- My Listings Section -->
         <div class="my-listings-section container" style="max-width: 85%; margin: 0 auto; text-align: center;">
             <div class="listings-header">
                 <h2 style="text-align: center; width: 100%;">My Listings</h2>
@@ -595,7 +587,6 @@
                 <button class="filter-btn" data-filter="active" style="border-radius: 50px;">Active</button>
                 <button class="filter-btn" data-filter="rejected" style="border-radius: 50px;">Rejected</button>
                 <button class="filter-btn" data-filter="sold" style="border-radius: 50px;">Sold</button>
-                <!-- Add this button in the listings-filter div after the "Sold" button -->
                 <button class="filter-btn" data-filter="archived" style="border-radius: 50px;">Archived</button>
 
             </div>
@@ -659,7 +650,6 @@
             </div>
         </div>
 
-        <!-- Delete Confirmation Modal -->
         <div id="deleteModal" class="modal">
             <div class="modal-content" style="border-radius: 50px;">
                 <span class="close">&times;</span>
@@ -674,12 +664,10 @@
         </div>
     </div>
 
-    @* Include CSRF token for AJAX request *@
     @Html.AntiForgeryToken()
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Success message timer
             setTimeout(function () {
                 var msg = document.getElementById('successMessage');
                 if (msg) {
@@ -689,22 +677,19 @@
                         msg.style.display = 'none';
                     }, 500);
                 }
-            }, 3000); // 3 seconds
+            }, 3000); 
 
-            // Filter buttons functionality
             const filterButtons = document.querySelectorAll('.filter-btn');
             const listingCards = document.querySelectorAll('.listing-card');
             const noListingsMessage = document.getElementById('noListingsMessage');
             const listingsGrid = document.querySelector('.listings-grid');
             const emptyListings = document.querySelector('.empty-listings');
 
-            // Initial check - if no listings at all, show the empty state
             if (listingCards.length === 0 && emptyListings) {
                 emptyListings.style.display = 'block';
                 if (listingsGrid) listingsGrid.style.display = 'none';
             }
 
-            // Filter functionality
             function applyFilter(filterValue) {
                 let visibleCount = 0;
 
@@ -719,7 +704,6 @@
                     }
                 });
 
-                // Show/hide no results message
                 if (visibleCount === 0 && listingCards.length > 0) {
                     noListingsMessage.style.display = 'block';
                     if (listingsGrid) listingsGrid.style.display = 'none';
@@ -728,7 +712,6 @@
                     if (listingsGrid && listingCards.length > 0) listingsGrid.style.display = 'grid';
                 }
 
-                // Update active button
                 filterButtons.forEach(btn => {
                     if (btn.getAttribute('data-filter') === filterValue) {
                         btn.classList.add('active');
@@ -738,7 +721,6 @@
                 });
             }
 
-            // Add click event to all filter buttons
             filterButtons.forEach(button => {
                 button.addEventListener('click', function() {
                     const filter = this.getAttribute('data-filter');
@@ -746,12 +728,10 @@
                 });
             });
 
-            // Add click event to "Show All Listings" button in no results message
             document.querySelector('.btn-show-all').addEventListener('click', function() {
                 applyFilter('all');
             });
 
-            // Delete listing functionality
             const deleteButtons = document.querySelectorAll('.btn-delete');
             const deleteModal = document.getElementById('deleteModal');
             const closeModal = document.querySelector('.close');
@@ -802,7 +782,6 @@
                     if (data.success) {
                         deleteModal.style.display = 'none';
 
-                        // Remove the listing card with animation
                         const listingCard = document.querySelector(`.listing-card[data-id="${listingId}"]`);
                         if (listingCard) {
                             listingCard.style.opacity = '0';
@@ -812,14 +791,11 @@
                             setTimeout(() => {
                                 listingCard.remove();
 
-                                // Check if there are any listings left
                                 const remainingListings = document.querySelectorAll('.listing-card');
                                 if (remainingListings.length === 0) {
-                                    // If no listings left at all, show empty state
                                     if (emptyListings) {
                                         emptyListings.style.display = 'block';
                                     } else {
-                                        // Create empty state if it doesn't exist
                                         const emptyDiv = document.createElement('div');
                                         emptyDiv.className = 'empty-listings';
                                         emptyDiv.innerHTML = `
@@ -833,14 +809,12 @@
                                     if (listingsGrid) listingsGrid.style.display = 'none';
                                     if (noListingsMessage) noListingsMessage.style.display = 'none';
                                 } else {
-                                    // Re-apply current filter to update the view
                                     const activeFilter = document.querySelector('.filter-btn.active').getAttribute('data-filter');
                                     applyFilter(activeFilter);
                                 }
                             }, 300);
                         }
 
-                        // Show success message
                         const successAlert = document.createElement('div');
                         successAlert.className = 'success-message';
                         successAlert.textContent = 'Listing deleted successfully';
@@ -848,14 +822,12 @@
                         const listingsHeader = document.querySelector('.listings-header');
                         listingsHeader.parentNode.insertBefore(successAlert, listingsHeader.nextSibling);
 
-                        // Remove alert after 3 seconds
                         setTimeout(() => {
                             successAlert.style.opacity = '0';
                             successAlert.style.transition = 'opacity 0.3s ease';
                             setTimeout(() => successAlert.remove(), 300);
                         }, 3000);
                     } else {
-                        // Show error message
                         alert(data.message || 'Error deleting listing. Please try again.');
                         deleteModal.style.display = 'none';
                     }

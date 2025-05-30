@@ -93,7 +93,6 @@ body {
         display: block;
     }
 
-/* User ID Card Styling */
 .user-id-card {
     background: white;
     border-radius: 8px;
@@ -180,7 +179,6 @@ body {
     background: #e04848;
 }
 
-/* Modal styling */
 .modal {
     display: none;
     position: fixed;
@@ -247,7 +245,6 @@ body {
     gap: 10px;
 }
 
-/* Reject reasons checklist */
 .reject-reasons {
     display: none;
     margin-top: 20px;
@@ -290,7 +287,6 @@ body {
     cursor: pointer;
 }
 
-/* Approval feedback */
 .approval-message {
     display: none;
     padding: 15px;
@@ -301,7 +297,6 @@ body {
     text-align: center;
 }
 
-/* Active card state */
 .user-id-card.active {
     border: 2px solid #0066cc;
 }
@@ -315,7 +310,6 @@ body {
     display: none;
 }
 
-/* Listing card styles */
 .item-card {
     background: white;
     border-radius: 8px;
@@ -372,7 +366,6 @@ body {
     gap: 10px;
 }
 
-/* Listing details styles */
 .breadcrumb {
     margin-bottom: 20px;
     color: #666;

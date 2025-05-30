@@ -103,9 +103,9 @@ body.search-body {
 
 .search-bar.focused {
     position: fixed;
-    top: 14%; /* yukarı çıkma miktarı ayarlıyoruz */
+    top: 14%; 
     left: 50%;
-    transform: translateX(-50%); /* kodun calısması içingerekli */
+    transform: translateX(-50%);
     z-index: 1000;
-    max-width: 50%; /* değişim */
+    max-width: 50%; 
 }

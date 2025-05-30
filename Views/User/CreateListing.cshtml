@@ -3,7 +3,6 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
     ViewData["Title"] = "Create Listing";
 
-    // Pull whatever you stored when the user signed‑in.
     var userIdInSession = Context.Session.GetInt32("UserId");
 }
 <!DOCTYPE html>
@@ -78,7 +77,6 @@
                         <label for="description">Description:</label>
                         <textarea style="border-radius:20px" id="description" asp-for="Description" rows="4" placeholder="Describe your item..." required></textarea>
 
-                        <!-- Dynamic fields will be added here -->
                         <div id="dynamicFields"></div>
 
                         <label for="location">Location:</label>
@@ -116,7 +114,6 @@
     </div>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
-            // Category selection data and handlers
             const allCategories = {
                 "Phone": ["IOS Phone", "Android Phone", "Other Phones", "Spare Parts", "Phone Accessories"],
                 "Tablets": ["IOS Tablets", "Android Tablets", "Other Tablets", "Tablet Accessories"],
@@ -132,9 +129,7 @@
                 ,"Others": []
             };
 
-            // Definition of fields for each category/subcategory
             const categoryFields = {
-                // Computers
                 "Laptops": [
                     { name: "ram", label: "RAM", type: "text", placeholder: "e.g. 16GB" },
                     { name: "ramType", label: "RAM Type", type: "text", placeholder: "e.g. DDR4" },
@@ -163,7 +158,6 @@
                     { name: "storage", label: "HDD/SSD", type: "text", placeholder: "e.g. 1TB SSD + 2TB HDD" },
                     { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
                 ],
-                // Phones
                 "IOS Phone": [
                     { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
                     { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP triple camera" },
@@ -194,7 +188,6 @@
                     { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 128GB" },
                     { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
                 ],
-                // Tablets
                 "IOS Tablets": [
                     { name: "faceRecognition", label: "Face Recognition", type: "select", options: ["Yes", "No"] },
                     { name: "camera", label: "Camera", type: "text", placeholder: "e.g. 12MP" },
@@ -225,7 +218,6 @@
                     { name: "storage", label: "Storage", type: "text", placeholder: "e.g. 32GB" },
                     { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 1 year" }
                 ],
-                // White Goods
                 "Washers": [
                     { name: "energyClass", label: "Energy Class", type: "text", placeholder: "e.g. A++" },
                     { name: "dimensions", label: "Product Dimensions", type: "text", placeholder: "e.g. 60x85x60 cm" },
@@ -256,7 +248,6 @@
                     { name: "volume", label: "Volume", type: "text", placeholder: "e.g. 65L" },
                     { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
                 ],
-                // Electrical Domestic Appliances
                 "Vacuum Cleaner": [
                     { name: "cableLength", label: "Cable Length", type: "text", placeholder: "e.g. 7m" },
                     { name: "waterContainer", label: "Water Container", type: "select", options: ["Yes", "No"] },
@@ -265,7 +256,6 @@
                     { name: "dustContainer", label: "Dust Container", type: "text", placeholder: "e.g. 2L" },
                     { name: "warranty", label: "Warranty Period", type: "text", placeholder: "e.g. 2 years" }
                 ],
-                // Televisions
                 "Televisions": [
                     { name: "screenSize", label: "Screen Size", type: "text", placeholder: "e.g. 55 inch" },
                     { name: "smartTV", label: "Smart TV", type: "select", options: ["Yes", "No"] },
@@ -319,11 +309,10 @@
                     subcategories.style.visibility = "visible";
                     details.style.visibility = "hidden";
                 } else {
-                    // If subcategories array is empty (like for "Others")
                     subcategories.style.visibility = "hidden";
                     details.style.visibility = "hidden";
-                    selectedSubcategory = "Others"; // Auto-set subcategory to "Others" for empty arrays
-                    continueBtn.style.display = "inline-block"; // Show the continue button
+                    selectedSubcategory = "Others"; 
+                    continueBtn.style.display = "inline-block";
                 }
             } else {
                 Object.keys(sub).forEach(key => subcategories.appendChild(createItem(key)));
@@ -347,10 +336,8 @@
             function generateDynamicFields() {
                 dynamicFields.innerHTML = "";
 
-                // Define which category to get fields for
                 let fieldsToShow = [];
 
-                // Look up in our field definitions based on selection
                 if (selectedDetail && categoryFields[selectedDetail]) {
                     fieldsToShow = categoryFields[selectedDetail];
                 } else if (selectedSubcategory && categoryFields[selectedSubcategory]) {
@@ -361,14 +348,12 @@
                     return;
                 }
 
-                // Create a heading for the specific fields
                 const heading = document.createElement("h3");
                 heading.textContent = "Item Specific Details";
                 heading.style.marginTop = "20px";
                 heading.style.marginBottom = "10px";
                 dynamicFields.appendChild(heading);
 
-                // Generate fields based on definition
                 fieldsToShow.forEach(field => {
                     const fieldContainer = document.createElement("div");
 
@@ -383,13 +368,11 @@
                         select.name = `DynamicProperties[${field.name}]`;
                         select.style.borderRadius = "50px";
 
-                        // Add empty option
                         const emptyOption = document.createElement("option");
                         emptyOption.value = "";
                         emptyOption.textContent = `Select ${field.label}`;
                         select.appendChild(emptyOption);
 
-                        // Add options from definition
                         field.options.forEach(option => {
                             const optionEl = document.createElement("option");
                             optionEl.value = option;
@@ -486,7 +469,6 @@
                 document.getElementById("hiddenSubcategory").value = selectedSubcategory;
                 document.getElementById("hiddenDetail").value = selectedDetail || "";
 
-                // Add stock field if First-Hand condition is selected
                 if (selectedCondition === "First-Hand" && !document.getElementById("stock")) {
                     const stockField = document.createElement("div");
                     stockField.innerHTML = `
@@ -495,7 +477,7 @@
                     `;
 
                     const form = document.querySelector("#detailsForm form");
-                    const insertBeforeEl = form.querySelector("label"); // Insert before first label
+                    const insertBeforeEl = form.querySelector("label"); 
                     form.insertBefore(stockField, insertBeforeEl);
                 }
 
@@ -510,7 +492,6 @@
                 continueBtn.style.display = "inline-block";
             });
 
-            // Image preview functionality
             document.getElementById('images').addEventListener('change', function() {
                 const preview = document.getElementById('imagePreview');
                 preview.innerHTML = "";
@@ -528,9 +509,7 @@
                 }
             });
 
-            // Form submission with modal
             listingForm.addEventListener('submit', function(e) {
-                // Basic validation before submit
                 const title = document.getElementById('title').value;
                 const price = document.getElementById('price').value;
                 const description = document.getElementById('description').value;
@@ -543,18 +522,14 @@
                     return false;
                 }
 
-                // Prevent default form submission
                 e.preventDefault();
 
-                // Set button to loading state
                 const submitButton = this.querySelector('button[type="submit"]');
                 submitButton.disabled = true;
                 submitButton.textContent = 'Creating listing...';
 
-                // Create FormData object to send all form data including files
                 const formData = new FormData(this);
 
-                // Submit form via AJAX
                 fetch(this.action, {
                     method: 'POST',
                     body: formData,
@@ -563,12 +538,10 @@
                     }
                 })
                 .then(response => {
-                    // Check if response is redirect (success) or HTML content (validation errors)
                     const contentType = response.headers.get('content-type');
                     if (contentType && contentType.includes('text/html')) {
                         return response.text().then(html => {
                             if (html.includes('ErrorMessage')) {
-                                // Show validation errors
                                 document.open();
                                 document.write(html);
                                 document.close();
@@ -578,32 +551,26 @@
                             }
                         });
                     } else {
-                        // Successful redirect
                         return { success: true };
                     }
                 })
                 .then(result => {
                     if (result.success) {
-                        // Show success modal
                         showSuccessModal();
                     } else {
-                        // Reset submit button if there was an error
                         submitButton.disabled = false;
                         submitButton.textContent = 'List the Item';
                     }
                 })
                 .catch(error => {
                     console.error('Error submitting form:', error);
-                    // Fall back to traditional form submission in case of AJAX error
                     submitButton.disabled = false;
                     submitButton.textContent = 'List the Item';
                     alert('There was an error submitting your form. Please try again.');
                 });
             });
 
-            // Function to show success modal
             function showSuccessModal() {
-                // Create modal if it doesn't exist
                 if (!document.getElementById('successModal')) {
                     const modalHtml = `
                         <div id="successModal" class="modal" style="display:none; position:fixed; z-index:9999; left:0; top:0; width:100%; height:100%; overflow:auto; background-color:rgba(0,0,0,0.4);">
@@ -632,15 +599,12 @@
                 const modal = document.getElementById('successModal');
                 const progressBar = modal.querySelector('.progress');
 
-                // Show the modal
                 modal.style.display = 'block';
 
-                // Animate the progress bar
                 setTimeout(() => {
                     progressBar.style.width = '100%';
                 }, 100);
 
-                // Set the countdown and redirect
                 let secondsLeft = 3;
                 const redirectMessage = document.getElementById('redirectMessage');
 

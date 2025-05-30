@@ -2,7 +2,6 @@
     ViewBag.Title = "Email Verification";
     var email = ViewBag.Email as string;
     var isEmailUpdate = TempData["IsEmailUpdate"] as bool? ?? false;
-    // Check if verification code was already sent during signup
     var verificationAlreadySent = TempData["VerificationSent"] as bool? ?? false;
 }
 
@@ -62,12 +61,10 @@
     </div>
 
     <script>
-        // Auto-send verification code only when a new verification is needed (not during signup)
         window.addEventListener("DOMContentLoaded", function () {
             const email = document.getElementById("email").value;
             const verificationAlreadySent = document.getElementById("verificationAlreadySent").value === "true";
 
-            // Only send a new verification code if one wasn't already sent during signup
             if (!verificationAlreadySent) {
                 fetch('/User/SendVerificationCode', {
                     method: 'POST',
@@ -88,7 +85,6 @@
             }
         });
 
-        // Helper function to show success/error messages
         function showMessage(message, isError = false) {
             const messageEl = document.getElementById("resultMessage");
             messageEl.textContent = message;
@@ -97,7 +93,6 @@
             messageEl.style.fontWeight = "bold";
         }
 
-        // Handle form submission for code verification
         document.getElementById("codeForm").addEventListener("submit", function (e) {
             e.preventDefault();
 

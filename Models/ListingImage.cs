@@ -15,7 +15,6 @@ namespace PrimeMarket.Models
 
         public bool IsMainImage { get; set; } = false;
 
-        // Navigation property
         [ForeignKey("ListingId")]
         public virtual Listing Listing { get; set; }
     }

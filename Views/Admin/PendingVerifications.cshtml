@@ -157,7 +157,6 @@
             font-size: 14px;
         }
 
-        /* Modal Styles */
         .modal {
             display: none;
             position: fixed;
@@ -223,8 +222,7 @@
 
             .modal-actions button {
                 padding: 10px 20px;
-                border: none;
-                border-radius: 5px;
+                border-radius: 50px;
                 cursor: pointer;
                 font-weight: bold;
             }
@@ -256,8 +254,7 @@
             padding: 10px 20px;
             background-color: #dc3545;
             color: white;
-            border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
             margin-top: 10px;
         }
@@ -288,7 +285,6 @@
             color: #721c24;
         }
 
-        /* User Profile Modal Styles */
         #userProfileModal {
             z-index: 1010;
         }
@@ -489,17 +485,8 @@
                 <img style="height: 50px; width: 100px; background-color: #f0f8ff" src="/images/PrimeMarket_Logo_V2.png" alt="PrimeMarket Logo" />
             </a>
             <div class="header-actions">
-                <a asp-action="Logout" asp-controller="Admin"><button class="btn-logoutadmin">Logout</button></a>
+                <button class="btn-logoutadmin" style="text-decoration:none"><a asp-action="Logout" asp-controller="Admin">Logout</a></button>
                 <p>@userName</p>
-
-                <!-- Notification Bell -->
-@*                 <div class="notification-wrapper">
-                    <img id="listingNotificationBell" class="notification-icon" style="margin-top:10px; height: 25px; width: 25px; cursor: pointer;" src="/images/NotificationBell.png" alt="Notification Bell" />
-                    <div id="listingNotificationDropdown" class="notification-dropdown">
-                        <p class="notification-item">An item is waiting to be approved or rejected</p>
-                        <p class="notification-item">A user sent ID for verification.</p>
-                    </div>
-                </div> *@
             </div>
         </div>
     </header>
@@ -584,7 +571,6 @@
         </div>
     </div>
 
-    <!-- Modal for enlarged image -->
     <div id="idModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -610,7 +596,6 @@
                 <button id="modalRejectBtn" class="btn-reject" onclick="showRejectReasons()">Reject</button>
             </div>
 
-            <!-- Reject reasons checklist -->
             <div id="rejectReasons" class="reject-reasons">
                 <h3>Select Reason(s) for Rejection:</h3>
                 <div class="reasons-checklist">
@@ -667,14 +652,12 @@
                 <button id="confirmRejectBtn" class="btn-confirm-reject" onclick="rejectVerification()">Confirm Rejection</button>
             </div>
 
-            <!-- Approval message -->
             <div id="approvalMessage" class="approval-message">
                 <p>ID verification has been approved successfully!</p>
             </div>
         </div>
     </div>
 
-    <!-- User Profile Modal -->
     <div id="userProfileModal" class="modal">
         <div class="modal-content user-profile-content">
             <span class="close" onclick="closeUserProfileModal()">&times;</span>
@@ -719,19 +702,10 @@
                 </div>
             </div>
 
-            <!-- User's Listings Section -->
-            <div class="user-listings-section">
-                <h2>User's Listings</h2>
-                <div id="profileModalListingsContainer">
-                    <div class="empty-listings">
-                        <p>Loading listings...</p>
-                    </div>
-                </div>
-            </div>
 
             <div class="modal-actions">
-                <button id="viewVerificationBtn" class="btn-approve" style="background-color: #0066cc;">View ID Verification</button>
-                <button id="closeProfileBtn" class="btn-reject" style="background-color: #6c757d;">Close</button>
+                <button id="viewVerificationBtn" class="btn-approve" style="background-color: #0066cc; border-radius:50px">View ID Verification</button>
+                <button id="closeProfileBtn" class="btn-reject" style="background-color: #6c757d;border-radius:50px">Close</button>
             </div>
         </div>
     </div>
@@ -740,9 +714,9 @@
         let currentVerificationId = null;
         let currentUserId = null;
 
-        // Image modal functions
         function openImageModal(id, userName, frontImage, backImage, faceImage) {
             currentVerificationId = id;
+
 
             document.getElementById('modalUserName').textContent = userName + ' - ID Verification';
             document.getElementById('modalImageFront').src = frontImage;
@@ -767,7 +741,6 @@
             document.getElementById('modalApproveBtn').style.display = 'block';
             document.getElementById('modalRejectBtn').style.display = 'block';
 
-            // Reset checkboxes
             document.querySelectorAll('input[name="reason"]').forEach(checkbox => {
                 checkbox.checked = false;
             });
@@ -795,14 +768,12 @@
         showRejectReasons();
         }
 
-        // User Profile Modal Functions
         function openUserProfileModal(userId, userName) {
             currentUserId = userId;
 
             document.getElementById('profileModalUserName').textContent = userName + "'s Profile";
             document.getElementById('userProfileModal').style.display = 'block';
 
-            // Clear previous data and show loading state
             document.getElementById('profileModalUserFirstName').textContent = "";
             document.getElementById('profileModalUserLastName').textContent = "";
             document.getElementById('profileModalUserEmail').textContent = "";
@@ -812,17 +783,14 @@
             document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
             document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
-            // Set empty listings message
             document.getElementById('profileModalListingsContainer').innerHTML = `
                 <div class="empty-listings">
                     <p>Loading listings...</p>
                 </div>
             `;
 
-            // Fetch user details
             fetchUserDetails(userId);
 
-            // Set up verification button click handler
             document.getElementById('viewVerificationBtn').onclick = function() {
                 const verificationId = document.querySelector(`.verification-card[data-user-id="${userId}"]`).getAttribute('data-id');
                 const verificationCard = document.querySelector(`.verification-card[data-id="${verificationId}"]`);
@@ -834,7 +802,6 @@
                     verificationCard.querySelector('.face-image').src);
             };
 
-            // Set up close button click handler
             document.getElementById('closeProfileBtn').onclick = closeUserProfileModal;
         }
 
@@ -843,7 +810,6 @@
         function fetchUserDetails(userId) {
             if (!userId) return;
 
-            // Get the CSRF token
             const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
 
             fetch(`/Admin/GetUserDetails?userId=${userId}`, {
@@ -864,7 +830,6 @@
             .then(user => {
                 console.log('User details received:', user);
 
-                // Update the UI with the user details
                 document.getElementById('profileModalUserFirstName').textContent = user.firstName || "";
                 document.getElementById('profileModalUserLastName').textContent = user.lastName || "";
                 document.getElementById('profileModalUserEmail').textContent = user.email || "";
@@ -880,15 +845,11 @@
                     document.getElementById('profileModalUserImage').src = user.profileImagePath;
                 }
 
-                // Show verification badge if user is verified
                 if (user.isIdVerified) {
                     document.getElementById('profileModalVerificationBadge').style.display = 'block';
                 } else {
                     document.getElementById('profileModalVerificationBadge').style.display = 'none';
                 }
-
-                // Fetch user listings after user details are loaded
-                fetchUserListings(userId);
             })
             .catch(error => {
                 console.error('Error fetching user details:', error);
@@ -899,8 +860,6 @@
                 document.getElementById('profileModalUserCreated').textContent = "";
                 document.getElementById('profileModalUserVerification').textContent = "Unknown";
 
-                // We'll still try to fetch listings in case user details failed but listings might succeed
-                fetchUserListings(userId);
             });
         }
 
@@ -911,124 +870,11 @@
             }
         }
 
-        function fetchUserListings(userId) {
-            if (!userId) return;
-
-            const listingsContainer = document.getElementById('profileModalListingsContainer');
-            if (!listingsContainer) {
-                console.error('Listings container not found in the DOM');
-                return;
-            }
-
-            // Show loading state
-            listingsContainer.innerHTML = `
-                <div class="empty-listings">
-                    <p>Loading listings...</p>
-                </div>
-            `;
-
-            // Get the anti-forgery token
-            const token = document.querySelector('input[name="__RequestVerificationToken"]')?.value || '';
-
-            fetch(`/Admin/GetUserListings?userId=${userId}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    'RequestVerificationToken': token
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error(`Server returned ${response.status}: ${response.statusText}`);
-                    throw new Error('Network response was not ok');
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log('User listings data received:', data);
-
-                // Safely handle the response data
-                let listings = [];
-
-                if (Array.isArray(data)) {
-                    listings = data;
-                } else if (data && typeof data === 'object') {
-                    // Handle possible object response with listings property
-                    if (Array.isArray(data.listings)) {
-                        listings = data.listings;
-                    } else if (data.success === false) {
-                        console.warn('API returned error:', data.message || 'Unknown error');
-                        throw new Error(data.message || 'Failed to load listings');
-                    }
-                }
-
-                if (listings.length === 0) {
-                    listingsContainer.innerHTML = `
-                        <div class="empty-listings">
-                            <p>This user has no listings.</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                // Build listings HTML
-                let listingsHTML = '<div class="listings-grid">';
-
-                listings.forEach(listing => {
-                    // Safely extract the main image
-                    let mainImage = "/images/placeholder.png";
-                    if (listing.images && listing.images.length > 0) {
-                        const mainImageObj = listing.images.find(img => img.isMainImage);
-                        mainImage = mainImageObj ? mainImageObj.imagePath : listing.images[0].imagePath;
-                    }
-
-                    // Safely get status and convert to lowercase
-                    const status = (listing.status || 'unknown').toLowerCase();
-
-                    // Safe conversion for price
-                    const price = typeof listing.price === 'number'
-                        ? listing.price.toLocaleString()
-                        : listing.price || '0';
-
-                    // Build HTML with appropriate escaping
-                    listingsHTML += `
-                        <div class="listing-card ${status}">
-                            <div class="listing-image">
-                                <img src="${mainImage}" alt="${(listing.title || '').replace(/"/g, '&quot;')}">
-                                <div class="listing-status ${status}">${listing.status || 'Unknown'}</div>
-                            </div>
-                            <div class="listing-details">
-                                <h3>${listing.title || 'Untitled Listing'}</h3>
-                                <p class="listing-price">₺${price}</p>
-                                <p class="listing-date">Listed on ${new Date(listing.createdAt || Date.now()).toLocaleDateString()}</p>
-                                <p>Category: ${listing.category || 'Unknown'}${listing.subCategory ? ` > ${listing.subCategory}` : ''}</p>
-                                ${listing.status === 'Rejected' && listing.rejectionReason ?
-                                    `<p class="rejection-reason"><strong>Rejection Reason:</strong> ${listing.rejectionReason}</p>` : ''}
-                            </div>
-                        </div>
-                    `;
-                });
-
-                listingsHTML += '</div>';
-                listingsContainer.innerHTML = listingsHTML;
-            })
-            .catch(error => {
-                console.error('Error fetching user listings:', error);
-                listingsContainer.innerHTML = `
-                    <div class="empty-listings">
-                        <p>Error loading listings. Please try again later.</p>
-                        <p class="error-details">${error.message || 'Unknown error'}</p>
-                    </div>
-                `;
-            });
-        }
 
         function approveVerification(id = null) {
             const verificationId = id || currentVerificationId;
             if (!verificationId) return;
 
-            // Show loading state
             const approveBtn = document.getElementById('modalApproveBtn');
             if (approveBtn) {
                 approveBtn.textContent = 'Approving...';
@@ -1079,7 +925,6 @@
         function rejectVerification() {
             if (!currentVerificationId) return;
 
-            // Get selected reasons
             const selectedReasons = [];
             document.querySelectorAll('input[name="reason"]:checked').forEach(checkbox => {
                 if (checkbox.id === 'reasonOther') {
@@ -1097,7 +942,6 @@
                 return;
             }
 
-            // Show loading state
             const confirmRejectBtn = document.getElementById('confirmRejectBtn');
             confirmRejectBtn.textContent = 'Rejecting...';
             confirmRejectBtn.disabled = true;
@@ -1151,7 +995,6 @@
                         `;
                     }
 
-                    // Update the counter
                     const countBadge = document.querySelector('.count-badge');
                     if (countBadge) {
                         const currentCount = parseInt(countBadge.textContent);
@@ -1166,7 +1009,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            // Toggle notification dropdown
             const notificationBell = document.getElementById('listingNotificationBell');
             const notificationDropdown = document.getElementById('listingNotificationDropdown');
 
@@ -1183,7 +1025,6 @@
                 });
             }
 
-            // Toggle "Other" reason text input
             const reasonOther = document.getElementById('reasonOther');
             const otherReasonText = document.getElementById('otherReasonText');
 
@@ -1193,7 +1034,6 @@
                 });
             }
 
-            // Close modals when clicking outside
             window.addEventListener('click', function(event) {
                 const idModal = document.getElementById('idModal');
                 const userProfileModal = document.getElementById('userProfileModal');
@@ -1213,7 +1053,6 @@
                 return;
             }
 
-            // Show the modal
             const modal = document.getElementById('userProfileModal');
             if (!modal) {
                 console.error("User profile modal element not found");
@@ -1222,40 +1061,33 @@
 
             modal.style.display = 'block';
 
-            // Set modal title with user name
             const titleEl = document.getElementById('profileModalUserName');
             if (titleEl) {
                 titleEl.textContent = userName ? `${userName}'s Profile` : 'User Profile';
             }
 
-            // Clear previous data and show loading indicators
             resetProfileModalData();
 
-            // Fetch user details
             fetchUserDetails(userId);
 
-            // Set up close button event handler
             const closeBtn = document.getElementById('closeProfileBtn');
             if (closeBtn) {
                 closeBtn.onclick = closeUserProfileModal;
             }
 
-            // Set up the view verification button if present
             const viewVerificationBtn = document.getElementById('viewVerificationBtn');
             if (viewVerificationBtn) {
                 viewVerificationBtn.onclick = function() {
-                    // Find the verification card for this user
                     const verificationCard = document.querySelector(`.verification-card[data-user-id="${userId}"]`);
                     if (verificationCard) {
                         const verificationId = verificationCard.getAttribute('data-id');
                         closeUserProfileModal();
 
-                        // Determine which openImageModal function to call based on which page we're on
                         if (typeof openImageModal === 'function') {
-                            // On the verification page
                             const frontImage = verificationCard.querySelector('.front-image')?.src;
                             const backImage = verificationCard.querySelector('.back-image')?.src;
-                            openImageModal(verificationId, userName, frontImage, backImage);
+                            const faceImage = verificationCard.querySelector('.face-image')?.src;
+                            openImageModal(verificationId, userName, frontImage, backImage, faceImage);
                         }
                     } else {
                         console.warn("Could not find verification card for user:", userId);
@@ -1265,7 +1097,6 @@
         }
 
         function resetProfileModalData() {
-            // Reset all user data fields with loading indicators
             document.getElementById('profileModalUserFirstName').textContent = "Loading...";
             document.getElementById('profileModalUserLastName').textContent = "Loading...";
             document.getElementById('profileModalUserEmail').textContent = "Loading...";
@@ -1275,15 +1106,6 @@
             document.getElementById('profileModalUserImage').src = "/images/user-placeholder.png";
             document.getElementById('profileModalVerificationBadge').style.display = 'none';
 
-            // Clear listings container with loading indicator
-            const listingsContainer = document.getElementById('profileModalListingsContainer');
-            if (listingsContainer) {
-                listingsContainer.innerHTML = `
-                    <div class="empty-listings">
-                        <p>Loading user data...</p>
-                    </div>
-                `;
-            }
         }
 
     </script>

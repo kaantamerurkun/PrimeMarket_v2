@@ -20,10 +20,8 @@ namespace PrimeMarket.Models
         [MaxLength(1000)]
         public string Comment { get; set; }
 
-        // To ensure only one review per user per product
         public bool IsVerifiedPurchase { get; set; } = true;
 
-        // Navigation properties
         [ForeignKey("ListingId")]
         public virtual Listing Listing { get; set; }
 

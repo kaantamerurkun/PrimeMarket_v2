@@ -106,7 +106,7 @@
     }
 
     .container {
-        margin: 120px auto 50px auto; /* top, horizontal center, bottom */
+        margin: 120px auto 50px auto;
         max-width: 1000px;
     }
 
@@ -281,11 +281,10 @@
             flex: 0 0 100%;
         }
     }
-</style>
+    </style>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get elements
         const decreaseBtn = document.getElementById('decreaseQuantity');
         const increaseBtn = document.getElementById('increaseQuantity');
         const quantityInput = document.getElementById('quantity');
@@ -293,14 +292,11 @@
         const totalAmount = document.getElementById('totalAmount');
         const payAmount = document.getElementById('payAmount');
 
-        // Get price from model
     const unitPrice = parseFloat('@Model.ListingPrice');
-        // Update total price based on quantity
         function updateTotalPrice() {
             const quantity = parseInt(quantityInput.value);
             const total = unitPrice * quantity;
 
-            // Format as currency
             const formatter = new Intl.NumberFormat('tr-TR', {
                 style: 'currency',
                 currency: 'TRY'
@@ -309,11 +305,9 @@
             totalAmount.textContent = formatter.format(total);
             payAmount.textContent = formatter.format(total);
 
-            // Update hidden input for form submission
             hiddenQuantityInput.value = quantity;
         }
 
-        // Handle decrease button click
         decreaseBtn?.addEventListener('click', function() {
             let quantity = parseInt(quantityInput.value);
             if (quantity > 1) {
@@ -322,18 +316,14 @@
             }
         });
 
-        // Handle increase button click
         increaseBtn?.addEventListener('click', function() {
             let quantity = parseInt(quantityInput.value);
-            // You might want to add a maximum limit here based on stock
-            // For now we'll use a reasonable limit of 100
             if (quantity < 100) {
                 quantityInput.value = ++quantity;
                 updateTotalPrice();
             }
         });
 
-        // Format card number with spaces
         const cardInput = document.getElementById('cardnumber');
         cardInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -343,7 +333,6 @@
             e.target.value = value;
         });
 
-        // Format expiry date with slash
         const expiryInput = document.getElementById('expiry');
         expiryInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -356,7 +345,6 @@
             e.target.value = value;
         });
 
-        // Validate form on submit
         const paymentForm = document.getElementById('paymentForm');
         paymentForm.addEventListener('submit', function(e) {
             const cardNumber = cardInput.value.replace(/\s/g, '');
@@ -366,26 +354,22 @@
 
             let isValid = true;
 
-            // Validate card number (basic check)
             if (cardNumber.length < 13 || cardNumber.length > 19) {
                 alert('Please enter a valid card number');
                 isValid = false;
             }
 
-            // Validate expiry date
             const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
             if (!expiryRegex.test(expiry)) {
                 alert('Please enter a valid expiry date in MM/YY format');
                 isValid = false;
             }
 
-            // Validate CVV
             if (cvv.length < 3 || cvv.length > 4) {
                 alert('Please enter a valid CVV code');
                 isValid = false;
             }
 
-            // Validate shipping address
             if (shippingAddress.trim().length < 10) {
                 alert('Please enter a valid shipping address (at least 10 characters)');
                 isValid = false;
@@ -396,7 +380,6 @@
             }
         });
 
-        // Load saved payment details
         document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
             fetch('/Payment/GetSavedPaymentDetails')
                 .then(response => response.json())
@@ -404,7 +387,6 @@
                     if (data.success) {
                         document.getElementById('fullname').value = data.cardholderName || '';
                         document.getElementById('shippingAddress').value = data.shippingAddress || '';
-                        // For security reasons, we don't autofill the full card number, expiry or CVV
                     } else {
                         alert('No saved payment details found');
                     }

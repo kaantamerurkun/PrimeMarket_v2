@@ -9,7 +9,6 @@
 
     <title>@ViewData["Title"] - PrimeMarket</title>
     <style>
-        /* Add only the necessary styles for the sticky footer */
         html {
             height: 100%;
         }
@@ -17,7 +16,7 @@
         body {
             min-height: 100%;
             position: relative;
-            padding-bottom: 80px; /* Height of the footer plus some padding */
+            padding-bottom: 80px; 
         }
 
         footer {
@@ -29,7 +28,6 @@
             width: 100%;
         }
 
-        /* Your existing styles */
         .search-box {
             position: relative;
             width: 300px;
@@ -58,9 +56,6 @@
             cursor: pointer;
             padding: 8px;
         }
-
-        /* Style for searchpagestyle.css */
-        /* This is for the standalone search page */
 
         .search-body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -118,7 +113,6 @@
                     background-color: #0055b3;
                 }
 
-        /* Added styles for consistent 4-item grid display */
         .results-container {
             margin-top: 30px;
             padding: 0 20px;
@@ -164,7 +158,6 @@
                 object-fit: cover;
             }
 
-        /* Responsive breakpoints */
         @@media (max-width: 1200px) {
             .results-grid
 
@@ -201,7 +194,6 @@
 
         }
 
-        /* Container for the entire page */
         .container {
             width: 100%;
             max-width: 1400px;
@@ -248,24 +240,18 @@
                     searchForm.addEventListener('submit', function(e) {
                         const query = searchInput.value.trim();
 
-                        // If query is just a number without a # prefix
                         if (/^\d+$/.test(query)) {
-                            // Create or show the ID search modal
                             showIdSearchModal();
                             e.preventDefault();
 
-                            // Suggest the correct format
                             searchInput.value = '#' + query;
                         }
                     });
                 }
 
-                // Function to show ID search modal
                 function showIdSearchModal() {
-                    // Check if modal already exists
                     let modal = document.getElementById('idSearchModal');
 
-                    // If not, create it
                     if (!modal) {
                         modal = document.createElement('div');
                         modal.id = 'idSearchModal';
@@ -294,19 +280,16 @@
 
                         document.body.appendChild(modal);
 
-                        // Add event listener to close button
                         document.getElementById('closeModal').addEventListener('click', function() {
                             modal.style.display = 'none';
                         });
 
-                        // Close modal if clicked outside
                         modal.addEventListener('click', function(e) {
                             if (e.target === modal) {
                                 modal.style.display = 'none';
                             }
                         });
                     } else {
-                        // Show existing modal
                         modal.style.display = 'flex';
                     }
                 }

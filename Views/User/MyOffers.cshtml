@@ -334,7 +334,6 @@
         color: #721c24;
     }
 
-    /* Modal styles */
     .modal {
         display: none;
         position: fixed;
@@ -392,7 +391,6 @@
         cursor: pointer;
     }
 
-    /* Responsive styles */
     @@media (max-width: 768px) {
         .offer-card
 
@@ -417,7 +415,6 @@
         const btnConfirm = document.getElementById('confirmCancel');
         let currentOfferId = null;
 
-        // Open modal when cancel button is clicked
         btnsCancel.forEach(btn => {
             btn.addEventListener('click', function() {
                 currentOfferId = this.getAttribute('data-offer-id');
@@ -425,30 +422,25 @@
             });
         });
 
-        // Close modal when X is clicked
         if (btnClose) {
             btnClose.addEventListener('click', function() {
                 modal.style.display = 'none';
             });
         }
 
-        // Close modal when "No, Keep Offer" is clicked
         if (btnCloseModal) {
             btnCloseModal.addEventListener('click', function() {
                 modal.style.display = 'none';
             });
         }
 
-        // Handle offer cancellation
         if (btnConfirm) {
             btnConfirm.addEventListener('click', function() {
                 if (currentOfferId) {
-                    // Create a form to submit the POST request
                     const form = document.createElement('form');
                     form.method = 'POST';
                     form.action = '/User/CancelOffer';
 
-                    // Add CSRF token
                     const csrfToken = document.querySelector('input[name="__RequestVerificationToken"]');
                     if (csrfToken) {
                         const tokenInput = document.createElement('input');
@@ -458,21 +450,18 @@
                         form.appendChild(tokenInput);
                     }
 
-                    // Add the offer ID
                     const offerIdInput = document.createElement('input');
                     offerIdInput.type = 'hidden';
                     offerIdInput.name = 'offerId';
                     offerIdInput.value = currentOfferId;
                     form.appendChild(offerIdInput);
 
-                    // Append the form to the document and submit it
                     document.body.appendChild(form);
                     form.submit();
                 }
             });
         }
 
-        // Close modal when clicking outside of it
         window.addEventListener('click', function(event) {
             if (event.target === modal) {
                 modal.style.display = 'none';

@@ -139,13 +139,10 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Auto-send verification code when page loads
             sendVerificationCode();
 
-            // Handle verification button click
             document.getElementById('verifyButton').addEventListener('click', verifyCode);
 
-            // Handle resend link click
             document.getElementById('resendCode').addEventListener('click', function(e) {
                 e.preventDefault();
                 sendVerificationCode();
@@ -156,7 +153,6 @@
             const email = document.getElementById("email").value;
             const resendLink = document.getElementById("resendCode");
 
-            // Temporarily disable resend link
             resendLink.style.opacity = "0.5";
             resendLink.style.pointerEvents = "none";
             resendLink.textContent = "Sending code...";
@@ -173,7 +169,6 @@
             .then(() => {
                 showMessage("Failed to send verification code. Please try again.", true);
 
-                // Re-enable resend link after 30 seconds
                 setTimeout(() => {
                     resendLink.style.opacity = "1";
                     resendLink.style.pointerEvents = "auto";
@@ -184,7 +179,6 @@
                 console.error(err);
                 showMessage("Verification code sent! Please check your email.", false);
 
-                // Re-enable resend link immediately on error
                 resendLink.style.opacity = "1";
                 resendLink.style.pointerEvents = "auto";
                 resendLink.textContent = "Didn't receive a code? Send again";
@@ -201,7 +195,6 @@
                 return;
             }
 
-            // Disable button during verification
             verifyButton.disabled = true;
             verifyButton.textContent = "Verifying...";
 

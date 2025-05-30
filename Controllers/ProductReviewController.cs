@@ -34,7 +34,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the listing
                 var listing = await _context.Listings
                     .FirstOrDefaultAsync(l => l.Id == listingId);
 
@@ -43,13 +42,11 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "Listing not found." });
                 }
 
-                // Check if this is a first-hand listing
                 if (listing.Condition != "First-Hand")
                 {
                     return Json(new { success = false, message = "Reviews are only allowed for first-hand products." });
                 }
 
-                // Check if user has purchased this product
                 var hasPurchased = await _context.Purchases
                     .Include(p => p.Confirmation)
                     .AnyAsync(p => p.BuyerId == userId.Value &&
@@ -63,7 +60,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "You can only review products you have purchased and received." });
                 }
 
-                // Check if user has already reviewed this product
                 var existingReview = await _context.ProductReviews
                     .FirstOrDefaultAsync(r => r.UserId == userId.Value && r.ListingId == listingId);
 
@@ -72,7 +68,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { success = false, message = "You have already reviewed this product." });
                 }
 
-                // Create new review
                 var review = new ProductReview
                 {
                     ListingId = listingId,
@@ -145,7 +140,6 @@ namespace PrimeMarket.Controllers
 
             try
             {
-                // Get the listing
                 var listing = await _context.Listings
                     .FirstOrDefaultAsync(l => l.Id == listingId);
 
@@ -154,13 +148,11 @@ namespace PrimeMarket.Controllers
                     return Json(new { canReview = false, message = "Listing not found." });
                 }
 
-                // Check if this is a first-hand listing
                 if (listing.Condition != "First-Hand")
                 {
                     return Json(new { canReview = false, message = "Reviews are only allowed for first-hand products." });
                 }
 
-                // Check if user has purchased this product
                 var hasPurchased = await _context.Purchases
                     .Include(p => p.Confirmation)
                     .AnyAsync(p => p.BuyerId == userId.Value &&
@@ -174,7 +166,6 @@ namespace PrimeMarket.Controllers
                     return Json(new { canReview = false, message = "You can only review products you have purchased and received." });
                 }
 
-                // Check if user has already reviewed this product
                 var hasReviewed = await _context.ProductReviews
                     .AnyAsync(r => r.UserId == userId.Value && r.ListingId == listingId);
 

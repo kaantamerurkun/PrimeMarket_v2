@@ -283,7 +283,6 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Format card number with spaces
         const cardInput = document.getElementById('cardnumber');
         cardInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -293,7 +292,6 @@
             e.target.value = value;
         });
 
-        // Format expiry date with slash
         const expiryInput = document.getElementById('expiry');
         expiryInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -305,7 +303,6 @@
             e.target.value = value;
         });
 
-        // Validate form on submit
         const paymentForm = document.getElementById('paymentForm');
         paymentForm.addEventListener('submit', function(e) {
             const cardNumber = cardInput.value.replace(/\s/g, '');
@@ -315,26 +312,22 @@
 
             let isValid = true;
 
-            // Validate card number (basic check)
             if (cardNumber.length < 13 || cardNumber.length > 19) {
                 alert('Please enter a valid card number');
                 isValid = false;
             }
 
-            // Validate expiry date
             const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
             if (!expiryRegex.test(expiry)) {
                 alert('Please enter a valid expiry date in MM/YY format');
                 isValid = false;
             }
 
-            // Validate CVV
             if (cvv.length < 3 || cvv.length > 4) {
                 alert('Please enter a valid CVV code');
                 isValid = false;
             }
 
-            // Validate shipping address
             if (shippingAddress.trim().length < 10) {
                 alert('Please enter a valid shipping address (at least 10 characters)');
                 isValid = false;
@@ -345,7 +338,6 @@
             }
         });
 
-        // Load saved payment details
         document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
             fetch('/Payment/GetSavedPaymentDetails')
                 .then(response => response.json())
@@ -353,7 +345,6 @@
                     if (data.success) {
                         document.getElementById('fullname').value = data.cardholderName || '';
                         document.getElementById('shippingAddress').value = data.shippingAddress || '';
-                        // For security reasons, we don't autofill the full card number, expiry or CVV
                     } else {
                         alert('No saved payment details found');
                     }

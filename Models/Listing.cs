@@ -8,7 +8,6 @@ using Monitor = PrimeMarket.Models.Products.Monitor;
 
 namespace PrimeMarket.Models
 {
-    // Modified Listing entity to support the relationship with specific product types
     public class Listing : BaseEntity
     {
         [Required]
@@ -24,9 +23,8 @@ namespace PrimeMarket.Models
         public string Description { get; set; }
 
         [Required]
-        public string Condition { get; set; } // First-Hand, Second-Hand
+        public string Condition { get; set; } 
 
-        // Add stock tracking for First-Hand listings
         public int? Stock { get; set; }
 
         [Required]
@@ -45,7 +43,6 @@ namespace PrimeMarket.Models
         public string? RejectionReason { get; set; }
         public int? ViewCount { get; set; } = 0;
 
-        // Navigation properties
         [ForeignKey("SellerId")]
         public virtual User Seller { get; set; }
         public virtual ICollection<ListingImage> Images { get; set; }
@@ -55,20 +52,16 @@ namespace PrimeMarket.Models
         public virtual ICollection<Purchase> Purchases { get; set; }
         public virtual ICollection<ProductReview> Reviews { get; set; }
 
-        // Product type relationships
         public virtual BaseProduct Product { get; set; }
 
-        // Phones
         public virtual IOSPhone IOSPhone { get; set; }
         public virtual AndroidPhone AndroidPhone { get; set; }
         public virtual OtherPhone OtherPhone { get; set; }
 
-        // Tablets
         public virtual IOSTablet IOSTablet { get; set; }
         public virtual AndroidTablet AndroidTablet { get; set; }
         public virtual OtherTablet OtherTablet { get; set; }
 
-        // Computers
         public virtual Laptop Laptop { get; set; }
         public virtual Desktop Desktop { get; set; }
         public virtual ComputerComponent ComputerComponent { get; set; }
@@ -76,14 +69,12 @@ namespace PrimeMarket.Models
         public virtual Keyboard Keyboard { get; set; }
 
 
-        // White Goods
         public virtual Washer Washer { get; set; }
         public virtual Dishwasher Dishwasher { get; set; }
         public virtual Fridge Fridge { get; set; }
         public virtual Oven Oven { get; set; }
 
 
-        // Electrical Domestic Appliances
         public virtual VacuumCleaner VacuumCleaner { get; set; }
         public virtual MicrowaveOven MicrowaveOven { get; set; }
         public virtual Stove Stove { get; set; }
@@ -93,10 +84,8 @@ namespace PrimeMarket.Models
         public virtual SewingMachine SewingMachine { get; set; }
 
 
-        // Televisions
         public virtual Television Television { get; set; }
 
-        // Accessories
         public virtual PhoneAccessory PhoneAccessory { get; set; }
         public virtual TabletAccessory TabletAccessory { get; set; }
         public virtual ComputerAccessory ComputerAccessory { get; set; }
@@ -110,7 +99,6 @@ namespace PrimeMarket.Models
         public virtual HeatingCooling HeatingCooling { get; set; }
         public virtual Camera Camera { get; set; }
 
-        //Other
         public virtual Other Other { get; set; }
     }
 }

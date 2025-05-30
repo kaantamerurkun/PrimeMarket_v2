@@ -17,17 +17,17 @@ body {
 }
 
     .star-rating .star {
-        font-size: 45px !important; /* Important to override inline styles */
-        color: #ddd !important; /* Light gray for default state */
+        font-size: 45px !important; 
+        color: #ddd !important;
         transition: color 0.2s ease;
     }
 
         .star-rating .star.hover {
-            color: #FEBA00 !important; /* Yellow for hover state */
+            color: #FEBA00 !important; 
         }
 
         .star-rating .star.selected {
-            color: #FEBA00 !important; /* Yellow for selected state */
+            color: #FEBA00 !important; 
         }
 
 .seller-rating {

@@ -103,7 +103,6 @@
                     </label>
                 </div>
 
-                <!-- Hidden fields for quantities -->
                 <div id="quantities-container">
                     @foreach (var item in Model.Items)
                     {
@@ -469,40 +468,31 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Get all the elements we need - with null checks
         const quantityInputs = document.querySelectorAll('.quantity-input') || [];
         const decreaseButtons = document.querySelectorAll('.decrease-btn') || [];
         const increaseButtons = document.querySelectorAll('.increase-btn') || [];
         const checkoutTotal = document.getElementById('checkout-total');
         const paymentAmount = document.getElementById('payment-amount');
 
-        // Calculate initial total
         updateTotalAmount();
 
-        // Handle quantity changes
         quantityInputs.forEach(input => {
             input.addEventListener('change', function() {
                 const itemId = this.getAttribute('data-id');
 
-                // Validate input value
                 if (this.value < 1) this.value = 1;
                 if (this.value > 99) this.value = 99;
 
-                // Update hidden input
                 document.getElementById(`quantity-input-${itemId}`).value = this.value;
 
-                // Update quantity text
                 document.getElementById(`quantity-text-${itemId}`).textContent = this.value;
 
-                // Update item total
                 updateItemTotal(itemId);
 
-                // Update order total
                 updateTotalAmount();
             });
         });
 
-        // Handle decrease button clicks
         decreaseButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const itemId = this.getAttribute('data-id');
@@ -512,22 +502,17 @@
                 if (currentValue > 1) {
                     input.value = currentValue - 1;
 
-                    // Update hidden input
                     document.getElementById(`quantity-input-${itemId}`).value = input.value;
 
-                    // Update quantity text
                     document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
 
-                    // Update item total
                     updateItemTotal(itemId);
 
-                    // Update order total
                     updateTotalAmount();
                 }
             });
         });
 
-        // Handle increase button clicks
         increaseButtons.forEach(button => {
             button.addEventListener('click', function() {
                 const itemId = this.getAttribute('data-id');
@@ -537,29 +522,23 @@
                 if (currentValue < 99) {
                     input.value = currentValue + 1;
 
-                    // Update hidden input
                     document.getElementById(`quantity-input-${itemId}`).value = input.value;
 
-                    // Update quantity text
                     document.getElementById(`quantity-text-${itemId}`).textContent = input.value;
 
-                    // Update item total
                     updateItemTotal(itemId);
 
-                    // Update order total
                     updateTotalAmount();
                 }
             });
         });
 
-        // Function to update item total
         function updateItemTotal(itemId) {
             const itemSummary = document.querySelector(`.item-summary[data-bookmark-id="${itemId}"]`);
             if (!itemSummary) return;
 
             const price = parseFloat(itemSummary.getAttribute('data-price'));
 
-            // Safely get quantity
             let quantity = 1;
             const quantityInput = document.querySelector(`.quantity-input[data-id="${itemId}"]`);
             if (quantityInput && quantityInput.value) {
@@ -573,7 +552,6 @@
             }
         }
 
-        // Function to update total amount
         function updateTotalAmount() {
             let total = 0;
             const itemSummaries = document.querySelectorAll('.item-summary');
@@ -582,13 +560,11 @@
                 const price = parseFloat(item.getAttribute('data-price'));
                 const bookmarkId = item.getAttribute('data-bookmark-id');
 
-                // Get quantity - safely handle missing elements
                 let quantity = 1;
                 const quantityElement = document.querySelector(`.quantity-input[data-id="${bookmarkId}"]`);
                 if (quantityElement && quantityElement.value) {
                     quantity = parseInt(quantityElement.value);
                 } else {
-                    // Try getting from quantity-display if input not found
                     const displayElement = item.querySelector('.quantity-display');
                     if (displayElement) {
                         quantity = parseInt(displayElement.textContent) || 1;
@@ -598,17 +574,14 @@
                 total += price * quantity;
             });
 
-            // Safely update UI elements
             if (checkoutTotal) checkoutTotal.textContent = formatCurrency(total);
             if (paymentAmount) paymentAmount.textContent = formatCurrency(total);
         }
 
-        // Function to format currency
         function formatCurrency(amount) {
             return new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' }).format(amount);
         }
 
-        // Format card number with spaces
         const cardInput = document.getElementById('cardNumber');
         cardInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -618,7 +591,6 @@
             e.target.value = value;
         });
 
-        // Format expiry date with slash
         const expiryInput = document.getElementById('expiryDate');
         expiryInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
@@ -630,7 +602,6 @@
             e.target.value = value;
         });
 
-        // Validate form on submit
         const paymentForm = document.getElementById('paymentForm');
         paymentForm.addEventListener('submit', function(e) {
             const cardNumber = cardInput.value.replace(/\s/g, '');
@@ -640,26 +611,22 @@
 
             let isValid = true;
 
-            // Validate card number (basic check)
             if (cardNumber.length < 13 || cardNumber.length > 19) {
                 alert('Please enter a valid card number');
                 isValid = false;
             }
 
-            // Validate expiry date
             const expiryRegex = /^(0[1-9]|1[0-2])\/\d{2}$/;
             if (!expiryRegex.test(expiry)) {
                 alert('Please enter a valid expiry date in MM/YY format');
                 isValid = false;
             }
 
-            // Validate CVV
             if (cvv.length < 3 || cvv.length > 4) {
                 alert('Please enter a valid CVV code');
                 isValid = false;
             }
 
-            // Validate shipping address
             if (shippingAddress.trim().length < 10) {
                 alert('Please enter a valid shipping address (at least 10 characters)');
                 isValid = false;
@@ -670,7 +637,6 @@
             }
         });
 
-        // Load saved payment details
         document.getElementById('loadSavedDetails')?.addEventListener('click', function() {
             fetch('/Payment/GetSavedPaymentDetails')
                 .then(response => response.json())
@@ -678,7 +644,6 @@
                     if (data.success) {
                         document.getElementById('cardholderName').value = data.cardholderName || '';
                         document.getElementById('shippingAddress').value = data.shippingAddress || '';
-                        // For security reasons, we don't autofill the full card number, expiry or CVV
                     } else {
                         alert('No saved payment details found');
                     }

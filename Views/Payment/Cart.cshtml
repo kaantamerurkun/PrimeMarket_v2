@@ -4,6 +4,7 @@
     Layout = "~/Views/Shared/_LayoutUser.cshtml";
 }
 <style>
+    
     .item-details h3 {
         margin: 0 0 10px 0;
         font-size: 16px;
@@ -283,7 +284,8 @@
         text-align: center;
     }
 
-    }</style>
+    }
+    </style>
 
 <div class="container" style="margin-top: 120px; margin-bottom: 50px;">
     <h1>Shopping Cart</h1>
@@ -404,13 +406,12 @@
         }
 
         function clamp(row, qty) {
-    const max = Number(row.dataset.maxStock);          // NaN when attribute is absent
+    const max = Number(row.dataset.maxStock);          
     if (!Number.isNaN(max) && qty > max) return max;
             if (qty < 1)          return 1;
             return qty;
         }
 
-        /* quantity + / - */
         document.querySelectorAll('.quantity-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const row  = btn.closest('.cart-item');
@@ -426,11 +427,9 @@
             });
         });
 
-        /* initial calc on load */
         document.querySelectorAll('.cart-item').forEach(recalcLine);
         recalcCart();
 
-        /* remove item */
         document.querySelectorAll('.btn-remove').forEach(btn => {
             btn.addEventListener('click', () => {
                 const id = btn.dataset.id;
@@ -451,7 +450,6 @@
             });
         });
 
-        /* ---- CHECKOUT ALL: persist quantities then redirect ---- */
         document.querySelector('.btn-checkout-all')?.addEventListener('click', function (e) {
             e.preventDefault();
             const cartItemsData = [];

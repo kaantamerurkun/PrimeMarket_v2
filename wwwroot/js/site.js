@@ -1,40 +1,29 @@
-﻿// site.js - Main JavaScript for PrimeMarket
-
-// Wait for DOM to be fully loaded
+﻿
 document.addEventListener('DOMContentLoaded', function () {
-    // Initialize notifications system
     initializeNotifications();
 
-    // Initialize message system
     initializeMessages();
 
-    // Initialize UI components
     initializeUIComponents();
 
-    // Handle bookmarks and cart
     initializeBookmarks();
 });
 
-// Notifications System
 function initializeNotifications() {
     const notificationBell = document.getElementById('listingNotificationBell');
     const notificationDropdown = document.getElementById('listingNotificationDropdown');
 
     if (!notificationBell || !notificationDropdown) return;
 
-    // Load notifications
     loadNotifications();
 
-    // Set up polling for new notifications (every 30 seconds)
     setInterval(loadNotifications, 30000);
 
-    // Toggle notification dropdown
     notificationBell.addEventListener('click', function (e) {
         e.stopPropagation();
         toggleDropdown(notificationDropdown);
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function (event) {
         if (!notificationDropdown.contains(event.target) && event.target !== notificationBell) {
             notificationDropdown.style.display = 'none';
@@ -59,7 +48,6 @@ function updateNotificationUI(notifications, unreadCount) {
 
     if (!notificationBell || !notificationDropdown) return;
 
-    // Update unread count badge
     const badge = document.getElementById('notification-badge') || createBadge();
     if (unreadCount > 0) {
         badge.textContent = unreadCount;
@@ -68,10 +56,8 @@ function updateNotificationUI(notifications, unreadCount) {
         badge.style.display = 'none';
     }
 
-    // Clear existing notifications
     notificationDropdown.innerHTML = '';
 
-    // Add new notifications
     if (notifications.length === 0) {
         const emptyNotice = document.createElement('p');
         emptyNotice.className = 'notification-item empty';
@@ -94,20 +80,17 @@ function updateNotificationUI(notifications, unreadCount) {
 
             notificationDropdown.appendChild(notificationItem);
 
-            // Handle mark as read button
             const markReadBtn = notificationItem.querySelector('.mark-read-btn');
             markReadBtn.addEventListener('click', function (e) {
                 e.stopPropagation();
                 markNotificationAsRead(notification.id);
             });
 
-            // Make the notification clickable based on type
             notificationItem.addEventListener('click', function () {
                 handleNotificationClick(notification);
             });
         });
 
-        // Add "View All" link
         const viewAllLink = document.createElement('a');
         viewAllLink.href = '/Notifications/Index';
         viewAllLink.className = 'view-all-link';
@@ -150,17 +133,15 @@ function markNotificationAsRead(notificationId) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                loadNotifications(); // Refresh notifications
+                loadNotifications(); 
             }
         })
         .catch(error => console.error('Error marking notification as read:', error));
 }
 
 function handleNotificationClick(notification) {
-    // Mark as read first
     markNotificationAsRead(notification.id);
 
-    // Redirect based on notification type
     switch (notification.type) {
         case 'ListingApproved':
         case 'ListingRejected':
@@ -186,33 +167,27 @@ function handleNotificationClick(notification) {
     }
 }
 
-// Messaging System
 function initializeMessages() {
     const messageIcon = document.getElementById('messageNotificationBell');
     const messageDropdown = document.getElementById('messageNotificationDropdown');
 
     if (!messageIcon || !messageDropdown) return;
 
-    // Load unread messages count
     loadUnreadMessageCount();
 
-    // Set up polling for new messages (every 30 seconds)
     setInterval(loadUnreadMessageCount, 30000);
 
-    // Toggle message dropdown
     messageIcon.addEventListener('click', function (e) {
         e.stopPropagation();
         toggleDropdown(messageDropdown);
     });
 
-    // Close dropdown when clicking outside
     document.addEventListener('click', function (event) {
         if (!messageDropdown.contains(event.target) && event.target !== messageIcon) {
             messageDropdown.style.display = 'none';
         }
     });
 
-    // Handle chat form submission
     const chatForm = document.getElementById('chatForm');
     if (chatForm) {
         chatForm.addEventListener('submit', function (e) {
@@ -294,10 +269,8 @@ function sendMessage() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Add message to chat
                 appendMessage(data.message);
 
-                // Clear input
                 messageInput.value = '';
             }
         })
@@ -311,7 +284,6 @@ function appendMessage(message) {
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${message.sentByMe ? 'you' : ''}`;
 
-    // Assuming you have a profile image for the current user
     const currentUserImage = document.getElementById('currentUserImage').value || '/images/placeholder.png';
 
     messageDiv.innerHTML = `
@@ -324,13 +296,10 @@ function appendMessage(message) {
 
     chatMessages.appendChild(messageDiv);
 
-    // Scroll to bottom
     chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-// UI Components
 function initializeUIComponents() {
-    // Toggle dropdowns
     const dropdownToggles = document.querySelectorAll('[data-toggle="dropdown"]');
     dropdownToggles.forEach(toggle => {
         const targetId = toggle.getAttribute('data-target');
@@ -344,10 +313,8 @@ function initializeUIComponents() {
         }
     });
 
-    // Initialize image gallery in listing details
     initializeImageGallery();
 
-    // Initialize form validations
     initializeFormValidations();
 }
 
@@ -355,7 +322,6 @@ function toggleDropdown(dropdown) {
     if (dropdown.style.display === 'block') {
         dropdown.style.display = 'none';
     } else {
-        // Close all other dropdowns first
         document.querySelectorAll('.dropdown-menu').forEach(menu => {
             if (menu !== dropdown) {
                 menu.style.display = 'none';
@@ -375,7 +341,6 @@ function initializeImageGallery() {
         thumbnail.addEventListener('click', function () {
             mainImage.src = this.src.replace(/\/\d+\/\d+$/, '/800/600');
 
-            // Add active class to selected thumbnail
             thumbnails.forEach(thumb => thumb.classList.remove('active'));
             this.classList.add('active');
         });
@@ -383,7 +348,6 @@ function initializeImageGallery() {
 }
 
 function initializeFormValidations() {
-    // Validate listing form
     const listingForm = document.getElementById('listingForm');
     if (listingForm) {
         listingForm.addEventListener('submit', function (e) {
@@ -393,7 +357,6 @@ function initializeFormValidations() {
         });
     }
 
-    // Validate payment form
     const paymentForm = document.getElementById('paymentForm');
     if (paymentForm) {
         paymentForm.addEventListener('submit', function (e) {
@@ -433,7 +396,6 @@ function validateListingForm() {
         isValid = false;
     }
 
-    // Only require images for new listings, not edits
     if (images && images.files.length === 0 && !document.querySelector('.edit-listing')) {
         showError(images, 'Please upload at least one image');
         isValid = false;
@@ -487,14 +449,12 @@ function showError(element, message) {
     errorElement.textContent = message;
     element.style.borderColor = 'red';
 
-    // Clear error on input change
     element.addEventListener('input', function () {
         this.style.borderColor = '';
         errorElement.textContent = '';
     }, { once: true });
 }
 
-// Helper Functions
 function formatTimeAgo(date) {
     const seconds = Math.floor((new Date() - date) / 1000);
 
@@ -550,9 +510,7 @@ function isValidCVV(cvv) {
     return cleanCVV.length >= 3 && cleanCVV.length <= 4;
 }
 
-// Bookmarks and Cart
 function initializeBookmarks() {
-    // Toggle bookmark
     const bookmarkBtns = document.querySelectorAll('.btn-bookmark');
     bookmarkBtns.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -561,7 +519,6 @@ function initializeBookmarks() {
         });
     });
 
-    // Add to cart
     const addToCartBtns = document.querySelectorAll('.btn-add-to-cart');
     addToCartBtns.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -570,7 +527,6 @@ function initializeBookmarks() {
         });
     });
 
-    // Remove from cart
     const removeFromCartBtns = document.querySelectorAll('.btn-remove-from-cart');
     removeFromCartBtns.forEach(btn => {
         btn.addEventListener('click', function () {
@@ -636,15 +592,12 @@ function removeFromCart(bookmarkId, cartItem) {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                // Remove item from UI
                 if (cartItem) {
                     cartItem.remove();
                 }
 
-                // Update total price
                 updateCartTotal();
 
-                // Show success message
                 showMessage('Item removed from cart successfully!', false);
             } else {
                 showMessage(data.message, true);
@@ -673,7 +626,6 @@ function updateCartTotal() {
         totalElement.textContent = `Total: ${total.toFixed(2)} TL`;
     }
 
-    // Show/hide buy all button
     const buyAllBtn = document.querySelector('.buyall-btn');
     if (buyAllBtn) {
         buyAllBtn.style.display = cartItems.length > 0 ? 'block' : 'none';
@@ -687,7 +639,6 @@ function showMessage(message, isError) {
     messageContainer.className = isError ? 'error-message' : 'success-message';
     messageContainer.style.display = 'block';
 
-    // Hide message after 3 seconds
     setTimeout(() => {
         messageContainer.style.display = 'none';
     }, 3000);

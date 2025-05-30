@@ -49,7 +49,6 @@
 </div>
 
 <script>
-    // Function to show status or error message
     function showMessage(message, isError = false) {
         const statusEl = document.getElementById("statusMessage");
         const errorEl = document.getElementById("errorMessage");
@@ -65,7 +64,6 @@
         }
     }
 
-    // When the page loads, trigger sending verification code
     window.addEventListener("DOMContentLoaded", function () {
         const email = document.getElementById("newEmail").value;
         if (email) {
@@ -73,7 +71,6 @@
         }
     });
 
-    // Handle resend button
     document.getElementById("resendBtn").addEventListener("click", function() {
         const email = document.getElementById("newEmail").value;
         if (email) {
@@ -88,7 +85,6 @@
         }
     });
 
-    // Function to send verification code
     function sendVerificationCode(email) {
         return fetch('/User/SendVerificationCode', {
             method: 'POST',
@@ -108,7 +104,6 @@
         });
     }
 
-    // Handle form submission for code verification
     document.getElementById("codeForm").addEventListener("submit", function (e) {
         e.preventDefault();
 

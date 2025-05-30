@@ -14,7 +14,6 @@ namespace PrimeMarket.Data
         {
         }
 
-        // Main entities
         public DbSet<User> Users { get; set; }
         public DbSet<Listing> Listings { get; set; }
         public DbSet<ListingImage> ListingImages { get; set; }
@@ -30,7 +29,6 @@ namespace PrimeMarket.Data
         public DbSet<Admin> Admins { get; set; }
         public DbSet<AdminAction> AdminActions { get; set; }
 
-        // Product entities
         public DbSet<IOSPhone> IOSPhones { get; set; }
         public DbSet<AndroidPhone> AndroidPhones { get; set; }
         public DbSet<OtherPhone> OtherPhones { get; set; }
@@ -77,9 +75,7 @@ namespace PrimeMarket.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Configure entity relationships
 
-            // User relationships
             modelBuilder.Entity<User>()
                 .HasMany(u => u.Listings)
                 .WithOne(l => l.Seller)
@@ -133,7 +129,6 @@ namespace PrimeMarket.Data
                 .WithOne(v => v.User)
                 .HasForeignKey<VerificationDocument>(v => v.UserId);
 
-            // Listing relationships
             modelBuilder.Entity<Listing>()
                 .HasMany(l => l.Images)
                 .WithOne(i => i.Listing)
@@ -160,7 +155,6 @@ namespace PrimeMarket.Data
                 .HasForeignKey(p => p.ListingId);
 
 
-            // Configure unique constraints
             modelBuilder.Entity<User>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
@@ -175,13 +169,11 @@ namespace PrimeMarket.Data
                 .HasForeignKey(b => b.UserId)
                 .OnDelete(DeleteBehavior.NoAction);
 
-            // Purchase confirmation relationship
             modelBuilder.Entity<Purchase>()
                 .HasOne(p => p.Confirmation)
                 .WithOne(c => c.Purchase)
                 .HasForeignKey<PurchaseConfirmation>(c => c.PurchaseId);
 
-            // Offer relationships
             modelBuilder.Entity<Offer>()
                 .HasOne(o => o.Messages)
                 .WithOne()
@@ -217,15 +209,11 @@ namespace PrimeMarket.Data
                 .HasForeignKey(sr => sr.PurchaseId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Ensure one rating per purchase
             modelBuilder.Entity<SellerRating>()
                 .HasIndex(sr => new { sr.BuyerId, sr.SellerId, sr.PurchaseId })
                 .IsUnique();
 
-            // Configure one-to-one relationships between Listing and product types
-            // This ensures that a Listing can only have one specific product type
 
-            // Phone product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.IOSPhone)
                 .WithOne(p => p.Listing)
@@ -241,7 +229,6 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<OtherPhone>(p => p.ListingId);
 
-            // Tablet product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.IOSTablet)
                 .WithOne(p => p.Listing)
@@ -257,7 +244,6 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<OtherTablet>(p => p.ListingId);
 
-            // Computer product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Laptop)
                 .WithOne(p => p.Listing)
@@ -268,7 +254,6 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Desktop>(p => p.ListingId);
 
-            // White Goods product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Washer)
                 .WithOne(p => p.Listing)
@@ -289,19 +274,16 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Oven>(p => p.ListingId);
 
-            // Electrical Domestic Appliances product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.VacuumCleaner)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<VacuumCleaner>(p => p.ListingId);
 
-            // Television product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Television)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Television>(p => p.ListingId);
 
-            // Accessories product types
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.PhoneAccessory)
                 .WithOne(p => p.Listing)
@@ -317,108 +299,97 @@ namespace PrimeMarket.Data
                 .WithOne(p => p.Listing)
                 .HasForeignKey<ComputerAccessory>(p => p.ListingId);
 
-            // Computer Components
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.ComputerComponent)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<ComputerComponent>(p => p.ListingId);
 
-            // Monitor
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Monitor)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Monitor>(p => p.ListingId);
 
-            // Stove
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Stove)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Stove>(p => p.ListingId);
 
-            // Microwave Oven
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.MicrowaveOven)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<MicrowaveOven>(p => p.ListingId);
 
-            // Beverage Preparation
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.BeveragePreparation)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<BeveragePreparation>(p => p.ListingId);
 
-            // Food Preparation
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.FoodPreparation)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<FoodPreparation>(p => p.ListingId);
 
-            // Iron
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Iron)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Iron>(p => p.ListingId);
 
-            // Sewing Machine
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.SewingMachine)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<SewingMachine>(p => p.ListingId);
 
-            // Keyboard
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Keyboard)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Keyboard>(p => p.ListingId);
 
-            // Speaker
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Speaker)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Speaker>(p => p.ListingId);
 
-            // Headphone/Earphone
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.HeadphoneEarphone)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<HeadphoneEarphone>(p => p.ListingId);
 
-            // Webcam
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Webcam)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Webcam>(p => p.ListingId);
 
-            // Microphone
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Microphone)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Microphone>(p => p.ListingId);
 
-            // Mouse
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Mouse)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<Mouse>(p => p.ListingId);
 
-            // Computer Bag
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.ComputerBag)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<ComputerBag>(p => p.ListingId);
-            // SparePart
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.SparePart)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<SparePart>(p => p.ListingId);
 
-            // HeatingCooling
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.HeatingCooling)
                 .WithOne(p => p.Listing)
                 .HasForeignKey<HeatingCooling>(p => p.ListingId);
 
-            // Camera
+
             modelBuilder.Entity<Listing>()
                 .HasOne(l => l.Camera)
                 .WithOne(p => p.Listing)
@@ -438,13 +409,13 @@ namespace PrimeMarket.Data
                 .HasOne(pr => pr.User)
                 .WithMany(u => u.ProductReviews)
                 .HasForeignKey(pr => pr.UserId)
-                .OnDelete(DeleteBehavior.Restrict); // Changed from Cascade to Restrict
+                .OnDelete(DeleteBehavior.Restrict); 
             
             modelBuilder.Entity<ProductReview>()
                 .HasOne(pr => pr.Listing)
                 .WithMany(l => l.Reviews)
                 .HasForeignKey(pr => pr.ListingId)
-                .OnDelete(DeleteBehavior.Cascade); // Keep cascade for listing deletion
+                .OnDelete(DeleteBehavior.Cascade); 
 
             modelBuilder.Entity<Offer>()
                 .HasOne(o => o.Buyer)
